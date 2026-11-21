@@ -1,0 +1,136 @@
+<section class="tw:border-b <%= Pages::Shop::Product::Component::BAND_CLASSES %>">
+  <div class="twwiderow tw:items-center tw:gap-10 tw:pt-12 tw:pb-10 tw:sm:pt-16 tw:sm:pb-14 <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>">
+    <div class="tw:flex tw:flex-col tw:items-start tw:gap-4.5">
+      <%= render(UI::Badge::Component.new(text: translation(".the_bike_index_shop"), color: :yellow, size: :lg)) %>
+
+      <h1
+        class="
+          tw:m-0 tw:font-header tw:text-[38px] tw:leading-[1.05]
+          tw:font-extrabold tw:tracking-tight tw:text-balance
+          tw:sm:text-[54px]
+        "
+      >
+        <%= translation(".gear_that_helps_get_bikes_home") %>
+      </h1>
+
+      <p
+        class="
+          tw:m-0 tw:mb-3.5 tw:max-w-115 tw:text-[19px] tw:leading-normal
+          tw:text-gray-600 tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".lede") %>
+      </p>
+
+      <%= render(UI::ButtonLink::Component.new(href: "##{FIRST_PRODUCT_ID}", text: translation(".shop_the_gear"),
+        color: :yellow, size: :callout, data: {controller: "scroll-to-hash", action: "scroll-to-hash#scroll"})) %>
+    </div>
+
+    <%= image_tag("kelsey/illustrations/comic-assets_bike-hero.png", alt: "", width: 1768, height: 1320, class: "tw:mx-auto tw:w-full tw:max-w-105") %>
+  </div>
+</section>
+
+<%= render(Pages::Shop::Product::Component.new(id: FIRST_PRODUCT_ID, name: translation(".caped_cap_name"),
+  category: translation(".cycling_cap"), sound: translation(".caped_cap_sound"),
+  description: translation(".caped_cap_description"), url: product_url("the-caped-registrant-cap"), price: PRICES[:caped_cap])) do |product| %>
+  <% product.with_media do %>
+    <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:overflow-hidden tw:p-0!")) do %>
+      <div
+        class="
+          tw:flex tw:aspect-4/3 tw:items-center tw:justify-center
+          tw:bg-blue-200 tw:p-8
+        "
+      >
+        <%= image_tag("shop/comic-cap.webp", alt: translation(".caped_cap_alt"), width: 675, height: 395, loading: "lazy",
+          class: "tw:w-full tw:max-w-130 tw:mix-blend-multiply") %>
+      </div>
+    <% end %>
+
+    <span
+      class="tw:-top-5.5 tw:-left-3.5 tw:-rotate-8 tw:text-yellow-300 <%= BURST_CLASSES %>"
+      aria-hidden="true"
+    >
+      <%= translation(".caped_cap_burst") %>
+    </span>
+  <% end %>
+<% end %>
+
+<%= render(Pages::Shop::Product::Component.new(name: translation(".pink_cap_name"), category: translation(".cycling_cap"),
+  sound: translation(".pink_cap_sound"), description: translation(".cycling_cap_description"),
+  url: product_url("bike-index-cycling-cap"), price: PRICES[:cycling_cap], flip: true, band: true)) do |product| %>
+  <% product.with_media do %>
+    <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:overflow-hidden tw:p-0!")) do %>
+      <div
+        class="
+          tw:relative tw:flex tw:aspect-4/3 tw:items-center
+          tw:justify-center tw:bg-white
+        "
+      >
+        <%= image_tag("shop/pink-cap-side.webp", alt: translation(".pink_cap_alt"), width: 912, height: 491, loading: "lazy",
+          class: "tw:w-full tw:max-w-130 tw:px-8 tw:pt-8 tw:pb-16") %>
+
+        <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:absolute tw:bottom-4 tw:left-4 tw:w-[38%] tw:overflow-hidden tw:p-0!")) do %>
+          <div
+            class="
+              tw:flex tw:flex-col tw:items-center tw:bg-white tw:px-2
+              tw:pt-2 tw:pb-1
+            "
+          >
+            <%= image_tag("shop/pink-cap-brim.webp", alt: translation(".pink_cap_brim_alt"), width: 400, height: 231, loading: "lazy", class: "tw:w-full") %>
+
+            <span class="tw:font-[Patrick_Hand,_cursive] tw:text-base tw:text-slate-900">
+              <%= translation(".under_the_brim") %>
+            </span>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+
+    <span
+      class="tw:-top-5.5 tw:-right-2.5 tw:rotate-7 tw:text-[#f0a878] <%= BURST_CLASSES %>"
+      aria-hidden="true"
+    >
+      <%= translation(".pink_cap_burst") %>
+    </span>
+  <% end %>
+<% end %>
+
+<%= render(Pages::Shop::Product::Component.new(id: STICKERS_ID, name: translation(".sticker_name"), category: translation(".for_riders_and_shops"),
+  sound: translation(".sticker_sound"), description: translation(".sticker_description"),
+  url: product_url("bike-index-info-card-sticker"))) do |product| %>
+  <% product.with_media do %>
+    <%= image_tag("shop/sticker-poster.webp", alt: translation(".sticker_alt"), width: 420, height: 590, loading: "lazy", class: "tw:mx-auto tw:w-full tw:max-w-100") %>
+
+    <span
+      class="tw:-top-4.5 tw:left-1 tw:-rotate-6 tw:text-blue-500 <%= BURST_CLASSES %>"
+      aria-hidden="true"
+    >
+      <%= translation(".sticker_burst") %>
+    </span>
+  <% end %>
+
+  <% product.with_pricing do %>
+    <%= render(SharedBlocks::Marketing::NumberBlocks::Component.new(html_class: "tw:mb-5 tw:max-w-100",
+      items: [[PRICES[:sticker], translation(".suggested_retail")], [translation(".for_shops"), translation(".wholesale_pricing_available")]])) %>
+  <% end %>
+
+  <% product.with_note do %>
+    <p class="tw:mt-4 tw:mb-0 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
+      <%= translation(".bulk_orders_html", contact_link: mail_to("support@bikeindex.org", translation(".contact_us"), class: "twlink tw:font-bold")) %>
+    </p>
+  <% end %>
+<% end %>
+
+<%= render(SharedBlocks::Marketing::InvertedBlock::Component.new(layout: :stacked, html_class: "tw:py-16")) do %>
+  <div
+    class="
+      tw:mx-auto tw:flex tw:max-w-250 tw:flex-wrap tw:items-center
+      tw:justify-center tw:gap-10
+    "
+  >
+    <%= image_tag("kelsey/illustrations/comic-assets_logo-cape.png", alt: "", width: 1055, height: 633, loading: "lazy", class: "tw:h-37.5 tw:w-auto") %>
+
+    <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".your_purchase_keeps_bike_index_free"),
+      intro: translation(".mission"), html_class: "tw:min-w-70 tw:flex-1")) %>
+  </div>
+<% end %>

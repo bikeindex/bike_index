@@ -1,0 +1,43 @@
+<%= tag.section(id: @id, class: ["tw:scroll-mt-4", ("tw:border-y #{BAND_CLASSES}" if @band)]) do %>
+  <div
+    class="
+      twwiderow tw:items-center tw:gap-x-14 tw:gap-y-12 tw:py-12 tw:sm:py-18
+      <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>
+    "
+  >
+    <%= tag.div(media, class: media_classes) %>
+
+    <div>
+      <div class="tw:mb-3.5 tw:flex tw:items-center tw:gap-3">
+        <%= render(UI::Badge::Component.new(text: @category, color: :yellow)) %>
+
+        <span
+          class="
+            tw:font-[Bangers,_cursive] tw:text-[28px] tw:text-purple-500
+            tw:dark:text-purple-300
+          "
+          aria-hidden="true"
+        >
+          <%= @sound %>
+        </span>
+      </div>
+
+      <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: @name, intro: @description,
+        html_class: "tw:mb-6 tw:max-w-125")) %>
+
+      <% if @price %>
+        <p class="tw:m-0 tw:mb-5 tw:font-header tw:text-[30px] tw:font-extrabold">
+          <%= @price %>
+        </p>
+      <% end %>
+
+      <%= pricing %>
+
+      <%= render(UI::ButtonLink::Component.new(href: @url, text: translation(".view"), color: :purple, size: :callout,
+        target: "_blank", rel: "noopener",
+        aria: {label: translation(".view_on_the_shop", name: @name)})) %>
+
+      <%= note %>
+    </div>
+  </div>
+<% end %>

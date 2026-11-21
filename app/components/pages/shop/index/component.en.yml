@@ -1,0 +1,53 @@
+---
+en:
+  components:
+    pages:
+      shop:
+        index:
+          bulk_orders_html: "%{contact_link} for bulk orders."
+          caped_cap_alt: The Caped Registrant cap, light blue comic print with purple
+            brim
+          caped_cap_burst: DING!
+          caped_cap_description: >-
+            Our comic art, all over a cycling cap. Bells ding, locks click, and the
+            caped shield keeps watch. Purple brim.
+          caped_cap_name: The Caped Registrant cap
+          caped_cap_sound: SWISH!
+          contact_us: Contact us
+          cycling_cap: Cycling cap
+          cycling_cap_description: >-
+            A lightweight cycling cap in pink or black, with an elastic band. The
+            Bike Index stripes and shield are printed under the brim. Wear it under
+            your helmet or around town.
+          for_riders_and_shops: For riders and shops
+          for_shops: For shops
+          gear_that_helps_get_bikes_home: Gear that helps get bikes home.
+          lede: >-
+            Bike Index is a free, nonprofit registry. Every cap and sticker you buy
+            keeps it free for riders everywhere.
+          mission: >-
+            We're a 501(c)(3) nonprofit. Sales fund the registry, the stolen-bike
+            alerts, and the partner network that helps riders recover their bikes.
+          pink_cap_alt: Illustration of the pink ripstop Bike Index cycling cap, side
+            view
+          pink_cap_brim_alt: 'Underside of the brim: blue and navy stripes with the
+            Bike Index shield'
+          pink_cap_burst: POW!
+          pink_cap_name: Pink or Black Bike Index cap
+          pink_cap_sound: ZOOM!
+          shop_the_gear: Shop the gear
+          sticker_alt: How not to get your bike stolen poster showing the registration
+            sticker
+          sticker_burst: SCAN!
+          sticker_description: >-
+            Stick it on your frame, scan the QR code, and your bike is registered
+            in about two minutes. If your bike is ever lost or stolen, anyone who
+            finds it can scan the sticker and see it belongs to you. Bike shops can
+            stock them too, for new sales, used bikes, and bikes in for service.
+          sticker_name: Bike Index registration stickers
+          sticker_sound: CLICK!
+          suggested_retail: Suggested retail
+          the_bike_index_shop: The Bike Index shop
+          under_the_brim: Under the brim
+          wholesale_pricing_available: Wholesale pricing available
+          your_purchase_keeps_bike_index_free: Your purchase keeps Bike Index free.

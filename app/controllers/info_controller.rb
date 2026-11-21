@@ -12,6 +12,8 @@ class InfoController < ApplicationController
       redirect_to("/membership") && return
     elsif @blog.title_slug == Blog.why_donate_slug
       redirect_to(donate_path) && return
+    elsif @blog.title_slug == Blog.store_slug
+      redirect_to(shop_path) && return
     elsif @blog.id == Blog.theft_rings_id
       redirect_to("/theft-rings") && return
     elsif @blog.blog?
