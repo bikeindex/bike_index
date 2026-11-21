@@ -71,5 +71,16 @@ RSpec.describe "API V3 Authorization specs", type: :request do
         expect(response.response_code).to eq(200)
       end
     end
+    context "token in header and params" do
+      it "responds when the tokens match, 401 when they differ" do
+        get "/api/v3/me", params: {access_token: token.token}, headers: {"Authorization" => "Bearer #{token.token}"}
+        expect(json_result).to eq({"id" => user.id.to_s})
+        expect(response.response_code).to eq(200)
+
+        other_token = create_doorkeeper_token(scopes: "public")
+        get "/api/v3/me", params: {access_token: other_token.token}, headers: {"Authorization" => "Bearer #{token.token}"}
+        expect(response.response_code).to eq(401)
+      end
+    end
   end
 end
