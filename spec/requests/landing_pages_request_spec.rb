@@ -14,6 +14,18 @@ RSpec.describe LandingPagesController, type: :request do
   end
 
   describe "#for_bike_shops" do
+    it "starts the organization signup as a bike shop" do
+      get "/for_bike_shops"
+      expect(response.body).to match("<title>Bike Index for Bike Shops</title>")
+      form = Capybara.string(response.body).find("form[action='/organizations/signup']")
+      fields = form.all("input[name^='organization_signup']", visible: :all).to_h { [it[:name], it[:value]] }
+      expect(fields).to eq("organization_signup[name]" => nil, "organization_signup[email]" => nil, "organization_signup[kind]" => "bike_shop")
+
+      post "/organizations/signup", params: fields.merge("organization_signup[name]" => "Spoke Shop", "organization_signup[email]" => "shop@example.com")
+      expect(response).to redirect_to "/organizations/signup?step=2"
+      expect(OrganizationSignup.last).to have_attributes(name: "Spoke Shop", kind: "bike_shop", email: "shop@example.com")
+    end
+
     it "frames the checker on the visitor's place, and California without a location" do
       get "/for_bike_shops", headers: {"HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
       expect(Capybara.string(response.body)).to have_css("iframe[src^='/ebike-rules/US/IN?']", visible: :all)
@@ -65,7 +77,6 @@ RSpec.describe LandingPagesController, type: :request do
   end
 
   {
-    for_bike_shops: "Bike Index for Bike Shops",
     for_cities: "Bike Index for Cities",
     for_law_enforcement: "Bike Index for Law Enforcement",
     for_schools: "Bike Index for Schools",

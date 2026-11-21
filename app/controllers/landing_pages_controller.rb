@@ -1,9 +1,16 @@
 class LandingPagesController < ApplicationController
   before_action :force_html_response
-  before_action :instantiate_feedback, except: %i[show for_community_groups ascend]
+  before_action :instantiate_feedback, except: %i[show for_bike_shops for_community_groups ascend]
 
   def show
     raise ActionController::RoutingError, "Not found" unless current_organization.present?
+  end
+
+  def for_bike_shops
+    render SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::LandingPages::ForBikeShops::Component.new(
+      recovery_displays: RecoveryDisplay.where.not(quote_by: [nil, ""]), current_user:,
+      checker_place: EbikeRuleServices::Places.from_location(request_location_hash)
+    ))
   end
 
   def for_community_groups
