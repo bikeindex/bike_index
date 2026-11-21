@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    ui:
+      table:
+        in_card:
+          select_record: Select %{record} %{id}
+          toggle_all_checked: Toggle all checked

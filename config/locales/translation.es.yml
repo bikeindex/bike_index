@@ -880,6 +880,7 @@ es:
         traditional_bike: Bicicleta tradicional (2 ruedas, 1 asiento, pedales)
         elliptical: Bicicleta elíptica
         balance_bike: Bicicleta de equilibrio
+        e_atv: e-ATV (e-Quad, vehículo todoterreno eléctrico)
       frame_material:
         aluminum: Aluminio
         composite: Carbono o compuesto
@@ -2570,8 +2571,7 @@ es:
         signed_in_as_other: Has iniciado sesión como %{email}, por lo que mantuvimos
           tu cuenta. El registro sigue guardado en la dirección de correo electrónico
           que te enviamos.
-        sign_out_to_agree: Has iniciado sesión como %{email}. Cierra sesión y vuelve
-          a abrir el enlace para aceptar las normas de seguridad.
+        accept_terms: Acepta los Términos de servicio para continuar.
       find_b_param:
         registration_not_found: No pudimos encontrar ese registro; inicie uno nuevo
           a continuación.
@@ -2607,10 +2607,10 @@ es:
           a continuación.
         link_invalid_resent: Ese enlace ya no funciona, así que le hemos enviado uno
           nuevo por correo electrónico a %{email}.
-        sign_out_to_confirm: Has iniciado sesión como %{email}. Cierra sesión y vuelve
-          a abrir el enlace para activar la organización.
         switched_signup: Estás terminando %{name}. Para terminar también %{replaced_name},
           abre el enlace del correo electrónico.
+        accept_terms: Acepte los Términos de servicio y los Términos de servicio para
+          organizaciones para activar la organización.
       find_signup_for_confirmation:
         signup_not_found: No pudimos encontrar ese registro; crea uno nuevo a continuación.
       redirect_to_organization:
@@ -4826,6 +4826,8 @@ es:
       subject: Mensaje de %{organization_name} sobre tu %{bike_type}
     organization_signup_confirmation:
       subject: Confirma tu correo electrónico para activar %{name} en Bike Index.
+    shop_welcome:
+      subject: El panel de control de tu tienda Bike Index está listo.
   payments:
     form:
       donation_header: "¡Ayúdanos a apoyar nuestros esfuerzos!"
@@ -5490,6 +5492,79 @@ es:
           podrás invitar al resto de tu equipo una vez que hayas iniciado sesión.
         link_signs_you_in: Este enlace te da acceso a Bike Index, así que no lo reenvíes.
           Funciona durante %{days} días.
+      shop_welcome:
+        bike_book_body: Compara las especificaciones, la geometría y muchas otras
+          características de miles de modelos de bicicletas.
+        bookmark_it: Guárdalo en tus favoritos. Iniciarás sesión con esta dirección
+          de correo electrónico.
+        browse_bike_book: Explorar el libro de bicicletas →
+        check_serials: Consulta el registro para mantener seguras las bicicletas usadas
+          que entregues como parte de pago.
+        check_serials_lead: Compruebe los números de serie antes de comprar.
+        check_your_state: Comprueba tu estado →
+        connect_pos_body: Sin conexión a un sistema de punto de venta, registrar las
+          bicicletas depende de que alguien se acuerde de hacerlo durante un día ajetreado.
+          Una vez conectado, cada venta de bicicleta se registra automáticamente en
+          Bike Index. No se necesitan formularios adicionales en el mostrador ni capacitación
+          para el personal. El cliente recibe un correo electrónico para reclamar
+          su bicicleta, con el número de serie y los detalles ya completados.
+        connect_pos_footnote: "¿Necesitas ayuda? Responde a este correo electrónico
+          y te guiaremos. ¿No tienes un TPV compatible? Aún puedes registrar las bicicletas
+          desde tu panel de control."
+        connect_pos_heading: Conecta tu TPV para que no se pierda ninguna bicicleta.
+        connect_pos_impact: Cuantas más bicicletas se registren, más bicicletas robadas
+          se identificarán y se devolverán, y más difícil será vender bicicletas robadas
+          en tu comunidad.
+        connect_your_pos_now: Conecta tu TPV ahora
+        create_your_shop_account: Crea tu cuenta de tienda
+        dashboard_intro: Tu cuenta de tienda es más que un simple registro. Es tu
+          base de operaciones en Bike Index.
+        dashboard_items_heading: Qué puedes hacer desde tu panel de control
+        ebike_checker: comprobador de bicicletas eléctricas
+        ebike_checker_body: Normativa estatal sobre las categorías de bicicletas eléctricas,
+          dónde se pueden usar y requisitos de edad y equipamiento. Muy útil cuando
+          un cliente pregunta qué es legal antes de comprar.
+        email_preferences: Preferencias de correo electrónico
+        free_tools: Pronto habrá novedades, y las cuentas de tienda serán las primeras
+          en recibirlas.
+        free_tools_heading: Herramientas para ayudar a los clientes a elegir
+        free_tools_intro: Úselas en la sala de ventas o envíe el enlace a los clientes.
+        free_tools_lead: Utilice nuestras herramientas gratuitas.
+        hero_body: "%{name} está configurado en Bike Index. En tu panel de control
+          se encuentra cada bicicleta registrada en tu tienda."
+        hero_body_connect_pos: "%{name} está configurado en Bike Index. En tu panel
+          de control se almacenan todas las bicicletas registradas en tu tienda. Solo
+          queda un paso: conecta tu TPV para que cada bicicleta que vendas se registre
+          automáticamente."
+        hero_heading: Ya estás dentro. Tu tienda tiene un panel de control.
+        included_free: Incluido gratis
+        most_important_next_step: Su próximo paso más importante
+        nonprofit: Bike Index, una organización sin fines de lucro 501(c)(3)
+        open_your_dashboard: Abre tu panel de control
+        preheader: El panel de control de tu tienda ya está disponible. Todas las
+          bicicletas registradas en tu tienda aparecen allí.
+        preheader_connect_pos: 'El panel de control de tu tienda ya está activo. Solo
+          queda un paso: conecta tu TPV para que todas las bicicletas que vendas queden
+          registradas.'
+        privacy_policy: Política de privacidad
+        questions: "¿Tienes preguntas sobre la configuración o tu panel de control?
+          Responde a este correo electrónico y un miembro de nuestro equipo de atención
+          al cliente te ayudará."
+        receiving_because: Recibes este mensaje porque creaste una cuenta de tienda
+          para %{name} en Bike Index.
+        see_every_bike: Cada venta aparece en una lista, con número de serie y detalles.
+        see_every_bike_lead: Vea todas las bicicletas que ha registrado.
+        shopify_soon: Shopify próximamente
+        stat_bikes: bicicletas matriculadas
+        stat_partners: tiendas asociadas, policía y ciudades
+        stat_recoveries: Recuperan bicicletas robadas
+        sticker_pos_step: Conecta tu TPV · aproximadamente 10 minutos
+        track_pos: Observa cómo funciona a medida que se registra cada venta.
+        track_pos_lead: Realice un seguimiento de su conexión de punto de venta.
+        why_shops_body: Tus clientes obtienen protección antirrobo gratuita y tu tienda
+          se convierte en un lugar de confianza. Es gratis tanto para ti como para
+          ellos, y nunca vendemos ni compartimos datos de clientes.
+        why_shops_heading: "¿Por qué las tiendas utilizan Bike Index?"
     ui:
       definition_list:
         row:
@@ -5607,6 +5682,9 @@ es:
           none: ninguno
           return_to_default_column_order: Volver al orden de columnas predeterminado
           visible_columns: Columnas visibles
+        in_card:
+          select_record: Seleccione %{record} %{id}
+          toggle_all_checked: Activar/desactivar todas las selecciones
     atoms:
       serial:
         hidden: oculto
@@ -5847,7 +5925,6 @@ es:
             hidden: oculto
             not_registered_with: Oculto porque no está registrado con %{org_name}
             view: Vista
-            toggle_all_checked: Activar/desactivar todas las selecciones
             course_acknowledgment_title: Reconocimiento del curso de educación en
             more_notes: "+%{count} más"
           multi_result_chip:
@@ -6820,6 +6897,15 @@ es:
             confirming_your_email: Confirmando tu correo electrónico
             continue: Continuar
             continue_where_you_left_off: Continúa y retomaremos donde lo dejaste.
+            continuing_keeps_you_signed_in: Si continúas, permanecerás conectado y
+              se guardará el registro en la dirección a la que está dirigido este
+              enlace.
+            i_agree_to_terms: Acepto los Términos de servicio de Bike Index.
+            link_is_for: Este enlace es para
+            read_terms: Lea los Términos de servicio
+            sign_out_to_agree: Quien acceda a este enlace deberá aceptar las normas
+              de seguridad. Cierre sesión y vuelva a abrir el enlace.
+            signed_in_as: Has iniciado sesión como
           step1:
             just_the_essentials: Solo lo esencial para empezar.
             register_your_vehicle: "¡Registra tu vehículo!"
@@ -8338,7 +8424,6 @@ es:
           customer_records_sold_or_shared: registros de clientes vendidos o compartidos
           data_stays_private: Sus datos permanecen privados.
           data_stays_private_body: Nunca vendido, nunca compartido.
-          ding: "¡TIMBRE!"
           ebike_legality_checker: Comprobador de legalidad de bicicletas eléctricas
           ebike_legality_checker_body: Información específica de cada estado sobre
             las categorías de bicicletas eléctricas, dónde se pueden usar y las normas
@@ -8423,7 +8508,6 @@ es:
           shop_name_placeholder: Ciclos de radios y cadena
           sign_up_free: Regístrate gratis
           sign_up_your_shop: Registra tu tienda
-          signup_name: inscribirse
           something_else_html: "¿Algo más? %{email_link}."
           step_connect_body: Vincula Lightspeed o Ascend a tu cuenta gratuita de la
             tienda. Tarda unos 10 minutos.
@@ -8446,13 +8530,12 @@ es:
           used_only_for_bikes: Utilizado únicamente para bicicletas
           we_never_sell_or_share: Nunca vendemos ni compartimos datos de nuestros
             clientes.
-          well_email_you: Le enviaremos un correo electrónico con instrucciones para
-            conectar su terminal de punto de venta (TPV).
           what_your_customers_get: Lo que obtienen tus clientes. Lo que obtiene tu
             tienda.
           wholesale: Al por mayor
           your_pos: Tu TPV
-          youre_in: Estás dentro.
+          signed_in_as_admin_html: Has iniciado sesión como %{email}, que será el
+            administrador de la tienda.
         ascend:
           a_dashboard_for_your_shop: Un panel de control para tu tienda
           a_dashboard_for_your_shop_body: Consulta las bicicletas que has vendido
@@ -8682,9 +8765,15 @@ es:
             confirm_email_to_activate_html: Confirma que %{email} es tu correo electrónico
               y configuraremos la organización contigo como administrador.
             sign_out_and_activate: Cerrar sesión y activar
-            signed_in_as_other: Has iniciado sesión como %{signed_in_as}, pero este
-              enlace es para %{email}. Al activarlo, se cerrará tu sesión y se iniciará
-              la de %{email}, el administrador de la organización.
+            activating_signs_you_out: Al activarlo, se cerrará su sesión y accederá
+              a la cuenta de administrador de la organización.
+            i_agree_to_terms: Acepto los Términos de servicio de Bike Index y los
+              Términos de servicio para organizaciones.
+            link_is_for: Este enlace es para
+            read_terms_html: Lea %{terms_link} y %{vendor_terms_link}
+            signed_in_as: Has iniciado sesión como
+            terms_of_service: Condiciones de servicio
+            vendor_terms: Condiciones de servicio para organizaciones
           step1:
             activation_link: Te enviaremos un enlace por correo electrónico para activar
               la organización; no es necesario que esperes, continúa.

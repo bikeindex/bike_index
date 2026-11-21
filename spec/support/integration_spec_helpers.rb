@@ -15,6 +15,15 @@ module IntegrationSpecHelpers
     end
   end
 
+  # The zone Intl reports, so the time localizer writes it to the timezone cookie on the
+  # next page load. Attached like emulate_touch_device's.
+  def emulate_timezone(timezone)
+    page.driver.with_playwright_page do |playwright_page|
+      session = playwright_page.context.new_cdp_session(playwright_page)
+      session.send_message("Emulation.setTimezoneOverride", params: {timezoneId: timezone})
+    end
+  end
+
   # Resize for this example only -- the browser context is recreated between
   # examples, so the configured viewport comes back on its own.
   def resize_window(width:, height:)

@@ -17,9 +17,8 @@ module Pages
         PRIVACY_ICON = SharedBlocks::Marketing::SectionHeading::Component::EYEBROW_COLORS[:yellow]
 
         # checker_place: the visitor's, as /ebike-rules detects it, which the checker's frame shows
-        def initialize(recovery_displays:, feedback:, current_user: nil, checker_place: nil)
+        def initialize(recovery_displays:, current_user: nil, checker_place: nil)
           @recovery_displays = recovery_displays
-          @feedback = feedback
           @current_user = current_user
           @checker_place = checker_place
         end
@@ -33,12 +32,15 @@ module Pages
             [number_with_delimiter(0), translation(".customer_records_sold_or_shared")]]
         end
 
-        # The values are what staff read in the lead's body, so they stay untranslated
         def pos_options
-          [[translation(".pos_lightspeed"), "POS: Lightspeed"],
-            [translation(".pos_ascend"), "POS: Ascend"],
-            [translation(".pos_shopify_coming_soon"), "POS: Shopify"],
-            [translation(".pos_other_or_none"), "POS: Other / none"]]
+          [[translation(".pos_lightspeed"), "lightspeed_pos"], [translation(".pos_ascend"), "ascend_pos"],
+            [translation(".pos_shopify_coming_soon"), "shopify_pos"], [translation(".pos_other_or_none"), "other_or_none_pos"]]
+        end
+
+        def form_data
+          {controller: "form-persist ui--forms--turnstile",
+           **UI::Forms::Turnstile::Component.form_data(user: @current_user),
+           action: "input->form-persist#save input->ui--forms--turnstile#update submit->form-persist#clear"}
         end
 
         def integrations

@@ -20,7 +20,6 @@ en:
           customer_records_sold_or_shared: customer records sold or shared
           data_stays_private: Their data stays private.
           data_stays_private_body: Never sold, never shared.
-          ding: DING!
           ebike_legality_checker: E-bike legality checker
           ebike_legality_checker_body: >-
             State-by-state guidance on e-bike classes, where they can ride, and age
@@ -103,7 +102,8 @@ en:
           shop_name_placeholder: Spoke & Chain Cycles
           sign_up_free: Sign up free
           sign_up_your_shop: Sign up your shop
-          signup_name: signup
+          signed_in_as_admin_html: You're signed in as %{email}, which will be the
+            shop's administrator.
           something_else_html: Something else? %{email_link}.
           step_connect_body: Link Lightspeed or Ascend to your free shop account.
             It takes about 10 minutes.
@@ -127,8 +127,6 @@ en:
           to_set_up: to set up
           used_only_for_bikes: Used only for bikes
           we_never_sell_or_share: We never sell or share customer data.
-          well_email_you: We'll email you about connecting your POS.
           what_your_customers_get: What your customers get. What your shop gets.
           wholesale: Wholesale
           your_pos: Your POS
-          youre_in: You're in.

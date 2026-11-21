@@ -868,6 +868,7 @@ nb:
         traditional_bike: Tradisjonell sykkel (2 hjul, 1 sete, pedal)
         elliptical: Elliptisk sykkel
         balance_bike: Balansesykkel
+        e_atv: e-ATV (e-Quad, elektrisk terrengkjøretøy)
       frame_material:
         aluminum: Aluminium
         composite: Karbon eller kompositt
@@ -2506,8 +2507,7 @@ nb:
         signed_in_as_other: Du er logget på som %{email}, så vi beholdt deg på den
           kontoen. Registreringen er fortsatt lagret på adressen vi sendte e-post
           til.
-        sign_out_to_agree: Du er logget på som %{email}. Logg ut, og åpne deretter
-          lenken på nytt for å godta sikkerhetsreglene.
+        accept_terms: Godta tjenestevilkårene for å fortsette
       find_b_param:
         registration_not_found: Vi fant ikke den registreringen – start en ny nedenfor
       redirect_to_single_page:
@@ -2538,10 +2538,10 @@ nb:
           sendte til %{email}, eller send en ny nedenfor.
         link_invalid_resent: Den lenken fungerer ikke lenger, så vi har sendt en ny
           til %{email}.
-        sign_out_to_confirm: Du er logget på som %{email}. Logg ut, og åpne deretter
-          lenken på nytt for å aktivere organisasjonen.
         switched_signup: Du er nå i ferd med å fullføre %{name}. For å fullføre %{replaced_name}
           også, åpne lenken i e-posten.
+        accept_terms: Godta tjenestevilkårene og tjenestevilkårene for organisasjoner
+          for å aktivere organisasjonen
       find_signup_for_confirmation:
         signup_not_found: Vi fant ikke den registreringen – start en ny nedenfor
       redirect_to_organization:
@@ -4621,6 +4621,8 @@ nb:
       subject: Melding fra %{organization_name} om din %{bike_type}
     organization_signup_confirmation:
       subject: Bekreft e-postadressen din for å aktivere %{name} på Bike Index
+    shop_welcome:
+      subject: Dashbordet ditt for Bike Index-butikken er klart
   payments:
     form:
       donation_header: Bidra til å støtte vår innsats!
@@ -5249,6 +5251,72 @@ nb:
           ditt når du er inne.
         link_signs_you_in: Denne lenken logger deg på Bike Index, så ikke videresend
           den. Den fungerer i %{days} dager.
+      shop_welcome:
+        bike_book_body: Sammenlign spesifikasjoner, geometri og en rekke andre funksjoner
+          på tvers av tusenvis av sykkelmodeller.
+        bookmark_it: Bokmerk det. Du logger inn med denne e-postadressen.
+        browse_bike_book: Bla gjennom sykkelboken →
+        check_serials: Søk i registeret for å holde innbytte av brukte sykler trygge.
+        check_serials_lead: Sjekk serienummeret før du kjøper.
+        check_your_state: Sjekk staten din →
+        connect_pos_body: Uten en POS-tilkobling avhenger registreringen av at noen
+          husker å gjøre det i løpet av en travel dag. Når du kobler til, blir hvert
+          sykkelsalg en Bike Index-registrering i bakgrunnen. Ingen ekstra skjemaer
+          ved skranken og ingen opplæring av ansatte. Kunden din får en e-post for
+          å hente sykkelen sin, med serienummer og detaljer allerede utfylt.
+        connect_pos_footnote: Trenger du hjelp? Svar på denne e-posten, så veileder
+          vi deg gjennom det. Støttes ikke POS-en? Du kan fortsatt registrere sykler
+          fra dashbordet ditt.
+        connect_pos_heading: Koble til POS-en din slik at ingen sykkel blir savnet.
+        connect_pos_impact: Jo flere sykler som registreres, desto flere stjålne sykler
+          blir gjenkjent og returnert, og desto vanskeligere blir det å selge stjålne
+          sykler i lokalsamfunnet ditt.
+        connect_your_pos_now: Koble til POS-en din nå
+        create_your_shop_account: Opprett din butikkkonto
+        dashboard_intro: Butikkkontoen din er mer enn en registrering. Det er din
+          hjemmebase på Bike Index.
+        dashboard_items_heading: Hva du kan gjøre fra dashbordet ditt
+        ebike_checker: Elsykkelkontrollør
+        ebike_checker_body: Regler fra stat til stat om elsykkelklasser, hvor de kan
+          sykle, og alders- og utstyrskrav. Nyttig når en kunde spør hva som er lovlig
+          før de kjøper.
+        email_preferences: E-postinnstillinger
+        free_tools: Nye er på vei, og butikkkontoer får dem først.
+        free_tools_heading: Verktøy som hjelper kundene med å velge
+        free_tools_intro: Bruk dem i butikken, eller send lenken til kundene.
+        free_tools_lead: Bruk våre gratis verktøy.
+        hero_body: "%{name} er satt opp på Bike Index. Dashbordet ditt er der alle
+          sykler som registreres i butikken din befinner seg."
+        hero_body_connect_pos: "%{name} er satt opp på Bike Index. Dashbordet ditt
+          er der alle sykler butikken din registrerer befinner seg. Ett trinn igjen:
+          koble til POS-en din slik at alle sykler du selger registreres automatisk."
+        hero_heading: Du er inne. Butikken din har et dashbord.
+        included_free: Inkludert gratis
+        most_important_next_step: Ditt viktigste neste steg
+        nonprofit: Bike Index, en ideell organisasjon 501(c)(3)
+        open_your_dashboard: Åpne dashbordet ditt
+        preheader: Verkstedsdashbordet ditt er aktivt. Alle sykler verkstedet ditt
+          registrerer ligger der.
+        preheader_connect_pos: 'Butikkens dashbord er live. Ett trinn igjen: koble
+          til POS-en din slik at alle sykler du selger blir registrert.'
+        privacy_policy: Personvernerklæring
+        questions: Spørsmål om oppsett eller dashbordet ditt? Svar på denne e-posten,
+          så vil en ekte person i butikkteamet vårt hjelpe deg.
+        receiving_because: Du mottar dette fordi du opprettet en butikkkonto for %{name}
+          på Bike Index.
+        see_every_bike: Hvert salg vises i én liste, med serienummer og detaljer.
+        see_every_bike_lead: Se alle sykler du har registrert.
+        shopify_soon: Shopify snart
+        stat_bikes: registrerte sykler
+        stat_partners: partnerbutikker, politi og byer
+        stat_recoveries: stjålne sykler funnet
+        sticker_pos_step: Koble til POS-en din · omtrent 10 minutter
+        track_pos: Se det fungere etter hvert som hvert salg registreres.
+        track_pos_lead: Spor POS-forbindelsen din.
+        why_shops_body: Kundene dine får gratis tyveribeskyttelse, og du blir en butikk
+          de stoler på. Det er gratis for deg og for dem, og vi selger eller deler
+          aldri kundedata.
+        why_shops_heading: Hvorfor butikker bruker Bike Index
     ui:
       definition_list:
         row:
@@ -5365,6 +5433,9 @@ nb:
           none: ingen
           return_to_default_column_order: Gå tilbake til standard kolonnerekkefølge
           visible_columns: Synlige kolonner
+        in_card:
+          select_record: Velg %{record} %{id}
+          toggle_all_checked: Slå av/på alle avkryssede
     atoms:
       serial:
         hidden: skjult
@@ -5600,7 +5671,6 @@ nb:
             hidden: skjult
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
             view: Utsikt
-            toggle_all_checked: Slå av/på alle avkryssede
             course_acknowledgment_title: Bekreftelse på utdanningskurs på
             more_notes: "+%{count} mer"
           multi_result_chip:
@@ -6540,6 +6610,14 @@ nb:
             confirming_your_email: Bekrefter e-postadressen din
             continue: Fortsette
             continue_where_you_left_off: Fortsett, så fortsetter vi der du slapp.
+            continuing_keeps_you_signed_in: Hvis du fortsetter, holder du deg pålogget
+              og lagrer registreringen på adressen denne lenken er til.
+            i_agree_to_terms: Jeg godtar Bike Index sine tjenestevilkår
+            link_is_for: Denne lenken er for
+            read_terms: Les tjenestevilkårene
+            sign_out_to_agree: Den som denne lenken er for, må godta sikkerhetsregler.
+              Logg ut, og åpne deretter lenken på nytt.
+            signed_in_as: Du er logget inn som
           step1:
             just_the_essentials: Bare det viktigste for å komme i gang.
             register_your_vehicle: Registrer kjøretøyet ditt!
@@ -7940,7 +8018,6 @@ nb:
           customer_records_sold_or_shared: kundeoppføringer solgt eller delt
           data_stays_private: Dataene deres forblir private.
           data_stays_private_body: Aldri solgt, aldri delt.
-          ding: DING!
           ebike_legality_checker: Lovlighetssjekker for elsykler
           ebike_legality_checker_body: Veiledning fra stat til stat om elsykkelklasser,
             hvor de kan sykle, og regler for alder og utstyr. Nyttig når en kunde
@@ -8017,7 +8094,6 @@ nb:
           shop_name_placeholder: Eike- og kjedesykler
           sign_up_free: Registrer deg gratis
           sign_up_your_shop: Registrer butikken din
-          signup_name: registrering
           something_else_html: Noe annet? %{email_link}.
           step_connect_body: Koble Lightspeed eller Ascend til din gratis butikkkonto.
             Det tar omtrent 10 minutter.
@@ -8039,11 +8115,11 @@ nb:
           to_set_up: å sette opp
           used_only_for_bikes: Brukes kun til sykler
           we_never_sell_or_share: Vi selger eller deler aldri kundedata.
-          well_email_you: Vi sender deg en e-post om tilkobling av POS-en din.
           what_your_customers_get: Det kundene dine får. Det butikken din får.
           wholesale: Engroshandel
           your_pos: Ditt salgssted
-          youre_in: Du er med.
+          signed_in_as_admin_html: Du er logget inn som %{email}, som vil være butikkens
+            administrator.
         ascend:
           a_dashboard_for_your_shop: Et dashbord for butikken din
           a_dashboard_for_your_shop_body: Søk etter syklene du har solgt når du trenger
@@ -8249,9 +8325,15 @@ nb:
             confirm_email_to_activate_html: Bekreft at %{email} er e-postadressen
               din, så konfigurerer vi organisasjonen med deg som administrator.
             sign_out_and_activate: Logg ut og aktiver
-            signed_in_as_other: Du er logget på som %{signed_in_as}, men denne lenken
-              er for %{email}. Aktivering logger deg av og inn på %{email}, organisasjonens
-              administrator.
+            activating_signs_you_out: Aktivering logger deg ut av den og inn på organisasjonens
+              administratorkonto.
+            i_agree_to_terms: Jeg godtar Bike Index sine tjenestevilkår og tjenestevilkår
+              for organisasjoner
+            link_is_for: Denne lenken er for
+            read_terms_html: Les %{terms_link} og %{vendor_terms_link}
+            signed_in_as: Du er logget inn som
+            terms_of_service: Vilkår for bruk
+            vendor_terms: Vilkår for bruk for organisasjoner
           step1:
             activation_link: Vi sender deg en e-post med en lenke for å aktivere organisasjonen
               – du trenger ikke å vente, fortsett.
