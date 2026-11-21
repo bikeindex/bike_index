@@ -343,8 +343,8 @@ RSpec.describe BikebookController, type: :request do
     let(:manufacturer_count) { fields.dig("manufacturer", "models_count") }
     let(:example_id) { fields.dig("manufacturer", "example_ids").first }
 
-    it "renders the vehicle model's fields with how many models fill each, opening what the URL names" do
-      get "/bikebook/schema_viewer", params: {open: "type", by_count: "type"}
+    it "renders the vehicle model's fields with how many models fill each, opening what the URL names and the folds around it" do
+      get "/bikebook/schema_viewer", params: {open: "type,frame.mounts", by_count: "type"}
 
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
@@ -352,6 +352,9 @@ RSpec.describe BikebookController, type: :request do
         .and have_css("[aria-current='page']", text: "Vehicle model")
         .and have_css("details[open][data-schema-path='type']")
         .and have_css("details:not([open])[data-schema-path='type_detail']")
+        # opened around the fold it names, and closed everywhere else
+        .and have_css("details[open][data-schema-path='frame'] details[open][data-schema-path='frame.mounts']")
+        .and have_css("details:not([open])[data-schema-path='wheels']")
         .and have_css("input[aria-label='type by count'][checked]")
         .and have_css("button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']")
         .and have_link(example_id, href: "/bikebook?vehicle_models=#{example_id}", visible: :all)

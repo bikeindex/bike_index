@@ -3,19 +3,27 @@
 require "rails_helper"
 
 RSpec.describe "Bike Book schema viewer", :js, type: :system do
-  it "keeps what's opened, and what's ordered by count, in the URL" do
-    visit "/bikebook/schema_viewer"
+  def toggle(path) = find("details[data-schema-path='#{path}'] > summary").click
 
-    find("details[data-schema-path='type'] > summary").click
+  it "keeps what's opened and what's ordered by count in the URL, while it shows" do
+    visit "/bikebook/schema_viewer"
+    expect(page).to have_no_css("details[open]")
+
+    toggle("type")
     expect(page).to have_current_path("/bikebook/schema_viewer?open=type")
 
     find("details[data-schema-path='type'] label", text: "by count").click
     expect(page).to have_current_path("/bikebook/schema_viewer?open=type&by_count=type")
 
-    find("details[data-schema-path='frame.mounts'] > summary").click
-    expect(page).to have_current_path("/bikebook/schema_viewer?open=type,frame.mounts&by_count=type")
+    toggle("frame")
+    toggle("frame.mounts")
+    expect(page).to have_current_path("/bikebook/schema_viewer?open=type,frame,frame.mounts&by_count=type")
 
-    find("details[data-schema-path='type'] > summary").click
-    expect(page).to have_current_path("/bikebook/schema_viewer?open=frame.mounts")
+    # closed around it, frame.mounts no longer shows
+    toggle("frame")
+    expect(page).to have_current_path("/bikebook/schema_viewer?open=type&by_count=type")
+
+    toggle("type")
+    expect(page).to have_current_path("/bikebook/schema_viewer")
   end
 end

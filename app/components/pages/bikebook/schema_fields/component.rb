@@ -26,7 +26,12 @@ module Pages
         private
 
         # open and by_count come from the URL, so they stay out of the key: a field they name anything in renders uncached
-        def cached?(path) = (@open + @by_count).none? { it == path || it.start_with?("#{path}.") }
+        def cached?(path) = (@open + @by_count).none? { within?(it, path) }
+
+        # every fold starts closed but those open names, and the folds around them
+        def open?(path) = @open.any? { within?(it, path) }
+
+        def within?(named, path) = named == path || named.start_with?("#{path}.")
 
         def field_path(name) = [@path, name].compact.join(".")
 
