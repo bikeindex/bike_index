@@ -1,8 +1,7 @@
 # Pin npm packages by running ./bin/importmap
 
-# Nothing here is CDN-pinned. The vendor/javascript files are self-contained bundles,
-# each carrying its own re-generation command in its header. REMEMBER TO ADD the host to
-# content_security_policy.rb if a pin ever goes back to a CDN.
+# The vendor/javascript files are self-contained bundles, each carrying its own re-generation
+# command in its header. REMEMBER TO ADD the host to content_security_policy.rb for a CDN pin.
 
 pin "application"
 pin "@hotwired/turbo-rails", to: "turbo.min.js", preload: true
