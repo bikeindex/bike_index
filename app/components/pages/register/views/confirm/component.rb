@@ -5,8 +5,7 @@ module Pages
     module Views
       module Confirm
         # Where the emailed confirmation link lands. Confirming is single use and scanners run the
-        # page's JS, so the form waits for a click rather than submitting on render.
-        # accept_terms: the account it signs in hasn't agreed to the terms yet
+        # page's JS, so the form waits for a click rather than submitting on render
         class Component < ApplicationComponent
           def initialize(b_param:, token:, accept_terms: false)
             @b_param = b_param

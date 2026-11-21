@@ -186,7 +186,7 @@ class RegisterController < ApplicationController
       return redirect_to_current_step
     end
 
-    if terms_pending? && !Binxtils::InputNormalizer.boolean(params[:terms_of_service])
+    if terms_pending? && params[:terms_of_service].blank?
       flash[:error] = translation(:accept_terms)
       return redirect_to(confirm_path)
     end
@@ -209,7 +209,7 @@ class RegisterController < ApplicationController
       find_education_course
     end
 
-    current_user.update(terms_of_service: true) unless current_user.terms_of_service
+    current_user.update(terms_of_service: true) unless current_user.terms_of_service?
     @b_param.confirm_email!(creator_id: current_user.id)
     complete_registration
   end
@@ -220,7 +220,7 @@ class RegisterController < ApplicationController
     confirm_register_path(b_param_token: @b_param.id_token, confirmation_token: params[:confirmation_token])
   end
 
-  # Whoever confirming leaves signed in - the session's account, or the emailed address's
+  # The account confirming leaves signed in
   def terms_pending?
     !(current_user || User.fuzzy_confirmed_or_unconfirmed_email_find(@b_param.owner_email))&.terms_of_service
   end
