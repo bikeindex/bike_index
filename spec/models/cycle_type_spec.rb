@@ -78,8 +78,8 @@ RSpec.describe CycleType, type: :model do
       let(:cycle_type) { CycleType.new("e-atv") }
       it "finds by various names" do
         expect(cycle_type.id).to eq 24
-        expect(CycleType.send(:names_and_secondary_names)[23])
-          .to eq(["e-atv", "e-atv (e-quad, electric all-terrain vehicle)", "e-quad", "electric all-terrain vehicle"])
+        expect(CycleType.send(:names_and_secondary_names)[:"e-atv"])
+          .to eq(["e-atv", "e-atv-e-quad-electric-all-terrain-vehicle", "e-quad", "electric-all-terrain-vehicle"])
         expect(CycleType.friendly_find("e-Quad")&.id).to eq cycle_type.id
         expect(CycleType.friendly_find("E-ATV")&.id).to eq cycle_type.id
         expect(CycleType.not_cycle?("e-atv")).to be true

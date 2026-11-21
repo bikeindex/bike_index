@@ -869,6 +869,7 @@ nl:
         traditional_bike: Traditionele fiets (2 wielen, 1 zadel, pedaal)
         elliptical: Elliptische fiets
         balance_bike: Loopfiets
+        e_atv: e-ATV (e-Quad, elektrisch terreinvoertuig)
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
