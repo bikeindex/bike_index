@@ -24,8 +24,9 @@ class BikebookModelsSyncJob < ScheduledJob
 
   private
 
+  # TODO: once the published catalog is at 2.0.0, whose manufacturer slugs are dashed, drop the tr
   def row(model)
-    {catalog_id: model["id"], manufacturer_slug: model["manufacturer"], name: model["model"],
+    {catalog_id: model["id"], manufacturer_slug: model["manufacturer"].tr("_", "-"), name: model["model"],
      model_slug: Slugifyer.book_slug(model["model"]), first_year: model["first_year"], final_year: model["final_year"],
      markets: model["markets"].to_a, variants: model["variants"].to_a.map { it.slice("id", "markets") }}
   end

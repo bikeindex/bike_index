@@ -178,16 +178,6 @@ RSpec.describe CycleType, type: :model do
     end
   end
 
-  describe "bikebook_type and from_bikebook_type" do
-    it "maps each slug to its Bike Book vehicle type and back" do
-      expect(CycleType.bikebook_type(:cargo)).to eq "cargo_bike"
-      expect(CycleType.bikebook_type("tall-bike")).to eq "tall_bike"
-      expect(CycleType.slugs_sym.map { CycleType.from_bikebook_type(CycleType.bikebook_type(it)) }).to eq CycleType.slugs_sym
-      expect(CycleType.from_bikebook_type("e_atv")).to eq :"e-atv"
-      expect(CycleType.from_bikebook_type("hovercraft")).to be_nil
-    end
-  end
-
   describe "not_cycle_drivetrain?" do
     it "is falsey" do
       expect(CycleType.not_cycle_drivetrain?(:bike)).to be_falsey

@@ -25,8 +25,8 @@
 #  index_bikebook_models_on_manufacturer_slug_and_model_slug  (manufacturer_slug,model_slug)
 #
 class BikebookModel < ApplicationRecord
-  # The catalog's manufacturer slugs are Bike Book's, which Slugifyer.legacy_manufacturer reproduces from a name
-  scope :for_manufacturer, ->(name) { where(manufacturer_slug: Slugifyer.legacy_manufacturer(name)) }
+  # The catalog's manufacturer slugs are Slugifyer.legacy_manufacturer's, dashed as schema 2.0.0's are
+  scope :for_manufacturer, ->(name) { where(manufacturer_slug: Slugifyer.legacy_manufacturer(name)&.tr("_", "-")) }
   scope :sold_in_year, ->(year) { where(first_year: ..year, final_year: [nil, year..]) }
 
   # The catalog id of the manufacturer's model of that name sold in that year, nil for one the catalog lacks. Of

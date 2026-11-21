@@ -17,7 +17,7 @@ module Integrations
         year = options[:year].to_i
         id = BikebookModel.catalog_id_for(manufacturer: options[:manufacturer], name: options[:frame_model], year:,
           market: options[:market])
-        record = id && Integrations::Bikebook::Catalog.model(id)
+        record = id && Integrations::Bikebook::Catalog.block_models(id)&.dig(id)
         record && {bike: bike_attributes(record, year), components: component_attributes(record)}.with_indifferent_access
       end
 
@@ -29,7 +29,7 @@ module Integrations
         colorways = record.dig("years", year.to_s, "colorways").to_a
         colorway = colorways.first if colorways.one?
         {
-          cycle_type: CycleType.from_bikebook_type(record["type"])&.to_s,
+          cycle_type: CycleType.find_sym(record["type"])&.to_s,
           paint_description: colorway&.dig("name"),
           description: record["description"],
           rear_wheel_bsd: record["wheels"]&.find { it["position"]&.include?("rear") }&.dig("bsd"),
@@ -43,7 +43,8 @@ module Integrations
         names = vocabulary && Integrations::Bikebook::Catalog.file(vocabulary)&.dig("names", "components.type")
         record["components"].to_a.map do |component|
           position = Array(component["position"])
-          {component_type: names&.dig(component["type"]) || component["type"]&.humanize, description: component["description"],
+          type = Integrations::Bikebook::Catalog.current_slug(component["type"])
+          {component_type: names&.dig(type) || type&.humanize, description: component["description"],
            manufacturer: component["manufacturer"], front: position.include?("front"), rear: position.include?("rear")}
         end
       end

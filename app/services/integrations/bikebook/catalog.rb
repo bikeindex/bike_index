@@ -46,12 +46,6 @@ module Integrations
         model && {title: "#{model["manufacturer"]} #{model["model"]}", description: model["description"], image_url: model["stock_photo"]}
       end
 
-      # nil for an id the catalog lacks, or while it doesn't answer
-      def model(id)
-        block = manifest&.dig("blocks", id[MODEL_ID, 1])
-        block && file(block)&.dig("models", id)
-      end
-
       # The catalog's market for a country's ISO code: it lists an EU member's models under the EU
       def market(iso) = EbikeRuleServices::Places::EU_MEMBERS.include?(iso) ? "EU" : iso
 
