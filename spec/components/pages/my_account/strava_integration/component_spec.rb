@@ -9,13 +9,12 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :component 
 
   context "not connected" do
     it "renders connect button" do
-      expect(component).not_to have_text("Integration")
       expect(component).to have_text("Integrate your bikes with Strava")
       expect(component).to have_css("img[src*='btn_strava_connect']")
     end
 
     it "does not render disconnect button" do
-      expect(component).not_to have_text("Disconnect Strava")
+      expect(component).not_to have_link("Disconnect")
     end
   end
 
@@ -24,7 +23,7 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :component 
 
     it "renders pending message" do
       expect(component).to have_text("Sync will begin shortly")
-      expect(component).to have_text("Disconnect Strava")
+      expect(component).to have_link("Disconnect")
     end
   end
 
@@ -34,7 +33,7 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :component 
     it "renders progress bar and download count" do
       expect(component).to have_text("Syncing activities")
       expect(component).to have_css("#strava-download-count")
-      expect(component).to have_text("Sync is running in the background")
+      expect(component).to have_text("Syncing")
     end
 
     it "renders stimulus controller for polling" do
@@ -42,7 +41,17 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :component 
     end
 
     it "renders disconnect button" do
-      expect(component).to have_text("Disconnect Strava")
+      expect(component).to have_link("Disconnect")
+    end
+  end
+
+  context "with a link_bikes_path" do
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: user) }
+    let!(:strava_gear) { FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b1234") }
+    let(:instance) { described_class.new(user:, link_bikes_path: "/bikes/1/edit/versions") }
+
+    it "links to it" do
+      expect(component).to have_link("Link bikes", href: "/bikes/1/edit/versions")
     end
   end
 
@@ -50,7 +59,7 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :component 
     let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: user) }
 
     it "renders connected status and activity count" do
-      expect(component).to have_text("Connected to Strava")
+      expect(component).to have_text("Connected")
       expect(component).to have_text(/150\s+activities synced/)
     end
 
@@ -61,17 +70,17 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :component 
       end
 
       it "renders gear list" do
-        expect(component).to have_text("Strava bikes connected")
+        expect(component).to have_text("0 / 1 bikes linked")
       end
     end
 
     it "does not render gear section without gear" do
-      expect(component).to have_text("Connected to Strava")
-      expect(component).not_to have_text("Strava bikes connected")
+      expect(component).to have_text("Connected")
+      expect(component).not_to have_text("bikes linked")
     end
 
     it "renders disconnect button" do
-      expect(component).to have_text("Disconnect Strava")
+      expect(component).to have_link("Disconnect")
     end
   end
 
@@ -84,7 +93,7 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :component 
     end
 
     it "renders disconnect button" do
-      expect(component).to have_text("Disconnect Strava")
+      expect(component).to have_link("Disconnect")
     end
   end
 end

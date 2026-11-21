@@ -1,0 +1,15 @@
+---
+en:
+  components:
+    pages:
+      my_account:
+        show:
+          bike_alerts:
+            add_it_now: Add it now!
+            generally_connect_to_org: >-
+              Some of your bikes are associated with %{org_name}, but this one is
+              not. Generally, you should connect all your bikes to %{org_name} -
+            generally_connect_to_org_named_html: >-
+              Some of your bikes are associated with %{org_name}, but %{bike} is not.
+              Generally, you should connect all your bikes to %{org_name} -
+            ignore_this_suggestion: Ignore this suggestion
