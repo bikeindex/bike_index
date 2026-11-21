@@ -140,7 +140,7 @@ RSpec.describe BikebookController, type: :request do
       end
 
       context "that the catalog hasn't" do
-        let(:params) { {vehicle_models: "m/segway/2025/gt9"} }
+        let(:params) { {vehicle_models: "m/segway-ninebot/2025/gt-9"} }
 
         it "is not found" do
           expect(response).to have_http_status(:not_found)
@@ -210,6 +210,8 @@ RSpec.describe BikebookController, type: :request do
     it "redirects from the vehicle's id alone" do
       get "/m/velotric/2024/fold_1"
       expect(response).to redirect_to("/bikebook?vehicle_models=m/velotric/2024/fold_1")
+      get "/m/super-73/2024/s-adv"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/super-73/2024/s-adv")
     end
 
     it "redirects from an e-vehicle classification's id to its card" do
