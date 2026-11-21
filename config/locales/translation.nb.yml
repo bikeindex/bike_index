@@ -4621,6 +4621,8 @@ nb:
       subject: Melding fra %{organization_name} om din %{bike_type}
     organization_signup_confirmation:
       subject: Bekreft e-postadressen din for å aktivere %{name} på Bike Index
+    shop_welcome:
+      subject: Dashbordet ditt for Bike Index-butikken er klart
   payments:
     form:
       donation_header: Bidra til å støtte vår innsats!
@@ -5249,6 +5251,72 @@ nb:
           ditt når du er inne.
         link_signs_you_in: Denne lenken logger deg på Bike Index, så ikke videresend
           den. Den fungerer i %{days} dager.
+      shop_welcome:
+        bike_book_body: Sammenlign spesifikasjoner, geometri og en rekke andre funksjoner
+          på tvers av tusenvis av sykkelmodeller.
+        bookmark_it: Bokmerk det. Du logger inn med denne e-postadressen.
+        browse_bike_book: Bla gjennom sykkelboken →
+        check_serials: Søk i registeret for å holde innbytte av brukte sykler trygge.
+        check_serials_lead: Sjekk serienummeret før du kjøper.
+        check_your_state: Sjekk staten din →
+        connect_pos_body: Uten en POS-tilkobling avhenger registreringen av at noen
+          husker å gjøre det i løpet av en travel dag. Når du kobler til, blir hvert
+          sykkelsalg en Bike Index-registrering i bakgrunnen. Ingen ekstra skjemaer
+          ved skranken og ingen opplæring av ansatte. Kunden din får en e-post for
+          å hente sykkelen sin, med serienummer og detaljer allerede utfylt.
+        connect_pos_footnote: Trenger du hjelp? Svar på denne e-posten, så veileder
+          vi deg gjennom det. Støttes ikke POS-en? Du kan fortsatt registrere sykler
+          fra dashbordet ditt.
+        connect_pos_heading: Koble til POS-en din slik at ingen sykkel blir savnet.
+        connect_pos_impact: Jo flere sykler som registreres, desto flere stjålne sykler
+          blir gjenkjent og returnert, og desto vanskeligere blir det å selge stjålne
+          sykler i lokalsamfunnet ditt.
+        connect_your_pos_now: Koble til POS-en din nå
+        create_your_shop_account: Opprett din butikkkonto
+        dashboard_intro: Butikkkontoen din er mer enn en registrering. Det er din
+          hjemmebase på Bike Index.
+        dashboard_items_heading: Hva du kan gjøre fra dashbordet ditt
+        ebike_checker: Elsykkelkontrollør
+        ebike_checker_body: Regler fra stat til stat om elsykkelklasser, hvor de kan
+          sykle, og alders- og utstyrskrav. Nyttig når en kunde spør hva som er lovlig
+          før de kjøper.
+        email_preferences: E-postinnstillinger
+        free_tools: Nye er på vei, og butikkkontoer får dem først.
+        free_tools_heading: Verktøy som hjelper kundene med å velge
+        free_tools_intro: Bruk dem i butikken, eller send lenken til kundene.
+        free_tools_lead: Bruk våre gratis verktøy.
+        hero_body: "%{name} er satt opp på Bike Index. Dashbordet ditt er der alle
+          sykler som registreres i butikken din befinner seg."
+        hero_body_connect_pos: "%{name} er satt opp på Bike Index. Dashbordet ditt
+          er der alle sykler butikken din registrerer befinner seg. Ett trinn igjen:
+          koble til POS-en din slik at alle sykler du selger registreres automatisk."
+        hero_heading: Du er inne. Butikken din har et dashbord.
+        included_free: Inkludert gratis
+        most_important_next_step: Ditt viktigste neste steg
+        nonprofit: Bike Index, en ideell organisasjon 501(c)(3)
+        open_your_dashboard: Åpne dashbordet ditt
+        preheader: Verkstedsdashbordet ditt er aktivt. Alle sykler verkstedet ditt
+          registrerer ligger der.
+        preheader_connect_pos: 'Butikkens dashbord er live. Ett trinn igjen: koble
+          til POS-en din slik at alle sykler du selger blir registrert.'
+        privacy_policy: Personvernerklæring
+        questions: Spørsmål om oppsett eller dashbordet ditt? Svar på denne e-posten,
+          så vil en ekte person i butikkteamet vårt hjelpe deg.
+        receiving_because: Du mottar dette fordi du opprettet en butikkkonto for %{name}
+          på Bike Index.
+        see_every_bike: Hvert salg vises i én liste, med serienummer og detaljer.
+        see_every_bike_lead: Se alle sykler du har registrert.
+        shopify_soon: Shopify snart
+        stat_bikes: registrerte sykler
+        stat_partners: partnerbutikker, politi og byer
+        stat_recoveries: stjålne sykler funnet
+        sticker_pos_step: Koble til POS-en din · omtrent 10 minutter
+        track_pos: Se det fungere etter hvert som hvert salg registreres.
+        track_pos_lead: Spor POS-forbindelsen din.
+        why_shops_body: Kundene dine får gratis tyveribeskyttelse, og du blir en butikk
+          de stoler på. Det er gratis for deg og for dem, og vi selger eller deler
+          aldri kundedata.
+        why_shops_heading: Hvorfor butikker bruker Bike Index
     ui:
       definition_list:
         row:
