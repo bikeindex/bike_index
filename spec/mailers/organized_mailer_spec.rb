@@ -378,14 +378,15 @@ RSpec.describe OrganizedMailer, type: :mailer do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let(:mail) { OrganizedMailer.shop_welcome(organization, user) }
 
-    it "renders without the email layout, replying to Bike Index" do
+    it "renders in the email layout, replying to Bike Index" do
       expect(mail.subject).to eq "Your Bike Index shop dashboard is ready"
       expect(mail.to).to eq([user.email])
       expect(mail.reply_to).to eq(["contact@bikeindex.org"])
       expect(mail.tag).to eq "shop_welcome"
       expect(mail.body.encoded).to match("Shifty Bike Shop is set up on Bike Index")
-      expect(mail.body.encoded).to_not match("binx-wrapper")
-      expect_render_donation(false, mail)
+      expect(mail.body.encoded).to match("binx-wrapper")
+      expect(mail.body.encoded).to match("The Bike Index Team")
+      expect_render_donation(true, mail)
     end
   end
 

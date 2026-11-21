@@ -1,595 +1,368 @@
-<!DOCTYPE html>
-
-<html
-  lang="<%= I18n.locale %>"
-  xmlns="http://www.w3.org/1999/xhtml"
-  xmlns:v="urn:schemas-microsoft-com:vml"
-  xmlns:o="urn:schemas-microsoft-com:office:office"
+<div
+  style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#FFFFFF;"
 >
-  <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="color-scheme" content="light dark">
-    <meta name="supported-color-schemes" content="light dark">
+  <%= preheader %>&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;
+</div>
 
-    <title><%= translation("title") %></title>
+<h1 class="uncap" style="margin:0 0 12px;">
+  <%= translation("hero_heading") %>
+</h1>
 
-    <!--[if mso]><noscript><xml><o:OfficeDocumentSettings><o:PixelsPerInch>96</o:PixelsPerInch></o:OfficeDocumentSettings></xml></noscript><![endif]-->
-    <style>
-      body{margin:0;padding:0;}
-      a{color:#016EC2;}
-      @media screen and (max-width:620px){
-        .wrap{width:100% !important;}
-        .px{padding-left:24px !important;padding-right:24px !important;}
-        .h1{font-size:24px !important;line-height:30px !important;}
-        .stack{display:block !important;width:100% !important;}
-        .stack-gap{padding-top:16px !important;padding-left:0 !important;}
-      }
-    </style>
-  </head>
+<p style="margin:0 0 8px;"><%= hero_body %></p>
+<%= dashboard_link %>
 
-  <body style="margin:0;padding:0;background-color:#F2F3F5;">
-    <div
-      style="display:none;max-height:0;overflow:hidden;mso-hide:all;font-size:1px;line-height:1px;color:#F2F3F5;"
-    >
-      <%= preheader %>&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;&#8199;&#847;
-    </div>
+<p style="margin:8px 0 0;<%= font_style(14, 20, "#666666") %>">
+  <%= translation("bookmark_it") %>
+</p>
 
-    <table
-      role="presentation"
-      width="100%"
-      cellpadding="0"
-      cellspacing="0"
-      border="0"
-      style="background-color:#F2F3F5;"
-    >
-      <tr>
-        <td align="center" style="padding:24px 12px;">
-          <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0"><tr><td><![endif]-->
-          <table
-            role="presentation"
-            class="wrap"
-            width="600"
-            cellpadding="0"
-            cellspacing="0"
-            border="0"
-            style="width:600px;max-width:600px;background-color:#FFFFFE;border:1px solid #E0E0E0;border-radius:8px;"
-          >
-            <!-- Header -->
-            <tr>
-              <td
-                class="px"
-                bgcolor="#2C3E50"
-                style="background-color:#2C3E50;padding:14px 40px;border-radius:8px 8px 0 0;"
+<% if connect_pos? %>
+  <table
+    role="presentation"
+    width="100%"
+    cellpadding="0"
+    cellspacing="0"
+    border="0"
+    bgcolor="#FFF6D6"
+    style="margin:36px 0 0;background-color:#FFF6D6;border:3px solid #1A1A1A;border-radius:8px;box-shadow:4px 4px 0 #1A1A1A;"
+  >
+    <tr>
+      <td style="padding:26px 28px 0;">
+        <table
+          role="presentation"
+          width="100%"
+          cellpadding="0"
+          cellspacing="0"
+          border="0"
+        >
+          <tr>
+            <td width="28" valign="middle" style="padding:0 0 10px;">
+              <table
+                role="presentation"
+                cellpadding="0"
+                cellspacing="0"
+                border="0"
               >
-                <table
-                  role="presentation"
-                  width="100%"
-                  cellpadding="0"
-                  cellspacing="0"
-                  border="0"
-                >
-                  <tr>
-                    <td
-                      style="<%= font_style(20, 22, "#FFFFFE", weight: 900, extra: "letter-spacing:1px;") %>"
-                    >
-                      <a
-                        href="<%= root_url %>"
-                        style="color:#FFFFFE;text-decoration:none;"
-                      >
-                        BIKE INDEX
-                      </a>
-                    </td>
-
-                    <td
-                      align="right"
-                      style="<%= font_style(12, 16, "#C9D3DC", weight: 700, extra: "letter-spacing:1px;text-transform:uppercase;") %>"
-                    >
-                      <%= translation("for_bike_shops") %>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-
-            <!-- Hero -->
-            <tr>
-              <td
-                class="px"
-                bgcolor="#2C3E50"
-                align="center"
-                style="background-color:#2C3E50;padding:4px 40px 28px;"
-              >
-                <%= image_tag logo_url, width: 90, alt: translation("hero_image_alt"), style: "display:block;width:90px;max-width:90px;height:auto;border:0;margin:0 auto 6px;" %>
-
-                <p
-                  style="margin:0 0 4px;font-family:Impact,'Arial Black',Arial,sans-serif;font-size:20px;line-height:24px;letter-spacing:2px;color:#FFD660;mso-line-height-rule:exactly;"
-                >
-                  <%= translation("ding") %>
-                </p>
-
-                <h1
-                  class="h1"
-                  style="margin:0 0 10px;<%= font_style(28, 34, "#FFFFFE", weight: 900) %>"
-                >
-                  <%= translation("hero_heading") %>
-                </h1>
-
-                <p style="margin:0 0 20px;<%= font_style(15, 23, "#DCE3EA") %>">
-                  <%= hero_body %>
-                </p>
-
-                <table
-                  role="presentation"
-                  cellpadding="0"
-                  cellspacing="0"
-                  border="0"
-                  align="center"
-                >
-                  <tr>
-                    <td
-                      align="center"
-                      bgcolor="#FFD660"
-                      style="background-color:#FFD660;border-radius:25px;"
-                    >
-                      <a
-                        href="<%= dashboard_url %>"
-                        style="display:block;padding:12px 28px;<%= font_style(14, 18, "#2C3E50", weight: 700, extra: "letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:25px;") %>"
-                      >
-                        <%= translation("open_your_dashboard") %>
-                      </a>
-                    </td>
-                  </tr>
-                </table>
-
-                <p style="margin:10px 0 0;<%= font_style(13, 20, "#C9D3DC") %>">
-                  <%= translation("bookmark_it") %>
-                </p>
-              </td>
-            </tr>
-
-            <% if connect_pos? %>
-              <!-- POS: the one next step -->
-              <tr>
-                <td class="px" style="padding:36px 40px 8px;">
-                  <table
-                    role="presentation"
-                    width="100%"
-                    cellpadding="0"
-                    cellspacing="0"
-                    border="0"
-                    bgcolor="#FFF6D6"
-                    style="background-color:#FFF6D6;border:3px solid #1A1A1A;border-radius:8px;box-shadow:4px 4px 0 #1A1A1A;"
+                <tr>
+                  <td
+                    width="20"
+                    height="20"
+                    align="center"
+                    bgcolor="#715EB2"
+                    style="width:20px;height:20px;background-color:#715EB2;border-radius:10px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:20px;font-weight:900;color:#FFFFFF;"
                   >
-                    <tr>
-                      <td style="padding:26px 28px 0;">
-                        <table
-                          role="presentation"
-                          width="100%"
-                          cellpadding="0"
-                          cellspacing="0"
-                          border="0"
-                        >
-                          <tr>
-                            <td
-                              width="28"
-                              valign="middle"
-                              style="padding:0 0 10px;"
-                            >
-                              <table
-                                role="presentation"
-                                cellpadding="0"
-                                cellspacing="0"
-                                border="0"
-                              >
-                                <tr>
-                                  <td
-                                    width="20"
-                                    height="20"
-                                    align="center"
-                                    bgcolor="#2C3E50"
-                                    style="width:20px;height:20px;background-color:#2C3E50;border-radius:10px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:20px;font-weight:900;color:#FFFFFE;"
-                                  >
-                                    &#10003;
-                                  </td>
-                                </tr>
-                              </table>
-                            </td>
+                    &#10003;
+                  </td>
+                </tr>
+              </table>
+            </td>
 
-                            <td
-                              valign="middle"
-                              style="padding:0 0 10px;<%= font_style(14, 20, "#5C5C5C", extra: "text-decoration:line-through;") %>"
-                            >
-                              <%= translation("create_your_shop_account") %>
-                            </td>
-                          </tr>
+            <td
+              valign="middle"
+              style="padding:0 0 10px;<%= font_style(14, 20, "#5C5C5C", extra: "text-decoration:line-through;") %>"
+            >
+              <%= translation("create_your_shop_account") %>
+            </td>
+          </tr>
 
-                          <tr>
-                            <td width="28" valign="middle" style="padding:0;">
-                              <table
-                                role="presentation"
-                                cellpadding="0"
-                                cellspacing="0"
-                                border="0"
-                              >
-                                <tr>
-                                  <td
-                                    width="16"
-                                    height="16"
-                                    align="center"
-                                    bgcolor="#FFFFFE"
-                                    style="width:16px;height:16px;background-color:#FFFFFE;border:2px solid #016EC2;border-radius:10px;font-size:0;line-height:0;"
-                                  >
-                                    &nbsp;
-                                  </td>
-                                </tr>
-                              </table>
-                            </td>
-
-                            <td
-                              valign="middle"
-                              style="padding:0;<%= font_style(14, 20, "#016EC2", weight: 700) %>"
-                            >
-                              <%= translation("sticker_pos_step") %>
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td style="padding:20px 28px 0;">
-                        <table
-                          role="presentation"
-                          width="100%"
-                          cellpadding="0"
-                          cellspacing="0"
-                          border="0"
-                        >
-                          <tr>
-                            <td
-                              height="2"
-                              bgcolor="#1A1A1A"
-                              style="background-color:#1A1A1A;font-size:0;line-height:0;"
-                            >
-                              &nbsp;
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    </tr>
-
-                    <tr>
-                      <td style="padding:22px 28px 30px;">
-                        <p
-                          style="margin:0 0 8px;<%= font_style(12, 16, "#715EB2", weight: 700, extra: "letter-spacing:1.5px;text-transform:uppercase;") %>"
-                        >
-                          <%= translation("most_important_next_step") %>
-                        </p>
-
-                        <h2
-                          style="margin:0 0 10px;<%= font_style(24, 30, "#2C3E50", weight: 800) %>"
-                        >
-                          <%= translation("connect_pos_heading") %>
-                        </h2>
-
-                        <p
-                          style="margin:0 0 14px;<%= font_style(15, 23, "#4D4D4D") %>"
-                        >
-                          <%= translation("connect_pos_body") %>
-                        </p>
-
-                        <p
-                          style="margin:0 0 20px;<%= font_style(15, 23, "#2C3E50", weight: 700) %>"
-                        >
-                          <%= translation("connect_pos_impact") %>
-                        </p>
-
-                        <table
-                          role="presentation"
-                          cellpadding="0"
-                          cellspacing="0"
-                          border="0"
-                          style="margin:0 0 22px;"
-                        >
-                          <tr>
-                            <% pos_chips.each_with_index do |(name, live), index| %>
-                              <% if index > 0 %>
-                                <td
-                                  width="8"
-                                  style="font-size:0;line-height:0;"
-                                >
-                                  &nbsp;
-                                </td>
-                              <% end %>
-
-                              <td
-                                style="padding:6px 12px;<%= live ? "background-color:#FFFFFE;border:1px solid #2C3E50;border-radius:14px;" : "border:1px dashed #8A8A8A;border-radius:14px;" %><%= font_style(13, 16, live ? "#2C3E50" : "#5C5C5C", weight: (700 if live)) %>"
-                              >
-                                <%= name %>
-                              </td>
-                            <% end %>
-                          </tr>
-                        </table>
-
-                        <table
-                          role="presentation"
-                          cellpadding="0"
-                          cellspacing="0"
-                          border="0"
-                        >
-                          <tr>
-                            <td
-                              align="center"
-                              bgcolor="#016EC2"
-                              style="background-color:#016EC2;border-radius:25px;"
-                            >
-                              <a
-                                href="<%= dashboard_url %>"
-                                style="display:block;padding:14px 32px;<%= font_style(15, 18, "#FFFFFE", weight: 700, extra: "letter-spacing:1.5px;text-transform:uppercase;text-decoration:none;border-radius:25px;") %>"
-                              >
-                                <%= translation("connect_your_pos_now") %>
-                              </a>
-                            </td>
-                          </tr>
-                        </table>
-
-                        <p
-                          style="margin:16px 0 0;<%= font_style(13, 20, "#5C5C5C") %>"
-                        >
-                          <%= translation("connect_pos_footnote") %>
-                        </p>
-                      </td>
-                    </tr>
-                  </table>
-                </td>
-              </tr>
-            <% end %>
-
-            <!-- Dashboard contents -->
-            <tr>
-              <td class="px" style="padding:40px 40px 8px;">
-                <h2
-                  style="margin:0 0 6px;<%= font_style(22, 28, "#2C3E50", weight: 800) %>"
-                >
-                  <%= translation("dashboard_items_heading") %>
-                </h2>
-
-                <p style="margin:0 0 20px;<%= font_style(15, 23, "#666666") %>">
-                  <%= translation("dashboard_intro") %>
-                </p>
-
-                <table
-                  role="presentation"
-                  width="100%"
-                  cellpadding="0"
-                  cellspacing="0"
-                  border="0"
-                >
-                  <% dashboard_items.each do |lead, body| %>
-                    <tr>
-                      <td
-                        width="32"
-                        valign="top"
-                        style="padding:0 0 16px;<%= font_style(16, 22, "#016EC2", weight: 900) %>"
-                      >
-                        &#10003;
-                      </td>
-
-                      <td
-                        valign="top"
-                        style="padding:0 0 16px;<%= font_style(15, 22, "#666666") %>"
-                      >
-                        <strong style="color:#2C3E50;"><%= lead %></strong> <%= body %>
-                      </td>
-                    </tr>
-                  <% end %>
-                </table>
-              </td>
-            </tr>
-
-            <!-- Free tools -->
-            <tr>
-              <td class="px" style="padding:40px 40px 8px;">
-                <p
-                  style="margin:0 0 6px;<%= font_style(12, 16, "#016EC2", weight: 700, extra: "letter-spacing:1.5px;text-transform:uppercase;") %>"
-                >
-                  <%= translation("included_free") %>
-                </p>
-
-                <h2
-                  style="margin:0 0 6px;<%= font_style(22, 28, "#2C3E50", weight: 800) %>"
-                >
-                  <%= translation("free_tools_heading") %>
-                </h2>
-
-                <p style="margin:0 0 20px;<%= font_style(15, 23, "#666666") %>">
-                  <%= translation("free_tools_intro") %>
-                </p>
-
-                <table
-                  role="presentation"
-                  width="100%"
-                  cellpadding="0"
-                  cellspacing="0"
-                  border="0"
-                >
-                  <tr>
-                    <% tools.each_with_index do |tool, index| %>
-                      <td
-                        class="stack <%= " stack-gap" if index > 0 %>"
-                        width="50%"
-                        valign="top"
-                        style="padding:0 <%= (index == 0) ? "8px 0 0" : "0 0 8px" %>;"
-                      >
-                        <table
-                          role="presentation"
-                          width="100%"
-                          cellpadding="0"
-                          cellspacing="0"
-                          border="0"
-                          style="border:1px solid #E0E0E0;border-radius:8px;"
-                        >
-                          <tr>
-                            <td
-                              height="6"
-                              bgcolor="<%= tool[:color] %>"
-                              style="background-color:<%= tool[:color] %>;font-size:0;line-height:0;border-radius:8px 8px 0 0;"
-                            >
-                              &nbsp;
-                            </td>
-                          </tr>
-
-                          <tr>
-                            <td style="padding:20px 20px 22px;">
-                              <h3
-                                style="margin:0 0 8px;<%= font_style(18, 24, "#2C3E50", weight: 800) %>"
-                              >
-                                <%= tool[:title] %>
-                              </h3>
-
-                              <p
-                                style="margin:0 0 14px;<%= font_style(14, 21, "#666666") %>"
-                              >
-                                <%= tool[:body] %>
-                              </p>
-
-                              <a
-                                href="<%= tool[:href] %>"
-                                style="<%= font_style(14, 20, "#016EC2", weight: 700, extra: "text-decoration:none;") %>"
-                              >
-                                <%= tool[:action] %>
-                              </a>
-                            </td>
-                          </tr>
-                        </table>
-                      </td>
-                    <% end %>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-
-            <!-- Value recap -->
-            <tr>
-              <td class="px" style="padding:40px 40px 0;">
-                <table
-                  role="presentation"
-                  width="100%"
-                  cellpadding="0"
-                  cellspacing="0"
-                  border="0"
-                  bgcolor="#F8F8F8"
-                  style="background-color:#F8F8F8;border-radius:8px;"
-                >
-                  <tr>
-                    <td style="padding:26px 26px 8px;">
-                      <h2
-                        style="margin:0 0 8px;<%= font_style(18, 24, "#2C3E50", weight: 800) %>"
-                      >
-                        <%= translation("why_shops_heading") %>
-                      </h2>
-
-                      <p
-                        style="margin:0 0 18px;<%= font_style(15, 23, "#666666") %>"
-                      >
-                        <%= translation("why_shops_body") %>
-                      </p>
-                    </td>
-                  </tr>
-
-                  <tr>
-                    <td style="padding:0 26px 24px;">
-                      <table
-                        role="presentation"
-                        width="100%"
-                        cellpadding="0"
-                        cellspacing="0"
-                        border="0"
-                      >
-                        <tr>
-                          <% stats.each_with_index do |(number, caption), index| %>
-                            <td
-                              class="stack <%= " stack-gap" if index > 0 %>"
-                              width="33%"
-                              valign="top"
-                              style="padding:0 0 4px <%= (index == 0) ? 0 : 16 %>px;"
-                            >
-                              <table
-                                role="presentation"
-                                width="100%"
-                                cellpadding="0"
-                                cellspacing="0"
-                                border="0"
-                              >
-                                <tr>
-                                  <td style="border-top:2px solid #016EC2;">
-                                    <p
-                                      style="margin:10px 0 2px;<%= font_style(22, 26, "#2C3E50", weight: 900) %>"
-                                    >
-                                      <%= number %>
-                                    </p>
-
-                                    <p
-                                      style="margin:0;<%= font_style(13, 18, "#666666") %>"
-                                    >
-                                      <%= caption %>
-                                    </p>
-                                  </td>
-                                </tr>
-                              </table>
-                            </td>
-                          <% end %>
-                        </tr>
-                      </table>
-                    </td>
-                  </tr>
-                </table>
-              </td>
-            </tr>
-
-            <!-- Sign-off -->
-            <tr>
-              <td class="px" style="padding:36px 40px 40px;">
-                <p style="margin:0 0 14px;<%= font_style(15, 23, "#666666") %>">
-                  <%= translation("questions") %>
-                </p>
-
-                <p
-                  style="margin:0;<%= font_style(15, 23, "#2C3E50", weight: 700) %>"
-                >
-                  <%= translation("shop_team") %>
-                </p>
-              </td>
-            </tr>
-
-            <!-- Footer -->
-            <tr>
-              <td
-                class="px"
-                bgcolor="#2C3E50"
-                style="background-color:#2C3E50;padding:24px 40px 26px;border-radius:0 0 8px 8px;"
+          <tr>
+            <td width="28" valign="middle" style="padding:0;">
+              <table
+                role="presentation"
+                cellpadding="0"
+                cellspacing="0"
+                border="0"
               >
-                <p style="margin:0 0 8px;<%= font_style(12, 18, "#C9D3DC") %>">
-                  <%= translation("receiving_because", name: @organization.name) %>
-                </p>
+                <tr>
+                  <td
+                    width="16"
+                    height="16"
+                    align="center"
+                    bgcolor="#FFFFFF"
+                    style="width:16px;height:16px;background-color:#FFFFFF;border:2px solid #016EC2;border-radius:10px;font-size:0;line-height:0;"
+                  >
+                    &nbsp;
+                  </td>
+                </tr>
+              </table>
+            </td>
 
-                <p style="margin:0 0 8px;<%= font_style(12, 18, "#C9D3DC") %>">
-                  <%= translation("nonprofit") %>
-                </p>
+            <td
+              valign="middle"
+              style="padding:0;<%= font_style(14, 20, "#016EC2", weight: 700) %>"
+            >
+              <%= translation("sticker_pos_step") %>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
 
-                <p style="margin:0;<%= font_style(12, 18, "#C9D3DC") %>">
-                  <a href="<%= privacy_url %>" style="color:#FFFFFE;text-decoration:underline;"><%= translation("privacy_policy") %></a>
-                  &nbsp;&middot;&nbsp;
-                  <a href="<%= edit_my_account_url %>" style="color:#FFFFFE;text-decoration:underline;"><%= translation("email_preferences") %></a>
-                </p>
+    <tr>
+      <td style="padding:20px 28px 0;">
+        <table
+          role="presentation"
+          width="100%"
+          cellpadding="0"
+          cellspacing="0"
+          border="0"
+        >
+          <tr>
+            <td
+              height="2"
+              bgcolor="#1A1A1A"
+              style="background-color:#1A1A1A;font-size:0;line-height:0;"
+            >
+              &nbsp;
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+
+    <tr>
+      <td style="padding:22px 28px 30px;">
+        <p
+          style="margin:0 0 8px;<%= font_style(12, 16, "#715EB2", weight: 700, extra: "letter-spacing:1.5px;text-transform:uppercase;") %>"
+        >
+          <%= translation("most_important_next_step") %>
+        </p>
+
+        <h2
+          class="uncap"
+          style="margin:0 0 10px;<%= font_style(24, 30, "#333333", weight: 700) %>"
+        >
+          <%= translation("connect_pos_heading") %>
+        </h2>
+
+        <p style="margin:0 0 14px;<%= font_style(15, 23, "#4D4D4D") %>">
+          <%= translation("connect_pos_body") %>
+        </p>
+
+        <p
+          style="margin:0 0 20px;<%= font_style(15, 23, "#333333", weight: 700) %>"
+        >
+          <%= translation("connect_pos_impact") %>
+        </p>
+
+        <table
+          role="presentation"
+          cellpadding="0"
+          cellspacing="0"
+          border="0"
+          style="margin:0 0 6px;"
+        >
+          <tr>
+            <% pos_chips.each_with_index do |(name, live), index| %>
+              <% if index > 0 %>
+                <td width="8" style="font-size:0;line-height:0;">&nbsp;</td>
+              <% end %>
+
+              <td
+                style="padding:6px 12px;<%= live ? "background-color:#FFFFFF;border:1px solid #333333;border-radius:14px;" : "border:1px dashed #8A8A8A;border-radius:14px;" %><%= font_style(13, 16, live ? "#333333" : "#5C5C5C", weight: (700 if live)) %>"
+              >
+                <%= name %>
               </td>
-            </tr>
-          </table>
-          <!--[if mso]></td></tr></table><![endif]-->
-        </td>
-      </tr>
-    </table>
-  </body>
-</html>
+            <% end %>
+          </tr>
+        </table>
+
+        <%= link_to translation("connect_your_pos_now"), dashboard_url, class: "binx-button", style: "margin-top:22px;" %>
+
+        <p style="margin:16px 0 0;<%= font_style(13, 20, "#5C5C5C") %>">
+          <%= translation("connect_pos_footnote") %>
+        </p>
+      </td>
+    </tr>
+  </table>
+<% end %>
+
+<h2
+  class="uncap"
+  style="margin:40px 0 6px;<%= font_style(22, 28, "#333333", weight: 700) %>"
+>
+  <%= translation("dashboard_items_heading") %>
+</h2>
+
+<p style="margin:0 0 20px;"><%= translation("dashboard_intro") %></p>
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+>
+  <% dashboard_items.each do |lead, body| %>
+    <tr>
+      <td
+        width="32"
+        valign="top"
+        style="padding:0 0 16px;<%= font_style(16, 22, "#016EC2", weight: 900) %>"
+      >
+        &#10003;
+      </td>
+
+      <td
+        valign="top"
+        style="padding:0 0 16px;<%= font_style(15, 22, "#666666") %>"
+      >
+        <strong style="color:#333333;"><%= lead %></strong> <%= body %>
+      </td>
+    </tr>
+  <% end %>
+</table>
+
+<p
+  style="margin:40px 0 6px;<%= font_style(12, 16, "#016EC2", weight: 700, extra: "letter-spacing:1.5px;text-transform:uppercase;") %>"
+>
+  <%= translation("included_free") %>
+</p>
+
+<h2
+  class="uncap"
+  style="margin:0 0 6px;<%= font_style(22, 28, "#333333", weight: 700) %>"
+>
+  <%= translation("free_tools_heading") %>
+</h2>
+
+<p style="margin:0 0 20px;"><%= translation("free_tools_intro") %></p>
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+>
+  <tr>
+    <% tools.each_with_index do |tool, index| %>
+      <td
+        class="stack <%= " stack-gap" if index > 0 %>"
+        width="50%"
+        valign="top"
+        style="padding:0 <%= (index == 0) ? "8px 0 0" : "0 0 8px" %>;"
+      >
+        <table
+          role="presentation"
+          width="100%"
+          cellpadding="0"
+          cellspacing="0"
+          border="0"
+          style="border:1px solid #E0E0E0;border-radius:8px;"
+        >
+          <tr>
+            <td
+              height="6"
+              bgcolor="<%= tool[:color] %>"
+              style="background-color:<%= tool[:color] %>;font-size:0;line-height:0;border-radius:8px 8px 0 0;"
+            >
+              &nbsp;
+            </td>
+          </tr>
+
+          <tr>
+            <td style="padding:20px 20px 22px;">
+              <h3
+                class="uncap"
+                style="margin:0 0 8px;<%= font_style(18, 24, "#333333", weight: 700) %>"
+              >
+                <%= tool[:title] %>
+              </h3>
+
+              <p style="margin:0 0 14px;<%= font_style(14, 21, "#666666") %>">
+                <%= tool[:body] %>
+              </p>
+
+              <a
+                href="<%= tool[:href] %>"
+                style="<%= font_style(14, 20, "#016EC2", weight: 700, extra: "text-decoration:none;") %>"
+              >
+                <%= tool[:action] %>
+              </a>
+            </td>
+          </tr>
+        </table>
+      </td>
+    <% end %>
+  </tr>
+</table>
+
+<table
+  role="presentation"
+  width="100%"
+  cellpadding="0"
+  cellspacing="0"
+  border="0"
+  bgcolor="#F8F8F8"
+  style="margin:40px 0 0;background-color:#F8F8F8;border-radius:8px;"
+>
+  <tr>
+    <td style="padding:26px 26px 8px;">
+      <h3
+        class="uncap"
+        style="margin:0 0 8px;<%= font_style(18, 24, "#333333", weight: 700) %>"
+      >
+        <%= translation("why_shops_heading") %>
+      </h3>
+
+      <p style="margin:0 0 18px;<%= font_style(15, 23, "#666666") %>">
+        <%= translation("why_shops_body") %>
+      </p>
+    </td>
+  </tr>
+
+  <tr>
+    <td style="padding:0 26px 24px;">
+      <table
+        role="presentation"
+        width="100%"
+        cellpadding="0"
+        cellspacing="0"
+        border="0"
+      >
+        <tr>
+          <% stats.each_with_index do |(number, caption), index| %>
+            <td
+              class="stack <%= " stack-gap" if index > 0 %>"
+              width="33%"
+              valign="top"
+              style="padding:0 0 4px <%= (index == 0) ? 0 : 16 %>px;"
+            >
+              <table
+                role="presentation"
+                width="100%"
+                cellpadding="0"
+                cellspacing="0"
+                border="0"
+              >
+                <tr>
+                  <td style="border-top:2px solid #715EB2;">
+                    <p
+                      style="margin:10px 0 2px;<%= font_style(22, 26, "#333333", weight: 900) %>"
+                    >
+                      <%= number %>
+                    </p>
+
+                    <p style="margin:0;<%= font_style(13, 18, "#666666") %>">
+                      <%= caption %>
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          <% end %>
+        </tr>
+      </table>
+    </td>
+  </tr>
+</table>
+
+<p style="margin:36px 0 0;"><%= translation("questions") %></p>
+
+<p style="margin:32px 0 0;<%= font_style(12, 18, "#888888") %>">
+  <%= translation("receiving_because", name: @organization.name) %>
+  <%= translation("nonprofit") %>.
+  <a href="<%= privacy_url %>" style="color:#888888;text-decoration:underline;"><%= translation("privacy_policy") %></a>
+  &middot;
+  <a href="<%= edit_my_account_url %>" style="color:#888888;text-decoration:underline;"><%= translation("email_preferences") %></a>
+</p>

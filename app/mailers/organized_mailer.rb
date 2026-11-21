@@ -41,10 +41,8 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
-  # Carries its own header, sign-off and footer, so it skips the email layout. Replies go to
-  # Bike Index rather than the shop's auto user, which is who `reply_to` would pick
+  # Replies go to Bike Index rather than the shop's auto user, which is who `reply_to` would pick
   def shop_welcome(organization, user)
-    @_action_has_layout = false
     component = Emails::ShopWelcome::Component.new(organization:)
 
     I18n.with_locale(user.preferred_language) do

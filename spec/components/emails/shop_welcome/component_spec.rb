@@ -16,9 +16,9 @@ RSpec.describe Emails::ShopWelcome::Component, type: :component do
     expect(component).to have_content("Connect your POS so no bike gets missed.")
     expect(component).to have_content("Shifty Bike Shop on Bike Index")
     expect(component.css("a").map { it[:href] }.compact_blank)
-      .to eq([ENV["BASE_URL"] + "/", dashboard_url, dashboard_url, "#{ENV["BASE_URL"]}/bikebook", "#{ENV["BASE_URL"]}/ebike-rules",
+      .to eq([dashboard_url, dashboard_url, "#{ENV["BASE_URL"]}/bikebook", "#{ENV["BASE_URL"]}/ebike-rules",
         "#{ENV["BASE_URL"]}/privacy", "#{ENV["BASE_URL"]}/my_account/edit"])
-    expect(component.css("img").first[:src]).to match(%r{\Ahttps?://[^/]+/assets/kelsey/illustrations/comic-assets_logo-cape-\h+\.png\z})
+    expect(component.css("a.binx-button").map { it.text.strip }).to eq(["Connect your POS now"])
   end
 
   it "renders the registry's live counts" do
@@ -34,6 +34,7 @@ RSpec.describe Emails::ShopWelcome::Component, type: :component do
       expect(component).to_not have_content("connect your POS")
       expect(component).to_not have_content("Connect your POS")
       expect(component.css("a").map { it[:href] }.compact_blank.count(dashboard_url)).to eq 1
+      expect(component.css("a.binx-button").map { it.text.strip }).to eq(["Open your dashboard"])
     end
   end
 end

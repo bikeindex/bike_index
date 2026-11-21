@@ -275,3 +275,17 @@ $alert-warning-color: #ffc107;
     height: auto;
   }
 }
+
+// Side-by-side cells that stack on a narrow screen. A media query has to live in the head, which is
+// what premailer does with this one
+@media screen and (max-width: 620px) {
+  .stack {
+    display: block !important;
+    width: 100% !important;
+  }
+
+  .stack-gap {
+    padding-top: 16px !important;
+    padding-left: 0 !important;
+  }
+}

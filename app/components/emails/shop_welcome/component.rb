@@ -2,9 +2,9 @@
 
 module Emails
   module ShopWelcome
-    # A full document rather than a fragment: OrganizedMailer#shop_welcome renders it without the
-    # email layout. Table markup and inline styles, because email clients ignore everything else -
-    # only the mobile media query lives in a <style>
+    # The body of the email layout, so the banner, sign-off and footer are the layout's. Table
+    # markup and inline styles, because email clients ignore most else - only stacking on a
+    # narrow screen is a class, in email_components.scss
     class Component < ApplicationComponent
       FONT = "font-family:Arial,Helvetica,sans-serif;mso-line-height-rule:exactly;"
 
@@ -23,7 +23,13 @@ module Emails
 
       def dashboard_url = organization_root_url(organization_id: @organization.to_param)
 
-      def logo_url = image_url("kelsey/illustrations/comic-assets_logo-cape.png", host: root_url)
+      # The POS step is the one big button when there is one
+      def dashboard_link
+        text = translation("open_your_dashboard")
+        return link_to(text, dashboard_url, class: "binx-button") unless connect_pos?
+
+        link_to(safe_join([text, "→"], " "), dashboard_url, style: font_style(16, 24, "#016EC2", weight: 700))
+      end
 
       def preheader = connect_pos? ? translation("preheader_connect_pos") : translation("preheader")
 

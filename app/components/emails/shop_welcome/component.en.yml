@@ -29,14 +29,12 @@ en:
         dashboard_intro: Your shop account is more than a sign-up. It's your home
           base on Bike Index.
         dashboard_items_heading: What you can do from your dashboard
-        ding: DING!
         ebike_checker: E-bike checker
         ebike_checker_body: >-
           State-by-state rules on e-bike classes, where they can ride, and age and
           equipment requirements. Handy when a customer asks what's legal before they
           buy.
         email_preferences: Email preferences
-        for_bike_shops: For bike shops
         free_tools: New ones are on the way, and shop accounts get them first.
         free_tools_heading: Tools to help customers choose
         free_tools_intro: Use them on the sales floor, or send customers the link.
@@ -49,7 +47,6 @@ en:
           shop registers lives. One step left: connect your POS so every bike you
           sell registers automatically.
         hero_heading: You're in. Your shop has a dashboard.
-        hero_image_alt: Bike Index shield wearing a superhero cape
         included_free: Included free
         most_important_next_step: Your most important next step
         nonprofit: Bike Index, a 501(c)(3) nonprofit
@@ -68,13 +65,11 @@ en:
           Bike Index.
         see_every_bike: Each sale shows up in one list, with serial and details.
         see_every_bike_lead: See every bike you've registered.
-        shop_team: The Bike Index shop team
         shopify_soon: Shopify soon
         stat_bikes: bikes registered
         stat_partners: partner shops, police, and cities
         stat_recoveries: stolen bikes recovered
         sticker_pos_step: Connect your POS · about 10 minutes
-        title: Your shop dashboard is ready
         track_pos: See it working as each sale registers.
         track_pos_lead: Track your POS connection.
         why_shops_body: >-
