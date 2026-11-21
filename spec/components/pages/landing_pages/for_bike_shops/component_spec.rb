@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
   let(:instance) { described_class.new(**options) }
   let(:component) { render_inline(instance) }
-  let(:options) { {recovery_displays:, feedback: Feedback.new} }
+  let(:options) { {recovery_displays:} }
   let(:recovery_displays) { [] }
 
   it "renders the signup form and the live stats" do
@@ -13,10 +13,8 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
     Counts.assign_for("recoveries", 18_263)
     Counts.assign_for("recoveries_value", 38_412_345)
     Counts.assign_for("organizations", 1_000)
-    expect(component).to have_css("form#new_feedback input[name='feedback[feedback_type]'][value='lead_for_bike_shop']", visible: :all)
     expect(component).to have_field("Shop name")
-    # A longer name overflowed the column and 500ed
-    expect(component).to have_css("input#feedback_name[maxlength='255']")
+    expect(component).to have_field("Email")
     expect(component).to have_select("Your POS", with_options: ["Lightspeed", "Ascend", "Shopify (coming soon)", "Other / none"])
     expect(component).to have_text("1.2M+")
     expect(component).to have_text("18,263")
@@ -29,9 +27,13 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
     expect(component).to_not have_text("Bikes that came home")
   end
 
-  it "returns a signup to the thank you that :target reveals" do
-    expect(component).to have_field("return_to", type: :hidden, with: "/for_bike_shops#shop-signed-up")
-    expect(component).to have_css("#shop-signed-up.tw\\:hidden", text: "You're in.", visible: :all)
+  context "signed in" do
+    let(:options) { {recovery_displays:, current_user: FactoryBot.create(:user_confirmed, email: "shop@example.com")} }
+
+    it "uses their email rather than asking for one" do
+      expect(component).to have_no_field("Email")
+      expect(component).to have_text("You're signed in as shop@example.com")
+    end
   end
 
   it "frames the checker on California" do
@@ -39,7 +41,7 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
   end
 
   context "with the visitor's place" do
-    let(:options) { {recovery_displays:, feedback: Feedback.new, checker_place: EbikeRuleServices::Places.find("US-OR")} }
+    let(:options) { {recovery_displays:, checker_place: EbikeRuleServices::Places.find("US-OR")} }
 
     it "frames the checker on it" do
       expect(component).to have_css("iframe[src^='/ebike-rules/US/OR?']", visible: :all)

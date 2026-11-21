@@ -158,6 +158,7 @@ class Organization < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
+  after_create_commit :enqueue_shop_welcome, if: :bike_shop?
 
   default_scope { order(:name) }
   scope :name_ordered, -> { order(arel_table["name"].lower) }
@@ -679,6 +680,8 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  def enqueue_shop_welcome = EmailJobs::ShopWelcomeJob.perform_in(EmailJobs::ShopWelcomeJob::DELAY, id)
 
   # Returning an address no account holds would leave auto_user blank, so every
   # later ensure_auto_user would save again and re-enqueue UpdateOrganizationAssociationsJob

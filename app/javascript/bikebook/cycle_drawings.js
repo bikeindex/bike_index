@@ -1,5 +1,4 @@
 import { builtWheel, frameGeometry, leg, radians, STANDOVER_X } from 'bikebook/frame_geometry'
-import { catalogValue } from 'bikebook/legacy_shape'
 import { array, isNumber } from 'bikebook/templates/values'
 
 // Each vehicle type's drawing, in mm with y up from the ground and the rider facing +x, as views of shapes and the
@@ -70,7 +69,7 @@ const tires = (rearAxle, rearWheel, frontAxle, frontWheel) => [['tire_width_rear
   .filter(([, , { tire }]) => tire)
   .map(([key, [x, y], { r, tire, tireListed }, side]) => v(key, [x, y - r], [x, y - r + tire], 0, { base: x, side, value: tire, listed: tireListed, derived: true, unlettered: true }))
 
-const ROAD = /^(road|track|atb_)/
+const ROAD = /^(road|track|atb-)/
 const BMX = /^bmx/
 
 // its handlebar type's bar, a road bike's drop bar where it lists none
@@ -176,7 +175,7 @@ const bikeShapes = (frame, context, detail) => {
   const body = {
     step_through: () => [tube(frontAxle, headBottom, headTop), tube(seatTop, rearAxle, bb, headBottom), tube(...stepTube(frame, fig('standover'))),
       ...saddled, cockpitParts(tube(headTop, stem, clamp), bar(data, clamp))],
-    bench_seat: () => [tube(frontAxle, headBottom, headTop, under, tail, rearAxle, bb, headBottom), tube(bb, under),
+    'bench-seat': () => [tube(frontAxle, headBottom, headTop, under, tail, rearAxle, bb, headBottom), tube(bb, under),
       seatPart(panel(front, back, plus(back, [0, -70]), plus(front, [-30, -70]))), part(headTop, riser), handlebar(riser)]
   }[detail]?.() ?? [tube(frontAxle, headBottom, headTop, seatTop, rearAxle, bb, headBottom), ...saddled,
     cockpitParts(tube(headTop, stem, clamp), bmx ? bmxBar(clamp, steering) : bar(data, clamp))]
@@ -194,7 +193,7 @@ const bikeDims = (frame, context, detail) => {
   const seatAngle = Math.atan2(seat[1], -seat[0]) * 180 / Math.PI
   const seatAtStack = atHeight(bb, seat, headTop[1])
   const seated = bench(frame, { fig })
-  const topTube = detail === 'bench_seat' ? seated.under : seatTop
+  const topTube = detail === 'bench-seat' ? seated.under : seatTop
   // just forward of the bottom bracket, between the BB height's line and the seat tube's out in front: on the top tube, or a
   // step-through's step tube
   const standoverX = bb[0] + STANDOVER_X
@@ -210,9 +209,9 @@ const bikeDims = (frame, context, detail) => {
     // out from where a seat tube stopping short of the stack, as a BMX's does, meets its top tube
     h('top_tube_effective', seatAtStack, headTop, 2.3, seatTop[1] < seatAtStack[1] ? { guides: [[seatTop, seatAtStack]] } : {}),
     d('head_tube', headTop, headBottom, 1),
-    ...(detail === 'bench_seat' ? [] : [d('stem_length', stem, clamp, 0.4)]),
+    ...(detail === 'bench-seat' ? [] : [d('stem_length', stem, clamp, 0.4)]),
     angle('head_angle', ground, headAngle, 3.4),
-    ...(detail === 'bench_seat' ? [] : [d('seat_tube_ct', bb, seatTop, -1.8), angle('seat_angle', bb, seatAngle, 3.4)]),
+    ...(detail === 'bench-seat' ? [] : [d('seat_tube_ct', bb, seatTop, -1.8), angle('seat_angle', bb, seatAngle, 3.4)]),
     d('chainstay', bb, rearAxle, 1),
     overall('wheelbase', rearAxle[0], frontAxle[0], -1.6),
     ...tires(rearAxle, frame.rearWheel, frontAxle, frame.frontWheel),
@@ -225,7 +224,7 @@ const bikeDims = (frame, context, detail) => {
       : fromGround('standover', standoverAt, 0, { t: detail === 'step_through' ? 0.7 : 0.5 }),
     d('fork_rake', foot, frontAxle, -0.6, { guides: [[headBottom, foot]] }),
     h('trail', ground, [frontAxle[0], 0], -0.7, { base: 0 }),
-    ...(detail === 'bench_seat'
+    ...(detail === 'bench-seat'
       ? [fromGround('seat_height', seated.front, 0, { base: seated.front[0] - 40 }), h('seat_length', seated.back, seated.front, 0.8),
           fromGround('handlebar_height', atHeight(headTop, steering, fig('handlebar_height')), 1.2, { base: frontAxle[0] + frame.frontWheel.r })]
       : [])
@@ -893,7 +892,7 @@ const TRICYCLE = { wheelbase: 1200, head_angle: 70, seat_height_min: 750, seat_h
 const CYCLE_DRAWINGS = {
   bike: { draw: bike(), defaults: BIKE, framed: true },
   'bike/step_through': { draw: bike('step_through'), defaults: { ...BIKE, standover: 450, head_angle: 70, seat_angle: 72 }, framed: true },
-  'bike/bench_seat': { draw: bike('bench_seat', { bsd: 406, tire: 100 }), defaults: { ...BIKE, stack: 560, reach: 430, head_angle: 66, chainstay: 460, seat_height: 840, seat_length: 620, handlebar_height: 1080 }, framed: true },
+  'bike/bench-seat': { draw: bike('bench-seat', { bsd: 406, tire: 100 }), defaults: { ...BIKE, stack: 560, reach: 430, head_angle: 66, chainstay: 460, seat_height: 840, seat_length: 620, handlebar_height: 1080 }, framed: true },
   tandem: { draw: tandem(), defaults: TANDEM },
   'tandem/step_through': { draw: tandem('step_through'), defaults: { ...TANDEM, standover: 500, stoker_standover: 450 } },
   unicycle: { draw: unicycle, defaults: { seat_height: 880, crank_length: 125 } },
@@ -901,23 +900,23 @@ const CYCLE_DRAWINGS = {
   'tricycle/tadpole': { draw: recumbent({ bsd: 507 }), defaults: { wheelbase: 1380, seat_height: 420, seat_angle: 55, bb_height: 480, crank_length: 165, track_width: 820 } },
   stroller: { draw: stroller, defaults: { wheelbase: 620, handlebar_height: 1040, 'dimensions.height': 1080, 'dimensions_folded.length': 700, 'dimensions_folded.height': 340 } },
   recumbent: { draw: recumbent({ bsd: 406 }), defaults: { wheelbase: 1060, seat_height: 300, seat_angle: 42, bb_height: 400, crank_length: 155, track_width: 780 } },
-  bike_trailer: { draw: bikeTrailer, defaults: { 'dimensions.length': 1450, 'dimensions.height': 900, 'dimensions.width': 800 } },
+  trailer: { draw: bikeTrailer, defaults: { 'dimensions.length': 1450, 'dimensions.height': 900, 'dimensions.width': 800 } },
   wheelchair: { draw: wheelchair, defaults: { seat_height: 490, seat_depth: 430, backrest_height: 420, seat_width: 420, 'dimensions.width': 640 } },
-  cargo_bike: { draw: longJohn, defaults: { bb_height: 290, chainstay: 450, wheelbase: 1800, head_angle: 70, head_tube: 100, seat_angle: 70, top_tube_effective: 600 } },
-  tall_bike: { draw: tallBike, defaults: { ...BIKE, frame_offset: 560 }, framed: true },
-  penny_farthing: { draw: pennyFarthing, defaults: { wheelbase: 980, seat_height: 1450, crank_length: 130 } },
-  cargo_bike_rear: { draw: longtail, defaults: { ...BIKE, chainstay: 640 }, framed: true },
-  cargo_tricycle: { draw: tricycle({ paired: 'front' }), defaults: { ...TRICYCLE, wheelbase: 1750, box_length: 900, box_height: 550, box_width: 800, track_width: 780 } },
-  cargo_tricycle_rear: { draw: tricycle({ paired: 'rear' }), defaults: { ...TRICYCLE, box_length: 900, box_height: 400, box_width: 700, track_width: 760 } },
-  trail_behind: { draw: trailBehind, defaults: { seat_height: 760, standover: 560, hitch_height: 900, tow_arm_length: 900 } },
-  pedi_cab: { draw: pediCab, defaults: { wheelbase: 2000, seat_height: 1000, bench_height: 700, 'dimensions.height': 1950 } },
-  e_scooter: { draw: scooter({ kick: false }), defaults: SCOOTER },
-  epamd: { draw: personalMobility, defaults: { 'dimensions.height': 740, 'dimensions.width': 200, pedal_height: 220 } },
-  scooter: { draw: scooter({ kick: true }), defaults: { ...SCOOTER, wheelbase: 620, deck_height: 90, deck_width: 120, handlebar_height: 860, handlebar_width: 400 } },
-  skateboard: { draw: skateboard, defaults: { 'dimensions.length': 820, 'dimensions.width': 210, wheelbase: 450, deck_height: 110 } },
-  e_motorcycle: { draw: eMotorcycle, defaults: { wheelbase: 1300, head_angle: 64, handlebar_height: 1150, seat_height: 880, seat_length: 650, ground_clearance: 300 } },
-  elliptical_bike: { draw: ellipticalBike, defaults: { wheelbase: 1350, operating_height: 1400, platform_height: 200, stride_length: 500, stride_height: 150 } },
-  balance_bike: { draw: balanceBike, defaults: { wheelbase: 560, head_angle: 70, head_tube: 90, standover: 300, seat_height_min: 290, seat_height_max: 420, handlebar_height_min: 460, handlebar_height_max: 540 } }
+  cargo: { draw: longJohn, defaults: { bb_height: 290, chainstay: 450, wheelbase: 1800, head_angle: 70, head_tube: 100, seat_angle: 70, top_tube_effective: 600 } },
+  'tall-bike': { draw: tallBike, defaults: { ...BIKE, frame_offset: 560 }, framed: true },
+  'penny-farthing': { draw: pennyFarthing, defaults: { wheelbase: 980, seat_height: 1450, crank_length: 130 } },
+  'cargo-rear': { draw: longtail, defaults: { ...BIKE, chainstay: 640 }, framed: true },
+  'cargo-trike': { draw: tricycle({ paired: 'front' }), defaults: { ...TRICYCLE, wheelbase: 1750, box_length: 900, box_height: 550, box_width: 800, track_width: 780 } },
+  'cargo-trike-rear': { draw: tricycle({ paired: 'rear' }), defaults: { ...TRICYCLE, box_length: 900, box_height: 400, box_width: 700, track_width: 760 } },
+  'trail-behind': { draw: trailBehind, defaults: { seat_height: 760, standover: 560, hitch_height: 900, tow_arm_length: 900 } },
+  'pedi-cab': { draw: pediCab, defaults: { wheelbase: 2000, seat_height: 1000, bench_height: 700, 'dimensions.height': 1950 } },
+  'e-scooter': { draw: scooter({ kick: false }), defaults: SCOOTER },
+  'personal-mobility': { draw: personalMobility, defaults: { 'dimensions.height': 740, 'dimensions.width': 200, pedal_height: 220 } },
+  'non-e-scooter': { draw: scooter({ kick: true }), defaults: { ...SCOOTER, wheelbase: 620, deck_height: 90, deck_width: 120, handlebar_height: 860, handlebar_width: 400 } },
+  'non-e-skateboard': { draw: skateboard, defaults: { 'dimensions.length': 820, 'dimensions.width': 210, wheelbase: 450, deck_height: 110 } },
+  'e-motorcycle': { draw: eMotorcycle, defaults: { wheelbase: 1300, head_angle: 64, handlebar_height: 1150, seat_height: 880, seat_length: 650, ground_clearance: 300 } },
+  elliptical: { draw: ellipticalBike, defaults: { wheelbase: 1350, operating_height: 1400, platform_height: 200, stride_length: 500, stride_height: 150 } },
+  'balance-bike': { draw: balanceBike, defaults: { wheelbase: 560, head_angle: 70, head_tube: 90, standover: 300, seat_height_min: 290, seat_height_max: 420, handlebar_height_min: 460, handlebar_height_max: 540 } }
 }
 
 // The type_details `type` is drawn its own way for, the only list of them
@@ -960,7 +959,7 @@ export const drawingViews = ({ type, data, typeDetail, size }) => {
   const wheelAt = (positions, fallback) => {
     const built = positions.map((position) => builtWheel(data, size, position)).find((each) => isNumber(each?.bsd))
     const figure = tireFigure(size, positions[0])
-    const tire = figure ?? built?.tire_width ?? assume('wheels', catalogValue(built, 'tire_width_max') ?? fallback.tire)
+    const tire = figure ?? built?.tire_width ?? assume('wheels', built?.tire_width_max ?? fallback.tire)
     return { r: (built?.bsd ?? assume('wheels', fallback.bsd)) / 2 + tire, tire, listed: Boolean(built), tireListed: isNumber(figure) || isNumber(built?.tire_width) }
   }
   // the first of `keys` it lists, else the first's typical

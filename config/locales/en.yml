@@ -1838,14 +1838,14 @@ en:
           We couldn't finish setting up your organization (%{errors}). Contact support@bikeindex.org
           and we'll sort it out.
       confirm_email:
+        accept_terms: >-
+          Agree to the Terms of Service and the Terms of Service for Organizations
+          to activate the organization
         link_invalid: >-
           That link doesn't work anymore. Use the newest email we sent to %{email},
           or send another below.
         link_invalid_resent: That link doesn't work anymore, so we've emailed a new
           one to %{email}.
-        sign_out_to_confirm: >-
-          You're signed in as %{email}. Sign out, then open the link again to activate
-          the organization.
         switched_signup: >-
           You're now finishing %{name}. To finish %{replaced_name} too, open the link
           in its email.
@@ -2006,11 +2006,9 @@ en:
         safety_rules_updated: The safety rules have been updated — please review them
           again
       confirm_email:
+        accept_terms: Agree to the Terms of Service to continue
         confirmation_link_expired: That confirmation link has expired — check your
           email for a new one
-        sign_out_to_agree: >-
-          You're signed in as %{email}. Sign out, then open the link again to agree
-          to the safety rules.
         signed_in_as_other: >-
           You're signed in as %{email}, so we kept you in that account. The registration
           is still saved to the address we emailed.
@@ -4583,6 +4581,8 @@ en:
       subject: Finish reporting your stolen %{cycle_type}
     partial_registration:
       subject: Finish your %{organization_name}Bike Index registration!
+    shop_welcome:
+      subject: Your Bike Index shop dashboard is ready
   payments:
     form:
       donation_header: Help support our efforts!

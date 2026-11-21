@@ -17,7 +17,7 @@ RSpec.describe Spreadsheets::PrimaryActivities do
       let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Biking)", priority: 10) }
       let!(:primary_activity_2) { FactoryBot.create(:primary_activity, name: "All Road", primary_activity_family:, priority: 4) }
       # The family exports as a flavor-less row (empty flavor column)
-      let(:target) { ["flavor,families,priority,short_name,slug", ",ATB (All Terrain Biking),10,ATB,atb", "All Road,ATB (All Terrain Biking),4,All Road,all-road", "Bike Polo,,1,Bike Polo,bike-polo"] }
+      let(:target) { ["flavor,families,priority,short_name,slug", ",ATB (All Terrain Biking),10,ATB,atb", "All Road,ATB (All Terrain Biking),4,All Road,atb-all-road", "Bike Polo,,1,Bike Polo,bike-polo"] }
 
       it "generates" do
         result = described_class.to_csv.split("\n")
@@ -36,7 +36,7 @@ RSpec.describe Spreadsheets::PrimaryActivities do
           ["flavor,families,priority,short_name,slug",
             ",ATB (All Terrain Biking),10,ATB,atb",
             ",Road Biking,9,Road,road-biking",
-            "All Road,ATB (All Terrain Biking) & Road Biking,4,All Road,all-road",
+            "All Road,ATB (All Terrain Biking) & Road Biking,4,All Road,atb-all-road",
             "Bike Polo,,1,Bike Polo,bike-polo"]
         end
 

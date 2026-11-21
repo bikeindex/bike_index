@@ -3105,7 +3105,8 @@ CREATE TABLE public.organization_signups (
     return_to character varying,
     organization_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    pos_kind integer
 );
 
 
@@ -8239,6 +8240,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261121050440'),
 ('20261119223217'),
 ('20261119180000'),
 ('20261119102802'),
