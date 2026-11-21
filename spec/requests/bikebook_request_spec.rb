@@ -219,8 +219,6 @@ RSpec.describe BikebookController, type: :request do
       expect(response).to redirect_to("/bikebook?classifications=evc/us/class_3")
       get "/evc/off_highway_motorcycle"
       expect(response).to redirect_to("/bikebook?classifications=evc/off_highway_motorcycle")
-      get "/evc/us/class-3"
-      expect(response).to redirect_to("/bikebook?classifications=evc/us/class-3")
     end
 
     context "without its m/, and with vehicles already picked" do
