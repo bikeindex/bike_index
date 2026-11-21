@@ -80,7 +80,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
       FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: bike.id,
         params: {bike: {manufacturer_id: bike.manufacturer_id, owner_email: owner_email}})
     end
-    let!(:registration_sequence) { FactoryBot.create(:registration_sequence_acknowledgment_pending, b_param:, bike:) }
+    let!(:education_course_acknowledgment) { FactoryBot.create(:education_course_acknowledgment_pending, b_param:, bike:) }
     let(:owner_email) { user.email }
 
     it "finds the one the user still has to finish" do

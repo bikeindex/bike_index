@@ -146,19 +146,6 @@ For each, name the existing component it renders or duplicates. One that wraps a
 
 **Required when the branch adds markup or an icon.** Run the `use-existing-markup` skill. It converts the hand-written markup to existing components without asking, covering marketing pages, buttons, icons and shadows. **Whenever it changes anything, tell the user in your reply.** List each conversion with the visible change it makes, and the commit it landed in. A page that looks different after a PR update, with no word about why, is what this prevents. Put its callouts (big shadows, and hover states on things that aren't buttons) in the same reply. When it changes nothing, say so in one line.
 
-### The markup audit
-
-**Required when the branch adds markup.** List it:
-
-```bash
-rtk proxy git diff origin/main...HEAD -U0 -- '*.erb' '*.haml' 'app/components/*.rb' |
-  grep -E '^(\+\+\+ |\+\s*%[a-z]|\+.*(<[a-z]|link_to|button_to|content_tag|tag\.|tw:))'
-```
-
-Read `app/components/ui/` and `app/components/atoms/`, plus the sibling `pages/` and `shared_blocks/` components that render the same thing, and convert every hand-written piece one of them covers — cards to `UI::Card`, headings to `UI::Header`, link rows to `UI::ButtonGroup`, pills to `UI::Badge`, a `link_to … method:` to `UI::ButtonLink`. Icons go through the asset audit's rule even when the file is already in the repo. A class map repeating another component's moves to something both already render: `Atoms::RegistrationStatusBadge::Component::BORDER_CLASSES`.
-
-Convert without asking, and name any visible change in your reply. A class the component's own outranks takes a `!`, as `Pages::MyAccount::Show::PromptBar` does; a match that needs a new `UI::*` argument goes to the user. Name each hand-written piece you kept and what no component covers.
-
 ### The cycle-type translation check
 
 `AGENTS.md`'s Translations section has the rule; this is how to find the branch's violations:
