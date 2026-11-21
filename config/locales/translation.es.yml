@@ -1527,6 +1527,8 @@ es:
           request_not_authorized: Request need to be authorized. Required parameter
             for authorizing request is missing or invalid.
           invalid_code_challenge: Se requiere desafío de código.
+          multiple_client_auth_methods: La solicitud utiliza más de un mecanismo para
+            autenticar al cliente.
         invalid_redirect_uri: La uri de redirección no es valida.
         unauthorized_client: El cliente no tiene autorización para realizar esta petición
           utilizando este método.

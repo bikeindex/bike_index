@@ -375,6 +375,13 @@ RSpec.describe User, type: :model do
       expect(user2.valid?).to be_falsey
       expect(user2.errors[:username]).to include("has already been taken")
     end
+
+    it "doesn't reslugify an unchanged username" do
+      user = FactoryBot.create(:user)
+      user.update_column :username, "-legacy--name"
+      user.reload.update(name: "New name")
+      expect(user.reload.username).to eq "-legacy--name"
+    end
   end
 
   describe "email and phone" do

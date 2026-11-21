@@ -3,8 +3,28 @@ require "rails_helper"
 RSpec.describe Slugifyer do
   describe "slugify" do
     it "handles &" do
-      expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-amp-trikes"
-      expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-amp-trikes"
+      expect(Slugifyer.slugify("Bikes &amp; Trikes")).to eq "bikes-and-trikes"
+      expect(Slugifyer.slugify("Bikes & Trikes")).to eq "bikes-and-trikes"
+      expect(Slugifyer.slugify("B&B")).to eq "b-and-b"
+      expect(Slugifyer.slugify("Bert's Bikes& Fitness")).to eq "berts-bikes-and-fitness"
+    end
+    it "handles + and HTML entities" do
+      expect(Slugifyer.slugify("L100+ Lowstep")).to eq "l100-plus-lowstep"
+      expect(Slugifyer.slugify("Heron Flats + Lofts")).to eq "heron-flats-plus-lofts"
+      expect(Slugifyer.slugify("O&#39;Neil &quot;Bikes&quot;")).to eq "oneil-bikes"
+    end
+    it "drops apostrophes and separates on other punctuation" do
+      expect(Slugifyer.slugify("Craig’s Cycles")).to eq "craigs-cycles"
+      expect(Slugifyer.slugify("27.5")).to eq "27-5"
+      expect(Slugifyer.slugify("Discus 45/40")).to eq "discus-45-40"
+      expect(Slugifyer.slugify("e.bike")).to eq "e-bike"
+      expect(Slugifyer.slugify("Italia_X")).to eq "italia-x"
+    end
+    it "squeezes and trims dashes" do
+      expect(Slugifyer.slugify("Foo - Bar")).to eq "foo-bar"
+      expect(Slugifyer.slugify("Trail / All-Mountain")).to eq "trail-all-mountain"
+      expect(Slugifyer.slugify("(Old) Bicycle Security ...")).to eq "bicycle-security"
+      expect(Slugifyer.slugify("foo---bar")).to eq "foo-bar"
     end
     it "handles é" do
       expect(Slugifyer.slugify("paké rum runner")).to eq("pake-rum-runner")
@@ -13,6 +33,13 @@ RSpec.describe Slugifyer do
 
     it "removes parens" do
       expect(Slugifyer.slugify(" Some Cool NAMe (additional info)")).to eq("some-cool-name")
+    end
+  end
+
+  describe "amp_as_and" do
+    it "converts an -amp- slug" do
+      expect(Slugifyer.amp_as_and("bikes-and-trikes")).to be_nil
+      expect(Slugifyer.amp_as_and("bikes-amp-trikes")).to eq "bikes-and-trikes"
     end
   end
 
