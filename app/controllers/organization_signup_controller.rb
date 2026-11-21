@@ -3,7 +3,7 @@ class OrganizationSignupController < ApplicationController
 
   SESSION_KEY = :organization_signup_token
 
-  before_action :find_signup, except: %i[new confirm confirm_email welcome]
+  before_action :find_signup, except: %i[new confirm confirm_email]
   before_action :find_signup_for_confirmation, only: %i[confirm confirm_email]
   # The step shown is server state - a cached page could show one the signup is past
   before_action { response.set_header("Cache-Control", "no-store") }
@@ -16,11 +16,11 @@ class OrganizationSignupController < ApplicationController
     @signup = OrgServices::Signup.resumable(token: session[SESSION_KEY], user: current_user) if params[:restart].blank?
     if @signup.blank?
       session.delete(SESSION_KEY)
-      @signup = OrgServices::Signup.build(user: current_user, return_to:, kind: params[:kind])
+      @signup = OrgServices::Signup.build(user: current_user, return_to: local_return_to, kind: params[:kind])
       return render(step_page("1"))
     end
 
-    @signup.update(return_to:) if return_to.present?
+    @signup.update(return_to: local_return_to) if local_return_to.present?
     # A link's kind preselects step 1, but never overrides one already chosen
     @signup.update(kind: params[:kind]) if @signup.kind.blank? && Organization.user_creatable_kinds.include?(params[:kind])
     session[SESSION_KEY] = @signup.id_token
@@ -48,9 +48,6 @@ class OrganizationSignupController < ApplicationController
 
     # Step 2 says the link is on its way, so it goes out here rather than at the end
     OrgServices::Signup.send_confirmation_email(@signup)
-    if OrgServices::Signup.out_of_links?(@signup)
-      flash[:error] = translation(:no_more_links, email: @signup.email, controller_method: "resend")
-    end
     redirect_to organization_signup_path(step: @signup.details_completed? ? :finished : 2)
   end
 
@@ -99,6 +96,7 @@ class OrganizationSignupController < ApplicationController
       return redirect_to(organization_signup_path)
     end
 
+    replaced = OrgServices::Signup.find(session[SESSION_KEY])
     # The only way back to a signup opened in another browser
     session[SESSION_KEY] = @signup.id_token
 
@@ -119,32 +117,22 @@ class OrganizationSignupController < ApplicationController
     # Both places this goes say what's next themselves, so signing in doesn't need to
     flash.delete(:notice)
     flash.delete(:success)
+    if replaced.present? && replaced != @signup && replaced.organization_id.blank?
+      flash[:notice] = translation(:switched_signup, name: @signup.name, replaced_name: replaced.name)
+    end
     OrgServices::Signup.confirm_email!(@signup)
     complete_or_details
-  end
-
-  def welcome
-    @organization = Organization.friendly_find(params[:organization_id])
-    return authenticate_user(flash_type: :notice) if current_user.blank?
-    return redirect_to(user_root_url) unless current_user.admin_of?(@organization)
-
-    render Pages::OrgSignup::Views::Welcome::Component.new(organization: @organization, current_user:, return_to:)
   end
 
   private
 
   def step_page(step)
     case step
-    when "finished" then Pages::OrgSignup::Views::StepFinished::Component.new(organization_signup: @signup)
+    when "finished" then Pages::OrgSignup::Views::StepFinished::Component.new(organization_signup: @signup, current_user:)
     when "2" then Pages::OrgSignup::Views::Step2::Component.new(organization_signup: @signup)
-    else Pages::OrgSignup::Views::Step1::Component.new(organization_signup: @signup, current_user:)
+    else Pages::OrgSignup::Views::Step1::Component.new(organization_signup: @signup, current_user:,
+      focus_email: params[:change_email].present?)
     end
-  end
-
-  # Only a path of our own, so a link can't send a new admin off-site. Browsers read a
-  # backslash as a slash and drop tabs and newlines, so "/\evil.com" is "//evil.com" too
-  def return_to
-    params[:return_to] if params[:return_to].to_s.match?(%r{\A/(?!/)[^\\[:space:][:cntrl:]]*\z})
   end
 
   def sign_in_email_owner
@@ -180,18 +168,19 @@ class OrganizationSignupController < ApplicationController
     end
 
     session.delete(SESSION_KEY)
-    return redirect_to_sign_in_for(organization) if current_user != email_owner
-
     # A page of its own rather than straight to return_to: these submissions are fetched,
     # and a fetch can't follow lightspeed_interface's redirect off-site
-    redirect_to welcome_organization_signup_path(organization_id: organization.to_param, return_to: @signup.return_to)
+    info_path = organization_info_path(organization_id: organization.to_param, return_to: @signup.return_to)
+    return redirect_to_sign_in_for(organization, after_sign_in: info_path) if current_user != email_owner
+
+    redirect_to info_path
   end
 
-  def redirect_to_sign_in_for(organization)
-    flash[:notice] = translation(:sign_in_to_manage, controller_method: :redirect_to_sign_in_for, name: organization.name,
-      email: email_owner&.email || @signup.email)
-    store_return_to(organization_manage_path(organization_id: organization.to_param))
-    redirect_to new_session_path
+  def redirect_to_sign_in_for(organization, after_sign_in: organization_manage_path(organization_id: organization.to_param))
+    email = email_owner&.email || @signup.email
+    flash[:notice] = translation(:sign_in_to_manage, controller_method: :redirect_to_sign_in_for, name: organization.name, email:)
+    store_return_to(after_sign_in)
+    redirect_to new_session_path(email:)
   end
 
   # Once its organization exists the signup has nothing left to show, so it goes there instead
@@ -204,7 +193,7 @@ class OrganizationSignupController < ApplicationController
 
   def find_signup
     @signup = OrgServices::Signup.find(session[SESSION_KEY])
-    @signup ||= OrgServices::Signup.build(user: current_user, return_to:) if action_name == "create"
+    @signup ||= OrgServices::Signup.build(user: current_user, return_to: local_return_to) if action_name == "create"
     return redirect_to(new_organization_signup_path) if @signup.blank?
 
     redirect_to_organization(@signup.organization) if @signup.organization.present?

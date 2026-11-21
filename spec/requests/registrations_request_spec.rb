@@ -37,11 +37,35 @@ RSpec.describe RegistrationsController, type: :request do
       expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
       expect(flash).to_not be_present
     end
+
+    it "passes the color scheme to the embed" do
+      current_user.update(color_scheme: "dark")
+      get "#{base_url}/new"
+      expect(Capybara.string(response.body)).to have_css("iframe[src*='color_scheme=dark']")
+    end
   end
 
   describe "embed" do
     let(:basic_field_names) do
       %w[commit creation_organization_id manufacturer_id owner_email primary_frame_color_id status]
+    end
+
+    describe "color scheme" do
+      def body = Capybara.string(response.body)
+
+      it "is light unless passed one, and carries it through the form" do
+        get "#{base_url}/embed"
+        expect(body).to have_no_css("body.dark")
+        expect(response.body).to_not include("window.colorSchemeQuery")
+
+        get "#{base_url}/embed", params: {color_scheme: "dark"}
+        expect(body).to have_css("body.dark")
+        expect(body).to have_css("form[action='/registrations?color_scheme=dark']")
+
+        get "#{base_url}/embed", params: {color_scheme: "system"}
+        expect(body).to have_no_css("body.dark")
+        expect(response.body).to include("window.colorSchemeQuery")
+      end
     end
 
     context "no organization" do

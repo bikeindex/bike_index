@@ -1,20 +1,21 @@
 <%= render Pages::Register::Parts::Shell::Component.new do %>
   <%= render Pages::Register::Parts::Progress::Component.new(flow: OrgServices::Signup, step: 2) %>
 
-  <% if @organization_signup.email_confirmed? %>
-    <%= render UI::Alerts::Base::Component.new(kind: :success,
-        text: translation(".email_confirmed", name: @organization_signup.name)) %>
-  <% else %>
+  <%# Confirmed with no email sent is a signed in account's own address - nothing to say %>
+  <% if OrgServices::Signup.out_of_links?(@organization_signup) %>
+    <%= render UI::Alerts::Base::Component.new(kind: :error, text: translation(".out_of_links", email: @organization_signup.email)) %>
+  <% elsif !@organization_signup.email_confirmed? %>
     <%= render UI::Alerts::Base::Component.new(kind: :purple, text: translation(".activation_link_sent", email: @organization_signup.email),
         icon: helpers.inline_svg_tag("icons/envelope.svg", class: "tw:h-4 tw:w-4 tw:shrink-0", aria_hidden: true)) %>
+  <% elsif @organization_signup.email_confirmations_sent.positive? %>
+    <%= render UI::Alerts::Base::Component.new(kind: :success,
+        text: translation(".email_confirmed", name: @organization_signup.name)) %>
   <% end %>
 
   <%= render UI::Header::Component.new(text: translation(".where_is_org", name: @organization_signup.name),
       subtitle: translation(".shown_to_people")) %>
 
-  <% if @organization_signup.errors.any? %>
-    <%= render UI::Alerts::Base::Component.new(kind: :error, text: @organization_signup.errors.full_messages.to_sentence) %>
-  <% end %>
+  <%= render UI::Alerts::ObjectError::Component.new(object: @organization_signup, name: translation(".signup_name")) %>
 
   <%= form_with(model: @organization_signup, url: organization_signup_path, method: :patch, scope: :organization_signup,
       data: {turbo: true, controller: "autofocus form-persist register--retry",

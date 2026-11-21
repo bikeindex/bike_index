@@ -95,9 +95,19 @@ RSpec.describe OrgServices::Signup do
     context "signed in" do
       let(:user) { FactoryBot.create(:user_confirmed, email: "signed_in@bikeindex.org") }
 
-      it "uses their email" do
+      it "uses their email, already confirmed" do
         expect(saved).to be_truthy
-        expect(organization_signup.reload.email).to eq "signed_in@bikeindex.org"
+        expect(organization_signup.reload).to have_attributes(email: "signed_in@bikeindex.org", email_confirmed?: true)
+        expect(described_class.send_confirmation_email(organization_signup)).to be_falsey
+      end
+
+      context "unconfirmed" do
+        let(:user) { FactoryBot.create(:user, email: "signed_in@bikeindex.org") }
+
+        it "still waits on the link" do
+          expect(saved).to be_truthy
+          expect(organization_signup.reload.email_confirmed?).to be_falsey
+        end
       end
     end
 
@@ -196,7 +206,7 @@ RSpec.describe OrgServices::Signup do
       organization = described_class.complete(organization_signup, user:)
       expect(organization).to be_persisted
       expect(organization).to have_attributes(name: "Shifty Bike Shop", kind: "bike_shop",
-        website: "http://shiftybikes.com", auto_user_id: user.id, approved: true)
+        website: "http://shiftybikes.com", auto_user_id: user.id, approved: true, show_on_map: true)
       expect(organization.locations.first).to have_attributes(name: "Shifty Bike Shop", phone: "7183839999",
         publicly_visible: true)
       expect(organization.locations.first.address_record)

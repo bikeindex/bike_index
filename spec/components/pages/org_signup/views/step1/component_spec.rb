@@ -31,8 +31,10 @@ RSpec.describe Pages::OrgSignup::Views::Step1::Component, type: :component do
     context "already part of an organization" do
       let(:current_user) { FactoryBot.create(:organization_role_claimed).user }
 
-      it "says this makes a separate one" do
-        expect(component).to have_text("You're already part of #{current_user.organizations.first.short_name} - this creates a separate organization.")
+      it "links the one they're in, and says this makes a separate one" do
+        organization = current_user.organizations.first
+        expect(component).to have_text("You're already part of the #{organization.short_name} organization - this will create a separate organization.")
+        expect(component).to have_link "#{organization.short_name} organization", href: "/o/#{organization.to_param}"
       end
     end
   end

@@ -12,8 +12,13 @@
       <%= helpers.inline_svg_tag("icons/envelope.svg", class: "tw:h-7.5 tw:w-7.5", aria_hidden: true) %>
     </div>
 
-    <%= render UI::Header::Component.new(text: translation(".check_your_email"),
-        subtitle: translation(".activate_html", email: tag.strong(@organization_signup.email), name: @organization_signup.name)) %>
+    <% if OrgServices::Signup.out_of_links?(@organization_signup) %>
+      <%= render UI::Header::Component.new(text: translation(".cant_send_another"),
+          subtitle: translation(".out_of_links_html", email: tag.strong(@organization_signup.email), name: @organization_signup.name)) %>
+    <% else %>
+      <%= render UI::Header::Component.new(text: translation(".check_your_email"),
+          subtitle: translation(".activate_html", email: tag.strong(@organization_signup.email), name: @organization_signup.name)) %>
+    <% end %>
 
     <div
       class="
@@ -37,16 +42,20 @@
       </ul>
     </div>
 
-    <p class="tw:mb-3 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
-      <%= translation(".no_email_yet") %>
-    </p>
+    <% unless exhausted? %>
+      <p class="tw:mb-3 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
+        <%= translation(".no_email_yet") %>
+      </p>
 
-    <%= render UI::ButtonLink::Component.new(text: translation(".send_it_again"), href: resend_organization_signup_path,
-        method: :post, form: {class: "tw:mb-5"}) %>
+      <%= render UI::ButtonLink::Component.new(text: translation(".send_it_again"), href: resend_organization_signup_path,
+          method: :post, form: {class: "tw:mb-5"}) %>
+    <% end %>
 
-    <p class="tw:mb-0 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
-      <%= translation(".wrong_address") %>
-      <%= link_to translation(".change_it"), organization_signup_path(step: 1), class: "twlink" %>
-    </p>
+    <% if change_email? %>
+      <p class="tw:mb-0 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
+        <%= translation(".wrong_address") %>
+        <%= link_to translation(".change_it"), organization_signup_path(step: 1, change_email: true), class: "twlink" %>
+      </p>
+    <% end %>
   </div>
 <% end %>
