@@ -80,7 +80,8 @@ class OrganizationSignupController < ApplicationController
 
   def confirm
     render Pages::OrgSignup::Views::Confirm::Component.new(organization_signup: @signup, token: params[:confirmation_token],
-      signed_in_as: (current_user.email if signed_in_as_someone_else?))
+      signed_in_as: (current_user.email if signed_in_as_someone_else?), accept_terms: terms_pending?,
+      terms_checked: params[:terms_of_service].present?)
   end
 
   def confirm_email
@@ -96,15 +97,18 @@ class OrganizationSignupController < ApplicationController
       return redirect_to(organization_signup_path)
     end
 
+    if terms_pending? && params[:terms_of_service].blank?
+      flash[:error] = translation(:accept_terms)
+      return redirect_to(confirm_path)
+    end
+
     replaced = OrgServices::Signup.find(session[SESSION_KEY])
     # The only way back to a signup opened in another browser
     session[SESSION_KEY] = @signup.id_token
 
     if signed_in_as_someone_else?
-      unless params[:sign_out].present?
-        flash[:error] = translation(:sign_out_to_confirm, email: current_user.email)
-        return redirect_to(confirm_path)
-      end
+      # The page says who's signed in, and its button signs them out
+      return redirect_to(confirm_path) unless params[:sign_out].present?
 
       remove_session
       @current_user = nil
@@ -120,6 +124,7 @@ class OrganizationSignupController < ApplicationController
     if replaced.present? && replaced != @signup && replaced.organization_id.blank?
       flash[:notice] = translation(:switched_signup, name: @signup.name, replaced_name: replaced.name)
     end
+    current_user.update(terms_of_service: true, accepted_vendor_terms_of_service: true) unless current_user.terms_of_service? && current_user.vendor_terms_of_service?
     OrgServices::Signup.confirm_email!(@signup)
     complete_or_details
   end
@@ -143,7 +148,8 @@ class OrganizationSignupController < ApplicationController
   end
 
   def confirm_path
-    confirm_organization_signup_path(signup_token: @signup.id_token, confirmation_token: params[:confirmation_token])
+    confirm_organization_signup_path(signup_token: @signup.id_token, confirmation_token: params[:confirmation_token],
+      terms_of_service: params[:terms_of_service])
   end
 
   def complete_or_details = @signup.details_completed? ? complete_signup : redirect_to(organization_signup_path(step: 2))
@@ -151,6 +157,9 @@ class OrganizationSignupController < ApplicationController
   def email_owner = @email_owner ||= User.fuzzy_confirmed_or_unconfirmed_email_find(@signup.email)
 
   def signed_in_as_someone_else? = current_user.present? && current_user != email_owner
+
+  # The email's account is the one confirming signs in, whoever's session it is
+  def terms_pending? = !(email_owner&.terms_of_service? && email_owner.vendor_terms_of_service?)
 
   # The confirmed address's account is the admin, whichever browser finishes - one that
   # isn't signed in as it gets the organization made, then has to sign in to manage it
