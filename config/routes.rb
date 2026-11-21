@@ -145,7 +145,6 @@ Rails.application.routes.draw do
 
   resources :feedbacks, only: %i[index create]
   post "csp_reports", to: "csp_reports#create"
-  get "vendor_signup", to: redirect("/organizations/new")
   get "lightspeed_interface", to: "organizations#lightspeed_interface"
   get "help", to: "feedbacks#index"
   get "feedbacks/new", to: redirect("/help")
