@@ -12,7 +12,7 @@
         <%= @model["manufacturer"] %>
       </p>
 
-      <h2 class="tw:m-0 tw:text-2xl tw:font-bold"><%= @model["model"] %></h2>
+      <%= render(UI::Header::Component.new(text: @model["model"], tag: :h2)) %>
 
       <%= render(UI::DefinitionList::Container::Component.new) do %>
         <%= render UI::DefinitionList::Row::Component.new(label: translation(".price"), value: price) %>
