@@ -147,7 +147,6 @@ RSpec.describe Search::ComboboxController, type: :request do
   end
 
   describe "bikebook_models" do
-    # Its slug, kris-holm, isn't the catalog's kris_holm
     let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Kris Holm") }
     before { sync_bikebook_models }
 
