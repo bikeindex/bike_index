@@ -8,10 +8,11 @@ class RegistrationsController < ApplicationController
   before_action :simple_header, except: %i[show edit]
   around_action :set_reading_role, only: %i[show]
   layout "reg_embed"
+  helper_method :embed_color_scheme
 
   def show
     @bike = Bike.unscoped.find_id(params[:id])
-    fail ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
+    return redirect_merged_bike_or_not_found(@bike) unless @bike.visible_by?(current_user)
 
     requested_view = view_from_param(params[:view_as])
     available_views = BikeServices::ShowViews.available(bike: @bike, current_user:,
@@ -85,6 +86,11 @@ class RegistrationsController < ApplicationController
   end
 
   private
+
+  # Partner sites frame the embed without knowing about dark mode, so it's light unless our own page passes a scheme
+  def embed_color_scheme
+    params[:color_scheme].presence_in(User.color_schemes.keys) || "light"
+  end
 
   # Both session touches mirror the legacy bikes#show: the recovery token is spent as
   # it's read, and a matching claim token records the email so signing up can claim

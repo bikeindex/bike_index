@@ -24,12 +24,21 @@
   <% end %>
 
   <% table.column(label: "Owner") do |match| %>
-    <% bike = match.bike || Bike.unscoped.find_by(id: match.bike_id) %>
-    <%= render Atoms::Admin::TableCells::User::Component.new(user: bike&.user, user_id: bike&.user_id, sort_state:, render_search: true) %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(user: match.bike&.user, user_id: match.bike&.user_id, sort_state:, render_search: true) %>
   <% end %>
 
   <% table.column(sortable: "status", label: "Status") do |match| %>
     <%= match.status.humanize %>
+  <% end %>
+
+  <% table.column(sortable: "merged_at", label: "Merged") do |match| %>
+    <% if match.merged_at.present? %>
+      <%= render UI::Time::Component.new(time: match.merged_at) %>
+    <% end %>
+
+    <% if match.merger_id.present? %>
+      <span class="tw:block tw:text-xs">by <%= render Atoms::Admin::TableCells::User::Component.new(user: match.merger, user_id: match.merger_id) %></span>
+    <% end %>
   <% end %>
 
   <% table.column do |match| %>

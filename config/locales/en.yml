@@ -707,6 +707,7 @@ en:
         cargo_rear: Cargo Bike Rear (e.g. longtail)
         cargo_trike: Cargo Tricycle (trike with front storage, e.g. Christiania bike)
         cargo_trike_rear: Cargo Tricycle (trike with rear storage)
+        e_atv: e-ATV (e-Quad, electric all-terrain vehicle)
         e_motorcycle: e-Motorcycle (e-Dirt bike, e-bike with no pedals)
         e_scooter: e-Scooter
         elliptical: Elliptical bike
@@ -1754,6 +1755,9 @@ en:
           user_is_banned: >-
             We're sorry, but it appears that your account has been locked. If you
             are unsure as to the reasons for this, please contact us.
+        sign_in_confirmed_user:
+          unable_to_sign_in: We confirmed your email, but couldn't sign you in to
+            that account
         skip_if_signed_in:
           already_signed_in: You're already signed in!
         turnstile_verified:
@@ -1825,23 +1829,52 @@ en:
       applications:
         ensure_app_owner!:
           not_your_application: That isn't your application
+    organization_signup:
+      complete_signup:
+        name_taken_meanwhile: >-
+          Another organization took the name %{name} while you were signing up. Choose
+          another name to finish - everything else is saved.
+        unable_to_complete: >-
+          We couldn't finish setting up your organization (%{errors}). Contact support@bikeindex.org
+          and we'll sort it out.
+      confirm_email:
+        accept_terms: >-
+          Agree to the Terms of Service and the Terms of Service for Organizations
+          to activate the organization
+        link_invalid: >-
+          That link doesn't work anymore. Use the newest email we sent to %{email},
+          or send another below.
+        link_invalid_resent: That link doesn't work anymore, so we've emailed a new
+          one to %{email}.
+        switched_signup: >-
+          You're now finishing %{name}. To finish %{replaced_name} too, open the link
+          in its email.
+      find_signup_for_confirmation:
+        signup_not_found: We couldn't find that signup — start a new one below
+      redirect_to_organization:
+        already_activated: "%{name} is already active"
+      redirect_to_sign_in_for:
+        sign_in_to_manage: "%{name} is active! Sign in as %{email} to manage it."
+      resend:
+        link_recently_sent: >-
+          We sent a link to %{email} in the last few minutes - it can take a little
+          while to arrive, so check your spam folder too.
+        link_resent: We've sent a new link to %{email}.
+        no_more_links: >-
+          We've already sent several links to %{email}, so we can't send another.
+          Check your spam folder, or contact support@bikeindex.org.
     organizations:
-      create:
-        must_create_an_account_first: >-
-          You have to sign up for an account on Bike Index before you can create an
-          organization
-        organization_created: Organization Created successfully!
       find_organization:
         not_found: >-
           We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org
           if this seems like an error.
       lightspeed_interface:
-        must_create_an_account_first: >-
-          You have to sign up for an account on Bike Index before you can connect
-          with Lightspeed
         must_create_an_organization_first: >-
           You have to create an organization on Bike Index before you can connect
           with Lightspeed
+        sign_in_or_add_organization: >-
+          Sign in to connect your organization with Lightspeed - or, if it isn't on
+          Bike Index yet, add it here.
       set_bparam:
         no_user: >-
           We're sorry, that organization doesn't have a user set up to register bikes
@@ -1901,7 +1934,6 @@ en:
             location.
       manage_impoundings:
         update:
-          could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
       manages:
         destroy:
@@ -1909,7 +1941,6 @@ en:
             %{org_name}.
           deleted_org: Deleted %{org_name}.
         update:
-          could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
       organization_messages:
         create:
@@ -1975,11 +2006,9 @@ en:
         safety_rules_updated: The safety rules have been updated — please review them
           again
       confirm_email:
+        accept_terms: Agree to the Terms of Service to continue
         confirmation_link_expired: That confirmation link has expired — check your
           email for a new one
-        sign_out_to_agree: >-
-          You're signed in as %{email}. Sign out, then open the link again to agree
-          to the safety rules.
         signed_in_as_other: >-
           You're signed in as %{email}, so we kept you in that account. The registration
           is still saved to the address we emailed.
@@ -1993,9 +2022,6 @@ en:
         safety_rules_sent: >-
           The %{bike_display} is registered - we've emailed %{email} the safety rules
           to agree to, which finishes the registration.
-      sign_in_confirmed_user:
-        unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
-          account
     search:
       marketplace:
         set_interpreted_params:
@@ -2544,6 +2570,7 @@ en:
         created for every bicycle you sell. All you need to do is add the customer's
         email address and the bicycle's serial number during a normal Lightspeed Retail
         checkout.
+      add_your_shop: Add your shop to Bike Index
       all_you_have_to_do_is_html: >-
         All you have to do is go to %{link}, where you'll be asked to authorize Bike
         Index to access your Lightspeed Account. Curious about what we collect? Read
@@ -3563,39 +3590,6 @@ en:
       you_bring_the_ideas_make_the_connections_: >-
         You bring the ideas, make the connections, and we’ll make sure you have the
         resources to get stuff done.
-    ascend:
-      ascend_knowledge_base_article: Ascend's Knowledge base article
-      automatic_bicycle_registration: Automatic Bicycle Registration for Bike Shops
-        using Ascend POS
-      email_shops_security_html: >-
-        Email %{shops_email_link} if you have any questions, or check out the %{security_link}.
-        Thank you for registering bikes in Bike Index!
-      email_us_the_password_to_finish_setting_u: Email us the password to finish setting
-        up!
-      follow_the_setup_instructions_html: Follow the setup instructions on <strong>%{ascend_link}</strong>
-        on Bike Index
-      if_your_shop_uses_lightspeed_html: >-
-        If your shop uses Lightspeed, check out our Lightspeed POS integration <a
-        target="none" href="%{lightspeed_path}">here</a>.
-      link_your_ascend_retail_and_bike_index: Link your Ascend Retail and Bike Index
-        Accounts for free
-      new_bike_shop_org: new bike shop organization
-      once_youve_set_up_the_trek_ascenwd: >-
-        Once you’ve set up the Trek Ascend POS bicycle registration, you’re done!
-        Each day, Bike Index will pull newly-sold bike information from Ascend to
-        create Bike Index accounts for your customers. Their new bikes will be waiting
-        for them upon login. They just have to check their email, and their new bike
-        will be waiting for them.
-      security_link_text: POS integration FAQ
-      sign_up_as_a_new_org_html: Sign up as a %{new_org_link} on Bike Index
-      then_if_a_customers_bike_goes_missing_html: >-
-        Then, if a customer’s bike goes missing, their bike’s information and serial
-        number will be stored for them to access. But don’t worry: <a target="none"
-        href="%{privacy_path}">we will never give out any of your customer data</a>.
-      we_have_a_new_free_bicycle_registration: >-
-        We have a free bicycle registration for bike shops. If you’re a shop that
-        uses Ascend as your POS, our new Ascend point of sale integration will allow
-        you to register each bike you sell automatically. Setup takes about 10 minutes.
     bike_shop_packages:
       bike_index_for_bike_shops: Bike Index for bike shops
       choose_a_package_size: Choose a package size
@@ -3726,9 +3720,6 @@ en:
     feedbacks_index: Help using Bike Index. Frequently asked questions and other things.
     feedbacks_new: Contact Bike Index. Your words are our muse, whisper them in our
       ear.
-    feedbacks_vendor_signup: >-
-      Sign up with Bike Index to register your customers' bikes quickly, easily and
-      for free.
     info_about: Why we made Bike Index and who we are
     info_protect_your_bike: >-
       Prevent bike theft. Recommendations and best practices for protecting your bike
@@ -3795,7 +3786,6 @@ en:
     documentation_api_v1: Bike Index API documentation
     feedbacks_index: Help with Bike Index
     feedbacks_new: Contact Bike Index
-    feedbacks_vendor_signup: Shop sign up - Bike Index
     info_about: About Bike Index
     info_serials: Bike serial numbers
     info_spokecard: Spoke cards - Bike Index
@@ -3814,6 +3804,12 @@ en:
     marketplace_how_it_works: How the Bike Index Marketplace works
     my_accounts_show: You on Bike Index
     news_index: Bike Index Blog
+    organization_signup_confirm: Activate your organization
+    organization_signup_create: Add your organization to Bike Index
+    organization_signup_new: Add your organization to Bike Index
+    organization_signup_show: Add your organization to Bike Index
+    organization_signup_update: Add your organization to Bike Index
+    organization_signup_welcome: "%{organization} is active"
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
     register_acknowledgment: Safety check for your %{cycle_type}
@@ -3853,9 +3849,6 @@ en:
   my_accounts:
     color_scheme:
       appearance: Appearance
-      dark: Dark
-      light: Light
-      system: System
     delete_account:
       delete_account: Delete account
       delete_my_account: Delete my account and all my registered bikes
@@ -4136,30 +4129,6 @@ en:
       when_was_it_stolen: When was it stolen?
       where_was_it_stolen: Where was it stolen?
       zipcode: Postal Code
-    new:
-      bike_index_for_organizations: Bike Index for organizations
-    new_form:
-      add_organization: add organization
-      add_your_organization_to_bike_index: 'Add your organization to Bike Index, for
-        free, in three easy steps:'
-      bike_index_account: Bike Index account
-      confirm_your_email: Confirm your email
-      fill_out_the_form_that_will_appear: Fill out the form that will appear on this
-        page once you're signed in.
-      filling_out_this_form_will_create_a_new_org: Filling out this form will create
-        a new, different organization
-      if_you_dont_want_that_to_be_the_case_html: >-
-        If you don't want that to be the case, %{logout_link} and sign up with the
-        email you would like to use instead.
-      log_out: log out
-      new_organization: New organization
-      organization_kind: Organization kind
-      organization_name: Organization name
-      sign_up_for_a_new_account_html: Sign up for a %{new_account_link}
-      you_are_already_a_member_of_org_html: You are already a member of %{org_link}.
-      your_current_account_will_be_a_member_html: >-
-        Your current account (<strong>%{user_email}</strong>) will be a member of
-        the organization you create.
   organized:
     ambassador_dashboards:
       getting_started:
@@ -4470,13 +4439,14 @@ en:
           Bike Index?
         select_email: Select email
         send_emails_directly: Send emails directly to unclaimed bike owners.
-        send_self_registration_email_html: Send email for registrations sent to <code>%{email}</code>
         send_self_registration_email_includes_unregistered: This includes unregistered
           notifications.
         send_self_registration_email_note: >-
           By default, Bike Index no longer sends email when a vehicle is registered
           to your organization registration email. Check this box if you want to receive
           email for registrations with an owner email of %{email}.
+        send_self_registration_email_to_html: Send email for registrations sent to
+          %{email}
         square_image: Use a square image for best results
         stolen_emails: Stolen emails
         unclaimed_registration_definition: >-
@@ -4603,6 +4573,8 @@ en:
       subject: Join %{organization_name}on Bike Index
     organization_message:
       subject: Message from %{organization_name} about your %{bike_type}
+    organization_signup_confirmation:
+      subject: Confirm your email to activate %{name} on Bike Index
     partial_register_confirmation:
       subject: Confirm your email to finish your %{organization_name}registration
     partial_register_confirmation_abandoned:
@@ -4613,6 +4585,8 @@ en:
       subject: Finish reporting your stolen %{cycle_type}
     partial_registration:
       subject: Finish your %{organization_name}Bike Index registration!
+    shop_welcome:
+      subject: Your Bike Index shop dashboard is ready
   payments:
     form:
       donation_header: Help support our efforts!
@@ -4953,6 +4927,7 @@ en:
       model_audits: E-Vehicle audits
       multi_search: Multi search
       org_dashboard: "%{org_name} Dashboard"
+      org_information: "%{org_name} Information"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
       org_registrations: "%{org_name} Registrations"
@@ -4971,6 +4946,20 @@ en:
       search_registrations: Search Registrations
       stolen_hot_sheet: Stolen Bike Hot Sheet
       stolen_message: Stolen Message
+    organization_signup:
+      address_required: Please enter the organization's full address
+      email_required: A valid email is required
+      kind_required: Please choose what kind of organization this is
+      name_required: Organization name is required
+      name_reserved: That name is reserved on Bike Index - please choose another
+      name_taken: >-
+        There's already an organization called %{name} on Bike Index. Choose another
+        name, or contact support@bikeindex.org if it's yours
+      name_taken_shortened: >-
+        That's too close to %{name}, which is already on Bike Index - names have to
+        be different within their first 30 characters. Choose another name, or contact
+        support@bikeindex.org if it's yours
+      name_too_short: Organization name needs at least two letters or numbers
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}

@@ -39,6 +39,10 @@ class EbikeRulesController < ApplicationController
       classification = params[:classification].presence&.then { EbikeRuleServices::StateLaws.classification(it) || raise(ActionController::RoutingError, "Not Found") }
       return render(Pages::EbikeRules::ClassCard::Component.new(e_bike_class:, classification:, place:, frame_id: turbo_frame_request_id))
     end
+    if turbo_frame_request_id&.start_with?(Pages::EbikeRules::Reasons::Component::FRAME_ID)
+      lookup = EbikeRuleServices::Lookup.from_params(params.permit(*LOOKUP_PARAMS), place:)
+      return render(Pages::EbikeRules::Reasons::Component.new(lookup:, frame_id: turbo_frame_request_id))
+    end
 
     detected_place = EbikeRuleServices::Places.from_location(request_location_hash)
     # where they chose it, rather than sending them back

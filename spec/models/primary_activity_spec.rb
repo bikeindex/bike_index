@@ -81,6 +81,16 @@ RSpec.describe PrimaryActivity, type: :model do
         end
       end
 
+      context "endurance" do
+        let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "Road Biking") }
+        let(:primary_activity) { FactoryBot.create(:primary_activity, name: "Endurance / Sportive", primary_activity_family:) }
+        it "shortens to Endurance" do
+          expect(primary_activity.reload.short_name).to eq "Endurance"
+          expect(primary_activity.display_name).to eq "Road: Endurance / Sportive"
+          expect(PrimaryActivity.friendly_find_id("Endurance")).to eq primary_activity.id
+        end
+      end
+
       context "track racing" do
         let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "Track racing") }
         let(:primary_activity) { FactoryBot.create(:primary_activity, name: "Pursuit", primary_activity_family:) }
@@ -101,6 +111,15 @@ RSpec.describe PrimaryActivity, type: :model do
     it "is expected" do
       expect(primary_activity_family.reload.priority).to eq 490
       expect(primary_activity.reload.priority).to eq 390
+    end
+  end
+
+  describe "friendly_find" do
+    let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "Bike & Camp") }
+    it "finds an -amp- slug by its -and- form" do
+      expect(primary_activity.slug).to eq "bike-and-camp"
+      expect(described_class.friendly_find("bike-amp-camp")).to eq primary_activity
+      expect(described_class.friendly_find_id("bike-amp-camp")).to eq primary_activity.id
     end
   end
 

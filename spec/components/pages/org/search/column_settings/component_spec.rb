@@ -28,7 +28,7 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
 
     it "keeps the impound records search's choices apart" do
       expect(described_class.column_settings_data_attributes(impound: true)[:"ui--table-column-settings-storage-key-value"])
-        .to eq "orgImpoundColumns"
+        .to eq "orgImpoundColumns2"
     end
   end
 
@@ -49,7 +49,7 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
     let(:enabled_feature_slugs) { %w[impound_bikes] }
 
     it "copies the impound records search's column order" do
-      expect(component).to have_css("button[data-ui--table-column-order-target='copy'][data-storage-key='orgImpoundColumnsOrder']",
+      expect(component).to have_css("button[data-ui--table-column-order-target='copy'][data-storage-key='orgImpoundColumns2Order']",
         text: "Copy column order from impounded vehicles search", visible: :all)
       expect(component).to have_no_css("h3", text: "Impound search columns", visible: :all)
     end
@@ -90,6 +90,17 @@ RSpec.describe Pages::Org::Search::ColumnSettings::Component, type: :component d
       expect(after_heading).to match_array(settings.impound_panel_columns)
       expect(component).to have_css("button[data-ui--table-column-order-target='copy'][data-storage-key='orgRegistrationColumnsOrder']",
         text: "Copy column order from registrations search", visible: :all)
+      expect(component.at_css("label:has(#table_column_settings_impound_current_location_cell)").text)
+        .to include "You don't have impound locations"
+    end
+
+    context "with impound locations" do
+      let(:enabled_feature_slugs) { %w[impound_bikes impound_bikes_locations] }
+
+      it "doesn't explain Current location" do
+        expect(component).to have_field("impound_current_location_cell", visible: :all)
+        expect(component.text).not_to include "have impound locations"
+      end
     end
   end
 

@@ -119,6 +119,19 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(response).to have_http_status(:not_found)
     end
 
+    it "renders why a model isn't an e-bike in the state in the frame Bike Book asks for, and nothing for one that is" do
+      frame = {"Turbo-Frame" => "#{Pages::EbikeRules::Reasons::Component::FRAME_ID}-overview-m-specialized-2025-haul_st"}
+      get "/ebike-rules/US/NJ", params: {vehicle_models: "m/specialized/2025/haul_st"}, headers: frame
+      expect(page).to have_css("turbo-frame#ebike-rules-reasons-overview-m-specialized-2025-haul_st p",
+        exact_text: "Classes 2 and 3 aren't recognized in New Jersey. Assists to 28 mph, over the 20 mph limit.")
+        .and have_no_css("[role='status']")
+      get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul_st"}, headers: frame
+      expect(page).to have_css("turbo-frame#ebike-rules-reasons-overview-m-specialized-2025-haul_st").and have_no_css("p")
+      # without a state, an e-moto's against the US classes' limits
+      get "/ebike-rules/US", params: {vehicle_models: "m/sur_ron/2026/ultra_bee_hp_x_us"}, headers: frame
+      expect(page).to have_css("turbo-frame p", text: "over the 28 mph limit.")
+    end
+
     it "sends a request Cloudflare locates to its state's page, which no cache keeps" do
       get "/ebike-rules", params: {utm_source: "newsletter"}, headers: indiana
 
@@ -193,7 +206,7 @@ RSpec.describe EbikeRulesController, type: :request do
 
       it "asks it once a minute, however much of the page reads it" do
         requests = 0
-        WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}manifest.json").to_return do
+        WebMock.stub_request(:get, Integrations::Bikebook::Catalog::MANIFEST_URL).to_return do
           requests += 1
           {status: 503}
         end

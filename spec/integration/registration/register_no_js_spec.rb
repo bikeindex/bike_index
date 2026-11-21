@@ -49,6 +49,7 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
     # The link is a GET onto a plain one-button form, which is a form either way
     visit confirmation_link
     expect(page).to have_content("Confirming your email")
+    check "I agree to Bike Index's Terms of Service"
     click_button "Continue"
 
     expect(page).to have_content("Registration complete")
@@ -81,6 +82,7 @@ RSpec.describe "Register flow without JavaScript", type: :system, driver: :playw
     expect(BParam.last.status).to eq "status_stolen"
 
     visit confirmation_link
+    check "I agree to Bike Index's Terms of Service"
     click_button "Continue"
 
     expect(page).to have_content("Report your stolen bike")

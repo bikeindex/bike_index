@@ -50,6 +50,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
       }),
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       featured: (params, legalClasses) => call('featured', { params, legalClasses }),
+      rotate: () => call('rotate'),
       group: (id, { market, market_scope: scope }) => call('group', { model: id, market, scope }),
       displays: (ids) => call('displays', { ids })
     }

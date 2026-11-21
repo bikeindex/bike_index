@@ -36,8 +36,6 @@ class InfoController < ApplicationController
   end
 
   def lightspeed
-    session[:return_to] = lightspeed_url unless current_user.present?
-    @organization = Organization.new
   end
 
   def privacy
@@ -102,6 +100,12 @@ class InfoController < ApplicationController
   def primary_activities
     respond_to do |format|
       format.csv { render plain: Spreadsheets::PrimaryActivities.to_csv }
+    end
+  end
+
+  def wheel_sizes
+    respond_to do |format|
+      format.csv { render plain: Spreadsheets::WheelSizes.to_csv }
     end
   end
 

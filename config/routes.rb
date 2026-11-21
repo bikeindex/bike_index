@@ -24,12 +24,19 @@ Rails.application.routes.draw do
   get "/discuss", to: redirect("https://discuss.bikeindex.org"), as: :discuss
   get "discourse_authentication", to: "discourse_authentication#index"
 
-  resources :organizations do
+  # Before resources :organizations, whose show would take "signup" as an id
+  resource :organization_signup, only: %i[new create show update], path: "organizations/signup",
+    controller: :organization_signup do
+    get :confirm
+    post :confirm_email
+    post :resend
+  end
+
+  resources :organizations, only: :new do
     member do
       get :embed
       get :embed_extended, as: :embed_extended
       get :embed_create_success
-      get :qr
     end
   end
 
@@ -45,7 +52,7 @@ Rails.application.routes.draw do
     for_community_groups for_cities for_law_enforcement for_schools].each { get it, controller: "landing_pages", action: it }
   %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
     protect_your_bike serials about where vendor_terms resources privacy terms security
-    how_not_to_buy_stolen lightspeed membership].each { get it, controller: "info", action: it }
+    how_not_to_buy_stolen lightspeed membership wheel_sizes].each { get it, controller: "info", action: it }
   get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
   get "donate/year-end-2026", to: "info#donate_year_end", as: :donate_year_end
   get "donate/year-end", to: redirect(path: "/donate/year-end-2026", status: 302) # a later year's campaign takes it over
@@ -138,7 +145,6 @@ Rails.application.routes.draw do
 
   resources :feedbacks, only: %i[index create]
   post "csp_reports", to: "csp_reports#create"
-  get "vendor_signup", to: redirect("/organizations/new")
   get "lightspeed_interface", to: "organizations#lightspeed_interface"
   get "help", to: "feedbacks#index"
   get "feedbacks/new", to: redirect("/help")
@@ -226,6 +232,8 @@ Rails.application.routes.draw do
   # Registration photos - the /register flow's and the embed forms' - upload before
   # there's a session, so they get their own endpoint
   post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
+  # After the resource above, so its named actions aren't taken for slugs
+  get "register/:organization_id", to: "register/organizations#show", as: :register_organization
 
   # Shadows ActiveStorage's own route (drawn last, so this wins) so the stock controller, which
   # checks nothing, isn't reachable. Deliberately unnamed - rails_direct_uploads_path still
@@ -539,6 +547,7 @@ Rails.application.routes.draw do
       end
     end
     resources :ambassador_task_assignments, only: %i[update]
+    resource :info, only: %i[show], controller: :info
 
     # Organized Admin resources (below here controllers should inherit Organized::AdminController)
     resource :manage, only: %i[show update destroy] do

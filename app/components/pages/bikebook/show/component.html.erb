@@ -342,9 +342,8 @@
     <section
       aria-label="<%= translation(".about_bike_book_label") %>"
       class="
-        twgutter tw:mx-auto tw:-mt-(--nav-gap) tw:flex tw:max-w-screen-xl
-        tw:flex-col tw:gap-3 tw:py-5 tw:sm:flex-row tw:sm:items-center
-        tw:sm:gap-6 tw:sm:py-6
+        twbootcontainer tw:-mt-(--nav-gap) tw:flex tw:flex-col tw:gap-3
+        tw:py-5 tw:sm:flex-row tw:sm:items-center tw:sm:gap-6 tw:sm:py-6
       "
     >
       <a
@@ -382,7 +381,11 @@
         </h1>
 
         <p class="tw:m-0 tw:text-[13px] tw:text-gray-600 tw:dark:text-gray-400">
-          <%= translation(".byline") %>
+          <%= translation(".free_to_use") %>
+
+          <%= translation(".learn_or_view_html",
+            learn_how_to_use_it: link_to(translation(".learn_how_to_use_it"), bikebook_license_path, class: "twlink tw:whitespace-nowrap"),
+            view_the_raw_data: link_to(translation(".view_the_raw_data"), Integrations::Bikebook::Catalog::GITHUB_REPO_URL, class: "twlink tw:whitespace-nowrap")) %>
         </p>
       </div>
     </section>
@@ -481,13 +484,4 @@
       </div>
     </div>
   </div>
-
-  <%# Flush on the footer, as SharedBlocks::Marketing::Wrapper's pages are %>
-  <section class="tw:-mb-(--footer-gap) tw:px-5 tw:py-2.5 tw:text-center tw:text-sm <%= SharedBlocks::Marketing::InvertedBlock::Component::BAND_CLASSES %>">
-    <%= translation(".free_to_use") %>
-
-    <%= translation(".learn_or_view_html",
-      learn_how_to_use_it: link_to(translation(".learn_how_to_use_it"), bikebook_license_path, class: "twlink tw:whitespace-nowrap"),
-      view_the_raw_data: link_to(translation(".view_the_raw_data"), Integrations::Bikebook::Catalog::GITHUB_REPO_URL, class: "twlink tw:whitespace-nowrap")) %>
-  </section>
 </div>

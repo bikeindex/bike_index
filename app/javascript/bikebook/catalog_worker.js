@@ -1,10 +1,11 @@
 // Searches the published catalog off the main thread, by the rules the catalog's own search follows
 /* global self */
 
-const FORMAT = 3
+const FORMAT = 4
 
 let models = []
 let byId = new Map()
+let bases = new Map()
 let classifications = {}
 let activities = []
 let manifest = null
@@ -96,9 +97,15 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
     group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
     searchText: `${model.display}\n${model.id}`.toLowerCase(),
     // a current model's first year where it's sold ahead of the calendar
-    sortYear: model.final_year ?? Math.max(model.first_year, currentYear)
+    sortYear: model.final_year ?? Math.max(model.first_year, currentYear),
+    // drawn per worker, which each page load starts, and again by `rotate`, so a reload features others and the page's
+    // own changes the same
+    chance: Math.random()
   }))
-  byId = new Map(models.map((model) => [model.id, model]))
+  // a market variant is its base's row under its own id and markets
+  const variants = models.flatMap((model) => model.variants.map(({ id, markets }) => [{ ...model, id, markets, variants: [] }, model]))
+  bases = new Map(variants.map(([variant, model]) => [variant.id, model]))
+  byId = new Map([...models, ...variants.map(([variant]) => variant)].map((model) => [model.id, model]))
   // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
   const labels = Object.entries(index.filter_options.e_vehicle_classification).map(([id, label]) => [id, { label, title: label, marker: true }])
   classifications = { ...Object.fromEntries(labels), ...vocabulary.e_vehicle_classifications }
@@ -125,7 +132,7 @@ const named = (name, vocabulary, names) => counted(name, Object.entries(names[vo
 
 // Each filter's choices, with how many models choosing it alone matches. Propulsion's checkboxes show no counts
 function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: { electric, e_vehicle_classification: classification, market, ...filterOptions } }, names) {
-  const sellers = new Set(models.flatMap(({ markets }) => markets))
+  const sellers = new Set(models.flatMap(marketsOf))
   const perManufacturer = models.reduce((counts, { manufacturer }) => counts.set(manufacturer, (counts.get(manufacturer) ?? 0) + 1), new Map())
   return {
     primary_activity: counted('primary_activity', activities.map(({ slug, name }) => [slug, name])),
@@ -145,10 +152,47 @@ const withYearRecords = (vehicle) => vehicle.years
   ? { ...vehicle, years: Object.entries(vehicle.years).map(([year, record]) => ({ year: Number(year), ...record })).sort((a, b) => b.year - a.year) }
   : vehicle
 
+// An array of these merges item by item, keyed by each item's values for them (an empty list by position); any other
+// array is replaced whole
+const IDENTITIES = {
+  colorways: ['name'],
+  components: ['type', 'position', 'type_detail'],
+  motors: [],
+  operating_modes: ['mode', 'availability', 'markets'],
+  sizes: ['name'],
+  mounts: ['type'],
+  wheels: ['position', 'bsd'],
+  brakes: ['position']
+}
+const isObject = (value) => value != null && typeof value === 'object' && !Array.isArray(value)
+const keyed = (key, items) => Object.fromEntries(items.map((item, index) => [
+  IDENTITIES[key].length ? IDENTITIES[key].map((field) => [item[field] ?? []].flat().join('+')).filter(Boolean).join(' ') : String(index),
+  item
+]))
+
+// false removes an object the home market's has (a year's record, a wheel), null any other value
+const merged = (record, changes) => Object.entries(changes).reduce((out, [key, value]) => {
+  if (value === null || (value === false && isObject(out[key]))) return except(out, key)
+  if (isObject(value) && Array.isArray(out[key])) return { ...out, [key]: Object.values(merged(keyed(key, out[key]), value)) }
+  return { ...out, [key]: isObject(value) && isObject(out[key]) ? merged(out[key], value) : value }
+}, record)
+const except = (record, key) => Object.fromEntries(Object.entries(record).filter(([each]) => each !== key))
+
+// From schema 1.1.0, a market's model sits in its home market's record, under `market_variants` keyed by the market
+// suffixing its id, as what differs from it; before, it's a record of its own. Integrations::Bikebook::MarketVariants
+// expands them the same way
+const withMarketVariants = (models) => Object.fromEntries(Object.entries(models).flatMap(([id, record]) => {
+  const home = except(record, 'market_variants')
+  return [[id, home], ...Object.entries(record.market_variants ?? {}).map(([market, changes]) => {
+    const variantId = `${id}_${market.toLowerCase()}`
+    return [variantId, { ...merged(home, changes), id: variantId }]
+  })]
+}))
+
 // A failed fetch is forgotten, so the next ask tries again
 const block = (key) => {
   if (!blocks.has(key)) {
-    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(models).map(([id, data]) => [id, withYearRecords(data)])), (error) => {
+    blocks.set(key, fetchJson(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(withMarketVariants(models)).map(([id, data]) => [id, withYearRecords(data)])), (error) => {
       blocks.delete(key)
       throw error
     }))
@@ -156,19 +200,21 @@ const block = (key) => {
   return blocks.get(key)
 }
 
-// A block leaves out the markets of a model sold in its maker's primary market alone, which the index resolves, and
-// whether it's current. `outsideMarket` where it isn't sold in `market`, blank for any
+const blockData = async (id) => manifest.blocks[blockKey(id)] && (await block(blockKey(id)))[id]
+
+// A block leaves out the markets of a model sold in its maker's primary market alone, which the index resolves. Its final
+// year says whether it's current, which a market variant's row, its base's, doesn't. `outsideMarket` where it isn't sold
+// in `market`, blank for any
 async function vehicles ({ ids, market }) {
   const found = await Promise.all(ids.map(async (value) => {
-    const key = blockKey(value)
-    const data = manifest.blocks[key] && (await block(key))[value]
+    const data = await blockData(value)
     const model = byId.get(value)
     return {
       value,
       display: model?.display,
       data: data && { ...data, markets: data.markets ?? model?.markets },
       outsideMarket: Boolean(market) && !model?.markets.includes(market),
-      current: Boolean(model) && model.final_year == null
+      current: Boolean(model) && data?.final_year == null
     }
   }))
   return found.filter(({ data }) => data)
@@ -189,9 +235,12 @@ async function similar ({ model, settings, filters: { sort, year_dir: yearDir, p
   const score = await scorer()
   const key = JSON.stringify({ model, settings, filters })
   if (lastSimilar?.key !== key) {
-    const own = byId.get(model)
+    const own = baseOf(model)
     const matches = filter({ ...filters, electric: filters.electric || (own?.electric ? '1' : '0'), vehicle_type: filters.vehicle_type || own?.vehicle_type })
-    lastSimilar = { key, result: score?.(model, settings, matches) ?? null }
+    // current as `vehicles` says
+    const includeNotCurrent = settings.includeNotCurrent ?? (await blockData(model))?.final_year != null
+    const result = own && score?.(own.id, { ...settings, includeNotCurrent }, matches)
+    lastSimilar = { key, result: result ? { ...result, models: result.models.map((each) => soldIn(each, filters.market)) } : null }
   }
   return lastSimilar.result
 }
@@ -221,62 +270,75 @@ function matching (params) {
   const needle = (params.q ?? '').trim().toLowerCase()
   const exact = needle.startsWith('m/') && byId.get(needle)
   const words = needle.split(/\s+/).filter(Boolean)
-  const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word)))
+  const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))).map((model) => soldIn(model, params.market))
   const whole = ({ searchText }) => searchText.includes(needle)
   const matches = needle ? [...found.filter(whole), ...found.filter((model) => !whole(model))] : found
-  return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes(exact) }
+  // by its own markets rather than its variants'
+  return { filteredCount: filtered.length, matches, unfiltered: Boolean(exact) && matches.length > 0 && !passes({ ...exact, variants: [] }) }
 }
 
-// The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, in the filters' order.
+// The `count` of models the filters leave, and featured_rules' `COUNT` of them, by its rules, the models tying on them
+// by `chance`, shown cheapest first unless the reader picked a sort, and whether a rotation could pick others.
 // `legalClasses` are the e-bike classes legal where the visitor is, by which every e-bike is legal where there are none
 function featured ({ params, legalClasses }) {
-  const { COUNT, requirements, preferences, quotas } = rules
+  const { COUNT, requirements, preferences, quotas, maximums } = rules
   const legalEbike = (model) => !legalClasses.length || legalClasses.some((propulsion) => propelled(model, propulsion, params.jurisdiction))
-  const filtered = sorted(params).filter(filter(params))
-  const candidates = requirements.reduce((models, requirement) => {
-    const passing = models.filter((model) => requirement(model, { legalEbike, params }))
-    return passing.length ? passing : models
-  }, filtered)
+  const filtered = models.filter(filter(params))
+  const candidates = requirements.reduce((models, requirement) => narrow(models, (model) => requirement(model, { legalEbike, params })), filtered)
+    .toSorted((a, b) => a.chance - b.chance)
   const count = Math.min(COUNT, candidates.length)
   // a share's models and the others each at least their part of the picks
   const minimums = quotas.flatMap(({ matches, share, minimum = Math.round(count * share) }) => share == null
     ? [{ matches, minimum }]
     : [{ matches, minimum }, { matches: (model) => !matches(model), minimum: count - minimum }])
+  // each candidate's quota matches, and the different ones among them, which bound the ranks any can reach
+  const matched = new Map(candidates.map((model) => [model, quotas.map(({ matches }) => matches(model))]))
+  const kinds = [...new Map([...matched.values()].map((each) => [each.join(), each])).values()]
   const picked = []
   while (picked.length < count) {
-    const pool = minimums.reduce((models, { matches, minimum }) => {
-      const narrowed = minimum - picked.filter(matches).length >= count - picked.length && models.filter(matches)
-      return narrowed?.length ? narrowed : models
-    }, candidates.filter((model) => !picked.includes(model)))
+    const capped = maximums.reduce((models, { matches, maximum }) => picked.filter(matches).length < maximum
+      ? models
+      : narrow(models, (model) => !matches(model)), candidates.filter((model) => !picked.includes(model)))
+    const pool = minimums.reduce((models, { matches, minimum }) => minimum - picked.filter(matches).length >= count - picked.length
+      ? narrow(models, matches)
+      : models, capped)
     // a share's models while the picks fall short of it and the others while they're over, a minimum's until it's met.
     // A quota met ranks every model alike
     const behind = quotas.map(({ matches, share, minimum }) => (share == null ? minimum : share * picked.length) - picked.filter(matches).length)
-    const helps = (model) => quotas.map(({ matches, share }, index) => share == null
-      ? behind[index] <= 0 || matches(model)
-      : behind[index] === 0 || (behind[index] > 0) === matches(model))
-    const ranks = (model) => [...preferences.map((prefers) => prefers(model, { picked })), ...helps(model)]
-    // no model outranks one meeting every rank
+    const helps = (matching) => quotas.map(({ share }, index) => share == null
+      ? behind[index] <= 0 || matching[index]
+      : behind[index] === 0 || (behind[index] > 0) === matching[index])
+    const ranks = (model) => [...preferences.map((prefers) => prefers(model, { picked })), ...helps(matched.get(model))]
+    // no model outranks one reaching the ranks a model with every preference would
+    const ceiling = kinds.map((each) => [...preferences.map(() => true), ...helps(each)]).reduce((top, each) => outranks(each, top) ? each : top)
     let best = null
     for (const model of pool) {
       const modelRanks = ranks(model)
       if (!best || outranks(modelRanks, best.ranks)) best = { model, ranks: modelRanks }
-      if (modelRanks.every(Boolean)) break
+      if (!outranks(ceiling, modelRanks)) break
     }
     picked.push(best.model)
   }
-  return { count: filtered.length, featured: candidates.filter((model) => picked.includes(model)) }
+  const shown = params.sort || params.year_dir || params.price_dir ? params : { sort: 'price' }
+  const featured = sorted(shown).filter((model) => picked.includes(model)).map((model) => soldIn(model, params.market))
+  return { count: filtered.length, featured, rotatable: candidates.length > COUNT }
+}
+
+// featured's picks drawn afresh, as a reload would
+function rotate () {
+  for (const model of models) model.chance = Math.random()
 }
 
 // The models of the `model` id's group by year, newest first, each under the newest it's sold in - so each once, and a
 // current one in this year. Those `market` leaves out by its `scope`, as a search would, but the model itself
 function group ({ model: id, market, scope }) {
-  const model = byId.get(id)
+  const model = baseOf(id)
   if (!model?.model_group) return null
 
   const years = new Map()
   for (const each of sorted({}).filter((each) => each.manufacturer === model.manufacturer && each.model_group === model.model_group && each.first_year &&
     (each === model || !market || inMarket(each, market, scope)))) {
-    years.set(each.sortYear, [...(years.get(each.sortYear) ?? []), each])
+    years.set(each.sortYear, [...(years.get(each.sortYear) ?? []), soldIn(each, market)])
   }
   return {
     name: model.model_group,
@@ -285,20 +347,22 @@ function group ({ model: id, market, scope }) {
   }
 }
 
+// `models` that `keep` keeps, unless that's none
+const narrow = (models, keep) => (kept => kept.length ? kept : models)(models.filter(keep))
+
 // Whether `a` wins at the first rank the two differ at
 const outranks = (a, b) => {
   const index = a.findIndex((value, each) => value !== b[each])
   return index !== -1 && a[index]
 }
 
-// Newest and priciest first unless asked otherwise, by year then price unless `sort` puts price first, the unpriced last
+// Newest and cheapest first unless asked otherwise, by year then price unless `sort` puts price first, the unpriced last
 // either way. Kept per order, so a query only has to filter
 function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
   const key = `${sort}/${yearDir}/${priceDir}`
   if (!orders.has(key)) {
-    const direction = (dir) => dir === 'asc' ? 1 : -1
-    const byYear = (a, b) => direction(yearDir) * (a.sortYear - b.sortYear)
-    const byPrice = (a, b) => (a.msrp_cents == null) - (b.msrp_cents == null) || direction(priceDir) * (a.msrp_cents - b.msrp_cents)
+    const byYear = (a, b) => (yearDir === 'asc' ? 1 : -1) * (a.sortYear - b.sortYear)
+    const byPrice = (a, b) => (a.msrp_cents == null) - (b.msrp_cents == null) || (priceDir === 'desc' ? -1 : 1) * (a.msrp_cents - b.msrp_cents)
     const [first, second] = sort === 'price' ? [byPrice, byYear] : [byYear, byPrice]
     orders.set(key, [...models].sort((a, b) => first(a, b) || second(a, b) || (a.id < b.id ? -1 : 1)))
   }
@@ -307,14 +371,25 @@ function sorted ({ sort, year_dir: yearDir, price_dir: priceDir }) {
 
 // the manufacturers with models sold in `market`
 const sellingIn = (market) => {
-  if (!sold.has(market)) sold.set(market, new Set(models.filter(({ markets }) => markets.includes(market)).map(({ manufacturer }) => manufacturer)))
+  if (!sold.has(market)) sold.set(market, new Set(models.filter((model) => marketsOf(model).includes(market)).map(({ manufacturer }) => manufacturer)))
   return sold.get(market)
 }
 
 // Its own models alone `only`, or every one for `any`. Preferring it, the default, adds the models sold elsewhere but
 // for e-vehicles, which its own laws class, and the makers it sells any of
-const inMarket = (model, market, scope) => scope === 'any' || model.markets.includes(market) ||
+const inMarket = (model, market, scope) => scope === 'any' || marketsOf(model).includes(market) ||
   (scope !== 'only' && !model.electric && !sellingIn(market).has(model.manufacturer))
+
+const baseOf = (id) => bases.get(id) ?? byId.get(id)
+
+// its own and its market variants'
+const marketsOf = (model) => [...model.markets, ...model.variants.flatMap(({ markets }) => markets)]
+
+// The model's market variant sold in `market`, where it has one
+const soldIn = (model, market) => {
+  const variant = market && model.variants.find(({ markets }) => markets.includes(market))
+  return variant ? byId.get(variant.id) : model
+}
 
 // A family matches its flavors; slugs naming no activity filter nothing
 function filter (params) {
@@ -357,7 +432,7 @@ function propelled ({ electric, e_vehicle_classifications: carried = [] }, propu
 
 self.onmessage = async ({ data: { id, type, ...args } }) => {
   try {
-    self.postMessage({ id, result: await { start, load, comparison: compare, search, featured, group, vehicles, displays, similar }[type](args) })
+    self.postMessage({ id, result: await { start, load, comparison: compare, search, featured, rotate, group, vehicles, displays, similar }[type](args) })
   } catch (error) {
     self.postMessage({ id, error: error.message })
   }

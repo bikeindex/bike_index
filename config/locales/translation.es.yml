@@ -880,6 +880,7 @@ es:
         traditional_bike: Bicicleta tradicional (2 ruedas, 1 asiento, pedales)
         elliptical: Bicicleta elíptica
         balance_bike: Bicicleta de equilibrio
+        e_atv: e-ATV (e-Quad, vehículo todoterreno eléctrico)
       frame_material:
         aluminum: Aluminio
         composite: Carbono o compuesto
@@ -1527,6 +1528,8 @@ es:
           request_not_authorized: Request need to be authorized. Required parameter
             for authorizing request is missing or invalid.
           invalid_code_challenge: Se requiere desafío de código.
+          multiple_client_auth_methods: La solicitud utiliza más de un mecanismo para
+            autenticar al cliente.
         invalid_redirect_uri: La uri de redirección no es valida.
         unauthorized_client: El cliente no tiene autorización para realizar esta petición
           utilizando este método.
@@ -2261,6 +2264,9 @@ es:
           already_signed_in: "¡Ya has iniciado sesión!"
         turnstile_verified:
           verify_not_a_robot: Por favor, confirma que no eres un robot.
+        sign_in_confirmed_user:
+          unable_to_sign_in: Hemos confirmado tu correo electrónico, pero no pudimos
+            iniciar sesión en esa cuenta.
     feedbacks:
       block_the_spam:
         please_sign_in: Por favor, inicia sesión para enviar ese mensaje.
@@ -2317,18 +2323,14 @@ es:
         ensure_app_owner!:
           not_your_application: Esa no es tu solicitud
     organizations:
-      create:
-        organization_created: "¡Organización creada con éxito!"
-        must_create_an_account_first: Debes registrarte para obtener una cuenta en
-          Bike Index antes de poder crear una organización.
       find_organization:
         not_found: Lo sentimos, esa organización aún no está en Bike Index. Si cree
           que se trata de un error, envíe un correo electrónico a contact@bikeindex.org.
       lightspeed_interface:
-        must_create_an_account_first: Debes crear una cuenta en Bike Index antes de
-          poder conectarte con Lightspeed.
         must_create_an_organization_first: Debes crear una organización en Bike Index
           antes de poder conectarte con Lightspeed.
+        sign_in_or_add_organization: Inicia sesión para conectar tu organización con
+          Lightspeed o, si aún no está en Bike Index, añádela aquí.
       set_bparam:
         no_user: Lo sentimos, esa organización no tiene un usuario configurado para
           registrar bicicletas. Si cree que se trata de un error, envíe un correo
@@ -2382,7 +2384,6 @@ es:
             minutos.
       manage_impoundings:
         update:
-          could_not_update: Lo sentimos, tuvimos problemas para actualizar %{org_name}.
           updated_successfully: "%{org_name} actualizado correctamente."
       manages:
         destroy:
@@ -2390,7 +2391,6 @@ es:
             para eliminar %{org_name}.
           deleted_org: Eliminado %{org_name}.
         update:
-          could_not_update: Lo sentimos, tuvimos problemas para actualizar %{org_name}.
           updated_successfully: "%{org_name} actualizado correctamente."
       parking_notifications:
         create:
@@ -2571,14 +2571,10 @@ es:
         signed_in_as_other: Has iniciado sesión como %{email}, por lo que mantuvimos
           tu cuenta. El registro sigue guardado en la dirección de correo electrónico
           que te enviamos.
-        sign_out_to_agree: Has iniciado sesión como %{email}. Cierra sesión y vuelve
-          a abrir el enlace para aceptar las normas de seguridad.
+        accept_terms: Acepta los Términos de servicio para continuar.
       find_b_param:
         registration_not_found: No pudimos encontrar ese registro; inicie uno nuevo
           a continuación.
-      sign_in_confirmed_user:
-        unable_to_sign_in: Hemos confirmado tu correo electrónico, pero no pudimos
-          iniciar sesión en esa cuenta.
       redirect_to_single_page:
         registered_for_owner: El %{bike_display} está registrado; le hemos enviado
           un correo electrónico a %{email} para que puedan reclamarlo.
@@ -2598,6 +2594,38 @@ es:
     memberships:
       create:
         already_a_member: Ya tienes una membresía.
+    organization_signup:
+      complete_signup:
+        name_taken_meanwhile: Otra organización ya utilizó el nombre %{name} mientras
+          te registrabas. Elige otro nombre para finalizar; el resto del registro
+          se guardará.
+        unable_to_complete: No pudimos finalizar la configuración de tu organización
+          (%{errors}). Ponte en contacto con support@bikeindex.org y lo solucionaremos.
+      confirm_email:
+        link_invalid: Ese enlace ya no funciona. Utilice el correo electrónico más
+          reciente que enviamos a %{email} o envíe otro a la dirección que aparece
+          a continuación.
+        link_invalid_resent: Ese enlace ya no funciona, así que le hemos enviado uno
+          nuevo por correo electrónico a %{email}.
+        switched_signup: Estás terminando %{name}. Para terminar también %{replaced_name},
+          abre el enlace del correo electrónico.
+        accept_terms: Acepte los Términos de servicio y los Términos de servicio para
+          organizaciones para activar la organización.
+      find_signup_for_confirmation:
+        signup_not_found: No pudimos encontrar ese registro; crea uno nuevo a continuación.
+      redirect_to_organization:
+        already_activated: "%{name} ya está activo"
+      redirect_to_sign_in_for:
+        sign_in_to_manage: "%{name} está activo. Inicia sesión como %{email} para
+          gestionarlo."
+      resend:
+        link_recently_sent: En los últimos minutos enviamos un enlace a %{email};
+          puede tardar un poco en llegar, así que revise también su carpeta de correo
+          no deseado.
+        link_resent: Hemos enviado un nuevo enlace a %{email}.
+        no_more_links: Ya hemos enviado varios enlaces a %{email}, así que no podemos
+          enviar otro. Revisa tu carpeta de correo no deseado o ponte en contacto
+          con support@bikeindex.org.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -2925,6 +2953,7 @@ es:
       write_do_not_register: Si un cliente no quiere que una bicicleta se añada al
         Índice de Bicicletas, simplemente debe añadir "NO REGISTRAR" en las notas
         de la venta y la bicicleta no se registrará.
+      add_your_shop: Añade tu tienda al Índice de Bicicletas
     privacy:
       available_here: disponible aquí
       changes: Cambios
@@ -3869,39 +3898,6 @@ es:
       you_bring_the_ideas_make_the_connections_: Tú aportas las ideas, tú estableces
         los contactos y nosotros nos aseguraremos de que tengas los recursos necesarios
         para llevar a cabo tus proyectos.
-    ascend:
-      ascend_knowledge_base_article: Artículo de la base de conocimientos de Ascend
-      automatic_bicycle_registration: Registro automático de bicicletas para tiendas
-        de bicicletas que utilizan el sistema POS Ascend.
-      email_shops_security_html: Si tiene alguna pregunta, envíe un correo electrónico
-        a %{shops_email_link} o consulte %{security_link}. ¡Gracias por registrar
-        sus bicicletas en Bike Index!
-      email_us_the_password_to_finish_setting_u: "¡Envíanos la contraseña por correo
-        electrónico para finalizar la configuración!"
-      follow_the_setup_instructions_html: Siga las instrucciones de configuración
-        en <strong>%{ascend_link}</strong> en Bike Index.
-      if_your_shop_uses_lightspeed_html: Si tu tienda utiliza Lightspeed, consulta
-        nuestra integración con Lightspeed POS <a target="none" href="%{lightspeed_path}">aquí</a>
-        .
-      link_your_ascend_retail_and_bike_index: Vincula tus cuentas de Ascend Retail
-        y Bike Index gratis.
-      new_bike_shop_org: nueva organización de tiendas de bicicletas
-      once_youve_set_up_the_trek_ascenwd: Una vez que hayas configurado el registro
-        de bicicletas en el punto de venta de Trek Ascend, ¡listo! Cada día, Bike
-        Index extraerá la información de las bicicletas recién vendidas de Ascend
-        para crear cuentas de Bike Index para tus clientes. Sus nuevas bicicletas
-        estarán esperándolos al iniciar sesión. Solo tienen que revisar su correo
-        electrónico y su nueva bicicleta estará lista.
-      security_link_text: Preguntas frecuentes sobre la integración de puntos de venta
-      sign_up_as_a_new_org_html: Regístrate como %{new_org_link} en Bike Index.
-      then_if_a_customers_bike_goes_missing_html: 'Si un cliente pierde su bicicleta,
-        su información y número de serie se almacenarán para que pueda acceder a ellos.
-        Pero no se preocupe: <a target="none" href="%{privacy_path}">nunca compartiremos
-        sus datos personales</a> .'
-      we_have_a_new_free_bicycle_registration: Ofrecemos un registro gratuito de bicicletas
-        para tiendas de bicicletas. Si tu tienda utiliza Ascend como sistema de punto
-        de venta, nuestra nueva integración con Ascend te permitirá registrar automáticamente
-        cada bicicleta que vendas. La configuración tarda aproximadamente 10 minutos.
     bike_shop_packages:
       bike_index_for_bike_shops: Índice de bicicletas para tiendas de bicicletas
       choose_a_package_size: Seleccione un tamaño de paquete
@@ -4023,8 +4019,6 @@ es:
     feedbacks_index: Ayuda para usar Bike Index. Preguntas frecuentes y otros temas.
     feedbacks_new: Contacta con Bike Index. Tus palabras son nuestra inspiración,
       susúrralas al oído.
-    feedbacks_vendor_signup: Regístrate en Bike Index para registrar las bicicletas
-      de tus clientes de forma rápida, sencilla y gratuita.
     info_about: Por qué creamos Bike Index y quiénes somos.
     info_protect_your_bike: Prevenga el robo de bicicletas. Recomendaciones y buenas
       prácticas para proteger su bicicleta de los ladrones.
@@ -4083,7 +4077,6 @@ es:
     documentation_api_v1: Documentación de la API de Bike Index
     feedbacks_index: Ayuda con el índice de bicicletas
     feedbacks_new: Índice de bicicletas de contacto
-    feedbacks_vendor_signup: Regístrate en la tienda - Índice de bicicletas
     info_about: Acerca de Bike Index
     info_serials: Números de serie de bicicletas
     info_spokecard: Tarjetas de radios - Índice de bicicletas
@@ -4130,6 +4123,12 @@ es:
     registration_form_settings: Configuración del formulario de registro
     marketplace_how_it_works: Cómo funciona el mercado de Bike Index
     register_landing: Registra tu bicicleta gratis
+    organization_signup_confirm: Active su organización
+    organization_signup_create: Añade tu organización al Índice de Bicicletas
+    organization_signup_new: Añade tu organización al Índice de Bicicletas
+    organization_signup_show: Añade tu organización al Índice de Bicicletas
+    organization_signup_update: Añade tu organización al Índice de Bicicletas
+    organization_signup_welcome: "%{organization} está activo"
   money:
     currencies:
       en: Dólar estadounidense
@@ -4288,9 +4287,6 @@ es:
         marketplace_messages: Mensajes del mercado
     color_scheme:
       appearance: Apariencia
-      dark: Oscuro
-      light: Luz
-      system: Sistema
   news:
     index:
       bike_index_blog: Blog de Bike Index
@@ -4330,28 +4326,6 @@ es:
       handlebar_type: Tipo de manillar
       optional: opcional
       phone_number_owner: Teléfono del propietario
-    new:
-      bike_index_for_organizations: Índice de bicicletas para organizaciones
-    new_form:
-      add_organization: agregar organización
-      add_your_organization_to_bike_index: 'Añade tu organización a Bike Index, de
-        forma gratuita, en tres sencillos pasos:'
-      bike_index_account: Cuenta de Bike Index
-      confirm_your_email: Confirma tu correo electrónico
-      fill_out_the_form_that_will_appear: Rellena el formulario que aparecerá en esta
-        página una vez que hayas iniciado sesión.
-      filling_out_this_form_will_create_a_new_org: Al completar este formulario se
-        creará una organización nueva y diferente.
-      if_you_dont_want_that_to_be_the_case_html: Si no quieres que sea así, %{logout_link}
-        y regístrate con el correo electrónico que te gustaría usar en su lugar.
-      log_out: finalizar la sesión
-      new_organization: Nueva organización
-      organization_kind: Tipo de organización
-      organization_name: Nombre de la organización
-      sign_up_for_a_new_account_html: Regístrate para un %{new_account_link}
-      you_are_already_a_member_of_org_html: Ya eres miembro de %{org_link}.
-      your_current_account_will_be_a_member_html: Tu cuenta actual ( <strong>%{user_email}</strong>
-        ) será miembro de la organización que crees.
     embed_fields:
       add_a_color: Añade un color
       additional_serial: Número de serie/etiqueta adicional
@@ -4711,8 +4685,6 @@ es:
           no reclamadas se envían a su organización para su revisión y posterior reenvío
           al usuario final, ya que dichos usuarios no han optado por recibir notificaciones
           del Índice de Bicicletas.
-        send_self_registration_email_html: Enviar correo electrónico para inscripciones
-          enviadas a <code>%{email}</code>
         send_self_registration_email_includes_unregistered: Esto incluye las notificaciones
           no registradas.
         send_self_registration_email_note: Por defecto, Bike Index ya no envía correos
@@ -4720,6 +4692,8 @@ es:
           de registro de su organización. Marque esta casilla si desea recibir correos
           electrónicos para los registros con una dirección de correo electrónico
           del propietario de %{email}.
+        send_self_registration_email_to_html: Enviar correo electrónico para inscripciones
+          enviadas a %{email}
     stickers:
       edit:
         bike: Bicicleta
@@ -4850,6 +4824,8 @@ es:
       subject: Finaliza la denuncia de tu %{cycle_type} robado.
     organization_message:
       subject: Mensaje de %{organization_name} sobre tu %{bike_type}
+    organization_signup_confirmation:
+      subject: Confirma tu correo electrónico para activar %{name} en Bike Index.
   payments:
     form:
       donation_header: "¡Ayúdanos a apoyar nuestros esfuerzos!"
@@ -5216,6 +5192,20 @@ es:
       add_a_registration: Agregar un registro
       registration_form_settings: Configuración del formulario de registro
       education_courses: cursos de formación
+      org_information: "%{org_name} Información"
+    organization_signup:
+      address_required: Por favor, introduzca la dirección completa de la organización.
+      email_required: Se requiere un correo electrónico válido.
+      kind_required: Por favor, elija qué tipo de organización es esta.
+      name_required: Se requiere el nombre de la organización.
+      name_reserved: Ese nombre está reservado en Bike Index; por favor, elija otro.
+      name_taken: Ya existe una organización llamada %{name} en Bike Index. Elija
+        otro nombre o póngase en contacto con support@bikeindex.org si es el suyo.
+      name_taken_shortened: Es demasiado parecido a %{name}, que ya está en Bike Index;
+        los nombres deben ser diferentes en sus primeros 30 caracteres. Elija otro
+        nombre o póngase en contacto con support@bikeindex.org si es suyo.
+      name_too_short: El nombre de la organización debe tener al menos dos letras
+        o números.
   theft_alert_plans:
     theft_alert_plan:
       days: Días
@@ -5492,6 +5482,14 @@ es:
           un mensaje sobre tu %{bike_type}:"
         sender_sent_you_a_message_html: "%{sender_email} de %{organization_name} te
           envió un mensaje sobre tu %{link}:"
+      organization_signup_confirmation:
+        activate_your_organization: Active su organización
+        confirm_and_activate: Confirmar mi correo electrónico y activar
+        confirm_to_activate_html: Confirma esta dirección de correo electrónico para
+          activar <strong>%{name}</strong> en Bike Index. Serás su administrador y
+          podrás invitar al resto de tu equipo una vez que hayas iniciado sesión.
+        link_signs_you_in: Este enlace te da acceso a Bike Index, así que no lo reenvíes.
+          Funciona durante %{days} días.
     ui:
       definition_list:
         row:
@@ -5609,6 +5607,9 @@ es:
           none: ninguno
           return_to_default_column_order: Volver al orden de columnas predeterminado
           visible_columns: Columnas visibles
+        in_card:
+          select_record: Seleccione %{record} %{id}
+          toggle_all_checked: Activar/desactivar todas las selecciones
     atoms:
       serial:
         hidden: oculto
@@ -5641,6 +5642,9 @@ es:
         report: Informe
         step_1: Paso 1
         step_2: Paso 2
+      org:
+        impound_current_location:
+          same_as_impounded_from: igual que incautado de
     pages:
       messages:
         thread_show:
@@ -5799,7 +5803,6 @@ es:
             show_location_search: mostrar búsqueda de ubicación
             all_bikes: Todas las bicicletas
             all_statuses: Todos los estados
-            impound_location_cell: Ubicación
             impound_status_cell: Estado de depósito
             impound_updated_at_cell: Incautación actualizada
             impound_updated_at_cell_panel: Hora - Registro de depósito actualizado
@@ -5824,6 +5827,10 @@ es:
               de la búsqueda de registros
             impound_search_columns: Columnas de búsqueda de depósitos
             course_acknowledgment_cell_panel: Tiempo - Curso de educación reconocido
+            current_location_without_locations: No tienes ubicaciones de depósito,
+              así que esto repite principalmente Incautado desde
+            impound_current_location_cell: Ubicación actual
+            impound_notes_cell: Notas de depósito
           column_settings_toggle:
             column_settings: Configuración de columnas
           settings_and_filters:
@@ -5843,8 +5850,8 @@ es:
             hidden: oculto
             not_registered_with: Oculto porque no está registrado con %{org_name}
             view: Vista
-            toggle_all_checked: Activar/desactivar todas las selecciones
             course_acknowledgment_title: Reconocimiento del curso de educación en
+            more_notes: "+%{count} más"
           multi_result_chip:
             no_results: no hay coincidencias
           multi_results:
@@ -5917,6 +5924,27 @@ es:
         education_course:
           page_edit_bullet:
             bullet: bala
+        info:
+          show:
+            add_a_registration: Agregar un registro
+            associated_with_org_html: Los registros realizados a través de este enlace
+              están asociados con <strong>%{org_name}</strong> .
+            continue_where_you_were: Continúa donde estabas
+            copy_registration_link: Copiar enlace de registro
+            get_qr_code_html: Obtén un %{qr_code_link} que abre el enlace al escanearlo.
+            has_paid_functionality: Su organización dispone de funcionalidades de
+              pago.
+            invite_your_team: Invita a tu equipo
+            next_invoice_due_html: Próxima factura con vencimiento el %{time}.
+            no_invoices_upcoming: No hay facturas pendientes.
+            no_password_yet: Por ahora, inicia sesión con los enlaces que te enviamos
+              por correo electrónico.
+            org_is_active: "%{name} está activo"
+            organization_set_up_next_steps: La organización establece los siguientes
+              pasos
+            qr_code: Código QR
+            set_a_password: Establecer una contraseña
+            your_public_registration_link: Enlace a su registro público
       registrations:
         show:
           bike_details:
@@ -6051,6 +6079,8 @@ es:
             impounded_from: Incautado de
             last_update_by: Última actualización por
             status: Estado
+            current_location: Ubicación actual
+            notes: Notas
           legacy_view_link:
             switch_to_classic: Volver al visor anterior
             view_in_legacy: Ver %{bike_type} en el visor antiguo
@@ -6792,10 +6822,20 @@ es:
             confirming_your_email: Confirmando tu correo electrónico
             continue: Continuar
             continue_where_you_left_off: Continúa y retomaremos donde lo dejaste.
+            continuing_keeps_you_signed_in: Si continúas, permanecerás conectado y
+              se guardará el registro en la dirección a la que está dirigido este
+              enlace.
+            i_agree_to_terms: Acepto los Términos de servicio de Bike Index.
+            link_is_for: Este enlace es para
+            read_terms: Lea los Términos de servicio
+            sign_out_to_agree: Quien acceda a este enlace deberá aceptar las normas
+              de seguridad. Cierre sesión y vuelva a abrir el enlace.
+            signed_in_as: Has iniciado sesión como
           step1:
             just_the_essentials: Solo lo esencial para empezar.
             register_your_vehicle: "¡Registra tu vehículo!"
-            register_your_vehicle_with_org: "¡Registra tu vehículo con %{org_name}!"
+            register_your_vehicle_with_org_html: "¡Registra tu vehículo con <strong>%{org_name}</strong>
+              !"
           step2:
             add_your_bikes_details: Agregue los detalles de su %{cycle_type}
             confirmation_link_sent: 'Te hemos enviado un enlace de confirmación a
@@ -6974,8 +7014,6 @@ es:
           year: Año
           filter_combobox:
             any: Cualquier
-          byline: Un enlace gratuito de Bike Index, el registro de bicicletas sin
-            ánimo de lucro.
           tagline: 'La biblioteca mundial de bicicletas: busca, compara y encuentra
             tu próxima bici.'
           activities: Actividades
@@ -7053,31 +7091,19 @@ es:
           answer_yes: Sí
           being_compiled: Las normas para este estado se están recopilando a partir
             de fuentes primarias.
-          class_1_throttle: Las motocicletas de Clase 1 no pueden tener acelerador.
-          class_3_throttle: El acelerador debe cortarse a 20 mph.
-          classes_start_on: Las clases entran en vigor %{date}. Hasta entonces, consulte
-            las reglas vigentes del estado.
           fails_rule: No cumple con esta regla.
           for_your_information: Para tu información
           gray_headline: Todavía no tenemos registradas las normas sobre bicicletas
             eléctricas de %{state}.
-          has_throttle: Tiene acelerador
           is_registered: "¿Está matriculada esta bicicleta?"
           legal_to_ride: Es legal conducirlo
-          limits_start_on: Estos límites entran en vigor %{date}
           manual_bike_name: bicicleta eléctrica
           may_be_moped: En su lugar, podría estar regulado como un ciclomotor o un
             vehículo a motor, lo que podría requerir matriculación y permiso de conducir.
           meets_rule: Cumple con esta regla
           motor: Motor
           mph_html: "%{mph} mph"
-          no_speed_cap: No hay límite de velocidad en la ley estatal.
-          no_throttle: Sin acelerador
-          no_watt_cap: No existe límite de potencia en la ley estatal.
-          not_classified: No es una bicicleta eléctrica de Clase 1, 2 o 3.
           not_permitted: No está permitido
-          own_classes: El estado establece sus propios límites en lugar de las tres
-            clases estándar.
           recovered_more_often: Las bicicletas robadas se recuperan dos veces más
             a menudo cuando están registradas.
           register_free: Regístrate en Bike Index — gratis
@@ -7085,10 +7111,6 @@ es:
           rules_not_on_file: Reglas no archivadas
           source_html: 'Fuente: Catálogo de leyes estatales de %{link}. Los resúmenes
             son solo de referencia y no constituyen asesoramiento legal.'
-          speed_not_provided: Velocidad máxima no proporcionada
-          speed_over_cap_html: Ayuda a %{mph} mph, por encima del límite de %{cap}
-            mph
-          speed_within_cap_html: Ayuda a %{mph} mph, dentro del límite
           still_reviewing: Todavía estamos revisando las reglas de %{state}.
           still_reviewing_body: Consulta la página web del Departamento de Vehículos
             Motorizados (DMV) o de la legislatura de tu estado para conocer las normas
@@ -7096,40 +7118,16 @@ es:
             la potencia de los motores de las bicicletas eléctricas a 750 W y la velocidad
             asistida a 20 mph (Clase 1-2) o 28 mph (Clase 3).
           throttle: Acelerador
-          throttle_allowed: Acelerador permitido para la Clase 2
-          throttle_not_allowed: El estado no permite un acelerador
-          throttle_not_stated: La ley estatal no especifica si se permite un acelerador.
           top_speed: Velocidad máxima
           watts_html: "%{watts}W"
-          watts_not_provided: Potencia del motor no proporcionada
-          watts_over_cap_html: El motor %{watts}W supera la capacidad %{cap}W
-          watts_within_cap_html: El motor %{watts}W está dentro de la tapa
           yes_to_html: Sí, a %{mph}
           your_state: Tu estado
-          class_3_throttle_over_html: El acelerador funciona hasta %{mph} mph, más
-            allá de las 20 mph se permite el acelerador de un Clase 3.
-          class_3_throttle_within_html: El acelerador se detiene a %{mph} mph
           over_mph_html: Más de %{mph} mph
           red_headline_manual: Esto no es una bicicleta eléctrica según las normas
             %{state} vigentes.
-          speed_past_cap_html: Ayuda a superar %{past} mph, por encima del límite
-            de %{cap} mph
-          speed_past_html: Ayuda a superar %{past} mph; comprueba que se detenga a
-            %{cap} mph.
-          classes_recognized:
-            one: Se reconoce la clase %{n}.
-            other: Se reconocen las clases %{n}.
           answer_optional: Opcional
-          class_3_optional_throttle_within_html: El acelerador opcional se detiene
-            a %{mph} mph.
-          class_3_speed_with_throttle_html: Ayuda a %{mph} mph, no permitido con acelerador.
-          class_n: Clase %{n}
-          classes_not_permitted: Es una bicicleta eléctrica %{classes}, lo cual no
-            está permitido.
           model_year: Modelo %{year}
-          optional_throttle_not_allowed: Es legal únicamente sin su acelerador opcional.
           optional_to_html: Opcional, a %{mph}
-          throttle_with_class_3_assist: No permitido con asistencia de Clase 3
           kmh_html: "%{kmh} km/h"
           law_source_html: 'Fuente: Catálogo de leyes sobre bicicletas eléctricas
             de %{link}. Los resúmenes son solo de referencia y no constituyen asesoramiento
@@ -7137,40 +7135,15 @@ es:
           may_be_moped_canada: En su lugar, podría estar regulado como un ciclomotor
             o un vehículo a motor, lo que podría requerir matriculación y permiso
             de conducir.
-          no_e_bike_category: Aquí no hay categoría para bicicletas eléctricas, así
-            que consulta las normas sobre licencia, matriculación y casco de esta
-            bicicleta.
-          no_speed_cap_in_law: No hay límite de velocidad en su ley.
-          no_watt_cap_in_law: No hay límite de potencia en su ley.
           optional_to_kmh_html: Opcional, hasta %{kmh} km/h
           over_kmh_html: Más de %{kmh} km/h
-          speed_over_cap_kmh_html: Ayuda a %{kmh} km/h, por encima del límite de %{cap}
-            km/h
-          speed_past_cap_kmh_html: Ayuda a superar los %{past} km/h, por encima del
-            límite de %{cap} km/h
-          speed_past_kmh_html: Ayuda a superar %{past} km/h; comprueba que se detenga
-            a %{cap} km/h.
-          speed_within_cap_kmh_html: Ayuda a %{kmh} km/h, dentro del límite
           still_reviewing_province_body: Consulta la normativa vigente sobre bicicletas
             eléctricas en el ministerio de transporte de tu provincia o territorio.
             La mayoría limita la potencia de los motores de las bicicletas eléctricas
             a 500 W y la velocidad asistida a 32 km/h.
-          throttle_allowed_in_law: Acelerador permitido
-          throttle_not_allowed_in_law: Su ley no permite un acelerador
-          throttle_not_stated_in_law: Su ley no especifica si se permite un acelerador.
-          watts_to_check_html: Compruebe que su motor tenga una potencia nominal de
-            %{cap}W o inferior.
           yes_to_kmh_html: Sí, a %{kmh} km/h
           your_province: Su provincia o territorio
-          classes_not_recognized_in:
-            one: La clase %{n} no se reconoce en %{state}.
-            other: Las clases %{n} no se reconocen en %{state}.
           falls_under_name: En %{state}, se encuentra dentro de %{name}.
-          optional_classes_not_recognized_in:
-            one: La clase %{n} no se reconoce en %{state}, por lo que solo es legal
-              tal como se vende.
-            other: Las clases %{n} no se reconocen en %{state}, por lo que es legal
-              solo como se vende.
           other_classification_rules: Reglas %{name}
           also_class_with_optional_throttle: También es una bicicleta eléctrica de
             clase %{n} con acelerador opcional.
@@ -7185,10 +7158,6 @@ es:
           heading_throttle_not_allowed: Acelerador no permitido
           heading_vehicle_html: Regulado como %{name}
           may_fall_under_name: En %{state}, puede quedar dentro de %{name}.
-          throttle_speed_over_cap_html: El acelerador alcanza %{mph} mph, superando
-            el límite de %{cap} mph.
-          throttle_speed_within_cap_html: El acelerador alcanza las %{mph} mph, dentro
-            del límite.
           class_summary: La %{name} es una bicicleta eléctrica de clase %{n} en %{state}.
           class_summary_optional: La %{name} es una bicicleta eléctrica de clase %{n}
             en %{state} y %{optional}.
@@ -7241,12 +7210,6 @@ es:
               con %{count} reglas para verificar.
           yellow_summary_no_classes_without_throttle: La %{name} está clasificada
             como una bicicleta eléctrica en %{state}, sin su acelerador opcional.
-          class_3_throttle_past: El acelerador supera las 20 mph, velocidad permitida
-            para un vehículo de Clase 3.
-          throttle_past_cap_kmh_html: El acelerador supera los %{past} km/h, sobrepasando
-            el límite de %{cap} km/h.
-          throttle_past_kmh_html: El acelerador supera los %{past} km/h; compruebe
-            que se detiene a %{cap} km/h.
           yes_over_mph_html: Sí, más de %{mph} mph
           class_summary_manual: Esta bicicleta eléctrica es una bicicleta eléctrica
             de clase %{n} en %{state}.
@@ -7263,13 +7226,9 @@ es:
             other: Esto se clasifica como una bicicleta eléctrica en %{state}, con
               reglas %{count} para verificar.
           bike_book_name: Libro de bicicletas
-          class_unknown_in_bike_book_label: Bike Book no indica su clase ni su velocidad
-            máxima, así que compruebe la clase en su etiqueta.
           entered_unverified_by_bike_book: Ingresado por usted, no verificado por
             Bike Book.
           full_bike_book_entry: Ver la entrada completa del Libro de Bicicletas
-          speed_to_check_bike_book_kmh_html: Bike Book no indica su velocidad máxima,
-            así que compruebe que el motor se detiene a %{cap} km/h.
         rule_label:
           classes: Clases reconocidas
           power: condensador de potencia del motor
@@ -7527,6 +7486,9 @@ es:
           watts_min: "%{watts}W+"
           copy_id: Copiar ID
           id: IDENTIFICACIÓN
+          class_3_throttle_barred: En %{state}, una bicicleta eléctrica de Clase 3
+            no puede tener acelerador, por lo que una Clase 3 con acelerador no es
+            una bicicleta eléctrica allí.
         bike_summary:
           classification: Clasificación E-%{vehicle_type}
           electric_certification: Certificación eléctrica
@@ -7535,6 +7497,86 @@ es:
           outside_checked_countries: Por ahora, los controles de bicicletas abarcan
             los estados de EE. UU. y las provincias canadienses. A continuación se
             muestran las leyes sobre bicicletas eléctricas de %{place}.
+        rule_note:
+          class_1_throttle: Las motocicletas de Clase 1 no pueden tener acelerador.
+          class_3_optional_throttle_within_html: El acelerador opcional se detiene
+            a %{mph} mph.
+          class_3_speed_with_throttle_html: Ayuda a %{mph} mph, no permitido con acelerador.
+          class_3_throttle: El acelerador debe cortarse a 20 mph.
+          class_3_throttle_over_html: El acelerador funciona hasta %{mph} mph, más
+            allá de las 20 mph se permite el acelerador de un Clase 3.
+          class_3_throttle_past: El acelerador supera las 20 mph, velocidad permitida
+            para un vehículo de Clase 3.
+          class_3_throttle_within_html: El acelerador se detiene a %{mph} mph
+          class_n: Clase %{n}
+          class_unknown_in_bike_book_label: Bike Book no indica su clase ni su velocidad
+            máxima, así que compruebe la clase en su etiqueta.
+          classes_not_permitted: Es una bicicleta eléctrica %{classes}, lo cual no
+            está permitido.
+          classes_not_recognized_in:
+            one: La clase %{n} no se reconoce en %{state}.
+            other: Las clases %{n} no se reconocen en %{state}.
+          classes_recognized:
+            one: Se reconoce la clase %{n}.
+            other: Se reconocen las clases %{n}.
+          classes_start_on: Las clases entran en vigor %{date}. Hasta entonces, consulte
+            las reglas vigentes del estado.
+          has_throttle: Tiene acelerador
+          limits_start_on: Estos límites entran en vigor %{date}
+          no_e_bike_category: Aquí no hay categoría para bicicletas eléctricas, así
+            que consulta las normas sobre licencia, matriculación y casco de esta
+            bicicleta.
+          no_speed_cap: No hay límite de velocidad en la ley estatal.
+          no_speed_cap_in_law: No hay límite de velocidad en su ley.
+          no_throttle: Sin acelerador
+          no_watt_cap: No existe límite de potencia en la ley estatal.
+          no_watt_cap_in_law: No hay límite de potencia en su ley.
+          not_classified: No es una bicicleta eléctrica de Clase 1, 2 o 3.
+          optional_classes_not_recognized_in:
+            one: La clase %{n} no se reconoce en %{state}, por lo que solo es legal
+              tal como se vende.
+            other: Las clases %{n} no se reconocen en %{state}, por lo que es legal
+              solo como se vende.
+          optional_throttle_not_allowed: Es legal únicamente sin su acelerador opcional.
+          own_classes: El estado establece sus propios límites en lugar de las tres
+            clases estándar.
+          speed_not_provided: Velocidad máxima no proporcionada
+          speed_over_cap_html: Ayuda a %{mph} mph, por encima del límite de %{cap}
+            mph
+          speed_over_cap_kmh_html: Ayuda a %{kmh} km/h, por encima del límite de %{cap}
+            km/h
+          speed_past_cap_html: Ayuda a superar %{past} mph, por encima del límite
+            de %{cap} mph
+          speed_past_cap_kmh_html: Ayuda a superar los %{past} km/h, por encima del
+            límite de %{cap} km/h
+          speed_past_html: Ayuda a superar %{past} mph; comprueba que se detenga a
+            %{cap} mph.
+          speed_past_kmh_html: Ayuda a superar %{past} km/h; comprueba que se detenga
+            a %{cap} km/h.
+          speed_to_check_bike_book_kmh_html: Bike Book no indica su velocidad máxima,
+            así que compruebe que el motor se detiene a %{cap} km/h.
+          speed_within_cap_html: Ayuda a %{mph} mph, dentro del límite
+          speed_within_cap_kmh_html: Ayuda a %{kmh} km/h, dentro del límite
+          throttle_allowed: Acelerador permitido para la Clase 2
+          throttle_allowed_in_law: Acelerador permitido
+          throttle_not_allowed: El estado no permite un acelerador
+          throttle_not_allowed_in_law: Su ley no permite un acelerador
+          throttle_not_stated: La ley estatal no especifica si se permite un acelerador.
+          throttle_not_stated_in_law: Su ley no especifica si se permite un acelerador.
+          throttle_past_cap_kmh_html: El acelerador supera los %{past} km/h, sobrepasando
+            el límite de %{cap} km/h.
+          throttle_past_kmh_html: El acelerador supera los %{past} km/h; compruebe
+            que se detiene a %{cap} km/h.
+          throttle_speed_over_cap_html: El acelerador alcanza %{mph} mph, superando
+            el límite de %{cap} mph.
+          throttle_speed_within_cap_html: El acelerador alcanza las %{mph} mph, dentro
+            del límite.
+          throttle_with_class_3_assist: No permitido con asistencia de Clase 3
+          watts_not_provided: Potencia del motor no proporcionada
+          watts_over_cap_html: El motor %{watts}W supera la capacidad %{cap}W
+          watts_to_check_html: Compruebe que su motor tenga una potencia nominal de
+            %{cap}W o inferior.
+          watts_within_cap_html: El motor %{watts}W está dentro de la tapa
       memberships:
         new:
           become_a_member: Hazte miembro
@@ -8307,7 +8349,6 @@ es:
           customer_records_sold_or_shared: registros de clientes vendidos o compartidos
           data_stays_private: Sus datos permanecen privados.
           data_stays_private_body: Nunca vendido, nunca compartido.
-          ding: "¡TIMBRE!"
           ebike_legality_checker: Comprobador de legalidad de bicicletas eléctricas
           ebike_legality_checker_body: Información específica de cada estado sobre
             las categorías de bicicletas eléctricas, dónde se pueden usar y las normas
@@ -8392,7 +8433,6 @@ es:
           shop_name_placeholder: Ciclos de radios y cadena
           sign_up_free: Regístrate gratis
           sign_up_your_shop: Registra tu tienda
-          signup_name: inscribirse
           something_else_html: "¿Algo más? %{email_link}."
           step_connect_body: Vincula Lightspeed o Ascend a tu cuenta gratuita de la
             tienda. Tarda unos 10 minutos.
@@ -8415,13 +8455,108 @@ es:
           used_only_for_bikes: Utilizado únicamente para bicicletas
           we_never_sell_or_share: Nunca vendemos ni compartimos datos de nuestros
             clientes.
-          well_email_you: Le enviaremos un correo electrónico con instrucciones para
-            conectar su terminal de punto de venta (TPV).
           what_your_customers_get: Lo que obtienen tus clientes. Lo que obtiene tu
             tienda.
           wholesale: Al por mayor
           your_pos: Tu TPV
-          youre_in: Estás dentro.
+          signed_in_as_admin_html: Has iniciado sesión como %{email}, que será el
+            administrador de la tienda.
+        ascend:
+          a_dashboard_for_your_shop: Un panel de control para tu tienda
+          a_dashboard_for_your_shop_body: Consulta las bicicletas que has vendido
+            cuando lo necesites. Si la bicicleta de un cliente desaparece, sus datos
+            y número de serie se almacenan y están listos para la denuncia policial
+            o para reportarla como robada.
+          a_free_benefit_for_every_customer: Un beneficio gratuito para cada cliente,
+            para ese día que esperas que nunca llegue.
+          a_full_suite_of_recovery_tools: Un conjunto completo de herramientas de
+            recuperación
+          a_full_suite_of_recovery_tools_body: Bike Index es la única organización
+            que ofrece a los consumidores un conjunto completo de herramientas para
+            la recuperación de bicicletas robadas.
+          a_network_on_their_side: Una red de apoyo
+          a_network_on_their_side_body: Nuestra amplia red de colaboradores sin ánimo
+            de lucro ayuda a apoyar y colaborar en la recuperación de bicicletas.
+          about_10_minutes: Aproximadamente 10 minutos
+          ascend_pos_integration: Integración de Ascend POS
+          bikes_waiting_for_customers: Bicicletas esperando a los clientes
+          bikes_waiting_for_customers_body: Creamos una cuenta de Bike Index para
+            cada cliente. Revisan su correo electrónico, inician sesión y su nueva
+            bicicleta ya está registrada. ¿Prefiere no recibir correos electrónicos?
+            Podemos desactivar las notificaciones para clientes por completo.
+          caped_hero_bike_alt: Bicicleta de héroe enmascarado
+          create_shop_account: Crear cuenta de tienda
+          create_your_shop_account: Crea tu cuenta de tienda en Bike Index.
+          create_your_shop_account_body: Regístrate como nueva organización de tienda
+            de bicicletas. Si tu tienda ya tiene una, inicia sesión y continúa.
+          customers_stay_in_control: Los clientes mantienen el control.
+          customers_stay_in_control_body: Los propietarios pueden actualizar, transferir
+            o eliminar su registro en cualquier momento.
+          email_notifications_off_body: Podemos desactivar las notificaciones por
+            correo electrónico por completo. La bicicleta permanecerá registrada con
+            el correo electrónico de tu tienda, así que si la policía la recupera,
+            se pondrán en contacto contigo y tú contactarás con el cliente. Estaremos
+            encantados de ayudarte a configurar los ajustes de privacidad que mejor
+            se adapten a tu tienda.
+          email_subject: Configuración de Ascend
+          email_us: Envíanos un correo electrónico
+          lightspeed_body_html: También tenemos un %{lightspeed_link}.
+          lightspeed_pos_integration: Integración de Lightspeed POS
+          link_your_accounts_once: Vincula tus cuentas de Ascend Retail y Bike Index
+            una sola vez. Es gratis y la configuración tarda unos 10 minutos.
+          never_sold_or_shared: Nunca se vendió ni se compartió.
+          never_sold_or_shared_body: Los nombres y correos electrónicos de los clientes
+            no se venden, alquilan ni ceden a terceros.
+          new_bike_sales_get_a_bike_index_account: Las ventas de bicicletas nuevas
+            se benefician automáticamente de una cuenta de Bike Index.
+          no_marketing_lists: No se aceptan listas de marketing.
+          no_marketing_lists_body: No añadimos a tus clientes a nuestros boletines
+            informativos ni les enviamos promociones.
+          nothing_to_do_at_checkout: No hay nada que hacer al momento de pagar.
+          nothing_to_do_at_checkout_body: Cada día, Bike Index retira de Ascend las
+            bicicletas recién vendidas. Tu personal continúa registrando las ventas
+            como siempre lo hace.
+          one_email_to_claim_their_bike: Un correo electrónico para reclamar su bicicleta
+          one_email_to_claim_their_bike_body: Los clientes reciben un único correo
+            electrónico informándoles de que la bicicleta que compraron en tu tienda
+            está registrada y lista para ser usada.
+          open_ascend_guide: Guía de Open Ascend
+          peace_of_mind: Tranquilidad de espíritu
+          peace_of_mind_body: Los datos de su bicicleta ya están almacenados, por
+            lo que nunca tienen que buscar el número de serie.
+          pos_integration_faq: Preguntas frecuentes sobre la integración de puntos
+            de venta
+          pos_integration_security_faq: Preguntas frecuentes sobre seguridad en la
+            integración de puntos de venta
+          privacy_intro: Bike Index es una organización sin ánimo de lucro. La información
+            de los clientes se utiliza para registrar las bicicletas y ayudar a recuperarlas,
+            y para ningún otro fin.
+          privacy_policy: Política de privacidad
+          questions: "¿Preguntas?"
+          questions_body_html: Envíe un correo electrónico a %{email_link} o lea el
+            %{faq_link}.
+          rather_they_didnt_get_an_email: "¿Prefieren no haber recibido un correo
+            electrónico?"
+          register_every_bike_you_sell: Registra automáticamente cada bicicleta que
+            vendas.
+          send_us_the_password: Envíanos la contraseña
+          send_us_the_password_body: Envíalo por correo electrónico a %{shops_email}
+            y terminaremos de conectar tus cuentas. Después de eso, habrás terminado.
+          set_up_in_three_steps: Configuración en tres pasos
+          start_setup: Iniciar configuración
+          turn_on_bike_index_in_ascend: Activar el índice de bicicletas en Ascend
+          turn_on_bike_index_in_ascend_body: Sigue las instrucciones de configuración
+            que encontrarás en el artículo de la base de conocimientos de Ascend.
+            Aquí es donde crearás la contraseña para la conexión.
+          using_lightspeed_instead: "¿Usar Lightspeed en su lugar?"
+          we_hope_their_bike_is_never_stolen: Esperamos que nunca les roben la bicicleta.
+            Si lo hacen, están cubiertos.
+          we_will_never_give_out_customer_data: Nunca compartiremos sus datos de cliente.
+          what_your_customers_get: Lo que obtienen tus clientes
+          your_customers_privacy: La privacidad de sus clientes
+          your_shop_is_on_bike_index: Tu tienda está en Bike Index.
+          your_shop_is_on_bike_index_body: Has iniciado sesión en la cuenta de organización
+            de tu tienda, así que este paso ya está hecho.
       marketplace:
         how_it_works:
           across_town_heading: Al otro lado de la ciudad o al otro lado del país.
@@ -8547,6 +8682,94 @@ es:
         stories:
           load_more_stories: Cargar más historias
           newer_stories: Historias más recientes
+      org_signup:
+        views:
+          confirm:
+            activate: Activar
+            activate_org: Activar %{name}
+            confirm_email_to_activate_html: Confirma que %{email} es tu correo electrónico
+              y configuraremos la organización contigo como administrador.
+            sign_out_and_activate: Cerrar sesión y activar
+            activating_signs_you_out: Al activarlo, se cerrará su sesión y accederá
+              a la cuenta de administrador de la organización.
+            i_agree_to_terms: Acepto los Términos de servicio de Bike Index y los
+              Términos de servicio para organizaciones.
+            link_is_for: Este enlace es para
+            read_terms_html: Lea %{terms_link} y %{vendor_terms_link}
+            signed_in_as: Has iniciado sesión como
+            terms_of_service: Condiciones de servicio
+            vendor_terms: Condiciones de servicio para organizaciones
+          step1:
+            activation_link: Te enviaremos un enlace por correo electrónico para activar
+              la organización; no es necesario que esperes, continúa.
+            add_your_organization: Añade tu organización
+            already_on_bike_index_html: "¿Su organización ya está en Bike Index? %{sign_in_link}
+              para gestionarla."
+            email: Tu correo electrónico
+            email_placeholder: tú@ejemplo.com
+            kind_bike_advocacy: Grupo de defensa
+            kind_bike_manufacturer: Fabricante
+            kind_bike_shop: Tienda de bicicletas
+            kind_law_enforcement: fuerzas del orden
+            kind_municipality: Ciudad o municipio
+            kind_other: Otro
+            kind_property_management: administración de propiedades
+            kind_school: Escuela o universidad
+            kind_software: Software
+            next: Próximo
+            organization_kind: "¿Qué tipo de organización?"
+            organization_name: Nombre de la organización
+            sign_in: Iniciar sesión
+            start_a_different_one: Crea otra organización en su lugar.
+            your_info: Tu información
+            your_organization: Su organización
+            already_part_of_organization_html: Ya formas parte de %{organization_link};
+              esto creará una organización separada.
+            free_to_start_few_minutes: Es gratis empezar, solo lleva unos minutos.
+            organization_link: Organización %{name}
+            signed_in_as_new_admin_html: Has iniciado sesión como %{email}, que será
+              el administrador de la nueva organización.
+            signup_name: inscribirse
+          step2:
+            activation_link_sent: Le hemos enviado por correo electrónico a %{email}
+              un enlace para activar la organización; primero, complete este paso.
+            contact: Contacto
+            email_confirmed: Tu correo electrónico está confirmado. Añade donde está
+              %{name} y se activará en cuanto termines.
+            finish: Finalizar
+            location: Ubicación
+            phone: Teléfono
+            publicly_visible: Mostrar esta ubicación en el mapa del Índice de Bicicletas
+            shown_to_people: Así, las personas que se registren contigo podrán encontrarte.
+            website: Sitio web
+            website_placeholder: ejemplo.com
+            where_is_org: "¿Dónde está %{name}?"
+            out_of_links: Hemos enviado todos los enlaces de activación posibles,
+              pero ninguno llegó a %{email}. Ponte en contacto con support@bikeindex.org
+              y lo solucionaremos.
+            signup_name: inscribirse
+          step_finished:
+            activate_html: Hemos enviado un enlace a %{email}; haz clic en él para
+              activar %{name}.
+            activating_lets_you: 'Una vez activado, puedes:'
+            change_it: Cámbialo
+            check_your_email: Revisa tu correo electrónico
+            invite_your_team: Invita al resto de tu equipo.
+            no_email_yet: "¿No has recibido el correo? Puede tardar unos minutos;
+              revisa tu carpeta de correo no deseado o pídenos que te lo enviemos
+              de nuevo."
+            register_for_community: Registra los vehículos de tu comunidad.
+            register_for_residents: Registre los vehículos de sus residentes.
+            register_for_students: Registre los vehículos de sus estudiantes y personal.
+            register_for_tenants: Registra los vehículos de tus inquilinos.
+            register_for_your_customers: Registre los vehículos de sus clientes.
+            send_it_again: Envíalo de nuevo
+            share_your_link: Comparte tu enlace de registro y código QR.
+            wrong_address: "¿Dirección equivocada?"
+            cant_send_another: No podemos enviar otro enlace
+            out_of_links_html: Hemos enviado todos los enlaces de activación posibles
+              para %{name}, pero ninguno llegó a %{email}. Ponte en contacto con support@bikeindex.org
+              y lo solucionaremos.
     shared_blocks:
       footer:
         about: Acerca
@@ -8751,6 +8974,11 @@ es:
           stat_partners: tiendas asociadas, departamentos de policía y ciudades
           stat_recoveries: Recuperan bicicletas robadas
           stat_value: valor devuelto a los propietarios
+      color_scheme_picker:
+        appearance: Apariencia
+        dark: Oscuro
+        light: Luz
+        system: Sistema
   user_emails:
     confirm:
       confirm_email: Confirmar correo electrónico

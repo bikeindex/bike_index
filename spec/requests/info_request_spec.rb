@@ -256,6 +256,9 @@ RSpec.describe InfoController, type: :request do
       expect(response).to render_template("lightspeed")
       expect(flash).to_not be_present
       expect(assigns(:show_general_alert)).to be_truthy
+      # Signing up comes back through the signup's own return_to, not a sign-in's
+      expect(response.body).to include new_organization_signup_path(return_to: lightspeed_interface_path)
+      expect(session[:return_to]).to be_blank
     end
     context "donate" do
       include_context :active_stripe_prices
@@ -281,6 +284,17 @@ RSpec.describe InfoController, type: :request do
       get "/primary_activities.csv"
       expect(response.status).to eq(200)
       expect(response.content_type).to match("text/csv")
+    end
+  end
+
+  context "wheel_sizes" do
+    let!(:wheel_size) { FactoryBot.create(:wheel_size, name: "7 x 1.5in", iso_bsd: 102, priority: :rare, description: "7 x 1.5in (178 x 38) solid wheel (Rare)") }
+
+    it "gets a csv" do
+      get "/wheel_sizes.csv"
+      expect(response.status).to eq(200)
+      expect(response.content_type).to match("text/csv")
+      expect(response.body).to eq "name,iso_bsd,priority,description\n7 x 1.5in,102,rare,7 x 1.5in (178 x 38) solid wheel (Rare)\n"
     end
   end
 end

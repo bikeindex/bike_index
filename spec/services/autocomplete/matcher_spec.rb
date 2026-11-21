@@ -60,8 +60,8 @@ RSpec.describe Autocomplete::Matcher do
       # (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)
       e_dash_result = described_class.search(nil, described_class.params_to_opts(q: "e-", per_page: 10))
       # pp e_dash_result.map { "#{it["search_id"]} - #{it["text"]}" }
-      expect(e_dash_result.count).to eq 9
-      target_e_result_ids = %w[p_10 v_11 v_16 v_18 v_12 v_21 v_22 v_19 v_20]
+      expect(e_dash_result.count).to eq 10
+      target_e_result_ids = %w[p_10 v_11 v_16 v_18 v_12 v_24 v_21 v_22 v_19 v_20]
       expect(e_dash_result.map { it["search_id"] }).to eq target_e_result_ids
 
       e_space_result = described_class.search(nil, described_class.params_to_opts(q: "e ", per_page: 10))

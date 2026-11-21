@@ -1,0 +1,9 @@
+<% if @impound_record.location.present? %>
+  <strong class="tw:block"><%= @impound_record.location.name %></strong>
+<% end %>
+
+<% if same_as_impounded_from? %>
+  <em class="tw:text-gray-400"><%= translation(".same_as_impounded_from") %></em>
+<% else %>
+  <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.address_record, visible_attribute: :street, kind: @kind)) %>
+<% end %>

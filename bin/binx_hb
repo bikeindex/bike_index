@@ -83,7 +83,7 @@ end
 # ids out of a pasted URL is the common case when fixing a reported bug.
 def parse_target(target)
   case target
-  when %r{\Ahttps?://} then [target[%r{/projects/(\d+)}, 1], target[%r{/faults/(\d+)}, 1]]
+  when %r{\Ahttps?://} then [target[%r{/projects/([^/]+)}, 1], target[%r{/faults/(\d+)}, 1]]
   when %r{/} then target.split("/", 2)
   else [target, nil]
   end
@@ -107,11 +107,22 @@ def window_start(window, default)
   Time.now.utc - lookback_seconds(window || default)
 end
 
-def get(path, token)
+def request(path, token)
   uri = URI("https://app.honeybadger.io/v2#{path}")
   request = Net::HTTP::Get.new(uri)
   request.basic_auth(token, "")
-  response = Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(request) }
+  [uri, Net::HTTP.start(uri.hostname, uri.port, use_ssl: true) { |http| http.request(request) }]
+end
+
+# Newer fault URLs carry an encoded project id (/projects/serRVGcq/...) the API
+# rejects, but fault ids are global, so whichever project has the fault is it.
+def project_holding(fault_id, token)
+  PROJECTS.find { |_name, id| request("/projects/#{id}/faults/#{fault_id}", token)[1].is_a?(Net::HTTPOK) }&.first ||
+    abort("Error: fault #{fault_id} isn't in #{PROJECTS.keys.join(", ")} - pass PROJECT/FAULT_ID")
+end
+
+def get(path, token)
+  uri, response = request(path, token)
 
   case response
   when Net::HTTPOK then response.body
@@ -185,6 +196,7 @@ end
 
 token = read_token
 raw_project, fault_id = parse_target(target)
+raw_project = project_holding(fault_id, token) if fault_id && !PROJECTS.key?(raw_project) && raw_project.to_i.zero?
 project_id, project_name = resolve_project(raw_project)
 
 case mode

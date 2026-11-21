@@ -103,6 +103,8 @@
         tw:dark:bg-gray-800 tw:dark:text-gray-500
         tw:dark:hover:border-blue-800 tw:dark:hover:text-blue-400
       "
+      aria-label="<%= translation(".collapse_sidebar") %>"
+      title="<%= translation(".collapse_sidebar") %>"
       data-collapse-label="<%= translation(".collapse_sidebar") %>"
       data-expand-label="<%= translation(".expand_sidebar") %>"
       data-shared-blocks--org-sidebar-target="collapseToggle"
@@ -199,7 +201,7 @@
 
                 <%# ui--collapse toggles rotate-90, so an already-open group starts rotated %>
                 <span
-                  class="tw:flex tw:text-gray-400 tw:dark:text-gray-500 tw:transition-transform tw:duration-200 tw:group-data-[collapsed=true]/sidebar:hidden <%= "tw:rotate-90" if open %>"
+                  class="tw:flex tw:text-gray-400 tw:transition-transform tw:duration-200 tw:group-data-[collapsed=true]/sidebar:hidden tw:dark:text-gray-500 <%= "tw:rotate-90" if open %>"
                   data-ui--collapse-target="chevron"
                 >
                   <%= render UI::IconChevron::Component.new %>
@@ -223,9 +225,12 @@
           <% when :link %>
             <%# text: nil, since a top-level row's label sits inside the block with its icon %>
             <%= render UI::ActiveLink::Component.from_item(item, html_class: row_class, text: nil) do %>
-              <% if item[:icon].present? %>
-                <span class="tw:flex tw:flex-none"><%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %></span>
-              <% end %>
+              <%# A group's icon width, and held open without an icon, so every label lines up %>
+              <span class="tw:flex tw:w-[18px] tw:flex-none tw:justify-center">
+                <% if item[:icon].present? %>
+                  <%= icon(item[:icon], html_class: "tw:h-[17px] tw:w-[17px]") %>
+                <% end %>
+              </span>
 
               <span class="tw:flex-1 tw:group-data-[collapsed=true]/sidebar:hidden">
                 <%= item[:label] %>

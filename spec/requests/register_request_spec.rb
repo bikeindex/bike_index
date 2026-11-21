@@ -478,15 +478,15 @@ RSpec.describe RegisterController, type: :request do
     end
 
     context "with an organization" do
-      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+      let(:organization) { FactoryBot.create(:organization, name: "Brakebills University", short_name: "Brakebills") }
       let(:b_param) do
         BParam.create(origin: "register_flow",
           params: {bike: {owner_email:, cycle_type: "cargo", creation_organization_id: organization.id}}.as_json)
       end
 
-      it "names the organization in the heading, and the cycle type only where js can swap it" do
+      it "names the organization in full in the heading, and the cycle type only where js can swap it" do
         get register_path(b_param_token: b_param.id_token, step: 1)
-        expect(response.body).to include "Register your vehicle with Brakebills!"
+        expect(response.body).to include "Register your vehicle with <strong>Brakebills University</strong>!"
         expect(response.body).to include '<span data-register--heading-target="cycleType">cargo bike</span> info'
         # Posted back, so a submission that has to build a registration keeps the org
         expect(Nokogiri::HTML(response.body).at_css("input[name='organization_id']")["value"])
@@ -516,7 +516,7 @@ RSpec.describe RegisterController, type: :request do
           get register_path(b_param_token: b_param.id_token, step: 1, organization_id: organization.slug)
           expect(b_param.reload.creation_organization_id).to eq organization.id
           expect(b_param.organization_id).to eq organization.id
-          expect(response.body).to include "with Brakebills!"
+          expect(response.body).to include "with <strong>Brakebills University</strong>!"
 
           # Once the bike exists there's nothing left to attribute
           b_param.update(created_bike_id: FactoryBot.create(:bike).id)
@@ -1528,7 +1528,7 @@ RSpec.describe RegisterController, type: :request do
 
         expect {
           post "#{base_url}/confirm_email", params: {b_param_token: b_param.id_token,
-                                                     confirmation_token: token}
+                                                     confirmation_token: token, terms_of_service: "1"}
         }.to_not change(Bike, :count)
         expect(response).to redirect_to step_path("report")
 
@@ -1933,21 +1933,31 @@ RSpec.describe RegisterController, type: :request do
   describe "confirm" do
     let!(:token) { b_param.generate_email_confirmation_token! }
     let(:confirm_params) { {b_param_token: b_param.id_token, confirmation_token: token} }
+    let(:accepted_params) { confirm_params.merge(terms_of_service: "1") }
     def step_path(step) = register_path(b_param_token: b_param.id_token, step:)
 
     it "renders a self-submitting form, then makes an account and signs them in" do
       get "#{base_url}/confirm", params: confirm_params
       expect(response.status).to eq 200
       expect(response.body).to include token
+      expect(response.body).to include "Terms of Service"
       # Rendering confirms nothing - a link scanner following the URL can't spend the token
       expect(b_param.reload.email_confirmed?).to be_falsey
 
       expect {
         post "#{base_url}/confirm_email", params: confirm_params
+      }.to_not change(User, :count)
+      expect(response).to redirect_to confirm_register_path(**confirm_params)
+      expect(flash[:error]).to eq "Agree to the Terms of Service to continue"
+      expect(b_param.reload.email_confirmed?).to be_falsey
+
+      expect {
+        post "#{base_url}/confirm_email", params: accepted_params
       }.to change(User, :count).by 1
       expect(b_param.reload).to have_attributes(email_confirmed?: true,
         email_confirmation_token: nil, creator_id: User.last.id)
-      expect(User.last).to have_attributes(email: owner_email, confirmed: true, passwordless_user: true)
+      expect(User.last).to have_attributes(email: owner_email, confirmed: true, passwordless_user: true,
+        terms_of_service: true)
       expect(User.last.last_login_at).to be_within(2.seconds).of Time.current
       # An account they never signed up for, so they're offered a password
       expect(flash[:notice]).to include(translation_key: :signed_up)
@@ -1958,7 +1968,7 @@ RSpec.describe RegisterController, type: :request do
 
       # Single use, so a forwarded link can't sign anyone in again
       expect {
-        post "#{base_url}/confirm_email", params: confirm_params
+        post "#{base_url}/confirm_email", params: accepted_params
       }.to_not change(User, :count)
       expect(response).to redirect_to step_path("2")
     end
@@ -1999,7 +2009,7 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to step_path("finished")
 
         expect {
-          post "#{base_url}/confirm_email", params: confirm_params
+          post "#{base_url}/confirm_email", params: accepted_params
         }.to change(Bike, :count).by 1
         expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
           creator_id: User.last.id)
@@ -2013,10 +2023,12 @@ RSpec.describe RegisterController, type: :request do
         include_context :request_spec_logged_in_as_user
 
         it "keeps their session, creating the bike for the confirmed address" do
+          get "#{base_url}/confirm", params: confirm_params
+          expect(response.body).to include "Continuing keeps you signed in"
           # The registration parked before they signed in, so it's still waiting here
           expect(b_param.reload.created_bike_id).to be_nil
           expect {
-            post "#{base_url}/confirm_email", params: confirm_params
+            post "#{base_url}/confirm_email", params: accepted_params
           }.to change(Bike, :count).by 1
           # No account for the confirmed address - they're still signed in as themselves
           expect(User.count).to eq 1
@@ -2036,7 +2048,7 @@ RSpec.describe RegisterController, type: :request do
         post base_url, params: step_1_params.merge(b_param_token: b_param.id_token)
         expect(b_param.reload.owner_email).to eq other_user.email
 
-        expect { post "#{base_url}/confirm_email", params: confirm_params }
+        expect { post "#{base_url}/confirm_email", params: accepted_params }
           .to_not change(User, :count)
         expect(b_param.reload.email_confirmed?).to be_falsey
         expect(flash[:error]).to be_present
@@ -2046,10 +2058,31 @@ RSpec.describe RegisterController, type: :request do
       end
     end
 
+    context "an address at an SSO domain" do
+      let(:owner_email) { "rider@sso.edu" }
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      before { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
+
+      it "signs in at the identity provider, which brings them back to the link" do
+        expect { post "#{base_url}/confirm_email", params: accepted_params }
+          .to_not change(User, :count)
+        expect(response).to redirect_to saml_init_path(org_slug: organization.to_param)
+        # The box they ticked comes back ticked
+        expect(session[:return_to]).to eq confirm_register_path(**accepted_params)
+        expect(b_param.reload.email_confirmed?).to be_falsey
+      end
+    end
+
     context "unconfirmed account for the address" do
       let!(:unconfirmed_user) { FactoryBot.create(:user, email: owner_email) }
 
       it "confirms it, since the link proved the address" do
+        get "#{base_url}/confirm", params: confirm_params
+        expect(response.body).to_not include "Terms of Service"
+        # They agreed to the terms when they signed up
         expect { post "#{base_url}/confirm_email", params: confirm_params }
           .to_not change(User, :count)
         expect(unconfirmed_user.reload.confirmed).to be_truthy
