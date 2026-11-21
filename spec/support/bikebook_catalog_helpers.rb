@@ -14,6 +14,12 @@ module BikebookCatalogHelpers
     end
   end
 
+  # The fixture catalog, its index synced to BikebookModel
+  def sync_bikebook_models
+    stub_bikebook_catalog
+    BikebookModelsSyncJob.new.perform
+  end
+
   # For the browser's and the server's both, with no stock photos, which render their placeholder
   def serve_bikebook_catalog(manifest_status: 200)
     stub_bikebook_catalog
@@ -39,3 +45,10 @@ module BikebookCatalogHelpers
 end
 
 RSpec.configure { it.include BikebookCatalogHelpers }
+
+# Unless a spec serves the fixture catalog, the catalog doesn't answer. VCR passes it by, so a cassette never records
+# it, and the stub is global and after the local ones, so it outlasts WebMock.reset! and stub_bikebook_catalog outranks it
+VCR.configure { |config| config.ignore_request { it.uri.start_with?(Integrations::Bikebook::Catalog::URL) } }
+WebMock.globally_stub_request(:after_local_stubs) do |request|
+  {status: 404} if request.uri.to_s.start_with?(Integrations::Bikebook::Catalog::URL)
+end

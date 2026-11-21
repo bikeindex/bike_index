@@ -146,6 +146,23 @@ RSpec.describe Search::ComboboxController, type: :request do
     end
   end
 
+  describe "bikebook_models" do
+    # Its slug, kris-holm, isn't the catalog's kris_holm
+    let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Kris Holm") }
+    before { sync_bikebook_models }
+
+    it "renders the manufacturer's matching model names" do
+      get "/search/combobox/bikebook_models", params: {q: "kh2", manufacturer_id: manufacturer.id, for_id: "test"}, as: :turbo_stream
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("KH24")
+      expect(response.body).to_not include("KH36")
+
+      get "/search/combobox/bikebook_models", params: {q: "kh2", manufacturer_id: 0, for_id: "test"}, as: :turbo_stream
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to_not include("KH24")
+    end
+  end
+
   describe "chips" do
     let!(:color) { FactoryBot.create(:color, name: "Burgundy") }
     let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Cool Bikes") }

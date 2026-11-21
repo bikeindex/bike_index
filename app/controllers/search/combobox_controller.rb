@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 module Search
-  # Backs the comboboxes that autocomplete from the Autocomplete index: the search
-  # query items (Pages::Search::EverythingCombobox::Component) - options and selection chips -
-  # and the manufacturer picker (UI::Forms::ComboboxManufacturer::Component).
+  # Backs the async comboboxes: from the Autocomplete index, the search query items
+  # (Pages::Search::EverythingCombobox::Component) - options and selection chips - and the
+  # manufacturer picker (UI::Forms::ComboboxManufacturer::Component); from BikebookModel,
+  # registration's model field.
   class ComboboxController < ApplicationController
     PER_PAGE = 15
 
@@ -36,6 +37,13 @@ module Search
           no_manufacturer_other: Binxtils::InputNormalizer.boolean(params[:no_manufacturer_other])
         )
       )
+    end
+
+    def bikebook_models
+      names = BikebookModel.for_manufacturer(Manufacturer.find_by(id: params[:manufacturer_id])&.name)
+        .names_matching(params[:q], page: current_page, per_page: PER_PAGE)
+
+      render turbo_stream: helpers.hw_async_combobox_options(names, next_page: next_page_for(names))
     end
 
     def chips
