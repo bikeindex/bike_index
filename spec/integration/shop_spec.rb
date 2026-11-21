@@ -13,7 +13,7 @@ RSpec.describe "shop", :js, type: :system do
     resize_window(width: 1280, height: 900)
     visit "/shop"
     expect(page).to have_css("h1", text: "Gear that helps get bikes home.", wait: 10)
-    wait_for_stimulus("shop--index")
+    wait_for_stimulus("scroll-to-hash")
     expect_axe_clean
 
     # The controller scrolls rather than jumping, which is why the URL doesn't gain the anchor
@@ -24,7 +24,7 @@ RSpec.describe "shop", :js, type: :system do
     # The pink cap's image is on the right wherever the row has two columns, down to where it wraps
     image = find("img[alt^='Illustration of the pink ripstop']")
     heading = find("h2", text: "Pink or Black Bike Index cap")
-    [1280, 740].each do |width|
+    [1280, 760].each do |width|
       resize_window(width:, height: 900)
       wait_for { corner(image).first > corner(heading).first }
     end

@@ -5,7 +5,7 @@ module Pages
     module Index
       class ComponentPreview < ApplicationComponentPreview
         def default
-          render(Pages::Shop::Index::Component.new)
+          render(SharedBlocks::Marketing::Wrapper::Component.new(page: Pages::Shop::Index::Component.new))
         end
       end
     end

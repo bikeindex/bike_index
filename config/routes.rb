@@ -20,7 +20,7 @@ Rails.application.routes.draw do
   end
 
   get "/shop", to: "shop#index", as: :shop
-  get "/store", to: redirect("/shop"), as: :store
+  get "/store", to: redirect(path: "/shop"), as: :store
   get "/discuss", to: redirect("https://discuss.bikeindex.org"), as: :discuss
   get "discourse_authentication", to: "discourse_authentication#index"
 

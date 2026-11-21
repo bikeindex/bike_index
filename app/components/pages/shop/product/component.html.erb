@@ -40,7 +40,13 @@
         <%= @description %>
       </p>
 
-      <%= price %>
+      <% if @price %>
+        <p class="tw:m-0 tw:mb-5 tw:font-header tw:text-[30px] tw:font-extrabold">
+          <%= @price %>
+        </p>
+      <% end %>
+
+      <%= pricing %>
 
       <%= render(UI::ButtonLink::Component.new(href: @url, text: translation(".view"), color: :purple, size: :callout,
         html_class: "tw:px-8! tw:py-3!", target: "_blank", rel: "noopener",

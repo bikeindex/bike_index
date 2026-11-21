@@ -10,11 +10,13 @@ module Pages
         BAND_CLASSES = "tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800/60"
 
         renders_one :media
-        renders_one :price
+        renders_one :pricing
         renders_one :note
 
-        def initialize(name:, category:, sound:, description:, url:, flip: false, band: false, id: nil)
+        # price: a single figure; pricing: a slot for anything more
+        def initialize(name:, category:, sound:, description:, url:, price: nil, flip: false, band: false, id: nil)
           @name = name
+          @price = price
           @category = category
           @sound = sound
           @description = description

@@ -26,6 +26,7 @@ RSpec.describe Pages::LandingPages::ForBikeShops::Component, type: :component do
     expect(component).to have_css("[data-ui--collapse-target='content'].tw\\:hidden", count: 5, visible: :all)
     expect(component).to have_link("See the tools", href: "#free-tools", count: 2)
     expect(component).to have_css("section#free-tools")
+    expect(component).to have_link("Order stickers", href: "/shop#registration-stickers")
     expect(component).to_not have_text("Bikes that came home")
   end
 

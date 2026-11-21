@@ -1,5 +1,4 @@
 <section
-  data-controller="shop--index"
   class="
     tw:border-b tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
     tw:dark:bg-gray-800/60
@@ -29,7 +28,7 @@
       </p>
 
       <%= render(UI::ButtonLink::Component.new(href: "##{FIRST_PRODUCT_ID}", text: translation(".shop_the_gear"),
-        color: :yellow, size: :callout, data: {action: "shop--index#scrollToProducts"})) %>
+        color: :yellow, size: :callout, data: {controller: "scroll-to-hash", action: "scroll-to-hash#scroll"})) %>
     </div>
 
     <%= image_tag("kelsey/illustrations/comic-assets_bike-hero.png", alt: "", width: 1768, height: 1320, class: "tw:mx-auto tw:w-full tw:max-w-105") %>
@@ -38,7 +37,7 @@
 
 <%= render(Pages::Shop::Product::Component.new(id: FIRST_PRODUCT_ID, name: translation(".caped_cap_name"),
   category: translation(".cycling_cap"), sound: translation(".caped_cap_sound"),
-  description: translation(".caped_cap_description"), url: product_url("the-caped-registrant-cap"))) do |product| %>
+  description: translation(".caped_cap_description"), url: product_url("the-caped-registrant-cap"), price: PRICES[:caped_cap])) do |product| %>
   <% product.with_media do %>
     <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:overflow-hidden tw:p-0!")) do %>
       <div
@@ -47,7 +46,7 @@
           tw:bg-blue-200 tw:p-8
         "
       >
-        <%= image_tag("shop/comic-cap.png", alt: translation(".caped_cap_alt"), width: 675, height: 395, loading: "lazy",
+        <%= image_tag("shop/comic-cap.webp", alt: translation(".caped_cap_alt"), width: 675, height: 395, loading: "lazy",
           class: "tw:w-full tw:max-w-130 tw:mix-blend-multiply") %>
       </div>
     <% end %>
@@ -59,15 +58,11 @@
       <%= translation(".caped_cap_burst") %>
     </span>
   <% end %>
-
-  <% product.with_price do %>
-    <p class="tw:mb-5 tw:text-[30px] <%= PRICE_CLASSES %>">$20.00</p>
-  <% end %>
 <% end %>
 
 <%= render(Pages::Shop::Product::Component.new(name: translation(".pink_cap_name"), category: translation(".cycling_cap"),
-  sound: translation(".pink_cap_sound"), description: translation(".pink_cap_description"),
-  url: product_url("bike-index-cycling-cap"), flip: true, band: true)) do |product| %>
+  sound: translation(".pink_cap_sound"), description: translation(".cycling_cap_description"),
+  url: product_url("bike-index-cycling-cap"), price: PRICES[:cycling_cap], flip: true, band: true)) do |product| %>
   <% product.with_media do %>
     <%= render(UI::Card::Component.new(shadow: :black, additional_classes: "tw:overflow-hidden tw:p-0!")) do %>
       <div
@@ -76,7 +71,7 @@
           tw:justify-center tw:bg-white
         "
       >
-        <%= image_tag("shop/pink-cap-side-v2.png", alt: translation(".pink_cap_alt"), width: 1560, height: 840, loading: "lazy",
+        <%= image_tag("shop/pink-cap-side.webp", alt: translation(".pink_cap_alt"), width: 912, height: 491, loading: "lazy",
           class: "tw:w-full tw:max-w-130 tw:px-8 tw:pt-8 tw:pb-16") %>
 
         <div
@@ -86,7 +81,7 @@
             tw:bg-white tw:px-2 tw:pt-2 tw:pb-1 tw:shadow-[3px_3px_0_#111]
           "
         >
-          <%= image_tag("shop/pink-cap-brim-v2.png", alt: translation(".pink_cap_brim_alt"), width: 1040, height: 600, loading: "lazy", class: "tw:w-full") %>
+          <%= image_tag("shop/pink-cap-brim.webp", alt: translation(".pink_cap_brim_alt"), width: 400, height: 231, loading: "lazy", class: "tw:w-full") %>
 
           <span class="tw:font-[Patrick_Hand,_cursive] tw:text-base tw:text-slate-900">
             <%= translation(".under_the_brim") %>
@@ -102,17 +97,13 @@
       <%= translation(".pink_cap_burst") %>
     </span>
   <% end %>
-
-  <% product.with_price do %>
-    <p class="tw:mb-5 tw:text-[30px] <%= PRICE_CLASSES %>">$15.00</p>
-  <% end %>
 <% end %>
 
-<%= render(Pages::Shop::Product::Component.new(name: translation(".sticker_name"), category: translation(".for_riders_and_shops"),
+<%= render(Pages::Shop::Product::Component.new(id: STICKERS_ID, name: translation(".sticker_name"), category: translation(".for_riders_and_shops"),
   sound: translation(".sticker_sound"), description: translation(".sticker_description"),
   url: product_url("bike-index-info-card-sticker"))) do |product| %>
   <% product.with_media do %>
-    <%= image_tag("shop/sticker-poster.png", alt: translation(".sticker_alt"), width: 420, height: 590, loading: "lazy", class: "tw:mx-auto tw:w-full tw:max-w-100") %>
+    <%= image_tag("shop/sticker-poster.webp", alt: translation(".sticker_alt"), width: 420, height: 590, loading: "lazy", class: "tw:mx-auto tw:w-full tw:max-w-100") %>
 
     <span
       class="tw:-top-4.5 tw:left-1 tw:-rotate-6 tw:text-blue-500 <%= BURST_CLASSES %>"
@@ -122,32 +113,9 @@
     </span>
   <% end %>
 
-  <% product.with_price do %>
-    <dl
-      class="
-        tw:m-0 tw:mb-5 tw:grid tw:max-w-100 tw:grid-cols-2 tw:divide-x
-        tw:divide-gray-200 tw:rounded-lg tw:border tw:border-gray-200
-        tw:dark:divide-gray-700 tw:dark:border-gray-700
-      "
-    >
-      <div class="tw:px-4.5 tw:py-3.5">
-        <dt class="tw:text-[26px] <%= PRICE_CLASSES %>">$7.99</dt>
-
-        <dd class="tw:m-0 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
-          <%= translation(".suggested_retail") %>
-        </dd>
-      </div>
-
-      <div class="tw:px-4.5 tw:py-3.5">
-        <dt class="tw:text-[26px] <%= PRICE_CLASSES %>">
-          <%= translation(".for_shops") %>
-        </dt>
-
-        <dd class="tw:m-0 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
-          <%= translation(".wholesale_pricing_available") %>
-        </dd>
-      </div>
-    </dl>
+  <% product.with_pricing do %>
+    <%= render(SharedBlocks::Marketing::NumberBlocks::Component.new(html_class: "tw:mb-5 tw:max-w-100",
+      items: [[PRICES[:sticker], translation(".suggested_retail")], [translation(".for_shops"), translation(".wholesale_pricing_available")]])) %>
   <% end %>
 
   <% product.with_note do %>

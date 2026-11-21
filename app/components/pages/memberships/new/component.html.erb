@@ -32,7 +32,7 @@
           "
         >
           <%= render(UI::ButtonLink::Component.new(href: "#membership-plans", text: translation(".become_a_member"),
-            color: :primary, size: :callout, data: {action: "memberships--new#scrollToPlans"})) %>
+            color: :primary, size: :callout, data: {controller: "scroll-to-hash", action: "scroll-to-hash#scroll"})) %>
 
           <span class="tw:text-[15px] tw:text-gray-500">
             <%= translation(".plans_from", price: price(:basic, :monthly)) %>
@@ -60,7 +60,6 @@
       tw:scroll-mt-10 tw:border-b tw:border-gray-200 tw:bg-gray-50
       tw:dark:border-gray-700 tw:dark:bg-gray-800
     "
-    data-memberships--new-target="plans"
   >
     <%= form_for Membership.new(level: @level), url: membership_path, method: :post,
       html: {class: "#{section_inner} tw:flex tw:flex-col tw:gap-7",
@@ -364,7 +363,7 @@
 
   <%= render(SharedBlocks::Marketing::CallToActionBanner::Component.new(heading: members_keep_it_free)) do %>
     <%= render(UI::ButtonLink::Component.new(href: "#membership-plans", color: :yellow, size: :callout,
-      data: {action: "memberships--new#scrollToPlans"})) do %>
+      data: {controller: "scroll-to-hash", action: "scroll-to-hash#scroll"})) do %>
       <span data-memberships--new-target="join">
         <%= labels(@level, @interval)[:join] %>
       </span>

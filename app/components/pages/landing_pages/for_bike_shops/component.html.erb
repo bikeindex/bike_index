@@ -197,7 +197,7 @@
 
       <%= render(SharedBlocks::Marketing::NumberBlocks::Component.new(items: sticker_prices, html_class: "tw:mb-6.5 tw:max-w-90")) %>
 
-      <%= render(UI::ButtonLink::Component.new(href: "https://bikeindex.myshopify.com/", text: translation(".order_stickers"),
+      <%= render(UI::ButtonLink::Component.new(href: shop_path(anchor: Pages::Shop::Index::Component::STICKERS_ID), text: translation(".order_stickers"),
         color: :primary, size: :callout)) %>
 
       <p class="tw:m-0 tw:mt-3.5 tw:text-[15px]">
