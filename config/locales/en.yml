@@ -3721,9 +3721,6 @@ en:
     feedbacks_index: Help using Bike Index. Frequently asked questions and other things.
     feedbacks_new: Contact Bike Index. Your words are our muse, whisper them in our
       ear.
-    feedbacks_vendor_signup: >-
-      Sign up with Bike Index to register your customers' bikes quickly, easily and
-      for free.
     info_about: Why we made Bike Index and who we are
     info_protect_your_bike: >-
       Prevent bike theft. Recommendations and best practices for protecting your bike
@@ -3787,7 +3784,6 @@ en:
     documentation_api_v1: Bike Index API documentation
     feedbacks_index: Help with Bike Index
     feedbacks_new: Contact Bike Index
-    feedbacks_vendor_signup: Shop sign up - Bike Index
     info_about: About Bike Index
     info_serials: Bike serial numbers
     info_spokecard: Spoke cards - Bike Index
