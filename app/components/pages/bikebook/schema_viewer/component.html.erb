@@ -1,9 +1,7 @@
 <div class="tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-10 tw:twtext-color">
-  <%= render(UI::Header::Component.new(text: translation(".title"), subtitle: safe_join([
-    translation(".subtitle_html", document: render(UI::Code::Inline::Component.new(text: @document)),
-      url: link_to(url, url, class: "twlink tw:break-all tw:underline"), version: @viewer["schema_version"]),
-    tag.br, tag.strong(translation(".versioning")), " ", @viewer["versioning"]
-  ]))) %>
+  <%= render(UI::Header::Component.new(text: translation(".title"), subtitle: translation(".subtitle_html",
+    document: render(UI::Code::Inline::Component.new(text: @document)),
+    url: link_to(url, url, class: "twlink tw:break-all tw:underline"), version: @viewer["schema_version"]))) %>
 
   <%= render(UI::Tabs::Component.new(nav_label: translation(".documents"), tabs:)) %>
 
@@ -20,4 +18,8 @@
 
     <div>}</div>
   </div>
+
+  <p class="tw:mt-8 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
+    <strong><%= translation(".versioning") %></strong> <%= @viewer["versioning"] %>
+  </p>
 </div>
