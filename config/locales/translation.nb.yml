@@ -5365,6 +5365,9 @@ nb:
           none: ingen
           return_to_default_column_order: Gå tilbake til standard kolonnerekkefølge
           visible_columns: Synlige kolonner
+        in_card:
+          select_record: Velg %{record} %{id}
+          toggle_all_checked: Slå av/på alle avkryssede
     atoms:
       serial:
         hidden: skjult
@@ -5600,7 +5603,6 @@ nb:
             hidden: skjult
             not_registered_with: Skjult fordi den ikke er registrert hos %{org_name}
             view: Utsikt
-            toggle_all_checked: Slå av/på alle avkryssede
             course_acknowledgment_title: Bekreftelse på utdanningskurs på
             more_notes: "+%{count} mer"
           multi_result_chip:

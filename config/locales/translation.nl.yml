@@ -5523,6 +5523,9 @@ nl:
           none: geen
           return_to_default_column_order: Terug naar de standaard kolomvolgorde
           visible_columns: Zichtbare kolommen
+        in_card:
+          select_record: Selecteer %{record} %{id}
+          toggle_all_checked: Alles aangevinkt weergeven/verbergen
     atoms:
       serial:
         hidden: verborgen
@@ -5768,7 +5771,6 @@ nl:
             hidden: verborgen
             not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
             view: Weergave
-            toggle_all_checked: Alles aangevinkt weergeven/verbergen
             course_acknowledgment_title: Erkenning van deelname aan de onderwijscursus
               bij
             more_notes: "+%{count} meer"

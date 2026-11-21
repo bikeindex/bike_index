@@ -5612,6 +5612,9 @@ it:
           none: nessuno
           return_to_default_column_order: Ripristina l'ordine predefinito delle colonne
           visible_columns: Colonne visibili
+        in_card:
+          select_record: Seleziona %{record} %{id}
+          toggle_all_checked: Seleziona tutto
     atoms:
       serial:
         hidden: nascosto
@@ -5855,7 +5858,6 @@ it:
             hidden: nascosto
             not_registered_with: Nascosto perché non è registrato con %{org_name}
             view: Visualizzazione
-            toggle_all_checked: Seleziona tutto
             course_acknowledgment_title: Riconoscimento del corso di formazione presso
             more_notes: "+%{count} altro"
           multi_result_chip:
