@@ -21,8 +21,7 @@ module Integrations
       # The model's title, description and image_url, nil for one the catalog hasn't. Raises Unreachable when it isn't readable?
       def vehicle(id)
         raise Unreachable unless readable?
-        block = manifest.dig("blocks", id[MODEL_ID, 1])
-        model = block && (file(block) || raise(Unreachable)).dig("models", id)
+        model = (block_models(id) || raise(Unreachable))[id]
         model && {title: "#{model["manufacturer"]} #{model["model"]}", description: model["description"], image_url: model["stock_photo"]}
       end
 
@@ -41,6 +40,12 @@ module Integrations
       # A published file, nil while the catalog doesn't answer. Its name is a digest of its contents,
       # so it keeps while it's published
       def file(path) = cached(["bikebook_catalog/file", path], path, expires_in: 1.week)
+
+      # The models of the block `id` is in, by id, empty for one the catalog hasn't. nil while the catalog doesn't answer
+      def block_models(id)
+        block = manifest&.dig("blocks", id.to_s[MODEL_ID, 1])
+        block ? file(block)&.then { Integrations::Bikebook::MarketVariants.expand(it["models"]) } : {}
+      end
 
       #
       # private below here
