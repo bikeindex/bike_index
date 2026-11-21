@@ -17,6 +17,14 @@ class BikebookController < ApplicationController
     @page_url = "https://bikeindex.org/bikebook/license"
   end
 
+  def schema_viewer
+    viewer = Integrations::Bikebook::Catalog.schema_viewer
+    document = viewer["documents"].key?(params[:document]) ? params[:document] : "vehicle_model"
+    @page_title = "Bike Book schema | Bike Index"
+    render Pages::Bikebook::SchemaViewer::Component.new(viewer:, document:, open: params[:open].to_s.split(","),
+      by_count: params[:by_count].to_s.split(","))
+  end
+
   # For uptime monitoring: the page breaks whenever the catalog doesn't answer in the format it reads. Green or red, as /up is
   def up
     up = Integrations::Bikebook::Catalog.readable?

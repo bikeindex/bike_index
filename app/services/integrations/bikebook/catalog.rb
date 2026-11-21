@@ -15,6 +15,7 @@ module Integrations
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/#{MANIFEST}" : "#{URL}#{MANIFEST}"
       GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
       MODEL_ID = %r{\Am/([a-z0-9_-]+/\d{4})/[a-z0-9_-]+\z}
+      SCHEMA_VIEWER = Rails.root.join("config/bikebook_schema_viewer.json")
 
       Unreachable = Class.new(StandardError)
 
@@ -46,6 +47,10 @@ module Integrations
         block = manifest&.dig("blocks", id.to_s[MODEL_ID, 1])
         block ? file(block)&.then { Integrations::Bikebook::MarketVariants.expand(it["models"]) } : {}
       end
+
+      # Each schema document's fields, with the count of models holding each value and a few of them
+      # TODO: read the catalog's published file, file(manifest["schema_viewer"]), once it publishes one
+      def schema_viewer = JSON.parse(SCHEMA_VIEWER.read)
 
       #
       # private below here

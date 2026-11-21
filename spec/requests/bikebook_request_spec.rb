@@ -324,4 +324,42 @@ RSpec.describe BikebookController, type: :request do
       end
     end
   end
+
+  describe "schema_viewer" do
+    let(:fields) { Integrations::Bikebook::Catalog.schema_viewer.dig("documents", "vehicle_model", "fields") }
+    let(:manufacturer_count) { fields.dig("manufacturer", "models_count") }
+    let(:example_id) { fields.dig("manufacturer", "example_ids").first }
+
+    it "renders the vehicle model's fields with how many models fill each, opening what the URL names" do
+      get "/bikebook/schema_viewer", params: {open: "type", by_count: "type"}
+
+      expect(response).to have_http_status(:ok)
+      page = Capybara.string(response.body)
+      expect(page).to have_title("Bike Book schema | Bike Index", exact: true)
+        .and have_css("[aria-current='page']", text: "Vehicle model")
+        .and have_css("details[open][data-schema-path='type']")
+        .and have_css("details:not([open])[data-schema-path='type_detail']")
+        .and have_css("input[aria-label='type by count'][checked]")
+        .and have_css("button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']")
+        .and have_link(example_id, href: "/bikebook?vehicle_models=#{example_id}", visible: :all)
+    end
+
+    context "with another document" do
+      it "renders its fields" do
+        get "/bikebook/schema_viewer", params: {document: "e_vehicle_classification"}
+
+        expect(response).to have_http_status(:ok)
+        expect(Capybara.string(response.body)).to have_css("[aria-current='page']", text: "E vehicle classification")
+          .and have_content("jurisdiction:")
+      end
+    end
+
+    context "with a document the catalog doesn't publish" do
+      it "renders the vehicle model's" do
+        get "/bikebook/schema_viewer", params: {document: "vocabulary"}
+
+        expect(Capybara.string(response.body)).to have_css("[aria-current='page']", text: "Vehicle model")
+      end
+    end
+  end
 end
