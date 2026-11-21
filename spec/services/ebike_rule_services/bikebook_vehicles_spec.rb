@@ -26,6 +26,15 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
         top_assist_kmh: 45, throttle_kmh: 32, top_kmh: 45, assists_past_kmh: nil)
     end
 
+    it "reads a battery's certifications with its motor's" do
+      block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2022.json").read)
+      motor = block["models"]["m/aventon/2022/level_2"]["motors"].first
+      motor["certifications"] = ["UL 2849"]
+      motor["battery"]["certifications"] = ["UL 2271"]
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}models/aventon/2022.json").to_return(body: block.to_json)
+      expect(described_class.find("m/aventon/2022/level_2")).to have_attributes(ul2849: :certified, ul2271: :certified)
+    end
+
     it "has a stock throttle from a throttle mode sold with it, or a throttle propulsion with no throttle mode" do
       expect(described_class.find("m/aventon/2026/level_4_adv")).to have_attributes(throttle: true, stock_throttle: true)
 

@@ -610,9 +610,9 @@ class ModelViewer {
     return section({ heading: 'Weight limits', content: join(rows) })
   }
 
-  // Its motors' standards, once each
+  // Its motors' and their batteries' standards, once each
   #certifications () {
-    return [...new Set(array(this.vehicle.motors).flatMap((motor) => array(motor.certifications)))]
+    return [...new Set(array(this.vehicle.motors).flatMap((motor) => [...array(motor.certifications), ...array(motor.battery?.certifications)]))]
   }
 
   suspensionSummary (suspension) {
