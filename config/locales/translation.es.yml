@@ -880,6 +880,7 @@ es:
         traditional_bike: Bicicleta tradicional (2 ruedas, 1 asiento, pedales)
         elliptical: Bicicleta elíptica
         balance_bike: Bicicleta de equilibrio
+        e_atv: e-ATV (e-Quad, vehículo todoterreno eléctrico)
       frame_material:
         aluminum: Aluminio
         composite: Carbono o compuesto
