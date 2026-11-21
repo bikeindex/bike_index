@@ -57,24 +57,24 @@ RSpec.describe Integrations::Bikebook::Catalog do
     let(:block_url) { "#{described_class::URL}models/segway/2025.json" }
 
     it "is the model's title, description and image, cached without its block, and reads neither again" do
-      expect(described_class.vehicle("m/segway/2025/gt3_pro")).to match(title: "Segway GT3 Pro",
+      expect(described_class.vehicle("m/segway/2025/gt3-pro")).to match(title: "Segway GT3 Pro",
         description: a_string_starting_with("Experience elite performance"), image_url: "https://bikebook.bikeindex.org/segway/2025/gt3_pro.png")
       expect(Rails.cache.exist?(["bikebook_catalog/file", "models/segway/2025.json"])).to be false
-      expect(Rails.cache.exist?(["bikebook_catalog/model", described_class.head["digest"], "m/segway/2025/gt3_pro"])).to be true
+      expect(Rails.cache.exist?(["bikebook_catalog/model", described_class.head["digest"], "m/segway/2025/gt3-pro"])).to be true
       Rails.cache.delete(["bikebook_catalog/manifest", described_class::MANIFEST])
       WebMock.stub_request(:get, /#{Regexp.escape(described_class::URL)}/o).to_return(status: 503)
       described_class::Reads.reset
 
-      expect(described_class.vehicle("m/segway/2025/gt3_pro")).to include(title: "Segway GT3 Pro")
+      expect(described_class.vehicle("m/segway/2025/gt3-pro")).to include(title: "Segway GT3 Pro")
     end
 
     it "takes up a catalog update within 5 minutes" do
-      expect(described_class.vehicle("m/segway/2025/gt3_pro")[:description]).to start_with("Experience elite performance")
+      expect(described_class.vehicle("m/segway/2025/gt3-pro")[:description]).to start_with("Experience elite performance")
       stub_bikebook_catalog_update
 
       travel(5.minutes + 1.second) do
         described_class::Reads.reset
-        expect(described_class.vehicle("m/segway/2025/gt3_pro")[:description]).to eq "Updated"
+        expect(described_class.vehicle("m/segway/2025/gt3-pro")[:description]).to eq "Updated"
       end
     end
 
@@ -87,14 +87,14 @@ RSpec.describe Integrations::Bikebook::Catalog do
       before { WebMock.stub_request(:get, block_url).to_return(status: 503) }
 
       it "raises Unreachable" do
-        expect { described_class.vehicle("m/segway/2025/gt3_pro") }.to raise_error(described_class::Unreachable)
+        expect { described_class.vehicle("m/segway/2025/gt3-pro") }.to raise_error(described_class::Unreachable)
       end
     end
   end
 
   describe "model" do
     it "is the model's record" do
-      expect(described_class.model("m/segway/2025/gt3_pro")).to include("id" => "m/segway/2025/gt3_pro", "motors" => be_present)
+      expect(described_class.model("m/segway/2025/gt3-pro")).to include("id" => "m/segway/2025/gt3-pro", "motors" => be_present)
     end
 
     it "is nil for what isn't a model's id, without reading or caching anything for it" do

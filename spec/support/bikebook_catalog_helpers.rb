@@ -21,7 +21,7 @@ module BikebookCatalogHelpers
   def stub_bikebook_catalog_update
     url = Integrations::Bikebook::Catalog::URL
     block = JSON.parse(FIXTURES.join("models/segway/2025.json").read)
-    block["models"]["m/segway/2025/gt3_pro"]["description"] = "Updated"
+    block["models"]["m/segway/2025/gt3-pro"]["description"] = "Updated"
     WebMock.stub_request(:get, "#{url}models/segway/2025.v2.json").to_return(body: block.to_json)
     WebMock.stub_request(:get, "#{url}vocabulary.v2.json").to_return(body: FIXTURES.join("vocabulary.json").read)
     manifest = JSON.parse(FIXTURES.join(Integrations::Bikebook::Catalog::MANIFEST).read)
