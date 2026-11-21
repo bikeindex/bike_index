@@ -3841,8 +3841,6 @@ nb:
       bruker JSON, er RESTful og er generelt ganske fantastisk
     feedbacks_index: Hjelp til å bruke Bike Index. Ofte stilte spørsmål og andre ting.
     feedbacks_new: Kontakt Bike Index. Dine ord er vår muse, hvisk dem i øret vårt.
-    feedbacks_vendor_signup: Registrer deg med Bike Index for å registrere dine kunders
-      sykler raskt, enkelt og gratis.
     info_about: Hvorfor vi laget Bike Index og hvem vi er
     info_protect_your_bike: Forhindre sykkeltyveri. Anbefalinger og beste praksis
       for å beskytte sykkelen din mot tyver.
@@ -3897,7 +3895,6 @@ nb:
     documentation_api_v1: Bike Index API dokumentasjon
     feedbacks_index: Hjelp med sykkelindeks
     feedbacks_new: Kontakt Bike Index
-    feedbacks_vendor_signup: Butikkregistrering - Bike Index
     info_about: Bike Index - Sykkelregistrering som fungerer
     info_serials: Serienummer på sykkel
     info_spokecard: Spoke-kort - Bike Index
