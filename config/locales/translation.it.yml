@@ -8371,7 +8371,6 @@ it:
           customer_records_sold_or_shared: dati dei clienti venduti o condivisi
           data_stays_private: I loro dati restano privati.
           data_stays_private_body: Mai venduto, mai condiviso.
-          ding: DING!
           ebike_legality_checker: Verificatore di legalità delle e-bike
           ebike_legality_checker_body: Linee guida stato per stato sulle classi di
             e-bike, sui luoghi in cui è consentito circolare e sulle normative relative
@@ -8454,7 +8453,6 @@ it:
           shop_name_placeholder: Cicli a raggi e catena
           sign_up_free: Iscrizione gratuita
           sign_up_your_shop: Registra il tuo negozio
-          signup_name: iscrizione
           something_else_html: Qualcos'altro? %{email_link}.
           step_connect_body: Collega Lightspeed o Ascend al tuo account gratuito del
             negozio. Ci vogliono circa 10 minuti.
@@ -8476,13 +8474,12 @@ it:
           to_set_up: per impostare
           used_only_for_bikes: Utilizzabile solo per biciclette
           we_never_sell_or_share: Non vendiamo né condividiamo mai i dati dei clienti.
-          well_email_you: Ti invieremo un'email con le istruzioni per collegare il
-            tuo sistema POS.
           what_your_customers_get: Ciò che ottengono i tuoi clienti. Ciò che ottiene
             il tuo negozio.
           wholesale: Commercio all'ingrosso
           your_pos: Il tuo POS
-          youre_in: Sei dentro.
+          signed_in_as_admin_html: Hai effettuato l'accesso come %{email}, che corrisponde
+            all'amministratore del negozio.
         ascend:
           a_dashboard_for_your_shop: Una dashboard per il tuo negozio
           a_dashboard_for_your_shop_body: Puoi cercare le biciclette che hai venduto

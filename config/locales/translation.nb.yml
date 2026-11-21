@@ -7948,7 +7948,6 @@ nb:
           customer_records_sold_or_shared: kundeoppføringer solgt eller delt
           data_stays_private: Dataene deres forblir private.
           data_stays_private_body: Aldri solgt, aldri delt.
-          ding: DING!
           ebike_legality_checker: Lovlighetssjekker for elsykler
           ebike_legality_checker_body: Veiledning fra stat til stat om elsykkelklasser,
             hvor de kan sykle, og regler for alder og utstyr. Nyttig når en kunde
@@ -8025,7 +8024,6 @@ nb:
           shop_name_placeholder: Eike- og kjedesykler
           sign_up_free: Registrer deg gratis
           sign_up_your_shop: Registrer butikken din
-          signup_name: registrering
           something_else_html: Noe annet? %{email_link}.
           step_connect_body: Koble Lightspeed eller Ascend til din gratis butikkkonto.
             Det tar omtrent 10 minutter.
@@ -8047,11 +8045,11 @@ nb:
           to_set_up: å sette opp
           used_only_for_bikes: Brukes kun til sykler
           we_never_sell_or_share: Vi selger eller deler aldri kundedata.
-          well_email_you: Vi sender deg en e-post om tilkobling av POS-en din.
           what_your_customers_get: Det kundene dine får. Det butikken din får.
           wholesale: Engroshandel
           your_pos: Ditt salgssted
-          youre_in: Du er med.
+          signed_in_as_admin_html: Du er logget inn som %{email}, som vil være butikkens
+            administrator.
         ascend:
           a_dashboard_for_your_shop: Et dashbord for butikken din
           a_dashboard_for_your_shop_body: Søk etter syklene du har solgt når du trenger

@@ -8238,7 +8238,6 @@ nl:
           customer_records_sold_or_shared: klantgegevens verkocht of gedeeld
           data_stays_private: Hun gegevens blijven privé.
           data_stays_private_body: Nooit verkocht, nooit gedeeld.
-          ding: DING!
           ebike_legality_checker: Controle op de legaliteit van e-bikes
           ebike_legality_checker_body: Per staat is er een overzicht van de toegestane
             categorieën e-bikes, waar ze mogen worden gebruikt en de leeftijds- en
@@ -8321,7 +8320,6 @@ nl:
           shop_name_placeholder: Spaak- en kettingfietsen
           sign_up_free: Meld je gratis aan
           sign_up_your_shop: Meld je winkel aan
-          signup_name: aanmelden
           something_else_html: Nog iets anders? %{email_link}.
           step_connect_body: Koppel Lightspeed of Ascend aan je gratis winkelaccount.
             Dit duurt ongeveer 10 minuten.
@@ -8343,11 +8341,11 @@ nl:
           to_set_up: om op te zetten
           used_only_for_bikes: Uitsluitend te gebruiken voor fietsen.
           we_never_sell_or_share: Wij verkopen of delen nooit klantgegevens.
-          well_email_you: We sturen u een e-mail over het koppelen van uw kassasysteem.
           what_your_customers_get: Wat uw klanten krijgen. Wat uw winkel krijgt.
           wholesale: Groothandel
           your_pos: Uw kassasysteem
-          youre_in: Je bent binnen.
+          signed_in_as_admin_html: Je bent ingelogd als %{email}, dit is de beheerder
+            van de winkel.
         ascend:
           a_dashboard_for_your_shop: Een dashboard voor uw winkel
           a_dashboard_for_your_shop_body: Zoek op elk gewenst moment in de fietsen

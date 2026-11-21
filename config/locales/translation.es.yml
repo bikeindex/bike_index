@@ -8347,7 +8347,6 @@ es:
           customer_records_sold_or_shared: registros de clientes vendidos o compartidos
           data_stays_private: Sus datos permanecen privados.
           data_stays_private_body: Nunca vendido, nunca compartido.
-          ding: "¡TIMBRE!"
           ebike_legality_checker: Comprobador de legalidad de bicicletas eléctricas
           ebike_legality_checker_body: Información específica de cada estado sobre
             las categorías de bicicletas eléctricas, dónde se pueden usar y las normas
@@ -8432,7 +8431,6 @@ es:
           shop_name_placeholder: Ciclos de radios y cadena
           sign_up_free: Regístrate gratis
           sign_up_your_shop: Registra tu tienda
-          signup_name: inscribirse
           something_else_html: "¿Algo más? %{email_link}."
           step_connect_body: Vincula Lightspeed o Ascend a tu cuenta gratuita de la
             tienda. Tarda unos 10 minutos.
@@ -8455,13 +8453,12 @@ es:
           used_only_for_bikes: Utilizado únicamente para bicicletas
           we_never_sell_or_share: Nunca vendemos ni compartimos datos de nuestros
             clientes.
-          well_email_you: Le enviaremos un correo electrónico con instrucciones para
-            conectar su terminal de punto de venta (TPV).
           what_your_customers_get: Lo que obtienen tus clientes. Lo que obtiene tu
             tienda.
           wholesale: Al por mayor
           your_pos: Tu TPV
-          youre_in: Estás dentro.
+          signed_in_as_admin_html: Has iniciado sesión como %{email}, que será el
+            administrador de la tienda.
         ascend:
           a_dashboard_for_your_shop: Un panel de control para tu tienda
           a_dashboard_for_your_shop_body: Consulta las bicicletas que has vendido
