@@ -26,6 +26,10 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
         top_assist_kmh: 45, throttle_kmh: 32, top_kmh: 45, assists_past_kmh: nil)
     end
 
+    it "reads a battery's certifications with its motor's" do
+      expect(described_class.find("m/aventon/2026/level_4_rec_step_through")).to have_attributes(ul2849: :certified, ul2271: :certified)
+    end
+
     it "reads a market's model from its home market's record" do
       expect(described_class.find("m/specialized/2025/haul_st_ca")).to have_attributes(bikebook_id: "m/specialized/2025/haul_st_ca",
         model: "Haul ST", e_bike_class: 2, e_vehicle_classifications: [], watts: 500, top_assist_kmh: nil, throttle_kmh: 32,
