@@ -25,17 +25,25 @@ module Integrations
       end
 
       # The model's title, description and image_url, nil for one the catalog hasn't. Raises Unreachable when it isn't
-      # readable?. Cached apart from its far larger block, under the manifest's digest: a cached one needs no manifest
-      # read, and an updated catalog re-keys them all
+      # readable?
       def vehicle(id)
         raise Unreachable unless readable?
 
-        summary = cached(["bikebook_catalog/vehicle", head["digest"], id], expires_in: 1.day) do
+        model(id)&.then { {title: "#{it["manufacturer"]} #{it["model"]}", description: it["description"], image_url: it["stock_photo"]} }
+      end
+
+      # The model's record, nil for one the catalog hasn't. Raises Unreachable while the catalog doesn't answer. Cached
+      # apart from its far larger block, under the manifest's digest: a cached one needs no manifest read, and an
+      # updated catalog re-keys them all
+      def model(id)
+        return unless id.to_s.match?(MODEL_ID)
+        raise Unreachable unless head
+
+        record = cached(["bikebook_catalog/model", head["digest"], id], expires_in: 1.day) do
           block = (manifest || raise(Unreachable)).dig("blocks", id[MODEL_ID, 1])
-          model = block && read(block).dig("models", id)
-          model ? {title: "#{model["manufacturer"]} #{model["model"]}", description: model["description"], image_url: model["stock_photo"]} : {}
+          block && read(block).dig("models", id) || {}
         end
-        (summary || raise(Unreachable)).presence
+        (record || raise(Unreachable)).presence
       end
 
       # vehicle_models' entries: each vehicle's id, then in braces what's picked for it, m/trek/2026/marlin_5{size:M}{json}.
@@ -72,6 +80,12 @@ module Integrations
             false
           end || nil
         end
+      end
+
+      # Drops what's cached under the key, for the rest of this request too
+      def forget(key)
+        Rails.cache.delete(key)
+        Reads.values[key] = nil
       end
 
       #

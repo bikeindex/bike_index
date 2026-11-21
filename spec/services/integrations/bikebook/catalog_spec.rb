@@ -56,10 +56,11 @@ RSpec.describe Integrations::Bikebook::Catalog do
   describe "vehicle" do
     let(:block_url) { "#{described_class::URL}models/segway/2025.json" }
 
-    it "caches the model's title, description and image, without its block, and reads neither again" do
+    it "is the model's title, description and image, cached without its block, and reads neither again" do
       expect(described_class.vehicle("m/segway/2025/gt3_pro")).to match(title: "Segway GT3 Pro",
         description: a_string_starting_with("Experience elite performance"), image_url: "https://bikebook.bikeindex.org/segway/2025/gt3_pro.png")
       expect(Rails.cache.exist?(["bikebook_catalog/file", "models/segway/2025.json"])).to be false
+      expect(Rails.cache.exist?(["bikebook_catalog/model", described_class.head["digest"], "m/segway/2025/gt3_pro"])).to be true
       Rails.cache.delete(["bikebook_catalog/manifest", described_class::MANIFEST])
       WebMock.stub_request(:get, /#{Regexp.escape(described_class::URL)}/o).to_return(status: 503)
       described_class::Reads.reset
@@ -88,6 +89,20 @@ RSpec.describe Integrations::Bikebook::Catalog do
       it "raises Unreachable" do
         expect { described_class.vehicle("m/segway/2025/gt3_pro") }.to raise_error(described_class::Unreachable)
       end
+    end
+  end
+
+  describe "model" do
+    it "is the model's record" do
+      expect(described_class.model("m/segway/2025/gt3_pro")).to include("id" => "m/segway/2025/gt3_pro", "motors" => be_present)
+    end
+
+    it "is nil for what isn't a model's id, without reading or caching anything for it" do
+      WebMock.stub_request(:get, /#{Regexp.escape(described_class::URL)}/o).to_return(status: 503)
+
+      expect(described_class.model("segway gt3")).to be_nil
+      expect(described_class.model(nil)).to be_nil
+      expect(Rails.cache.exist?(["bikebook_catalog/head", described_class::MANIFEST])).to be false
     end
   end
 end

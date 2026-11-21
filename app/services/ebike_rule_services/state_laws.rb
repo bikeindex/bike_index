@@ -82,7 +82,7 @@ module EbikeRuleServices
     # they aren't in. Whether they are is kept on its own, so a page whose fragments are cached doesn't read the laws
     def version
       path = Integrations::Bikebook::Catalog.vocabulary
-      path && Integrations::Bikebook::Catalog.cached(["bikebook_catalog/state_laws_in", path], expires_in: 1.week) { path if parsed[:laws].any? }
+      path && Integrations::Bikebook::Catalog.cached(laws_in_key(path), expires_in: 1.week) { path if parsed[:laws].any? }
     end
 
     # By ISO 3166-2 code, each place outside the US the catalog classifies e-vehicles in: its e-bike laws, or without
@@ -138,13 +138,17 @@ module EbikeRuleServices
     end
 
     # The vocabulary's classifications as the block reads them. Its file name carries its digest, so a republished one
-    # is a new key, and the version moves when the block reads different keys
+    # is a new key, and the version moves when the block reads different keys. One that can't be read says the laws
+    # aren't in, so no page caches what it renders without them
     def vocabulary(name)
       path = Integrations::Bikebook::Catalog.vocabulary
       path && Integrations::Bikebook::Catalog.cached(["bikebook_catalog/#{name}", 2, path], expires_in: 1.week) do
-        Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { yield it }
+        Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { yield it } ||
+          Integrations::Bikebook::Catalog.forget(laws_in_key(path))
       end
     end
+
+    def laws_in_key(path) = ["bikebook_catalog/state_laws_in", path]
 
     def parse(records)
       states = records.filter_map { |id, record| [id[STATE_ID, 1].upcase, id, record] if id.match?(STATE_ID) }
@@ -265,6 +269,6 @@ module EbikeRuleServices
       (tier[:mph].nil? || mph&.<=(tier[:mph])) && (watts.nil? || (tier[:min_watts]..tier[:watt_cap]).cover?(watts))
     end
 
-    conceal :for_class?, :ranked_top_rules, :top_rule_rank, :parsed, :classifications, :vocabulary, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :speed_rank, :state_class, :metric?, :mph, :power, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
+    conceal :for_class?, :ranked_top_rules, :top_rule_rank, :parsed, :classifications, :vocabulary, :laws_in_key, :parse, :parse_places, :motor_vehicle_law, :state_classes, :by_speed, :speed_rank, :state_class, :metric?, :mph, :power, :law, :restriction, :web_pages, :date, :in_force, :current, :upcoming, :top_rules, :within_limits?
   end
 end
