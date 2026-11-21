@@ -54,6 +54,10 @@ BLOCKED_EXTERNAL_HOSTS = %w[
   www.facebook.com
 ].freeze
 
+# application.js imports this from jsDelivr, so a slow CDN stalls `load`; blocking it would
+# break every Stimulus controller, so serve a copy fetched once per process
+TIME_LOCALIZER_URL = Rails.application.importmap.packages["@bikeindex/time-localizer"].path
+
 # Point BASE_URL at Capybara's server for `:js` specs, so `*_url` helpers rendered
 # during the example resolve to it. default_url_options is read off BASE_URL once at
 # boot, so it takes the same treatment -- otherwise a helper called outside a request
@@ -61,6 +65,8 @@ BLOCKED_EXTERNAL_HOSTS = %w[
 # link it's on can't be clicked. Replacing the hash rather than writing through it
 # keeps ActionMailer on the host it was configured with -- test.rb hands both the same one.
 RSpec.configure do |config|
+  time_localizer_body = nil
+
   config.around(:each, :js) do |example|
     original_base_url = ENV["BASE_URL"]
     original_url_options = Rails.application.routes.default_url_options
@@ -83,6 +89,11 @@ RSpec.configure do |config|
       BLOCKED_EXTERNAL_HOSTS.each do |host|
         playwright_page.route("https://#{host}/**", ->(route, _request) { route.abort })
       end
+
+      time_localizer_body ||= playwright_page.request.get(TIME_LOCALIZER_URL, failOnStatusCode: true, maxRetries: 3, timeout: 10_000).body
+      playwright_page.route(TIME_LOCALIZER_URL, lambda { |route, _request|
+        route.fulfill(body: time_localizer_body, contentType: "text/javascript")
+      })
 
       # Capybara reports a nil current_path for three URLs, not just the about:blank one
       # (session.rb: nil for an `about:` scheme, then `path unless path&.empty?`) -- an
