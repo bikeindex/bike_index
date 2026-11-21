@@ -19,7 +19,7 @@ RSpec.describe Payment, type: :model do
       expect(Payment.normalize_referral_source("BIKES_12")).to eq "bikes-12"
     end
     it "handles ios" do
-      expect(Payment.normalize_referral_source("app-ios-11.2.3")).to eq "app-ios-1123"
+      expect(Payment.normalize_referral_source("app-ios-11.2.3")).to eq "app-ios-11-2-3"
     end
   end
 

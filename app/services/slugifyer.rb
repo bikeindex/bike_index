@@ -2,7 +2,7 @@ module Slugifyer
   extend Functionable
 
   def slugify(string)
-    # Apostrophes are dropped (Craig's is craigs), anything else separates words
+    # Apostrophes go before transliterating, which turns curly ones into "?"; other punctuation separates words
     transliterate(remove_parens(CGI.unescapeHTML(string.to_s).delete("'’‘`´")))
       .gsub("%20", " ")
       .gsub("&", "-and-").gsub("+", "-plus-")
