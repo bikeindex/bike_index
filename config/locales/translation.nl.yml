@@ -7001,17 +7001,11 @@ nl:
           answer_yes: Ja
           being_compiled: De regels voor deze staat worden samengesteld op basis van
             primaire bronnen.
-          class_1_throttle: Motorfietsen van klasse 1 mogen geen gashendel hebben.
-          class_3_throttle: Het gaspedaal moet bij 32 km/u (20 mph) worden uitgeschakeld.
-          classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
-            regels van de staat raadplegen.
           fails_rule: Voldoet niet aan deze regel.
           for_your_information: Ter informatie
           gray_headline: We hebben de e-bike-regels van %{state} nog niet in ons bestand.
-          has_throttle: Heeft een gasklep
           is_registered: Is deze fiets geregistreerd?
           legal_to_ride: Legaal om te rijden
-          limits_start_on: Deze limieten treden in werking %{date}
           manual_bike_name: e-bike
           may_be_moped: Het kan ook zijn dat het voertuig wordt gereguleerd als een
             bromfiets of motorvoertuig, waarvoor registratie en een rijbewijs vereist
@@ -7019,13 +7013,7 @@ nl:
           meets_rule: Voldoet aan deze regel
           motor: Motor
           mph_html: "%{mph} mph"
-          no_speed_cap: Geen snelheidslimiet in de staatswetgeving.
-          no_throttle: Geen gaspedaal
-          no_watt_cap: Geen maximumvermogen in de staatswet
-          not_classified: Het is geen e-bike van klasse 1, 2 of 3.
           not_permitted: Niet toegestaan
-          own_classes: De staat stelt zijn eigen grenzen vast in plaats van de drie
-            standaardklassen.
           recovered_more_often: Gestolen fietsen worden twee keer zo vaak teruggevonden
             als ze geregistreerd zijn.
           register_free: Registreer je gratis op Bike Index
@@ -7033,9 +7021,6 @@ nl:
           rules_not_on_file: Regels niet aanwezig
           source_html: 'Bron: %{link}''s catalogus van staatsrecht. Samenvattingen
             dienen ter referentie en zijn geen juridisch advies.'
-          speed_not_provided: Maximale snelheid niet vermeld
-          speed_over_cap_html: Assisteert tot %{mph} mph, boven de %{cap} mph-limiet
-          speed_within_cap_html: Assistentie tot %{mph} mph, binnen de limiet
           still_reviewing: We zijn de regels van %{state} nog aan het bekijken.
           still_reviewing_body: Raadpleeg de website van de RDW of de wetgevende macht
             van uw staat voor de actuele regelgeving met betrekking tot e-bikes. De
@@ -7043,81 +7028,30 @@ nl:
             en een maximumsnelheid van 20 mph (klasse 1-2) of 28 mph (klasse 3) voor
             trapondersteuning.
           throttle: Elektrisch gaspedaal
-          throttle_allowed: Gashendel toegestaan voor klasse 2
-          throttle_not_allowed: De staat staat geen gashendel toe.
-          throttle_not_stated: De wetgeving van de staat zegt niet of een gasklep
-            is toegestaan.
           top_speed: Topsnelheid
           watts_html: "%{watts}W"
-          watts_not_provided: Motorvermogen niet opgegeven
-          watts_over_cap_html: "%{watts}W motor overschrijdt de %{cap}W capaciteit"
-          watts_within_cap_html: "%{watts}W-motor bevindt zich in de kap"
           yes_to_html: Ja, naar %{mph}
           your_state: Uw staat
-          class_3_throttle_over_html: Het gaspedaal gaat tot %{mph} mph, voorbij de
-            20 mph die het gaspedaal van een klasse 3-voertuig is toegestaan.
-          class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
           over_mph_html: Meer dan %{mph} mph
           red_headline_manual: Dit is geen e-bike volgens de huidige %{state} regels.
-          speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
-            de %{cap} mph-limiet
-          speed_past_html: Ondersteunt voorbij %{past} mph; controleer of het stopt
-            bij %{cap} mph
-          classes_recognized:
-            one: Klasse %{n} wordt herkend
-            other: De klassen %{n} worden erkend.
           answer_optional: Optioneel
-          class_3_optional_throttle_within_html: Optionele gashendel stopt bij %{mph}
-            mph
-          class_3_speed_with_throttle_html: Assistentie tot %{mph} mph, niet toegestaan
-            met gashendel
-          class_n: Klasse %{n}
-          classes_not_permitted: Het is een %{classes} e-bike, wat niet is toegestaan.
           model_year: "%{year} model"
-          optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
-            gasklep.
           optional_to_html: Optioneel, naar %{mph}
-          throttle_with_class_3_assist: Niet toegestaan met assistentie van klasse
-            3
           kmh_html: "%{kmh} km/u"
           law_source_html: 'Bron: %{link}''s catalogus van wetgeving betreffende e-bikes.
             Samenvattingen dienen ter referentie en zijn geen juridisch advies.'
           may_be_moped_canada: Het kan ook zijn dat het voertuig als bromfiets of
             motorvoertuig wordt gereguleerd, waarvoor registratie en een rijbewijs
             vereist kunnen zijn.
-          no_e_bike_category: Er is hier geen aparte categorie voor e-bikes, dus controleer
-            de regels voor rijbewijs, registratie en helmplicht.
-          no_speed_cap_in_law: Er is geen snelheidslimiet in de wetgeving.
-          no_watt_cap_in_law: Er is geen maximumvermogen vastgelegd in de wet.
           optional_to_kmh_html: Optioneel, naar %{kmh} km/u
           over_kmh_html: Meer dan %{kmh} km/u
-          speed_over_cap_kmh_html: Assistentie tot %{kmh} km/u, boven de %{cap} km/u
-            limiet
-          speed_past_cap_kmh_html: Assistentie bij snelheden boven %{past} km/u, boven
-            de %{cap} km/u-limiet
-          speed_past_kmh_html: Assisteert voorbij %{past} km/u; controleer of het
-            stopt bij %{cap} km/u.
-          speed_within_cap_kmh_html: Assistentie tot %{kmh} km/u, binnen de limiet
           still_reviewing_province_body: Raadpleeg het ministerie van Transport van
             uw provincie of territorium voor de actuele regelgeving met betrekking
             tot e-bikes. De meeste ministeries stellen een maximumvermogen van e-bikemotoren
             van 500W en een maximumsnelheid met trapondersteuning van 32 km/u.
-          throttle_allowed_in_law: Gashendel toegestaan
-          throttle_not_allowed_in_law: De wet staat geen gashendel toe.
-          throttle_not_stated_in_law: De wet zegt niet of een gasklep is toegestaan.
-          watts_to_check_html: Controleer of de motor een vermogen heeft van %{cap}W
-            of minder.
           yes_to_kmh_html: Ja, tot %{kmh} km/u
           your_province: Uw provincie of territorium
-          classes_not_recognized_in:
-            one: Klasse %{n} wordt niet herkend in %{state}
-            other: Klassen %{n} worden niet herkend in %{state}
           falls_under_name: In %{state} valt het onder %{name}.
-          optional_classes_not_recognized_in:
-            one: Klasse %{n} wordt niet herkend in %{state}, dus het is alleen legaal
-              zoals het verkocht wordt.
-            other: De klassen %{n} worden niet herkend in %{state}, dus het is alleen
-              legaal zoals het verkocht wordt.
           other_classification_rules: "%{name} regels"
           also_class_with_optional_throttle: is ook een e-bike van klasse %{n} met
             optionele gashendel
@@ -7132,10 +7066,6 @@ nl:
           heading_throttle_not_allowed: Gas geven is niet toegestaan
           heading_vehicle_html: Gereguleerd als %{name}
           may_fall_under_name: In %{state} kan het onder %{name} vallen.
-          throttle_speed_over_cap_html: Het gaspedaal loopt door tot %{mph} mph, boven
-            de %{cap} mph-limiet.
-          throttle_speed_within_cap_html: Gashendel loopt tot %{mph} mph, binnen de
-            limiet
           class_summary: De %{name} is een e-bike van klasse %{n} in %{state}.
           class_summary_optional: De %{name} is een e-bike van klasse %{n} in %{state}
             en %{optional}.
@@ -7186,13 +7116,6 @@ nl:
               regels die gecontroleerd moeten worden.
           yellow_summary_no_classes_without_throttle: De %{name} wordt in %{state}
             als e-bike geclassificeerd, zonder de optionele gashendel.
-          class_3_throttle_past: Het gaspedaal wordt ingedrukt als de snelheid van
-            20 mph (32 km/u) wordt overschreden, de snelheid die is toegestaan voor
-            een voertuig van klasse 3.
-          throttle_past_cap_kmh_html: Het gaspedaal slaat door tot voorbij %{past}
-            km/u, boven de %{cap} km/u limiet.
-          throttle_past_kmh_html: Het gaspedaal slaat door tot voorbij %{past} km/u;
-            controleer of het stopt bij %{cap} km/u.
           yes_over_mph_html: Ja, meer dan %{mph} mph
           class_summary_manual: Deze e-bike is een e-bike van klasse %{n} in %{state}.
           class_summary_with_rules_manual:
@@ -7208,13 +7131,9 @@ nl:
             other: Dit wordt geclassificeerd als een e-bike in %{state}, met %{count}
               regels om te controleren.
           bike_book_name: Fietsboek
-          class_unknown_in_bike_book_label: Bike Book vermeldt de klasse of topsnelheid
-            niet, dus controleer de klasse op het label.
           entered_unverified_by_bike_book: Invoer door u, niet geverifieerd door Bike
             Book.
           full_bike_book_entry: Bekijk het volledige Bike Book-artikel
-          speed_to_check_bike_book_kmh_html: Bike Book vermeldt de topsnelheid niet,
-            dus controleer of de motor stopt bij %{cap} km/u.
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
@@ -7467,6 +7386,8 @@ nl:
           watts_min: "%{watts}W+"
           copy_id: Kopieer ID
           id: ID
+          class_3_throttle_barred: In %{state} mag een e-bike van klasse 3 geen gashendel
+            hebben, dus een e-bike van klasse 3 met een gashendel is daar geen e-bike.
         bike_summary:
           classification: E-%{vehicle_type} classificatie
           electric_certification: Elektrische certificering
@@ -7475,6 +7396,88 @@ nl:
           outside_checked_countries: De fietscontroles gelden voorlopig alleen in
             Amerikaanse staten en Canadese provincies. De wetgeving voor e-bikes in
             %{place} staat hieronder.
+        rule_note:
+          class_1_throttle: Motorfietsen van klasse 1 mogen geen gashendel hebben.
+          class_3_optional_throttle_within_html: Optionele gashendel stopt bij %{mph}
+            mph
+          class_3_speed_with_throttle_html: Assistentie tot %{mph} mph, niet toegestaan
+            met gashendel
+          class_3_throttle: Het gaspedaal moet bij 32 km/u (20 mph) worden uitgeschakeld.
+          class_3_throttle_over_html: Het gaspedaal gaat tot %{mph} mph, voorbij de
+            20 mph die het gaspedaal van een klasse 3-voertuig is toegestaan.
+          class_3_throttle_past: Het gaspedaal wordt ingedrukt als de snelheid van
+            20 mph (32 km/u) wordt overschreden, de snelheid die is toegestaan voor
+            een voertuig van klasse 3.
+          class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
+          class_n: Klasse %{n}
+          class_unknown_in_bike_book_label: Bike Book vermeldt de klasse of topsnelheid
+            niet, dus controleer de klasse op het label.
+          classes_not_permitted: Het is een %{classes} e-bike, wat niet is toegestaan.
+          classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}
+            other: Klassen %{n} worden niet herkend in %{state}
+          classes_recognized:
+            one: Klasse %{n} wordt herkend
+            other: De klassen %{n} worden erkend.
+          classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
+            regels van de staat raadplegen.
+          has_throttle: Heeft een gasklep
+          limits_start_on: Deze limieten treden in werking %{date}
+          no_e_bike_category: Er is hier geen aparte categorie voor e-bikes, dus controleer
+            de regels voor rijbewijs, registratie en helmplicht.
+          no_speed_cap: Geen snelheidslimiet in de staatswetgeving.
+          no_speed_cap_in_law: Er is geen snelheidslimiet in de wetgeving.
+          no_throttle: Geen gaspedaal
+          no_watt_cap: Geen maximumvermogen in de staatswet
+          no_watt_cap_in_law: Er is geen maximumvermogen vastgelegd in de wet.
+          not_classified: Het is geen e-bike van klasse 1, 2 of 3.
+          optional_classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}, dus het is alleen legaal
+              zoals het verkocht wordt.
+            other: De klassen %{n} worden niet herkend in %{state}, dus het is alleen
+              legaal zoals het verkocht wordt.
+          optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
+            gasklep.
+          own_classes: De staat stelt zijn eigen grenzen vast in plaats van de drie
+            standaardklassen.
+          speed_not_provided: Maximale snelheid niet vermeld
+          speed_over_cap_html: Assisteert tot %{mph} mph, boven de %{cap} mph-limiet
+          speed_over_cap_kmh_html: Assistentie tot %{kmh} km/u, boven de %{cap} km/u
+            limiet
+          speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
+            de %{cap} mph-limiet
+          speed_past_cap_kmh_html: Assistentie bij snelheden boven %{past} km/u, boven
+            de %{cap} km/u-limiet
+          speed_past_html: Ondersteunt voorbij %{past} mph; controleer of het stopt
+            bij %{cap} mph
+          speed_past_kmh_html: Assisteert voorbij %{past} km/u; controleer of het
+            stopt bij %{cap} km/u.
+          speed_to_check_bike_book_kmh_html: Bike Book vermeldt de topsnelheid niet,
+            dus controleer of de motor stopt bij %{cap} km/u.
+          speed_within_cap_html: Assistentie tot %{mph} mph, binnen de limiet
+          speed_within_cap_kmh_html: Assistentie tot %{kmh} km/u, binnen de limiet
+          throttle_allowed: Gashendel toegestaan voor klasse 2
+          throttle_allowed_in_law: Gashendel toegestaan
+          throttle_not_allowed: De staat staat geen gashendel toe.
+          throttle_not_allowed_in_law: De wet staat geen gashendel toe.
+          throttle_not_stated: De wetgeving van de staat zegt niet of een gasklep
+            is toegestaan.
+          throttle_not_stated_in_law: De wet zegt niet of een gasklep is toegestaan.
+          throttle_past_cap_kmh_html: Het gaspedaal slaat door tot voorbij %{past}
+            km/u, boven de %{cap} km/u limiet.
+          throttle_past_kmh_html: Het gaspedaal slaat door tot voorbij %{past} km/u;
+            controleer of het stopt bij %{cap} km/u.
+          throttle_speed_over_cap_html: Het gaspedaal loopt door tot %{mph} mph, boven
+            de %{cap} mph-limiet.
+          throttle_speed_within_cap_html: Gashendel loopt tot %{mph} mph, binnen de
+            limiet
+          throttle_with_class_3_assist: Niet toegestaan met assistentie van klasse
+            3
+          watts_not_provided: Motorvermogen niet opgegeven
+          watts_over_cap_html: "%{watts}W motor overschrijdt de %{cap}W capaciteit"
+          watts_to_check_html: Controleer of de motor een vermogen heeft van %{cap}W
+            of minder.
+          watts_within_cap_html: "%{watts}W-motor bevindt zich in de kap"
       memberships:
         new:
           become_a_member: Word lid

@@ -6792,29 +6792,18 @@ nb:
           answer_no: Nei
           answer_yes: Ja
           being_compiled: Regler for denne staten blir satt sammen fra primærkilder.
-          class_1_throttle: Klasse 1-sykler kan ikke ha gass
-          class_3_throttle: Gassen må slås av ved 32 km/t
-          classes_start_on: Kursene trer i kraft %{date}. Inntil da, sjekk statens
-            gjeldende regler
           fails_rule: Oppfyller ikke denne regelen
           for_your_information: Til din informasjon
           gray_headline: Vi har ikke %{state} sine elsykkelregler registrert ennå.
-          has_throttle: Har en gasspedal
           is_registered: Er denne sykkelen registrert?
           legal_to_ride: Lovlig å sykle
-          limits_start_on: Disse grensene trer i kraft %{date}
           manual_bike_name: elsykkel
           may_be_moped: Det kan i stedet være regulert som moped eller motorvogn,
             noe som kan kreve registrering og førerkort.
           meets_rule: Oppfyller denne regelen
           motor: Motor
           mph_html: "%{mph} mph"
-          no_speed_cap: Ingen fartsgrense i statsloven
-          no_throttle: Ingen gass
-          no_watt_cap: Ingen maktbegrensning i statsloven
-          not_classified: Det er ikke en elsykkel i klasse 1, 2 eller 3.
           not_permitted: Ikke tillatt
-          own_classes: Staten setter sine egne grenser i stedet for de tre standardklassene
           recovered_more_often: Stjålne sykler blir funnet dobbelt så ofte når de
             er registrert.
           register_free: Registrer deg på Bike Index – gratis
@@ -6822,80 +6811,34 @@ nb:
           rules_not_on_file: Regler ikke arkivert
           source_html: 'Kilde: %{link}s katalog over statslovgivning. Sammendragene
             er kun for referanse, ikke juridisk rådgivning.'
-          speed_not_provided: Toppfart ikke oppgitt
-          speed_over_cap_html: Assisterer til %{mph} mph, over %{cap} mph-grensen
-          speed_within_cap_html: Hjelper opp til %{mph} mph, innenfor grensen
           still_reviewing: Vi gjennomgår fortsatt reglene til %{state}.
           still_reviewing_body: Sjekk nettstedet til din statlige trafikkstasjon eller
             lovgivende forsamling for gjeldende regler for elsykler. De fleste stater
             har en grense på 750 W for elsykkelmotorer og en assistert hastighet på
             32 km/t (klasse 1–2) eller 45 km/t (klasse 3).
           throttle: Gasspedal
-          throttle_allowed: Gass tillatt for klasse 2
-          throttle_not_allowed: Staten tillater ikke gassregulering
-          throttle_not_stated: Statens lov sier ikke om det er tillatt med gass
           top_speed: Toppfart
           watts_html: "%{watts}W"
-          watts_not_provided: Motoreffekt ikke oppgitt
-          watts_over_cap_html: "%{watts}W-motoren overskrider %{cap}W-grensen"
-          watts_within_cap_html: "%{watts}W-motoren er innenfor hetten"
           yes_to_html: Ja, til %{mph}
           your_state: Din stat
-          class_3_throttle_over_html: Gasspedalen går til %{mph} mph, over 20 mph
-            er tillatt for en klasse 3-gasspedal.
-          class_3_throttle_within_html: Gasspedalen stopper ved %{mph} mph
           over_mph_html: Over %{mph} mph
           red_headline_manual: Dette er ikke en elsykkel i henhold til gjeldende %{state}-regler.
-          speed_past_cap_html: Assisterer forbi %{past} mph, over %{cap} mph-grensen
-          speed_past_html: Assisterer forbi %{past} mph; sjekk at den stopper ved
-            %{cap} mph
-          classes_recognized:
-            one: Klasse %{n} er gjenkjent
-            other: Klasser %{n} er gjenkjent
           answer_optional: Valgfri
-          class_3_optional_throttle_within_html: Valgfri gassstopp ved %{mph} mph
-          class_3_speed_with_throttle_html: Assisterer til %{mph} mph, ikke tillatt
-            med gasspedal
-          class_n: Klasse %{n}
-          classes_not_permitted: Det er en %{classes} elsykkel, som ikke er tillatt
           model_year: "%{year}-modell"
-          optional_throttle_not_allowed: Det er bare lovlig uten den valgfrie gasspedalen
           optional_to_html: Valgfritt, til %{mph}
-          throttle_with_class_3_assist: Ikke tillatt med klasse 3-assistanse
           kmh_html: "%{kmh} km/t"
           law_source_html: 'Kilde: %{link}s katalog over elsykkellovgivning. Sammendragene
             er kun for referanse, ikke juridisk rådgivning.'
           may_be_moped_canada: Den kan i stedet være regulert som moped eller motorvogn,
             noe som kan kreve registrering og førerkort.
-          no_e_bike_category: Det er ingen elsykkelkategori her, så sjekk førerkort-,
-            registrerings- og hjelmreglene for denne.
-          no_speed_cap_in_law: Ingen fartsgrense i loven sin
-          no_watt_cap_in_law: Ingen effektgrense i loven sin
           optional_to_kmh_html: Valgfritt, til %{kmh} km/t
           over_kmh_html: Over %{kmh} km/t
-          speed_over_cap_kmh_html: Assisterer til %{kmh} km/t, over %{cap} km/t-grensen
-          speed_past_cap_kmh_html: Assisterer forbi %{past} km/t, over %{cap} km/t-grensen
-          speed_past_kmh_html: Assisterer etter %{past} km/t; sjekk at den stopper
-            innen %{cap} km/t
-          speed_within_cap_kmh_html: Hjelper opp til %{kmh} km/t, innenfor grensen
           still_reviewing_province_body: Sjekk samferdselsdepartementet i din provins
             eller ditt territorium for gjeldende regler for elsykler. De fleste elsykkelmotorer
             har en effekt på 500 W og en assistert hastighet på 32 km/t.
-          throttle_allowed_in_law: Gass tillatt
-          throttle_not_allowed_in_law: Loven tillater ikke gass
-          throttle_not_stated_in_law: Loven sier ikke om det er tillatt med gass.
-          watts_to_check_html: Sjekk at motoren er nominell til %{cap}W eller mindre
           yes_to_kmh_html: Ja, til %{kmh} km/t
           your_province: Din provins eller ditt territorium
-          classes_not_recognized_in:
-            one: Klassen %{n} gjenkjennes ikke i %{state}
-            other: Klassene %{n} gjenkjennes ikke i %{state}
           falls_under_name: I %{state} faller den inn under %{name}.
-          optional_classes_not_recognized_in:
-            one: Klasse %{n} gjenkjennes ikke i %{state}, så den er bare lovlig slik
-              den selges.
-            other: Klassene %{n} gjenkjennes ikke i %{state}, så de er bare lovlige
-              slik de selges.
           other_classification_rules: "%{name} regler"
           also_class_with_optional_throttle: er også en elsykkel i klasse %{n} med
             valgfri gasspedal
@@ -6910,10 +6853,6 @@ nb:
           heading_throttle_not_allowed: Gass ikke tillatt
           heading_vehicle_html: Regulert som %{name}
           may_fall_under_name: I %{state} kan den falle inn under %{name}.
-          throttle_speed_over_cap_html: Gasspedalen går til %{mph} mph, over %{cap}
-            mph-grensen
-          throttle_speed_within_cap_html: Gasspedalen går til %{mph} mph, innenfor
-            grensen
           class_summary: "%{name} er en elsykkel i klasse %{n} i %{state}."
           class_summary_optional: "%{name} er en elsykkel i klasse %{n} i %{state}
             og %{optional}."
@@ -6963,12 +6902,6 @@ nb:
               regler som må kontrolleres."
           yellow_summary_no_classes_without_throttle: "%{name} er klassifisert som
             en elsykkel i %{state}, uten den valgfrie gasspedalen."
-          class_3_throttle_past: Gasspedalen går forbi 20 mph (32 km/t) som er tillatt
-            for klasse 3-gasspedalen.
-          throttle_past_cap_kmh_html: Gasspedalen går forbi %{past} km/t, over %{cap}
-            km/t-grensen
-          throttle_past_kmh_html: Gasspedalen går forbi %{past} km/t; sjekk at den
-            stopper ved %{cap} km/t
           yes_over_mph_html: Ja, over %{mph} mph
           class_summary_manual: Denne elsykkelen er en elsykkel i klasse %{n} i %{state}.
           class_summary_with_rules_manual:
@@ -6984,13 +6917,9 @@ nb:
             other: Dette er klassifisert som en elsykkel i %{state}, med %{count}
               regler som må kontrolleres.
           bike_book_name: Sykkelbok
-          class_unknown_in_bike_book_label: Bike Book oppgir ikke klasse eller toppfart,
-            så sjekk klassen på etiketten.
           entered_unverified_by_bike_book: Registrert av deg, ikke bekreftet av Bike
             Book.
           full_bike_book_entry: Se hele Bike Book-oppføringen
-          speed_to_check_bike_book_kmh_html: Bike Book oppgir ikke toppfarten, så
-            sjekk at motoren stopper ved %{cap} km/t
         rule_label:
           classes: Klasser anerkjent
           power: Motoreffektbegrensning
@@ -7225,6 +7154,8 @@ nb:
           watts_min: "%{watts}W+"
           copy_id: Kopier ID
           id: ID
+          class_3_throttle_barred: I %{state} kan ikke en elsykkel i klasse 3 ha gass,
+            så en elsykkel i klasse 3 med gass er ikke en elsykkel der.
         bike_summary:
           classification: E-%{vehicle_type}-klassifisering
           electric_certification: Elektrisk sertifisering
@@ -7233,6 +7164,78 @@ nb:
           outside_checked_countries: Sykkelkontrollene dekker foreløpig amerikanske
             stater og kanadiske provinser. %{place}s lover for elsykler finner du
             nedenfor.
+        rule_note:
+          class_1_throttle: Klasse 1-sykler kan ikke ha gass
+          class_3_optional_throttle_within_html: Valgfri gassstopp ved %{mph} mph
+          class_3_speed_with_throttle_html: Assisterer til %{mph} mph, ikke tillatt
+            med gasspedal
+          class_3_throttle: Gassen må slås av ved 32 km/t
+          class_3_throttle_over_html: Gasspedalen går til %{mph} mph, over 20 mph
+            er tillatt for en klasse 3-gasspedal.
+          class_3_throttle_past: Gasspedalen går forbi 20 mph (32 km/t) som er tillatt
+            for klasse 3-gasspedalen.
+          class_3_throttle_within_html: Gasspedalen stopper ved %{mph} mph
+          class_n: Klasse %{n}
+          class_unknown_in_bike_book_label: Bike Book oppgir ikke klasse eller toppfart,
+            så sjekk klassen på etiketten.
+          classes_not_permitted: Det er en %{classes} elsykkel, som ikke er tillatt
+          classes_not_recognized_in:
+            one: Klassen %{n} gjenkjennes ikke i %{state}
+            other: Klassene %{n} gjenkjennes ikke i %{state}
+          classes_recognized:
+            one: Klasse %{n} er gjenkjent
+            other: Klasser %{n} er gjenkjent
+          classes_start_on: Kursene trer i kraft %{date}. Inntil da, sjekk statens
+            gjeldende regler
+          has_throttle: Har en gasspedal
+          limits_start_on: Disse grensene trer i kraft %{date}
+          no_e_bike_category: Det er ingen elsykkelkategori her, så sjekk førerkort-,
+            registrerings- og hjelmreglene for denne.
+          no_speed_cap: Ingen fartsgrense i statsloven
+          no_speed_cap_in_law: Ingen fartsgrense i loven sin
+          no_throttle: Ingen gass
+          no_watt_cap: Ingen maktbegrensning i statsloven
+          no_watt_cap_in_law: Ingen effektgrense i loven sin
+          not_classified: Det er ikke en elsykkel i klasse 1, 2 eller 3.
+          optional_classes_not_recognized_in:
+            one: Klasse %{n} gjenkjennes ikke i %{state}, så den er bare lovlig slik
+              den selges.
+            other: Klassene %{n} gjenkjennes ikke i %{state}, så de er bare lovlige
+              slik de selges.
+          optional_throttle_not_allowed: Det er bare lovlig uten den valgfrie gasspedalen
+          own_classes: Staten setter sine egne grenser i stedet for de tre standardklassene
+          speed_not_provided: Toppfart ikke oppgitt
+          speed_over_cap_html: Assisterer til %{mph} mph, over %{cap} mph-grensen
+          speed_over_cap_kmh_html: Assisterer til %{kmh} km/t, over %{cap} km/t-grensen
+          speed_past_cap_html: Assisterer forbi %{past} mph, over %{cap} mph-grensen
+          speed_past_cap_kmh_html: Assisterer forbi %{past} km/t, over %{cap} km/t-grensen
+          speed_past_html: Assisterer forbi %{past} mph; sjekk at den stopper ved
+            %{cap} mph
+          speed_past_kmh_html: Assisterer etter %{past} km/t; sjekk at den stopper
+            innen %{cap} km/t
+          speed_to_check_bike_book_kmh_html: Bike Book oppgir ikke toppfarten, så
+            sjekk at motoren stopper ved %{cap} km/t
+          speed_within_cap_html: Hjelper opp til %{mph} mph, innenfor grensen
+          speed_within_cap_kmh_html: Hjelper opp til %{kmh} km/t, innenfor grensen
+          throttle_allowed: Gass tillatt for klasse 2
+          throttle_allowed_in_law: Gass tillatt
+          throttle_not_allowed: Staten tillater ikke gassregulering
+          throttle_not_allowed_in_law: Loven tillater ikke gass
+          throttle_not_stated: Statens lov sier ikke om det er tillatt med gass
+          throttle_not_stated_in_law: Loven sier ikke om det er tillatt med gass.
+          throttle_past_cap_kmh_html: Gasspedalen går forbi %{past} km/t, over %{cap}
+            km/t-grensen
+          throttle_past_kmh_html: Gasspedalen går forbi %{past} km/t; sjekk at den
+            stopper ved %{cap} km/t
+          throttle_speed_over_cap_html: Gasspedalen går til %{mph} mph, over %{cap}
+            mph-grensen
+          throttle_speed_within_cap_html: Gasspedalen går til %{mph} mph, innenfor
+            grensen
+          throttle_with_class_3_assist: Ikke tillatt med klasse 3-assistanse
+          watts_not_provided: Motoreffekt ikke oppgitt
+          watts_over_cap_html: "%{watts}W-motoren overskrider %{cap}W-grensen"
+          watts_to_check_html: Sjekk at motoren er nominell til %{cap}W eller mindre
+          watts_within_cap_html: "%{watts}W-motoren er innenfor hetten"
       memberships:
         new:
           become_a_member: Bli medlem
