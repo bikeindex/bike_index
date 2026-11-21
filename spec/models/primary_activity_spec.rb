@@ -114,6 +114,15 @@ RSpec.describe PrimaryActivity, type: :model do
     end
   end
 
+  describe "friendly_find" do
+    let!(:primary_activity) { FactoryBot.create(:primary_activity, name: "Bike & Camp") }
+    it "finds an -amp- slug by its -and- form" do
+      expect(primary_activity.slug).to eq "bike-and-camp"
+      expect(described_class.friendly_find("bike-amp-camp")).to eq primary_activity
+      expect(described_class.friendly_find_id("bike-amp-camp")).to eq primary_activity.id
+    end
+  end
+
   describe "friendly_find_id_and_family_ids" do
     let(:primary_activity_family) { FactoryBot.create(:primary_activity_family, name: "ATB (All Terrain Biking)") }
     let!(:primary_activity) { FactoryBot.create(:primary_activity, primary_activity_family:) }

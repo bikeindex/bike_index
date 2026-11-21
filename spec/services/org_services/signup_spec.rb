@@ -64,6 +64,16 @@ RSpec.describe OrgServices::Signup do
       end
     end
 
+    context "a name that only differs by punctuation" do
+      let!(:organization) { FactoryBot.create(:organization, name: "Craig's Cycles") }
+      let(:start_params) { {name: "Craigs Cycles", kind: "bike_shop", email: "org_admin@bikeindex.org"} }
+
+      it "names the organization that has it" do
+        expect(saved).to be_falsey
+        expect(organization_signup.errors.full_messages.first).to start_with("There's already an organization called Craig's Cycles")
+      end
+    end
+
     context "a long name that's only taken in its first 30 characters" do
       let!(:organization) { FactoryBot.create(:organization, name: "The Community Bicycle Cooperative of Springfield") }
       let(:start_params) { {name: "The Community Bicycle Cooperative of Shelbyville", kind: "bike_shop", email: "org_admin@bikeindex.org"} }
@@ -95,9 +105,19 @@ RSpec.describe OrgServices::Signup do
     context "signed in" do
       let(:user) { FactoryBot.create(:user_confirmed, email: "signed_in@bikeindex.org") }
 
-      it "uses their email" do
+      it "uses their email, already confirmed" do
         expect(saved).to be_truthy
-        expect(organization_signup.reload.email).to eq "signed_in@bikeindex.org"
+        expect(organization_signup.reload).to have_attributes(email: "signed_in@bikeindex.org", email_confirmed?: true)
+        expect(described_class.send_confirmation_email(organization_signup)).to be_falsey
+      end
+
+      context "unconfirmed" do
+        let(:user) { FactoryBot.create(:user, email: "signed_in@bikeindex.org") }
+
+        it "still waits on the link" do
+          expect(saved).to be_truthy
+          expect(organization_signup.reload.email_confirmed?).to be_falsey
+        end
       end
     end
 
@@ -196,7 +216,7 @@ RSpec.describe OrgServices::Signup do
       organization = described_class.complete(organization_signup, user:)
       expect(organization).to be_persisted
       expect(organization).to have_attributes(name: "Shifty Bike Shop", kind: "bike_shop",
-        website: "http://shiftybikes.com", auto_user_id: user.id, approved: true)
+        website: "http://shiftybikes.com", auto_user_id: user.id, approved: true, show_on_map: true)
       expect(organization.locations.first).to have_attributes(name: "Shifty Bike Shop", phone: "7183839999",
         publicly_visible: true)
       expect(organization.locations.first.address_record)

@@ -30,7 +30,6 @@ Rails.application.routes.draw do
     get :confirm
     post :confirm_email
     post :resend
-    get :welcome
   end
 
   resources :organizations, only: :new do
@@ -38,7 +37,6 @@ Rails.application.routes.draw do
       get :embed
       get :embed_extended, as: :embed_extended
       get :embed_create_success
-      get :qr
     end
   end
 
@@ -235,6 +233,8 @@ Rails.application.routes.draw do
   # Registration photos - the /register flow's and the embed forms' - upload before
   # there's a session, so they get their own endpoint
   post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
+  # After the resource above, so its named actions aren't taken for slugs
+  get "register/:organization_id", to: "register/organizations#show", as: :register_organization
 
   # Shadows ActiveStorage's own route (drawn last, so this wins) so the stock controller, which
   # checks nothing, isn't reachable. Deliberately unnamed - rails_direct_uploads_path still
@@ -548,6 +548,7 @@ Rails.application.routes.draw do
       end
     end
     resources :ambassador_task_assignments, only: %i[update]
+    resource :info, only: %i[show], controller: :info
 
     # Organized Admin resources (below here controllers should inherit Organized::AdminController)
     resource :manage, only: %i[show update destroy] do

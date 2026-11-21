@@ -106,6 +106,19 @@ RSpec.describe Bikes::EditsController, type: :request do
       expect(response.body).to match(/<title>Versions: #{bike.title_string}/)
     end
   end
+  context "merged into its shop's POS registration" do
+    let(:pos_registration_match) { FactoryBot.create(:pos_registration_match, status: :merged, user: bike_creator) }
+    let(:bike) { pos_registration_match.bike }
+    before { bike.destroy! }
+
+    it "redirects to the POS registration's page, but not a form submission" do
+      get edit_bike_path(bike.id, edit_template: "photos")
+      expect(response).to redirect_to(edit_bike_path(pos_registration_match.pos_bike_id, edit_template: "photos"))
+      patch bike_path(bike.id), params: {bike: {description: "Lost"}}
+      expect(response.status).to eq 404
+    end
+  end
+
   describe "groups edit_template" do
     let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: bike_creator) }
     let!(:other_organization) { FactoryBot.create(:organization) }

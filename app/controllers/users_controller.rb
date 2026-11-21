@@ -159,6 +159,8 @@ class UsersController < ApplicationController
           else
             translation(:thanks_for_accepting_tos)
           end
+          return if return_to_if_present
+
           redirect_to(user_root_url) && return
         else
           redirect_to(accept_vendor_terms_path, notice: translation(:accept_tos_to_use_as_org)) && return

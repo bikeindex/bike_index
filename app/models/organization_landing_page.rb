@@ -26,14 +26,14 @@ class OrganizationLandingPage < ApplicationRecord
 
   # ORGANIZATIONS_WITH_LANDING_PAGES routes the page - enabled is only a copy of it
   def env_enabled?
-    LandingPageOrganizations::SLUGS.include?(organization&.slug)
+    organization&.landing_page_slug.present?
   end
 
   def enabled_mismatch_error
     return if enabled? == env_enabled?
 
     "This landing page's enabled is #{enabled?}, but ORGANIZATIONS_WITH_LANDING_PAGES " \
-      "#{enabled? ? "does not include" : "includes"} \"#{organization&.slug}\" - " \
+      "#{enabled? ? "does not include" : "includes"} \"#{organization&.landing_page_slug || organization&.slug}\" - " \
       "and that's what routes the page."
   end
 

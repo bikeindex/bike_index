@@ -238,6 +238,8 @@ module ControllerHelpers
     fail ActiveRecord::RecordNotFound
   end
 
+  def local_return_to = LocalPath.only(params[:return_to])
+
   # Generally this is implicitly set - however! it can also be explicitly set
   def store_return_to(target = nil)
     # fallback to the return to parameters, or the current path
@@ -269,26 +271,24 @@ module ControllerHelpers
         translation(:reset_your_password,
           scope: [:controllers, :concerns, :controller_helpers, __method__])
       render(action: :update_password) && (return true)
-    when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
-      redirect_to(target) && (return true) if URI.parse(target).relative? || target.include?("/oauth/")
+    when /\A#{ENV["BASE_URL"]}/
+      redirect_to(target) && (return true) if target.include?("/oauth/")
+    when %r{\A/}
+      redirect_to(target) && (return true) if LocalPath.only(target)
     when "https://facebook.com/bikeindex"
       redirect_to(target, allow_other_host: true) && (return true)
     end
   end
 
   # handle_target refuses an off-site target on arrival, too late to keep a caller-chosen
-  # URL out of mail we send. "//host" is off-site despite the leading slash.
-  def emailable_return_to
-    target = session[:return_to]
-    target if target&.start_with?("/") && !target.start_with?("//")
-  end
+  # URL out of mail we send
+  def emailable_return_to = LocalPath.only(session[:return_to])
 
   def permitted_return_to
     target = (session[:return_to] || cookies[:return_to] || params[:return_to])&.downcase
     return nil if invalid_return_to?(target)
 
-    # Either starting with our URL or /
-    target if target.start_with?(/#{ENV["BASE_URL"]}/, "/")
+    target.start_with?(/#{ENV["BASE_URL"]}/) ? target : LocalPath.only(target)
   end
 
   # Wrap `I18n.translate` for use in controllers, abstracting away
@@ -364,6 +364,18 @@ module ControllerHelpers
   end
 
   private
+
+  # For a bike the user can't see: a registration merged into its shop's POS registration sends its links to the
+  # same page of that one, if they can see it
+  def redirect_merged_bike_or_not_found(bike)
+    merged_into = PosRegistrationMatch.merged_into(bike) if request.get? || request.head?
+    fail ActiveRecord::RecordNotFound unless merged_into&.visible_by?(current_user)
+
+    id_param = request.path_parameters.key?(:bike_id) ? :bike_id : :id
+    # Keeps tokens, e.g. a parking notification's retrieval link, as query params only. An id there would win
+    redirect_to(url_for(request.path_parameters.merge(id_param => merged_into.id, :only_path => true,
+      :params => request.query_parameters.except("id", "bike_id"))))
+  end
 
   # passive_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the current_organization in any given request
@@ -470,6 +482,8 @@ module ControllerHelpers
 
       flash[:success] = translation(:accept_tos_for_orgs,
         scope: [:controllers, :concerns, :controller_helpers, __method__])
+      # Back here once they've accepted - a POST's path can't be revisited
+      store_return_to(request.fullpath) if request.get?
       redirect_to(accept_vendor_terms_path) && return
     elsif current_user.blank?
       flash[:notice] = translation(:please_sign_in,
