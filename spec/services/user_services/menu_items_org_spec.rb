@@ -55,7 +55,9 @@ RSpec.describe UserServices::MenuItemsOrg do
             link_item("Multi search", "/o/#{organization.to_param}/registrations/multi_search")
           ]),
           link_item("Add a registration", "/o/#{organization.to_param}/registrations/new",
-            icon: "plus-circle", match_params: {parking_notification: nil})
+            icon: "plus-circle", match_params: {parking_notification: nil}),
+          {type: :divider},
+          link_item("#{organization.short_name} Information", "/o/#{organization.to_param}/info")
         ]
       end
 
@@ -67,7 +69,7 @@ RSpec.describe UserServices::MenuItemsOrg do
         subject(:items) { described_class.for(organization:, current_user:, old_register_view: true) }
 
         it "points add a registration at the embed form" do
-          expect(items.last).to eq(link_item("Add a registration", "/o/#{organization.to_param}/bikes/new",
+          expect(items[1]).to eq(link_item("Add a registration", "/o/#{organization.to_param}/bikes/new",
             icon: "plus-circle", match_params: {parking_notification: nil}))
         end
       end
@@ -99,7 +101,7 @@ RSpec.describe UserServices::MenuItemsOrg do
 
       it "groups the menu the way the design lays it out" do
         expect(items.map { |item| item[:type] }).to eq(%i[group link divider group group group link
-          link link link link divider group])
+          link link link link divider group link])
 
         groups = items.select { |item| item[:type] == :group }
         expect(groups.map { |group| group[:key] }).to eq(%i[registrations impounded parking bulk settings])

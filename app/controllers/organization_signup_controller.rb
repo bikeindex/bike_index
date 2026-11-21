@@ -3,7 +3,7 @@ class OrganizationSignupController < ApplicationController
 
   SESSION_KEY = :organization_signup_token
 
-  before_action :find_signup, except: %i[new confirm confirm_email welcome]
+  before_action :find_signup, except: %i[new confirm confirm_email]
   before_action :find_signup_for_confirmation, only: %i[confirm confirm_email]
   # The step shown is server state - a cached page could show one the signup is past
   before_action { response.set_header("Cache-Control", "no-store") }
@@ -16,11 +16,11 @@ class OrganizationSignupController < ApplicationController
     @signup = OrgServices::Signup.resumable(token: session[SESSION_KEY], user: current_user) if params[:restart].blank?
     if @signup.blank?
       session.delete(SESSION_KEY)
-      @signup = OrgServices::Signup.build(user: current_user, return_to:, kind: params[:kind])
+      @signup = OrgServices::Signup.build(user: current_user, return_to: local_return_to, kind: params[:kind])
       return render(step_page("1"))
     end
 
-    @signup.update(return_to:) if return_to.present?
+    @signup.update(return_to: local_return_to) if local_return_to.present?
     # A link's kind preselects step 1, but never overrides one already chosen
     @signup.update(kind: params[:kind]) if @signup.kind.blank? && Organization.user_creatable_kinds.include?(params[:kind])
     session[SESSION_KEY] = @signup.id_token
@@ -130,15 +130,6 @@ class OrganizationSignupController < ApplicationController
     complete_or_details
   end
 
-  def welcome
-    @organization = Organization.friendly_find(params[:organization_id])
-    return authenticate_user(flash_type: :notice) if current_user.blank?
-    return redirect_to(user_root_url) unless current_user.admin_of?(@organization)
-    return unless ensure_member_of!(@organization)
-
-    render Pages::OrgSignup::Views::Welcome::Component.new(organization: @organization, current_user:, return_to:)
-  end
-
   private
 
   def step_page(step)
@@ -148,12 +139,6 @@ class OrganizationSignupController < ApplicationController
     else Pages::OrgSignup::Views::Step1::Component.new(organization_signup: @signup, current_user:,
       focus_email: params[:change_email].present?)
     end
-  end
-
-  # Only a path of our own, so a link can't send a new admin off-site. Browsers read a
-  # backslash as a slash and drop tabs and newlines, so "/\evil.com" is "//evil.com" too
-  def return_to
-    params[:return_to] if params[:return_to].to_s.match?(%r{\A/(?!/)[^\\[:space:][:cntrl:]]*\z})
   end
 
   def sign_in_email_owner
@@ -194,10 +179,10 @@ class OrganizationSignupController < ApplicationController
     session.delete(SESSION_KEY)
     # A page of its own rather than straight to return_to: these submissions are fetched,
     # and a fetch can't follow lightspeed_interface's redirect off-site
-    welcome_path = welcome_organization_signup_path(organization_id: organization.to_param, return_to: @signup.return_to)
-    return redirect_to_sign_in_for(organization, after_sign_in: welcome_path) if current_user != email_owner
+    info_path = organization_info_path(organization_id: organization.to_param, return_to: @signup.return_to)
+    return redirect_to_sign_in_for(organization, after_sign_in: info_path) if current_user != email_owner
 
-    redirect_to welcome_path
+    redirect_to info_path
   end
 
   def redirect_to_sign_in_for(organization, after_sign_in: organization_manage_path(organization_id: organization.to_param))
@@ -217,7 +202,7 @@ class OrganizationSignupController < ApplicationController
 
   def find_signup
     @signup = OrgServices::Signup.find(session[SESSION_KEY])
-    @signup ||= OrgServices::Signup.build(user: current_user, return_to:) if action_name == "create"
+    @signup ||= OrgServices::Signup.build(user: current_user, return_to: local_return_to) if action_name == "create"
     return redirect_to(new_organization_signup_path) if @signup.blank?
 
     redirect_to_organization(@signup.organization) if @signup.organization.present?

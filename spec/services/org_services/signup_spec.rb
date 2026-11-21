@@ -64,6 +64,16 @@ RSpec.describe OrgServices::Signup do
       end
     end
 
+    context "a name that only differs by punctuation" do
+      let!(:organization) { FactoryBot.create(:organization, name: "Craig's Cycles") }
+      let(:start_params) { {name: "Craigs Cycles", kind: "bike_shop", email: "org_admin@bikeindex.org"} }
+
+      it "names the organization that has it" do
+        expect(saved).to be_falsey
+        expect(organization_signup.errors.full_messages.first).to start_with("There's already an organization called Craig's Cycles")
+      end
+    end
+
     context "a long name that's only taken in its first 30 characters" do
       let!(:organization) { FactoryBot.create(:organization, name: "The Community Bicycle Cooperative of Springfield") }
       let(:start_params) { {name: "The Community Bicycle Cooperative of Shelbyville", kind: "bike_shop", email: "org_admin@bikeindex.org"} }

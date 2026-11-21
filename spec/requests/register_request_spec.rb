@@ -478,15 +478,15 @@ RSpec.describe RegisterController, type: :request do
     end
 
     context "with an organization" do
-      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+      let(:organization) { FactoryBot.create(:organization, name: "Brakebills University", short_name: "Brakebills") }
       let(:b_param) do
         BParam.create(origin: "register_flow",
           params: {bike: {owner_email:, cycle_type: "cargo", creation_organization_id: organization.id}}.as_json)
       end
 
-      it "names the organization in the heading, and the cycle type only where js can swap it" do
+      it "names the organization in full in the heading, and the cycle type only where js can swap it" do
         get register_path(b_param_token: b_param.id_token, step: 1)
-        expect(response.body).to include "Register your vehicle with Brakebills!"
+        expect(response.body).to include "Register your vehicle with <strong>Brakebills University</strong>!"
         expect(response.body).to include '<span data-register--heading-target="cycleType">cargo bike</span> info'
         # Posted back, so a submission that has to build a registration keeps the org
         expect(Nokogiri::HTML(response.body).at_css("input[name='organization_id']")["value"])
@@ -516,7 +516,7 @@ RSpec.describe RegisterController, type: :request do
           get register_path(b_param_token: b_param.id_token, step: 1, organization_id: organization.slug)
           expect(b_param.reload.creation_organization_id).to eq organization.id
           expect(b_param.organization_id).to eq organization.id
-          expect(response.body).to include "with Brakebills!"
+          expect(response.body).to include "with <strong>Brakebills University</strong>!"
 
           # Once the bike exists there's nothing left to attribute
           b_param.update(created_bike_id: FactoryBot.create(:bike).id)

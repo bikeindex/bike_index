@@ -12,8 +12,10 @@ RSpec.describe Admin::PosRegistrationMatchesController, type: :request do
     let(:duplicate_bike_group) { DuplicateBikeGroup.create }
     let(:owned_bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
     let!(:merge_candidate) { PosRegistrationMatch.create!(duplicate_bike_group:, bike: owned_bike, pos_bike:) }
+    let(:merger) { FactoryBot.create(:user) }
     let!(:review_candidate) do
-      PosRegistrationMatch.create!(duplicate_bike_group:, bike: FactoryBot.create(:bike), pos_bike:, review_reasons: %w[stolen_history impounded])
+      PosRegistrationMatch.create!(duplicate_bike_group:, bike: FactoryBot.create(:bike), pos_bike:, review_reasons: %w[stolen_history impounded],
+        status: :merged, merged_at: Time.current, merger:)
     end
 
     it "lists matches and filters by bucket, reason and owner" do
@@ -23,7 +25,7 @@ RSpec.describe Admin::PosRegistrationMatchesController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:collection).pluck(:id)).to match_array([merge_candidate.id, review_candidate.id])
-      expect(response.body).to include("Stolen history on the serial")
+      expect(response.body).to include("Stolen history on the serial", merger.email)
 
       get base_url, params: {search_bucket: "merge_candidate"}
       expect(assigns(:collection).pluck(:id)).to eq([merge_candidate.id])
