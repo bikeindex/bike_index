@@ -54,7 +54,7 @@ module EbikeRuleServices
     end
 
     def law
-      return if place.nil?
+      return StateLaws::US_CLASSES if place.nil?
 
       Places.us?(place) ? StateLaws.find(place[:abbr]) : StateLaws.place_law(place[:code])
     end
