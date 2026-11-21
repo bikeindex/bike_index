@@ -16,14 +16,6 @@ RSpec.describe EbikeRuleServices::StateLaws do
       expect(described_class.find("CO")[:sources]).to include("https://leg.colorado.gov/bills/hb25-1197")
     end
 
-    it "reads the power limits of a catalog published before 0.28.0" do
-      vocabulary = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
-      vocabulary["e_vehicle_classifications"].transform_values! { it.transform_keys { |key| {"power_max" => "max_power", "power_min" => "min_power"}.fetch(key, key) } }
-      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(body: vocabulary.to_json)
-
-      expect(described_class.find("CO")).to include(watt_cap: 750)
-    end
-
     it "has no classes for a law that names none of the three" do
       expect(described_class.find("PA")).to include(classes: [], mph: 20)
     end

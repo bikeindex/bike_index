@@ -1,7 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { listedFigure } from 'bikebook/cycle_drawings'
 import { OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
-import { catalogValue, currentShape } from 'bikebook/legacy_shape'
 import { missing } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
@@ -25,7 +24,7 @@ const LIMITS = [['rider', 'Max rider weight'], ['payload', 'Max payload (rider +
 // none for a value that isn't compared. `parts` splits a value whose parts are each compared, and `amount` shows a
 // difference, given the number it's of
 export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], market, highlight, beside = false, corner = nothing }) => {
-  const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, currentShape(data)))
+  const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
   const geometry = GEOMETRY.map((key) => {
@@ -103,7 +102,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
     if (options.length < 2) return options[0]?.name ?? missing
     return html`<select class="twinput tw:w-auto tw:py-1 tw:text-sm" aria-label=${`Size of ${named[index].model}`} data-action="bikebook--page#pickSize"
       data-bikebook--page-vehicle-param=${key} data-bikebook--page-first-param=${index === 0}>${options.map((size) =>
-        html`<option value=${size.name} ?selected=${size === sizes[index]} data-size=${JSON.stringify({ name: size.name, geometry: Object.fromEntries(['top_tube_effective', 'reach', 'rider_height_min', 'rider_height_max'].map((key) => [key, catalogValue(size.geometry, key)])) })}>${size.name}</option>`)}</select>`
+        html`<option value=${size.name} ?selected=${size === sizes[index]} data-size=${JSON.stringify({ name: size.name, geometry: Object.fromEntries(['top_tube_effective', 'reach', 'rider_height_min', 'rider_height_max'].map((key) => [key, size.geometry?.[key]])) })}>${size.name}</option>`)}</select>`
   }
 
   const records = (rows) => rows.map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])

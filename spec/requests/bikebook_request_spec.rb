@@ -119,6 +119,11 @@ RSpec.describe BikebookController, type: :request do
       expect(response).to have_http_status(:moved_permanently)
       expect(response).to redirect_to("/bikebook?classifications=evc/us/class-3,evc/out-of-class/us/ca&electric=class-2,1&q=level_2" \
         "&vehicle_models=m/aventon/2022/level-2{size:M/L}{color:Sage_Green},m/segway/2025/gt3-pro")
+      # its filters' slugs too, which 2.0.0 renamed some of
+      get "/bikebook", params: {manufacturer: "riese_and_muller,trek", vehicle_type: "bike,cargo_bike_rear", primary_activity: "road_endurance,atb_gravel",
+                                frame_material: "carbon", handlebar_type: "drop_bar"}
+      expect(response).to redirect_to("/bikebook?frame_material=composite&handlebar_type=drop_bar&manufacturer=riese-and-muller,trek" \
+        "&primary_activity=road-endurance-sportive,atb-gravel&vehicle_type=bike,cargo-rear")
     end
 
     context "a model alone" do

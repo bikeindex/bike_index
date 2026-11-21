@@ -59,6 +59,41 @@ const dashedIds = (value) => {
 }
 const fetchCatalog = (url) => fetchJson(url).then(dashedIds)
 
+// Schema 2.0.0's slugs for the vocabulary Bike Index reads values of, which an older catalog underscores, and where 2.0.0
+// renamed one, names otherwise. Integrations::Bikebook::Catalog.current_slug reads them the same way
+// TODO: once the published catalog is at 2.0.0, remove this
+const RENAMED = {
+  __proto__: null,
+  bike_trailer: 'trailer',
+  cargo_bike: 'cargo',
+  cargo_bike_rear: 'cargo-rear',
+  cargo_tricycle: 'cargo-trike',
+  cargo_tricycle_rear: 'cargo-trike-rear',
+  epamd: 'personal-mobility',
+  scooter: 'non-e-scooter',
+  skateboard: 'non-e-skateboard',
+  elliptical_bike: 'elliptical',
+  road_endurance: 'road-endurance-sportive',
+  carbon: 'composite',
+  wood: 'organic'
+}
+const dashed = (value) => typeof value === 'string' ? value.replaceAll('_', '-') : value
+const currentSlug = (value) => Array.isArray(value) ? value.map(currentSlug) : RENAMED[value] ?? dashed(value)
+const SLUGGED = {
+  type: currentSlug,
+  type_detail: currentSlug,
+  primary_activity: currentSlug,
+  drivetrain: currentSlug,
+  frame: (frame) => frame.material ? { ...frame, material: currentSlug(frame.material) } : frame,
+  components: (components) => Array.isArray(components) ? components.map((each) => ({ ...each, type: currentSlug(each.type) })) : components
+}
+const withCurrentSlugs = (record) => Object.fromEntries(Object.entries(record).map(([key, value]) => [key, value != null && SLUGGED[key] ? SLUGGED[key](value) : value]))
+const NAMED = ['type', 'type_detail', 'primary_activity', 'drivetrain', 'frame.material', 'components.type']
+const withCurrentNames = (names) => ({
+  ...names,
+  ...Object.fromEntries(NAMED.filter((group) => names[group]).map((group) => [group, Object.fromEntries(Object.entries(names[group]).map(([value, name]) => [currentSlug(value), name]))]))
+})
+
 const list = (value) => (value ?? '').split(',').filter(Boolean)
 const path = (id) => id.replace(/^m\//, '')
 const blockKey = (id) => path(id).split('/').slice(0, 2).join('/')
@@ -83,7 +118,7 @@ function start ({ manifestUrl, ids, jurisdictions, comparing }) {
     ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
   })
   started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchCatalog(new URL(file, base)))))
-    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
+    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, names: withCurrentNames(vocabulary.names), e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
   if (comparing) fetchComparison()
   return started
 }
@@ -92,7 +127,13 @@ function start ({ manifestUrl, ids, jurisdictions, comparing }) {
 async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   similarityUrl = similarityModule
   const [published, { vocabulary, kit }, featuredRules] = await Promise.all([opened.then(() => fetchJson(new URL(manifest.index, base))), started, import(rulesUrl)])
-  const index = { ...published, filter_options: dashedIds(published.filter_options) }
+  const index = {
+    ...published,
+    manufacturers: Object.fromEntries(Object.entries(published.manufacturers).map(([slug, name]) => [dashed(slug), name])),
+    primary_activities: published.primary_activities.map((each) => ({ ...each, slug: currentSlug(each.slug), family: currentSlug(each.family) })),
+    vehicle_types: published.vehicle_types.map((each) => ({ ...each, slug: currentSlug(each.slug) })),
+    filter_options: dashedIds(published.filter_options)
+  }
   rules = featuredRules
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
@@ -102,15 +143,18 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
     ...model,
     // field by field, as walking the whole index takes three times its parse
     id: dashedIds(model.id),
+    manufacturer: dashed(model.manufacturer),
+    primary_activity: currentSlug(model.primary_activity),
+    vehicle_type: currentSlug(model.vehicle_type),
     e_vehicle_classifications: dashedIds(model.e_vehicle_classifications),
     variants: dashedIds(model.variants),
     position,
     // an extension at its own path, or the whole URL of a photo it shares with another model, by its published id
     stock_photo: model.photo && (model.photo.includes('://') ? model.photo : `${index.stock_photos}/${path(model.id)}.${model.photo}`),
-    activity_name: activityNames[model.primary_activity],
-    type_name: typeNames[model.vehicle_type],
+    activity_name: activityNames[currentSlug(model.primary_activity)],
+    type_name: typeNames[currentSlug(model.vehicle_type)],
     // by its maker, as makers share names, and its first word where it has no group
-    group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
+    group_key: `${dashed(model.manufacturer)}/${model.model_group ?? model.model.split(' ')[0]}`,
     searchText: `${model.display}\n${dashedIds(model.id)}`.toLowerCase(),
     // a current model's first year where it's sold ahead of the calendar
     sortYear: model.final_year ?? Math.max(model.first_year, currentYear),
@@ -128,7 +172,8 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index, vocabulary.names) }
 }
 
-const fetchComparison = () => (comparisonFetch ??= opened.then(() => manifest.comparison && fetchJson(new URL(manifest.comparison, base))).catch(() => null))
+const fetchComparison = () => (comparisonFetch ??= opened.then(() => manifest.comparison && fetchJson(new URL(manifest.comparison, base)))
+  .then((published) => published && { ...published, fields: { ...published.fields, frame_material: currentSlug(published.fields.frame_material) } }).catch(() => null))
 
 // The comparison, once the index, whose order it's in, has loaded, for its frame materials as well as how alike models are;
 // without it neither is offered. Fetched when it's asked for, leaving the index the connection, unless `start` is told the
@@ -208,7 +253,7 @@ const withMarketVariants = (models) => Object.fromEntries(Object.entries(models)
 // A failed fetch is forgotten, so the next ask tries again
 const block = (key) => {
   if (!blocks.has(key)) {
-    blocks.set(key, fetchCatalog(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(withMarketVariants(models)).map(([id, data]) => [id, withYearRecords(data)])), (error) => {
+    blocks.set(key, fetchCatalog(new URL(manifest.blocks[key], base)).then(({ models }) => Object.fromEntries(Object.entries(withMarketVariants(models)).map(([id, data]) => [id, withYearRecords(withCurrentSlugs(data))])), (error) => {
       blocks.delete(key)
       throw error
     }))

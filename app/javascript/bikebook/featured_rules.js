@@ -11,7 +11,7 @@ const HIGH_PRICE_CENTS = 500000
 const TOP_PRICE_CENTS = 800000
 const MAX_PRICE_CENTS = 1000000
 const CURRENCIES = { EU: 'EUR', AU: 'AUD', CA: 'CAD', CH: 'CHF', GB: 'GBP', HK: 'HKD', ID: 'IDR', IN: 'INR', JP: 'JPY', NZ: 'NZD', TW: 'TWD' }
-const CYCLE_TYPES = ['bike', 'cargo_bike', 'cargo_bike_rear', 'tandem', 'recumbent']
+const CYCLE_TYPES = ['bike', 'cargo', 'cargo-rear', 'tandem', 'recumbent']
 
 // A model whose `key` none of the picks share
 const unseen = (key) => (model, { picked }) => !picked.some((each) => key(each) === key(model))
@@ -34,7 +34,7 @@ export const requirements = [
   ({ msrp_currency: currency }, { params }) => currency === local(params),
   // none over $10,000 until the reader filters by price, but Reactive Adaptations' adaptive bikes, which rarely cost less
   (model, { params }) => params.price_min || params.price_max || !priced(MAX_PRICE_CENTS)(model) ||
-    model.manufacturer === 'reactive_adaptations'
+    model.manufacturer === 'reactive-adaptations'
 ]
 
 // In order, each deciding between the models the ones before it tie on

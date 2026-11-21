@@ -17,10 +17,25 @@ module Integrations
       MODEL_ID = %r{\Am/([a-z0-9_-]+/\d{4})/[a-z0-9_-]+\z}
       # a model's, a component's or a classification's id, or a block's key: its maker and year
       CATALOG_ID = %r{\A(?:(?:m|c|evc)/[a-z0-9_/-]+|[a-z0-9_-]+/\d{4})\z}
-      # The ids in a link's params: vehicle_models' among what's picked for each, the electric filter's US classes, and the
-      # name non_e_bike_type is of a classification
-      LINKED_PARAMS = %w[vehicle_models classifications electric classification].index_with(%r{\b(?:(?:m|c|evc)/[a-z0-9_/-]+|class_\d\b)})
-        .merge("non_e_bike_type" => /\A[a-z0-9_]+\z/).freeze
+      # The ids in a link's params: vehicle_models' among what's picked for each, and the electric filter's US classes
+      LINKED_ID = %r{\b(?:(?:m|c|evc)/[a-z0-9_/-]+|class_\d\b)}
+      # Schema 2.0.0's slugs for the vocabulary Bike Index reads values of, which an older catalog underscores, and where
+      # 2.0.0 renamed one, names otherwise. bikebook/catalog_worker.js reads them the same way
+      # TODO: once the published catalog is at 2.0.0, and an older link's slugs have had a year to move, remove this
+      RENAMED = {
+        "bike_trailer" => "trailer",
+        "cargo_bike" => "cargo",
+        "cargo_bike_rear" => "cargo-rear",
+        "cargo_tricycle" => "cargo-trike",
+        "cargo_tricycle_rear" => "cargo-trike-rear",
+        "epamd" => "personal-mobility",
+        "scooter" => "non-e-scooter",
+        "skateboard" => "non-e-skateboard",
+        "elliptical_bike" => "elliptical",
+        "road_endurance" => "road-endurance-sportive",
+        "carbon" => "composite",
+        "wood" => "organic"
+      }.freeze
 
       Unreachable = Class.new(StandardError)
 
@@ -64,11 +79,20 @@ module Integrations
         end
       end
 
-      # A link's query with its ids dashed, which an older link's are not
+      def current_slug(value) = RENAMED[value] || value&.tr("_", "-")
+
+      # A link's query with its ids and slugs schema 2.0.0's, which an older link's are not. non_e_bike_type is a
+      # classification's name
       def dashed_query(query)
         query.to_h do |name, value|
-          pattern = LINKED_PARAMS[name]
-          [name, (pattern && value.is_a?(String)) ? value.gsub(pattern) { it.tr("_", "-") } : value]
+          next [name, value] unless value.is_a?(String)
+
+          [name, case name
+                 when "vehicle_models", "classifications", "electric", "classification" then value.gsub(LINKED_ID) { it.tr("_", "-") }
+                 when "primary_activity", "vehicle_type", "frame_material" then value.gsub(/[^,]+/) { current_slug(it) }
+                 when "manufacturer", "non_e_bike_type" then value.tr("_", "-")
+                 else value
+                 end]
         end
       end
 
