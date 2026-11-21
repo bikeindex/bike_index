@@ -73,7 +73,7 @@ class ApplicationController < ActionController::Base
   end
 
   def not_acceptable_in_other_format(exception)
-    raise exception unless lookup_context.any?(exception.path, exception.prefixes)
+    raise exception if lookup_context.formats.include?(:html) || !lookup_context.any?(exception.path, exception.prefixes)
 
     head :not_acceptable
   end
