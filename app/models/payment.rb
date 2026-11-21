@@ -83,7 +83,7 @@ class Payment < ApplicationRecord
     def normalize_referral_source(str)
       return nil if str.blank?
 
-      str = str.strip.downcase.gsub(/\A(https:\/\/)?bikeindex.org\W?/, "").tr("_", "-")
+      str = str.strip.downcase.gsub(/\A(https:\/\/)?bikeindex.org\W?/, "")
       Slugifyer.slugify(str)
     end
 

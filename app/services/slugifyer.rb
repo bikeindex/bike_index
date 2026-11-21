@@ -6,7 +6,7 @@ module Slugifyer
     transliterate(remove_parens(CGI.unescapeHTML(string.to_s).delete("'’‘`´")))
       .gsub("%20", " ")
       .gsub("&", "-and-").gsub("+", "-plus-")
-      .gsub(/[^A-Za-z0-9_]+/, "-")
+      .gsub(/[^A-Za-z0-9]+/, "-")
       .delete_prefix("-").delete_suffix("-")
   end
 

@@ -18,6 +18,7 @@ RSpec.describe Slugifyer do
       expect(Slugifyer.slugify("27.5")).to eq "27-5"
       expect(Slugifyer.slugify("Discus 45/40")).to eq "discus-45-40"
       expect(Slugifyer.slugify("e.bike")).to eq "e-bike"
+      expect(Slugifyer.slugify("Italia_X")).to eq "italia-x"
     end
     it "squeezes and trims dashes" do
       expect(Slugifyer.slugify("Foo - Bar")).to eq "foo-bar"
