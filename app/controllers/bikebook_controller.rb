@@ -42,7 +42,7 @@ class BikebookController < ApplicationController
     model = Integrations::Bikebook::Catalog.model(id) || fail(ActiveRecord::RecordNotFound)
     @page_description = model["description"]
     @page_image = model["stock_photo"]
-    overview = Pages::Bikebook::Show::ModelOverview::Component.new(model:, vocabulary: Integrations::Bikebook::Catalog.vocabulary)
+    overview = Pages::Bikebook::ModelOverview::Component.new(model:, vocabulary: Integrations::Bikebook::Catalog.vocabulary)
     render_page(overview.title, overview:)
   rescue Integrations::Bikebook::Catalog::Unreachable
     # the browser loads the catalog itself, and a crawler keeps the model's page and comes back
