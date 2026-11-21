@@ -19,9 +19,8 @@ module Integrations
       CATALOG_ID = %r{\A(?:(?:m|c|evc)/[a-z0-9_/-]+|[a-z0-9_-]+/\d{4})\z}
       # The ids in a link's params: vehicle_models' among what's picked for each, the electric filter's US classes, and the
       # name non_e_bike_type is of a classification
-      LINKED_ID = %r{\b(?:(?:m|c|evc)/[a-z0-9_/-]+|class_\d\b)}
-      LINKED_PARAMS = {"vehicle_models" => LINKED_ID, "classifications" => LINKED_ID, "electric" => LINKED_ID,
-                       "classification" => LINKED_ID, "non_e_bike_type" => /\A[a-z0-9_]+\z/}.freeze
+      LINKED_PARAMS = %w[vehicle_models classifications electric classification].index_with(%r{\b(?:(?:m|c|evc)/[a-z0-9_/-]+|class_\d\b)})
+        .merge("non_e_bike_type" => /\A[a-z0-9_]+\z/).freeze
 
       Unreachable = Class.new(StandardError)
 
@@ -67,7 +66,10 @@ module Integrations
 
       # A link's query with its ids dashed, which an older link's are not
       def dashed_query(query)
-        query.to_h { |name, value| [name, (LINKED_PARAMS[name] && value.is_a?(String)) ? value.gsub(LINKED_PARAMS[name]) { it.tr("_", "-") } : value] }
+        query.to_h do |name, value|
+          pattern = LINKED_PARAMS[name]
+          [name, (pattern && value.is_a?(String)) ? value.gsub(pattern) { it.tr("_", "-") } : value]
+        end
       end
 
       #

@@ -29,7 +29,7 @@ module Pages
         def catalog_version = @catalog_version ||= EbikeRuleServices::StateLaws.version
 
         # Every visitor's and every query's, which bikebook--page and placeholder_class fill in around them
-        def page_cache_key(*parts) = [self.class.cache_digest, 2, catalog_version, *parts]
+        def page_cache_key(*parts) = child_cache_key(self.class, *parts)
 
         # A component's own fragment inside the page's, under skip_digest: Rails' digest of this template would expire it
         # with any change here. Not cache_on: these also render on /ebike-rules, where the same tile twice would repeat

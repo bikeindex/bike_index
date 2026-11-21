@@ -92,9 +92,7 @@ function start ({ manifestUrl, ids, jurisdictions, comparing }) {
 async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   similarityUrl = similarityModule
   const [published, { vocabulary, kit }, featuredRules] = await Promise.all([opened.then(() => fetchJson(new URL(manifest.index, base))), started, import(rulesUrl)])
-  // an extension at its own path, or the whole URL of a photo it shares with another model
-  const photoOf = ({ id, photo }) => photo && (photo.includes('://') ? photo : `${published.stock_photos}/${path(id)}.${photo}`)
-  const index = dashedIds({ ...published, models: published.models.map((model) => ({ ...model, stock_photo: photoOf(model) })) })
+  const index = { ...published, filter_options: dashedIds(published.filter_options) }
   rules = featuredRules
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
@@ -102,12 +100,18 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   activities = index.primary_activities
   models = index.models.map((model, position) => ({
     ...model,
+    // field by field, as walking the whole index takes three times its parse
+    id: dashedIds(model.id),
+    e_vehicle_classifications: dashedIds(model.e_vehicle_classifications),
+    variants: dashedIds(model.variants),
     position,
+    // an extension at its own path, or the whole URL of a photo it shares with another model, by its published id
+    stock_photo: model.photo && (model.photo.includes('://') ? model.photo : `${index.stock_photos}/${path(model.id)}.${model.photo}`),
     activity_name: activityNames[model.primary_activity],
     type_name: typeNames[model.vehicle_type],
     // by its maker, as makers share names, and its first word where it has no group
     group_key: `${model.manufacturer}/${model.model_group ?? model.model.split(' ')[0]}`,
-    searchText: `${model.display}\n${model.id}`.toLowerCase(),
+    searchText: `${model.display}\n${dashedIds(model.id)}`.toLowerCase(),
     // a current model's first year where it's sold ahead of the calendar
     sortYear: model.final_year ?? Math.max(model.first_year, currentYear),
     // drawn per worker, which each page load starts, and again by `rotate`, so a reload features others and the page's
@@ -124,7 +128,7 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index, vocabulary.names) }
 }
 
-const fetchComparison = () => (comparisonFetch ??= opened.then(() => manifest.comparison && fetchCatalog(new URL(manifest.comparison, base))).catch(() => null))
+const fetchComparison = () => (comparisonFetch ??= opened.then(() => manifest.comparison && fetchJson(new URL(manifest.comparison, base))).catch(() => null))
 
 // The comparison, once the index, whose order it's in, has loaded, for its frame materials as well as how alike models are;
 // without it neither is offered. Fetched when it's asked for, leaving the index the connection, unless `start` is told the
@@ -280,7 +284,7 @@ function matching (params) {
   const passes = filter(params)
   const filtered = sorted(params).filter(passes)
   const needle = (params.q ?? '').trim().toLowerCase()
-  const exact = needle.startsWith('m/') && byId.get(needle)
+  const exact = needle.startsWith('m/') && byId.get(dashedIds(needle))
   const words = needle.split(/\s+/).filter(Boolean)
   const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))).map((model) => soldIn(model, params.market))
   const whole = ({ searchText }) => searchText.includes(needle)

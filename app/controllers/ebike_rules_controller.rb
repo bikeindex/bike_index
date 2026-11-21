@@ -70,12 +70,6 @@ class EbikeRulesController < ApplicationController
 
   private
 
-  # TODO: once the published catalog is at schema 2.0.0, and an older link's ids have had a year to move, remove this
-  def redirect_to_dashed_ids
-    query = Integrations::Bikebook::Catalog.dashed_query(request.query_parameters)
-    redirect_to(ReadableQuery.path(request.path, query), status: :moved_permanently) if query != request.query_parameters
-  end
-
   # LogSearcher stores a check's log line as a search
   def append_info_to_payload(payload)
     super

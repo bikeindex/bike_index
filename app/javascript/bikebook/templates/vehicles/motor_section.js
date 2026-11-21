@@ -35,7 +35,7 @@ export const motorSection = ({ presenter, heading, motor, others }) => {
   const modeFields = except(presenter.kit.motor.mode_fields, ['e_vehicle_classifications'])
   const display = (each) => ({
     ...each,
-    // a unit linked by its market's id, …_us, named for that market
+    // a unit linked by its market's id, …-us, named for that market
     name: compact([presence([each.manufacturer, each.model].filter(present).join(' ')), market(presenter, each.id)]).join(', '),
     id: each.id ? copyableCode({ value: each.id, label: 'Copy ID' }) : null,
     // a merged motor lists each of its drive wheels

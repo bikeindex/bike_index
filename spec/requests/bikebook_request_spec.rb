@@ -215,9 +215,9 @@ RSpec.describe BikebookController, type: :request do
       expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3-pro")
     end
 
-    it "redirects from the vehicle's id alone, an older link's dashed" do
+    it "redirects from the vehicle's id alone, an older link's for show to dash" do
       get "/m/velotric/2024/fold_1"
-      expect(response).to redirect_to("/bikebook?vehicle_models=m/velotric/2024/fold-1")
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/velotric/2024/fold_1")
       get "/m/super-73/2024/s-adv"
       expect(response).to redirect_to("/bikebook?vehicle_models=m/super-73/2024/s-adv")
     end
@@ -226,13 +226,13 @@ RSpec.describe BikebookController, type: :request do
       get "/evc/us/class-3"
       expect(response).to redirect_to("/bikebook?classifications=evc/us/class-3")
       get "/evc/off_highway_motorcycle"
-      expect(response).to redirect_to("/bikebook?classifications=evc/off-highway-motorcycle")
+      expect(response).to redirect_to("/bikebook?classifications=evc/off_highway_motorcycle")
     end
 
     context "without its m/, and with vehicles already picked" do
       it "picks it ahead of them, keeping the query" do
         get "/bikebook/segway/2025/gt3_pro", params: {vehicle_models: "m/aventon/2022/level_2,m/segway/2025/gt3_pro", filters: "1"}
-        expect(response).to redirect_to("/bikebook?filters=1&vehicle_models=m/segway/2025/gt3-pro,m/aventon/2022/level-2")
+        expect(response).to redirect_to("/bikebook?filters=1&vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2")
       end
 
       context "with what's picked for each" do
