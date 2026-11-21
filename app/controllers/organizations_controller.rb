@@ -1,4 +1,5 @@
 class OrganizationsController < ApplicationController
+  before_action :force_html_response, only: %i[embed embed_extended embed_create_success]
   before_action :set_bparam, only: %i[embed embed_extended]
   before_action :allow_x_frame, only: %i[embed embed_extended embed_create_success]
 

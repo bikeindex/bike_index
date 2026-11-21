@@ -82,6 +82,15 @@ RSpec.describe OrganizationsController, type: :request do
         expect(bike.status).to eq "status_with_owner"
         expect(bike.owner_email).to eq "something@example.com"
       end
+
+      context "requesting json" do
+        it "renders the html embed" do
+          get "#{base_url}/#{current_organization.slug}/embed_extended", headers: {"Accept" => "application/json"}
+          expect(response).to have_http_status(:ok)
+          expect(response.media_type).to eq "text/html"
+          expect(response).to render_template(:embed_extended)
+        end
+      end
     end
     context "with all the organization features possible" do
       # Because we render different fields for some of the organization features, make sure they all work
