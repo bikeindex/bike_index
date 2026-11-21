@@ -23,14 +23,14 @@ export const MAX_COMPARE = 10
 
 // The compared vehicles' cards, from catalog blocks
 export class VehicleViewer {
-  // `jurisdiction`'s out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle, as
+  // `jurisdiction`'s out of class marker, evc/out-of-class/us/ca, where its law bars a Class 3's throttle, as
   // EbikeRuleServices::StateLaws.out_of_class_ids has them, and as a state, whose /ebike-rules says why a model isn't
   // an e-bike there. Model cards name the markets of those `market` doesn't sell
   constructor (kit, vocabulary, { jurisdiction, market } = {}) {
     this.presenter = new VehiclePresenter(kit, vocabulary)
     const barred = Object.values(vocabulary.e_vehicle_classifications)
       .some((record) => record.jurisdiction === `US-${jurisdiction}` && record.class_3_throttle === false)
-    this.outOfClassId = barred ? `evc/out_of_class/us/${jurisdiction.toLowerCase()}` : null
+    this.outOfClassId = barred ? `evc/out-of-class/us/${jurisdiction.toLowerCase()}` : null
     this.state = jurisdiction && jurisdiction !== 'US' ? jurisdiction : null
     this.card = { placeholderUrl: kit.placeholder_url, currencies: vocabulary.currencies, market, configurations: kit.model_configurations }
   }

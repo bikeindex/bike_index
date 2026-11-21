@@ -63,7 +63,7 @@ const WEIGHT_LOADS = {
 // In the box rather than on the bike, so listed apart and never compared part by part
 const INCLUDED = 'included_not_installed'
 
-export const US_CLASS = /^evc\/us\/class_(\d)$/
+export const US_CLASS = /^evc\/us\/class-(\d)$/
 const classNumbers = (mode) => mode.ids.map((id) => id.match(US_CLASS)?.[1]).filter(Boolean)
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
 const tireInches = (presenter, millimeters) => presenter.labeled(presenter.rounded(millimeters / 25.4).toFixed(1), 'in', presenter.kit.inches)
@@ -146,7 +146,7 @@ export const componentsOf = ({ presenter, vehicles, others }) => {
 }
 
 class ModelViewer {
-  // `outOfClassId` the viewing `state`'s out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle
+  // `outOfClassId` the viewing `state`'s out of class marker, evc/out-of-class/us/ca, where its law bars a Class 3's throttle
   // `jsonOpen` whether its JSON is open, which vehicle_models keeps by its `key`
   constructor ({ presenter, data, value, key, jsonOpen, market, comparing, idSuffix, others, removePath, selectedSize, sizePath, outOfClassId, state, lettering }) {
     this.presenter = presenter
@@ -222,7 +222,7 @@ class ModelViewer {
   // with no throttle mode is, or 'throttle' with an optional one
   #throttledClass3 () {
     const modes = this.vehicle.classifiedModes
-    if (!modes.some(({ ids }) => ids.includes('evc/us/class_3'))) return null
+    if (!modes.some(({ ids }) => ids.includes('evc/us/class-3'))) return null
     const throttles = modes.filter(({ mode }) => mode === 'throttle')
     if (throttles.length ? throttles.some(stock) : array(this.data.propulsion).includes('throttle')) return 'stock'
     return throttles.length ? 'throttle' : null

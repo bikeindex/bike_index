@@ -3,6 +3,8 @@
 class EbikeRulesController < ApplicationController
   LOOKUP_PARAMS = %i[vehicle_models manual top_speed watts throttle throttle_speed].freeze
 
+  before_action :redirect_to_dashed_ids, only: :show
+
   def show
     # a form's place - the lookup's without JavaScript, or the country switch's - which can't send it to the place's own page
     query = request.query_parameters
@@ -67,6 +69,12 @@ class EbikeRulesController < ApplicationController
   end
 
   private
+
+  # TODO: once the published catalog is at schema 2.0.0, and an older link's ids have had a year to move, remove this
+  def redirect_to_dashed_ids
+    query = Integrations::Bikebook::Catalog.dashed_query(request.query_parameters)
+    redirect_to(ReadableQuery.path(request.path, query), status: :moved_permanently) if query != request.query_parameters
+  end
 
   # LogSearcher stores a check's log line as a search
   def append_info_to_payload(payload)

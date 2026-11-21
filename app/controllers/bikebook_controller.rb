@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class BikebookController < ApplicationController
+  before_action :redirect_to_dashed_ids, only: :show
+
   def show
     entries = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
     model = Integrations::Bikebook::Catalog.vehicle_id(entries.first) if entries.one?
@@ -24,17 +26,24 @@ class BikebookController < ApplicationController
       status: up ? :ok : :service_unavailable
   end
 
-  # /bikebook/m/segway/2025/gt3_pro, or without its m/, or its id alone, /m/segway/2025/gt3_pro, picks that vehicle ahead
+  # /bikebook/m/segway/2025/gt3-pro, or without its m/, or its id alone, /m/segway/2025/gt3-pro, picks that vehicle ahead
   # of any already picked, with what's picked for it there
   def vehicle
-    id = "m/#{params[:vehicle_model].delete_prefix("m/")}"
-    picked, others = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
+    query = Integrations::Bikebook::Catalog.dashed_query(request.query_parameters)
+    id = Integrations::Bikebook::Catalog.dashed_ids("m/#{params[:vehicle_model].delete_prefix("m/")}")
+    picked, others = Integrations::Bikebook::Catalog.vehicle_entries(query["vehicle_models"])
       .partition { Integrations::Bikebook::Catalog.vehicle_id(it) == id }
-    query = request.query_parameters.merge("vehicle_models" => [picked.first || id, *others].join(","))
+    query = query.merge("vehicle_models" => [picked.first || id, *others].join(","))
     redirect_to ReadableQuery.path(bikebook_path, query)
   end
 
   private
+
+  # TODO: once the published catalog is at schema 2.0.0, and an older link's ids have had a year to move, remove this
+  def redirect_to_dashed_ids
+    query = Integrations::Bikebook::Catalog.dashed_query(request.query_parameters)
+    redirect_to(ReadableQuery.path(request.path, query), status: :moved_permanently) if query != request.query_parameters
+  end
 
   # A model picked alone is its own page, canonically without the search's other params
   def render_vehicle(id)

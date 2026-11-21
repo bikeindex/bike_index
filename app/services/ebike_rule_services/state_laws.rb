@@ -8,9 +8,9 @@ module EbikeRuleServices
     # The 50 states and D.C., alphabetical
     STATES = StatesAndCountries.states.reject { it[:abbr] == "PR" }.freeze
     STATE_ID = %r{\Aevc/us/([a-z]{2})/}
-    OFF_HIGHWAY = "evc/off_highway_motorcycle"
+    OFF_HIGHWAY = "evc/off-highway-motorcycle"
     MOTORCYCLE = "evc/motorcycle"
-    ROAD_GROUPS = ["evc/moped", "evc/motor_driven_cycle", MOTORCYCLE].freeze
+    ROAD_GROUPS = ["evc/moped", "evc/motor-driven-cycle", MOTORCYCLE].freeze
     RULE_GROUPS = %w[rider_rule enforcement legal_context seller_rule vehicle_definition].freeze
     TOP_RULE = /\Atop_rule_(\d+)\z/
     NAMED_CLASSES = /\bclass(?:es)? ((?:\d\b(?:,? (?:and|or) |, )?)+)/i
@@ -20,12 +20,12 @@ module EbikeRuleServices
     # Corrections the catalog doesn't carry yet: `either` limits are alternatives, and NOT_AN_EBIKE folds a
     # class into the one e-moto entry, listed last. New Jersey's law counts an electric motorized bicycle as
     # a motorcycle, and a dirt bike is one too
-    NOT_AN_EBIKE = {id: "evc/out_of_class", not_an_ebike: true}.freeze
+    NOT_AN_EBIKE = {id: "evc/out-of-class", not_an_ebike: true}.freeze
     CLASS_OVERRIDES = {
-      "evc/us/nj/motorized_bicycle" => {either: true},
-      "evc/us/nj/electric_motorized_bicycle" => NOT_AN_EBIKE,
+      "evc/us/nj/motorized-bicycle" => {either: true},
+      "evc/us/nj/electric-motorized-bicycle" => NOT_AN_EBIKE,
       "evc/us/nj/motorcycle" => NOT_AN_EBIKE,
-      "evc/us/nj/dirt_bike" => NOT_AN_EBIKE
+      "evc/us/nj/dirt-bike" => NOT_AN_EBIKE
     }.freeze
 
     # By abbreviation, empty when the catalog doesn't answer. A limit is nil where the state sets none,
@@ -70,7 +70,7 @@ module EbikeRuleServices
       classifications[id]&.merge(CLASS_OVERRIDES.fetch(id, {}))
     end
 
-    # The catalog's marker for a vehicle in no class in the state alone: California's evc/out_of_class/us/ca
+    # The catalog's marker for a vehicle in no class in the state alone: California's evc/out-of-class/us/ca
     def out_of_class_id(abbreviation) = "#{NOT_AN_EBIKE[:id]}/us/#{abbreviation.downcase}"
 
     # The markers of the states whose law bars a Class 3's throttle, as California's does
@@ -139,7 +139,7 @@ module EbikeRuleServices
     # is a new key, and the version moves when the block reads different keys
     def vocabulary(name)
       path = Integrations::Bikebook::Catalog.manifest&.dig("vocabulary")
-      path && Rails.cache.fetch(["bikebook_catalog/#{name}", 2, path], expires_in: 1.week, skip_nil: true) do
+      path && Rails.cache.fetch(["bikebook_catalog/#{name}", 3, path], expires_in: 1.week, skip_nil: true) do
         Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { yield it }
       end
     end

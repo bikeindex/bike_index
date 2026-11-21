@@ -22,7 +22,7 @@ const batteryRows = (presenter, battery = {}) => {
 }
 
 const market = (presenter, id) => {
-  const code = String(id ?? '').match(/_([a-z]{2})$/)?.[1]?.toUpperCase()
+  const code = String(id ?? '').match(/-([a-z]{2})$/)?.[1]?.toUpperCase()
   return code && presenter.vocabulary.names?.markets?.[code] ? code : null
 }
 

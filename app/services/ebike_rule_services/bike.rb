@@ -21,7 +21,7 @@ module EbikeRuleServices
       end
       classes = (e_bike_class == 3 && throttle && throttle_mph.to_i <= 20) ? [2, 3] : [e_bike_class].compact
       new(bikebook_id: nil, manufacturer_name: nil, model: nil, first_year: nil, vehicle_type: "bike", e_bike_class:, class_unknown: false,
-        e_vehicle_classifications: classes.map { "evc/us/class_#{it}" }, optional_classes: {}, watts:, peak_watts: nil,
+        e_vehicle_classifications: classes.map { "evc/us/class-#{it}" }, optional_classes: {}, watts:, peak_watts: nil,
         top_assist_mph: (top_mph if e_bike_class), top_assist_kmh: nil, assists_past_kmh: nil, throttle:, stock_throttle: throttle,
         throttle_mph: (throttle_mph if e_bike_class && throttle_mph.to_i <= 20), throttle_kmh: nil, ul2849: :unrecorded, ul2271: :unrecorded, photo_url: nil)
     end
