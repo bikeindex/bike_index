@@ -7064,14 +7064,19 @@ nl:
           less: minder
           models: "%{number} modellen"
           more: "+%{count} meer"
-          representative: "(vertegenwoordiger)"
           schema_order: schema volgorde
+          file: bestand
+          representative_initial: R
+          representative_vehicle_lowercase: representatief voertuig
+          view_list: lijst bekijken
         schema_viewer:
           documents: Schema-documenten
           subtitle_html: De structuur van een %{document}-bestand op schema %{version},
             gepubliceerd als %{url}
-          title: Fietsboek schema
-          versioning: 'Versiebeheer:'
+          schemas_title: Fietsboek schema's
+          unavailable: De catalogus van Bike Book reageert niet, daarom kunnen de
+            schema's momenteel niet worden weergegeven. Probeer het over een minuut
+            opnieuw.
       ebike_rules:
         class_tile:
           class: Klas
