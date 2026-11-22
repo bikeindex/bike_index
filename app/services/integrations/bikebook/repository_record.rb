@@ -16,7 +16,7 @@ module Integrations
       # The schema document the record is, nil for an id that isn't a record's
       def document(id) = DOCUMENTS[id[ID, 1]]
 
-      def path(id) = document(id) && "#{document(id)}s/#{id[ID, 2]}.json"
+      def path(id) = document(id)&.then { "#{it}s/#{id[ID, 2]}.json" }
 
       # nil for an id with no file. A failure is kept for a minute, so GitHub being down holds up one request a minute
       def json(id)

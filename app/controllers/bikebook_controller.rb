@@ -28,13 +28,12 @@ class BikebookController < ApplicationController
   end
 
   def schema
-    json, status = begin
-      [Integrations::Bikebook::RepositoryRecord.json(params[:id]) || fail(ActiveRecord::RecordNotFound), :ok]
+    json = begin
+      Integrations::Bikebook::RepositoryRecord.json(params[:id]) || raise(ActiveRecord::RecordNotFound)
     rescue Integrations::Bikebook::RepositoryRecord::Unreachable
-      [nil, :service_unavailable]
     end
     @page_title = "#{params[:id]} | Bike Book"
-    render Pages::Bikebook::Schema::Component.new(id: params[:id], json:), status:
+    render Pages::Bikebook::Schema::Component.new(id: params[:id], json:), status: json ? :ok : :service_unavailable
   end
 
   # For uptime monitoring: the page breaks whenever the catalog doesn't answer in the format it reads. Green or red, as /up is

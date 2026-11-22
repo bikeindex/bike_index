@@ -7,8 +7,7 @@ module Pages
       # schema viewer's description of its field and of its value.
       # json: nil while the repository doesn't answer
       class Component < ApplicationComponent
-        Line = Data.define(:depth, :key, :value, :tail, :comment)
-        MUTED_CLASSES = "tw:text-gray-400 tw:dark:text-gray-500"
+        LINE = /\A( *)("(?:[^"\\]|\\.)*": )?(.*?)(,?)\z/
 
         def initialize(id:, json:)
           @id = id
@@ -21,34 +20,33 @@ module Pages
 
         def fields = Integrations::Bikebook::Catalog.schema_viewer.dig("documents", Integrations::Bikebook::RepositoryRecord.document(@id), "fields")
 
-        def code = tag.pre(safe_join(lines(JSON.parse(@json), {"fields" => fields}).map { line_tag(it) }),
-          class: "tw:overflow-x-auto tw:font-mono tw:text-sm tw:leading-6")
+        def code
+          record = JSON.parse(@json)
+          lines = JSON.pretty_generate(record).lines(chomp: true).zip(comments(record, {"fields" => fields}))
+          tag.pre(safe_join(lines.map { line_tag(*it) }), class: "tw:overflow-x-auto tw:font-mono tw:text-sm tw:leading-6")
+        end
 
-        # JSON.pretty_generate's lines
-        def lines(value, field, depth = 0, key = nil, comma = "")
+        # One for each of JSON.pretty_generate's lines, an object or array closing on a line of its own
+        def comments(value, field)
           comment = [field["description"], field["values"]&.find { it["value"] == value }&.dig("description")].compact.join("; ").presence
-          entries = case value
-          when Hash then value.map { |name, each| [name, each, child(field, name)] }
-          when Array then value.map { [nil, it, item(field)] }
+          children = case value
+          when Hash then value.flat_map { |name, each| comments(each, child(field, name)) }
+          when Array then value.flat_map { comments(it, item(field)) }
           end
-          return [Line.new(depth, key, JSON.generate(value), comma, comment)] if entries.blank?
-
-          open, close = value.is_a?(Hash) ? %w[{ }] : %w([ ])
-          [Line.new(depth, key, nil, open, comment),
-            *entries.each_with_index.flat_map { |(name, each, schema), index| lines(each, schema, depth + 1, name, (index < entries.length - 1) ? "," : "") },
-            Line.new(depth, nil, nil, "#{close}#{comma}", nil)]
+          children.present? ? [comment, *children, nil] : [comment]
         end
 
         # every entry of an object keyed by year has the fields of `each`
-        def child(field, name) = field["keyed_by"] ? {"fields" => field["each"]} : field.dig("fields", name) || {}
+        def child(field, name) = field["keyed_by"] ? item(field) : field.dig("fields", name) || {}
 
         def item(field) = field["each"] ? {"fields" => field["each"]} : field.slice("values")
 
-        def line_tag(line)
-          code = safe_join(["  " * line.depth, line.key && tag.span("#{JSON.generate(line.key)}:", class: "tw:text-blue-700 tw:dark:text-blue-300"),
-            line.key && " ", line.value && tag.span(line.value, class: Pages::Bikebook::SchemaFields::Component::VALUE_CLASSES), line.tail].compact)
-          comment = line.comment && tag.span("// #{line.comment}", class: "tw:min-w-0 tw:whitespace-pre-wrap #{MUTED_CLASSES}")
-          tag.span(safe_join([tag.span(code, class: "tw:shrink-0"), comment].compact, " "), class: "tw:flex tw:gap-2")
+        def line_tag(line, comment)
+          indent, key, value, comma = line.match(LINE).captures
+          value = tag.span(value, class: Pages::Bikebook::SchemaFields::Component::VALUE_CLASSES) unless %w[{ [ } ]].include?(value)
+          code = tag.span(safe_join([indent, key && tag.span(key, class: "tw:text-blue-700 tw:dark:text-blue-300"), value, comma].compact), class: "tw:shrink-0")
+          comment &&= tag.span("// #{comment}", class: "tw:min-w-0 tw:whitespace-pre-wrap tw:text-gray-400 tw:dark:text-gray-500")
+          tag.span(safe_join([code, comment].compact, " "), class: "tw:flex tw:gap-2")
         end
       end
     end
