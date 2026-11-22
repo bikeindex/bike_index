@@ -17,15 +17,20 @@ module BikebookCatalogHelpers
     end
   end
 
-  # The catalog as it is once it publishes again: a new vocabulary, and Segway's 2025 block with a new description
+  # The catalog as it is once it publishes again: a new vocabulary, Segway's 2025 block with a new description, and a
+  # schema viewer counting 12,345,678 models with a manufacturer
   def stub_bikebook_catalog_update
     url = Integrations::Bikebook::Catalog::URL
     block = JSON.parse(FIXTURES.join("models/segway/2025.json").read)
     block["models"]["m/segway/2025/gt3-pro"]["description"] = "Updated"
     WebMock.stub_request(:get, "#{url}models/segway/2025.v2.json").to_return(body: block.to_json)
     WebMock.stub_request(:get, "#{url}vocabulary.v2.json").to_return(body: FIXTURES.join("vocabulary.json").read)
+    viewer = JSON.parse(FIXTURES.join("schema_viewer.json").read)
+    viewer["documents"]["vehicle_model"]["fields"]["manufacturer"]["models_count"] = 12_345_678
+    WebMock.stub_request(:get, "#{url}schema_viewer.v2.json").to_return(body: viewer.to_json)
     manifest = JSON.parse(FIXTURES.join(Integrations::Bikebook::Catalog::MANIFEST).read)
-    manifest = manifest.merge("vocabulary" => "vocabulary.v2.json", "blocks" => manifest["blocks"].merge("segway/2025" => "models/segway/2025.v2.json"))
+    manifest = manifest.merge("vocabulary" => "vocabulary.v2.json", "schema_viewer" => "schema_viewer.v2.json",
+      "blocks" => manifest["blocks"].merge("segway/2025" => "models/segway/2025.v2.json"))
     WebMock.stub_request(:get, "#{url}#{Integrations::Bikebook::Catalog::MANIFEST}").to_return(body: manifest.to_json)
   end
 

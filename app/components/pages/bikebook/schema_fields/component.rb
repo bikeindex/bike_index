@@ -14,7 +14,6 @@ module Pages
         LINED_ENUM_LIMIT = 14
         PLACEHOLDERS = {"integer" => "number", "float" => "number"}.freeze
         VALUE_CLASSES = "tw:text-purple-700 tw:dark:text-purple-300"
-        REPRESENTATIVE_VEHICLES_URL = "#{Integrations::Bikebook::Catalog::GITHUB_REPO_URL}/blob/main/representative_vehicles.csv"
 
         def initialize(fields:, open:, by_count:, representative_ids:, cache_key:, path: nil, in_cache: false)
           @fields = fields
@@ -64,13 +63,14 @@ module Pages
         def example_item(id)
           representative = representative_badge if @representative_ids.include?(id)
           link = link_to(id, ReadableQuery.path(bikebook_path, "vehicle_models" => id), class: "twlink tw:font-mono")
-          file = link_to(translation(".file"), "#{Integrations::Bikebook::Catalog::GITHUB_REPO_URL}/blob/main/vehicle_models/#{id.delete_prefix("m/")}.json", class: "gray-link")
+          file = link_to(translation(".file"), "#{Integrations::Bikebook::Catalog::GITHUB_FILES_URL}/vehicle_models/#{id.delete_prefix("m/")}.json", class: "gray-link")
           tag.li(safe_join([link, file, representative].compact, " "))
         end
 
         def representative_badge
-          render(UI::Badge::Component.new(text: translation(".representative_initial"), title: translation(".representative_vehicle_lowercase"), size: :xs)) do |badge|
-            badge.with_tooltip_body { safe_join([translation(".representative_vehicle_lowercase"), link_to(translation(".view_list"), REPRESENTATIVE_VEHICLES_URL, class: "twlink")], " - ") }
+          label = translation(".representative_vehicle_lowercase")
+          render(UI::Badge::Component.new(text: translation(".representative_initial"), title: label, size: :xs)) do |badge|
+            badge.with_tooltip_body { safe_join([label, link_to(translation(".view_list"), "#{Integrations::Bikebook::Catalog::GITHUB_FILES_URL}/representative_vehicles.csv", class: "twlink")], " - ") }
           end
         end
 

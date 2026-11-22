@@ -73,7 +73,7 @@ module UI
         label = content.presence || @text
         label = safe_join([leading, label]) if leading
         badge = content_tag(:span, label, class: badge_class)
-        return badge unless custom_title? || tooltip_body?
+        return badge unless tooltip?
 
         render(UI::Tooltip::Component.new(text: @title)) do |tooltip|
           tooltip.with_body_content(tooltip_body.to_s) if tooltip_body?
@@ -100,8 +100,10 @@ module UI
         @title.present? && @title != @text
       end
 
+      def tooltip? = custom_title? || tooltip_body?
+
       def badge_class
-        self.class.badge_classes(color: @color, size: @size, solid: @solid, cursor: (custom_title? || tooltip_body?) ? "tw:cursor-help" : "tw:cursor-default")
+        self.class.badge_classes(color: @color, size: @size, solid: @solid, cursor: tooltip? ? "tw:cursor-help" : "tw:cursor-default")
       end
     end
   end

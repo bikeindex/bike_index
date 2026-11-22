@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe BikebookController, type: :request do
+  include ActiveSupport::Testing::TimeHelpers
+
   describe "show" do
     before { stub_bikebook_catalog }
 
@@ -382,28 +384,17 @@ RSpec.describe BikebookController, type: :request do
         ActionController::Base.cache_store = :null_store
       end
 
-      context "when the catalog publishes a new schema viewer" do
-        let(:url) { Integrations::Bikebook::Catalog::URL }
-        let(:viewer) { JSON.parse(BikebookCatalogHelpers::FIXTURES.join("schema_viewer.json").read) }
-        let(:republished) { viewer.deep_merge("documents" => {"vehicle_model" => {"fields" => {"manufacturer" => {"models_count" => 12_345_678}}}}) }
-        let(:manifest) { JSON.parse(BikebookCatalogHelpers::FIXTURES.join(Integrations::Bikebook::Catalog::MANIFEST).read) }
+      it "renders a newly published schema viewer's counts rather than the cached ones" do
+        # model and first_year fill as many models as manufacturer does
+        old_badge = "button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']"
+        get "/bikebook_schema"
+        old_badges = Capybara.string(response.body).all(old_badge).count
 
-        it "renders the new file's counts rather than the cached ones" do
-          # model and first_year fill as many models as manufacturer does
-          old_badge = "button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']"
-          get "/bikebook_schema"
-          old_badges = Capybara.string(response.body).all(old_badge).count
+        stub_bikebook_catalog_update
+        travel(5.minutes + 1.second) { get "/bikebook_schema" }
 
-          WebMock.stub_request(:get, "#{url}schema_viewer.v2.json").to_return(body: republished.to_json)
-          WebMock.stub_request(:get, "#{url}#{Integrations::Bikebook::Catalog::MANIFEST}")
-            .to_return(body: manifest.merge("schema_viewer" => "schema_viewer.v2.json").to_json)
-          # the manifest keeps 5 minutes
-          Rails.cache.clear
-          get "/bikebook_schema"
-
-          expect(Capybara.string(response.body)).to have_css("button[aria-label='12,345,678 models']")
-            .and have_css(old_badge, count: old_badges - 1)
-        end
+        expect(Capybara.string(response.body)).to have_css("button[aria-label='12,345,678 models']")
+          .and have_css(old_badge, count: old_badges - 1)
       end
 
       it "caches a field's fields inside its fragment, and on their own only where it renders afresh" do
