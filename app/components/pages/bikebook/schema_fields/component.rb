@@ -14,6 +14,7 @@ module Pages
         LINED_ENUM_LIMIT = 14
         PLACEHOLDERS = {"integer" => "number", "float" => "number"}.freeze
         VALUE_CLASSES = "tw:text-purple-700 tw:dark:text-purple-300"
+        REPRESENTATIVE_VEHICLES_URL = "#{Integrations::Bikebook::Catalog::GITHUB_REPO_URL}/blob/main/representative_vehicles.csv"
 
         def initialize(fields:, open:, by_count:, representative_ids:, cache_key:, path: nil, in_cache: false)
           @fields = fields
@@ -61,9 +62,16 @@ module Pages
         end
 
         def example_item(id)
-          representative = tag.span(translation(".representative"), class: "tw:text-gray-500") if @representative_ids.include?(id)
+          representative = representative_badge if @representative_ids.include?(id)
           link = link_to(id, ReadableQuery.path(bikebook_path, "vehicle_models" => id), class: "twlink tw:font-mono")
           tag.li(safe_join([link, representative].compact, " "))
+        end
+
+        def representative_badge
+          render(UI::Tooltip::Component.new(text: translation(".representative_vehicle"))) do |tooltip|
+            tooltip.with_body { safe_join([translation(".representative_vehicle"), link_to(translation(".view_list"), REPRESENTATIVE_VEHICLES_URL, class: "twlink")], " - ") }
+            tag.span(render(UI::Badge::Component.new(text: translation(".representative_initial"), size: :xs)), class: "tw:*:cursor-pointer")
+          end
         end
 
         # each value's place counting down from the most models, for CSS order to sort the lines by

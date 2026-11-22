@@ -10,5 +10,7 @@ en:
           less: less
           models: "%{number} models"
           more: "+%{count} more"
-          representative: "(representative)"
+          representative_initial: R
+          representative_vehicle: Representative vehicle
           schema_order: schema order
+          view_list: view list
