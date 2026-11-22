@@ -4,7 +4,7 @@ module Pages
   module Bikebook
     module SchemaViewer
       # The fields of each document the catalog publishes, with how many models hold each value.
-      # viewer: Integrations::Bikebook::Catalog.schema_viewer
+      # viewer: Integrations::Bikebook::Catalog.schema_viewer, nil while the catalog doesn't answer
       # open: the paths of the folded objects and enums rendered open
       # by_count: the paths of the open enums ordering their values by count
       class Component < ApplicationComponent

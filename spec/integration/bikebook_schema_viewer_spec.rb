@@ -3,6 +3,8 @@
 require "rails_helper"
 
 RSpec.describe "Bike Book schema viewer", :js, type: :system do
+  before { stub_bikebook_catalog }
+
   def toggle(path) = find("details[data-schema-path='#{path}'] > summary").click
 
   it "keeps what's opened and what's ordered by count in the URL, while it shows" do

@@ -339,6 +339,8 @@ RSpec.describe BikebookController, type: :request do
   end
 
   describe "schema_viewer" do
+    before { stub_bikebook_catalog }
+
     let(:fields) { Integrations::Bikebook::Catalog.schema_viewer.dig("documents", "vehicle_model", "fields") }
     let(:manufacturer_count) { fields.dig("manufacturer", "models_count") }
     let(:example_id) { fields.dig("manufacturer", "example_ids").first }
@@ -380,16 +382,11 @@ RSpec.describe BikebookController, type: :request do
         ActionController::Base.cache_store = :null_store
       end
 
-      context "when a new schema file is published" do
-        let(:published) { Pathname(Dir.mktmpdir).join("bikebook_schema_viewer.json") }
-        let(:viewer) { Integrations::Bikebook::Catalog.schema_viewer.except("digest") }
-        # the same published_at, so only its contents tell the two apart
+      context "when the catalog publishes a new schema viewer" do
+        let(:url) { Integrations::Bikebook::Catalog::URL }
+        let(:viewer) { JSON.parse(BikebookCatalogHelpers::FIXTURES.join("schema_viewer.json").read) }
         let(:republished) { viewer.deep_merge("documents" => {"vehicle_model" => {"fields" => {"manufacturer" => {"models_count" => 12_345_678}}}}) }
-
-        before do
-          published.write(viewer.to_json)
-          stub_const("Integrations::Bikebook::Catalog::SCHEMA_VIEWER", published)
-        end
+        let(:manifest) { JSON.parse(BikebookCatalogHelpers::FIXTURES.join(Integrations::Bikebook::Catalog::MANIFEST).read) }
 
         it "renders the new file's counts rather than the cached ones" do
           # model and first_year fill as many models as manufacturer does
@@ -397,7 +394,11 @@ RSpec.describe BikebookController, type: :request do
           get "/bikebook_schema"
           old_badges = Capybara.string(response.body).all(old_badge).count
 
-          published.write(republished.to_json)
+          WebMock.stub_request(:get, "#{url}schema_viewer.v2.json").to_return(body: republished.to_json)
+          WebMock.stub_request(:get, "#{url}#{Integrations::Bikebook::Catalog::MANIFEST}")
+            .to_return(body: manifest.merge("schema_viewer" => "schema_viewer.v2.json").to_json)
+          # the manifest keeps 5 minutes
+          Rails.cache.clear
           get "/bikebook_schema"
 
           expect(Capybara.string(response.body)).to have_css("button[aria-label='12,345,678 models']")
@@ -428,6 +429,18 @@ RSpec.describe BikebookController, type: :request do
           .and have_css("input[aria-label='type by count'][checked]")
           .and have_css("details:not([open])[data-schema-path='type_detail']")
           .and have_css("button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']")
+      end
+    end
+
+    context "while the catalog doesn't answer" do
+      before { WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}#{Integrations::Bikebook::Catalog::MANIFEST}").to_return(status: 503) }
+
+      it "says so" do
+        get "/bikebook_schema", params: {document: "component"}
+
+        expect(response).to have_http_status(:service_unavailable)
+        expect(Capybara.string(response.body)).to have_content("Bike Book's catalog isn't answering")
+          .and have_no_css("[aria-current='page']")
       end
     end
 

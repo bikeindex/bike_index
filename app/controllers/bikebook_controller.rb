@@ -21,10 +21,10 @@ class BikebookController < ApplicationController
 
   def schema_viewer
     viewer = Integrations::Bikebook::Catalog.schema_viewer
-    document = viewer["documents"].key?(params[:document]) ? params[:document] : "vehicle_model"
+    document = viewer&.dig("documents", params[:document].to_s) ? params[:document] : "vehicle_model"
     @page_title = "Bike Book schemas | Bike Index"
     render Pages::Bikebook::SchemaViewer::Component.new(viewer:, document:, open: params[:open].to_s.split(","),
-      by_count: params[:by_count].to_s.split(","))
+      by_count: params[:by_count].to_s.split(",")), status: viewer ? :ok : :service_unavailable
   end
 
   # For uptime monitoring: the page breaks whenever the catalog doesn't answer in the format it reads. Green or red, as /up is
