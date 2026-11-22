@@ -3,7 +3,54 @@
 require "rails_helper"
 
 RSpec.describe EbikeRuleServices::StateLaws do
+  include ActiveSupport::Testing::TimeHelpers
+
   before { stub_bikebook_catalog }
+
+  describe "version" do
+    let(:vocabulary_url) { "#{Integrations::Bikebook::Catalog::URL}vocabulary.json" }
+
+    it "is the vocabulary file once the laws are in, without reading them again" do
+      expect(described_class.version).to eq "vocabulary.json"
+      Rails.cache.delete(["bikebook_catalog/state_laws_with_rule_categories", 3, "vocabulary.json"])
+      Integrations::Bikebook::Catalog::Reads.reset
+      WebMock.stub_request(:get, vocabulary_url).to_return(status: 503)
+
+      expect(described_class.version).to eq "vocabulary.json"
+    end
+
+    it "moves to the new vocabulary within 5 minutes of a catalog update" do
+      expect(described_class.version).to eq "vocabulary.json"
+      stub_bikebook_catalog_update
+
+      travel(5.minutes + 1.second) do
+        Integrations::Bikebook::Catalog::Reads.reset
+        expect(described_class.version).to eq "vocabulary.v2.json"
+      end
+    end
+
+    it "is nil once a read of the laws fails, for the rest of the request and after" do
+      expect(described_class.version).to eq "vocabulary.json"
+      Rails.cache.delete(["bikebook_catalog/state_laws_with_rule_categories", 3, "vocabulary.json"])
+      Rails.cache.delete(["bikebook_catalog/file", 2, "vocabulary.json"])
+      WebMock.stub_request(:get, vocabulary_url).to_return(status: 503)
+      Integrations::Bikebook::Catalog::Reads.reset
+      expect(described_class.version).to eq "vocabulary.json"
+
+      expect(described_class.find("CO")).to be_nil
+      expect(described_class.version).to be_nil
+      Integrations::Bikebook::Catalog::Reads.reset
+      expect(described_class.version).to be_nil
+    end
+
+    context "while the laws can't be read" do
+      before { WebMock.stub_request(:get, vocabulary_url).to_return(status: 503) }
+
+      it "is nil" do
+        expect(described_class.version).to be_nil
+      end
+    end
+  end
 
   describe "find" do
     it "reads a state's e-bike law from the catalog" do
@@ -14,6 +61,16 @@ RSpec.describe EbikeRuleServices::StateLaws do
           citation: "Colorado Revised Statutes §42-4-1412", categories: ["rider_rule", "top_rule_1"], sources: ["https://olls.info/crs/crs2026-title-42.pdf#page=981"],
           starts_on: nil, ends_on: nil})
       expect(described_class.find("CO")[:sources]).to include("https://leg.colorado.gov/bills/hb25-1197")
+    end
+
+    it "reads the parsed laws once a request" do
+      expect(described_class.find("CO")).to include(watt_cap: 750)
+      Rails.cache.clear
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(status: 503)
+
+      expect(described_class.find("CO")).to include(watt_cap: 750)
+      Integrations::Bikebook::Catalog::Reads.reset
+      expect(described_class.find("CO")).to be_nil
     end
 
     it "has no classes for a law that names none of the three" do

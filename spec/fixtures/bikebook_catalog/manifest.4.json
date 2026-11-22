@@ -4,6 +4,7 @@
   "schema_version": "0.25.3",
   "index": "index.json",
   "vocabulary": "vocabulary.json",
+  "schema_viewer": "schema_viewer.json",
   "blocks": {
     "aventon/2022": "models/aventon/2022.json",
     "aventon/2024": "models/aventon/2024.json",
