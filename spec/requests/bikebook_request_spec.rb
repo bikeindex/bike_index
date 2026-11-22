@@ -266,12 +266,8 @@ RSpec.describe BikebookController, type: :request do
     end
   end
 
-  describe "up", vcr: {cassette_name: "bikebook-up"} do
-    # WebMock stubs outlive their examples here, and answer ahead of the cassette
-    before do
-      WebMock.reset!
-      Rails.cache.clear
-    end
+  describe "up" do
+    before { stub_bikebook_catalog }
 
     it "is ok, in the format the browser's reader reads" do
       get "/up/bikebook"
@@ -291,9 +287,9 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
-    context "with no catalog published", vcr: {cassette_name: "bikebook-up_not_found"} do
+    context "with no catalog published" do
       it "is unavailable" do
-        stub_const("Integrations::Bikebook::Catalog::URL", "https://bikebook-catalog.bikeindex.org/not_a_catalog/")
+        stub_bikebook_catalog(status: 404)
         get "/up/bikebook"
         expect(response).to have_http_status(:service_unavailable)
         expect(response.body).to include(%(<body style="background-color: red">))
@@ -448,10 +444,10 @@ RSpec.describe BikebookController, type: :request do
     include ActiveSupport::Testing::TimeHelpers
 
     let(:url) { Integrations::Bikebook::RepositoryRecord::URL }
-    # the test cache is a file store, and WebMock's request counts outlive examples
+    # WebMock's request counts outlive examples
     before do
-      Rails.cache.clear
       WebMock.reset!
+      stub_bikebook_catalog
     end
 
     def lines = Nokogiri::HTML5(response.body).css("pre > span").map(&:text)

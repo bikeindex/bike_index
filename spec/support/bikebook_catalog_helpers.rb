@@ -67,8 +67,9 @@ end
 RSpec.configure { it.include BikebookCatalogHelpers }
 
 # Unless a spec serves the fixture catalog, the catalog doesn't answer. VCR passes it by, so a cassette never records
-# it, and the stub is global and after the local ones, so it outlasts WebMock.reset! and stub_bikebook_catalog outranks it
-VCR.configure { |config| config.ignore_request { it.uri.start_with?(Integrations::Bikebook::Catalog::URL) } }
+# it, and the stub is global and after the local ones, so it outlasts WebMock.reset! and stub_bikebook_catalog outranks it.
+# By host, as WebMock's URI carries the port
+VCR.configure { |config| config.ignore_request { URI(it.uri).host == URI(Integrations::Bikebook::Catalog::URL).host } }
 WebMock.globally_stub_request(:after_local_stubs) do |request|
-  {status: 404} if request.uri.to_s.start_with?(Integrations::Bikebook::Catalog::URL)
+  {status: 404} if request.uri.host == URI(Integrations::Bikebook::Catalog::URL).host
 end
