@@ -454,8 +454,8 @@ RSpec.describe BikebookController, type: :request do
 
     it "pretty-prints a record's file in its own key order, commented with the schema's descriptions, and keeps it" do
       component = WebMock.stub_request(:get, "#{url}components/aventon/2024/a100.json").to_return(body: <<~JSON)
-        {"schema_version": "2.0.0", "id": "c/aventon/2024/a100", "type": "ebike-motor", "first_year": 2024,
-         "motor": {"spindle": "ISIS", "kind": "mid-drive"}, "aliases": []}
+        {"schema_version": "2.0.0", "id": "c/aventon/2024/a100", "type": "ebike-motor", "manufacturer": "Aventon", "model": "A100",
+         "first_year": 2024, "motor": {"spindle": "ISIS", "kind": "mid-drive"}, "aliases": []}
       JSON
       model = WebMock.stub_request(:get, "#{url}vehicle_models/segway/2025/gt3-pro.json").to_return(body: <<~JSON)
         {"id": "m/segway/2025/gt3-pro", "markets": ["US"], "years": {"2025": {"colorways": [{"name": "Grey"}], "url_live": true}}}
@@ -469,6 +469,8 @@ RSpec.describe BikebookController, type: :request do
         '  "schema_version": "2.0.0",',
         '  "id": "c/aventon/2024/a100",',
         '  "type": "ebike-motor", // E-vehicle Motor',
+        '  "manufacturer": "Aventon",',
+        '  "model": "A100",',
         '  "first_year": 2024, // year it launched',
         '  "motor": { // E-vehicle Motor only',
         '    "spindle": "ISIS", // a mid drive\'s crank interface, e.g. ISIS',
@@ -477,8 +479,16 @@ RSpec.describe BikebookController, type: :request do
         '  "aliases": [] // other names it\'s specced under',
         "}"
       ])
-      expect(Capybara.string(response.body)).to have_link("View this file on GitHub",
-        href: "https://github.com/bikeindex/bikebook/blob/main/components/aventon/2024/a100.json")
+      page = Capybara.string(response.body)
+      expect(page).to have_link("View this file on GitHub", href: "https://github.com/bikeindex/bikebook/blob/main/components/aventon/2024/a100.json")
+        .and have_css("[aria-current='page']", text: "Component")
+        .and have_text("The shape of a component file")
+        .and have_no_css("[data-schema-path]")
+      # the search picks it, named as /bikebook names it, once the catalog loads
+      lookup = page.find("[data-controller='bikebook--schema-lookup']")
+      expect(lookup["data-bikebook--schema-lookup-display-value"]).to eq "Aventon A100"
+      expect(lookup["data-bikebook--schema-lookup-cleared-url-value"]).to eq "/bikebook_schemas?document=component"
+      expect(lookup).to have_field("vehicle_models", disabled: true, placeholder: "Loading the catalog…")
       WebMock::API.assert_requested(component, times: 1)
 
       get "/bikebook_schemas/m/segway/2025/gt3-pro"

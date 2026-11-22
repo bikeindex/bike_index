@@ -4,25 +4,25 @@ module Pages
   module Bikebook
     module Schema
       # A record's file in the bikebook repository, pretty-printed in its own key order, each line commented with the
-      # schema viewer's description of its field and of its value, uncommented while the catalog doesn't answer.
+      # schema viewer's description of its field and of its value.
       # json: nil while the repository doesn't answer
+      # fields: its document's in the schema viewer, nil while the catalog doesn't answer, which leaves it uncommented
       class Component < ApplicationComponent
         LINE = /\A( *)("(?:[^"\\]|\\.)*": )?(.*?)(,?)\z/
 
-        def initialize(id:, json:)
+        def initialize(id:, json:, fields:)
           @id = id
           @json = json
+          @fields = fields
         end
 
         private
 
-        def github_url = "#{Integrations::Bikebook::Catalog::GITHUB_REPO_URL}/blob/main/#{Integrations::Bikebook::RepositoryRecord.path(@id)}"
-
-        def fields = Integrations::Bikebook::Catalog.schema_viewer&.dig("documents", Integrations::Bikebook::RepositoryRecord.document(@id), "fields")
+        def github_url = "#{Integrations::Bikebook::Catalog::GITHUB_FILES_URL}/#{Integrations::Bikebook::RepositoryRecord.path(@id)}"
 
         def code
           record = JSON.parse(@json)
-          lines = JSON.pretty_generate(record).lines(chomp: true).zip(comments(record, {"fields" => fields}))
+          lines = JSON.pretty_generate(record).lines(chomp: true).zip(comments(record, {"fields" => @fields}))
           tag.pre(safe_join(lines.map { line_tag(*it) }), class: "tw:overflow-x-auto tw:font-mono tw:text-sm tw:leading-6")
         end
 

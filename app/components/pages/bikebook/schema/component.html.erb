@@ -1,9 +1,9 @@
-<div class="tw:mx-auto tw:max-w-6xl tw:px-5 tw:py-10 tw:twtext-color">
-  <%= render(UI::Header::Component.new(text: @id, subtitle: link_to(translation(".view_on_github"), github_url, class: "twlink tw:underline"))) %>
+<% if @json %>
+  <p class="tw:mb-4">
+    <%= link_to(translation(".view_on_github"), github_url, class: "twlink tw:underline") %>
+  </p>
 
-  <% if @json %>
-    <%= code %>
-  <% else %>
-    <p><%= translation(".unreachable") %></p>
-  <% end %>
-</div>
+  <%= code %>
+<% else %>
+  <p><%= translation(".unreachable") %></p>
+<% end %>
