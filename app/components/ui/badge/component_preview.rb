@@ -17,8 +17,8 @@ module UI
       end
 
       def gray_xs_with_tooltip_body
-        render(UI::Badge::Component.new(text: "R", title: "Representative vehicle", size: :xs)) do |badge|
-          badge.with_tooltip_body { 'Representative vehicle - <a class="twlink" href="https://github.com/bikeindex/bikebook/blob/main/representative_vehicles.csv">view list</a>'.html_safe }
+        render(UI::Badge::Component.new(text: "R", title: "representative vehicle", size: :xs)) do |badge|
+          badge.with_tooltip_body { 'representative vehicle - <a class="twlink" href="https://github.com/bikeindex/bikebook/blob/main/representative_vehicles.csv">view list</a>'.html_safe }
         end
       end
 

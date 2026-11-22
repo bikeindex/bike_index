@@ -68,8 +68,8 @@ module Pages
         end
 
         def representative_badge
-          render(UI::Badge::Component.new(text: translation(".representative_initial"), title: translation(".representative_vehicle"), size: :xs)) do |badge|
-            badge.with_tooltip_body { safe_join([translation(".representative_vehicle"), link_to(translation(".view_list"), REPRESENTATIVE_VEHICLES_URL, class: "twlink")], " - ") }
+          render(UI::Badge::Component.new(text: translation(".representative_initial"), title: translation(".representative_vehicle_lowercase"), size: :xs)) do |badge|
+            badge.with_tooltip_body { safe_join([translation(".representative_vehicle_lowercase"), link_to(translation(".view_list"), REPRESENTATIVE_VEHICLES_URL, class: "twlink")], " - ") }
           end
         end
 

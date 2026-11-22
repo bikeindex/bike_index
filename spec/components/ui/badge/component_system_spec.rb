@@ -25,7 +25,7 @@ RSpec.describe UI::Badge::Component, :js, type: :system do
 
     tooltip = find("[role='tooltip']", visible: :all)
     expect(tooltip).not_to be_visible
-    trigger = find("button[aria-label='Representative vehicle']", text: "R")
+    trigger = find("button[aria-label='representative vehicle']", text: "R")
     expect(trigger.find("span.tw\\:cursor-help")).to be_present
 
     trigger.click
