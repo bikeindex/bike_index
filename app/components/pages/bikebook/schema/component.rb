@@ -4,7 +4,7 @@ module Pages
   module Bikebook
     module Schema
       # A record's file in the bikebook repository, pretty-printed in its own key order, each line commented with the
-      # schema viewer's description of its field and of its value.
+      # schema viewer's description of its field and of its value, uncommented while the catalog doesn't answer.
       # json: nil while the repository doesn't answer
       class Component < ApplicationComponent
         LINE = /\A( *)("(?:[^"\\]|\\.)*": )?(.*?)(,?)\z/
@@ -18,7 +18,7 @@ module Pages
 
         def github_url = "#{Integrations::Bikebook::Catalog::GITHUB_REPO_URL}/blob/main/#{Integrations::Bikebook::RepositoryRecord.path(@id)}"
 
-        def fields = Integrations::Bikebook::Catalog.schema_viewer.dig("documents", Integrations::Bikebook::RepositoryRecord.document(@id), "fields")
+        def fields = Integrations::Bikebook::Catalog.schema_viewer&.dig("documents", Integrations::Bikebook::RepositoryRecord.document(@id), "fields")
 
         def code
           record = JSON.parse(@json)

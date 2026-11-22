@@ -17,8 +17,10 @@ module Integrations
         year = options[:year].to_i
         id = BikebookModel.catalog_id_for(manufacturer: options[:manufacturer], name: options[:frame_model], year:,
           market: options[:market])
-        record = id && Integrations::Bikebook::Catalog.block_models(id)&.dig(id)
+        record = id && Integrations::Bikebook::Catalog.model(id)
         record && {bike: bike_attributes(record, year), components: component_attributes(record)}.with_indifferent_access
+      rescue Integrations::Bikebook::Catalog::Unreachable
+        nil
       end
 
       #
@@ -39,7 +41,7 @@ module Integrations
 
       # A component's type by the name its Ctype has
       def component_attributes(record)
-        vocabulary = Integrations::Bikebook::Catalog.manifest&.dig("vocabulary")
+        vocabulary = Integrations::Bikebook::Catalog.vocabulary
         names = vocabulary && Integrations::Bikebook::Catalog.file(vocabulary)&.dig("names", "components.type")
           &.transform_keys { Integrations::Bikebook::Catalog.current_slug(it) }
         record["components"].to_a.map do |component|
