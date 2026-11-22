@@ -27,7 +27,8 @@ RSpec.describe Atoms::Admin::Badges::User::Component, type: :component do
       expect(user.donor?).to be_truthy
       result = render_component(user:)
       expect(result).to have_text("D")
-      expect(result).to have_css("[role='tooltip']", text: "Donor", visible: :all)
+      expect(result).to have_css("[role='tooltip']", text: "Donor - payments", visible: :all)
+        .and have_link("payments", href: "/admin/payments?user_id=#{user.id}", visible: :all)
 
       result_full = render_component(user:, full_text: true)
       expect(result_full).to have_text(/D\s*onor/)
@@ -42,6 +43,7 @@ RSpec.describe Atoms::Admin::Badges::User::Component, type: :component do
         result = render_component(user:)
         expect(result).to have_css("[role='tooltip']", text: "Donor", visible: :all)
         expect(result).to have_css("[role='tooltip']", text: "Promoted alert purchaser", visible: :all)
+          .and have_link("alerts", href: "/admin/theft_alerts?user_id=#{user.id}", visible: :all)
 
         # If superuser, don't show other stuff
         FactoryBot.create(:superuser_ability, user:)
@@ -63,13 +65,15 @@ RSpec.describe Atoms::Admin::Badges::User::Component, type: :component do
       expect(result).to have_css("[role='tooltip']", text: "Member", visible: :all)
 
       component_text = whitespace_normalized_body_text(result.to_html)
-      expect(component_text).to eq("M Member")
+      expect(component_text).to eq("M Member - memberships")
+      expect(result).to have_link("memberships", href: "/admin/memberships?user_id=#{user.id}", visible: :all)
     end
 
     it "renders full text" do
       result = render_component(user:, full_text: true)
       component_text = whitespace_normalized_body_text(result.to_html)
-      expect(component_text).to eq("M Member")
+      expect(component_text).to eq("M Member - memberships")
+      expect(result).to have_link("memberships", href: "/admin/memberships?user_id=#{user.id}")
     end
 
     context "membership ended" do
@@ -117,11 +121,13 @@ RSpec.describe Atoms::Admin::Badges::User::Component, type: :component do
         expect(result).to have_css("[role='tooltip']", text: "Paid organization member - Law Enforcement", visible: :all)
 
         component_text = whitespace_normalized_body_text(result.to_html)
-        expect(component_text).to eq("$O-P Paid organization member - Law Enforcement")
+        expect(component_text).to eq("$O-P Paid organization member - Law Enforcement - #{organization.name}")
+        expect(result).to have_link(organization.name, href: "/admin/organizations/#{organization.to_param}", visible: :all)
 
         result_full = render_component(user:, full_text: true)
         component_text = whitespace_normalized_body_text(result_full.to_html)
-        expect(component_text).to eq("$O-P Paid organization member - Law Enforcement")
+        expect(component_text).to eq("$O-P Paid organization member - Law Enforcement - #{organization.name}")
+        expect(result_full).to have_link(organization.name, href: "/admin/organizations/#{organization.to_param}")
       end
     end
   end

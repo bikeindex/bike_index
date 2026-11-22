@@ -87,17 +87,26 @@ module Atoms
             "tw:inline-flex tw:gap-1 #{"tw:gap-x-3" if @full_text}"
           end
 
-          def badge_color(variant)
-            {
-              donor: :success,
-              member: :success,
-              organization_role: :notice,
-              superuser: :purple,
-              recovery: :warning,
-              theft_alert: :cyan,
-              banned: :error,
-              email_banned: :error
-            }[variant]
+          # link: what the label links to, beside it - in the tooltip, or after the label in full text
+          def badges
+            [
+              (badge("D", "Donor", :success, link: ["payments", admin_payments_path(user_id: @user.id)]) if @tags.include?(:donor)),
+              (badge("M", "Member", :success, link: ["memberships", admin_memberships_path(user_id: @user.id)]) if @tags.include?(:member)),
+              (badge(org_icon_text, org_full_text, :notice, link: [organization.name, admin_organization_path(organization)]) if @tags.include?(:organization_role)),
+              (badge("R", "Recovered bike", :warning) if @tags.include?(:recovery)),
+              (badge("S", "Superuser", :purple) if @tags.include?(:superuser)),
+              (badge("P", "Promoted alert purchaser", :cyan, link: ["alerts", admin_theft_alerts_path(user_id: @user.id)]) if @tags.include?(:theft_alert)),
+              (badge("B", banned_text, :error) if banned?),
+              (badge("EB", "Email Banned: #{email_banned_text}", :error) if email_banned?)
+            ].compact
+          end
+
+          def badge(text, label, color, link: nil) = {text:, label:, color:, link:}
+
+          def description(badge)
+            return badge[:label] unless badge[:link]
+
+            safe_join([badge[:label], link_to(*badge[:link], class: "twlink")], " - ")
           end
         end
       end
