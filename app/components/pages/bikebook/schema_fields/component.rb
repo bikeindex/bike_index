@@ -55,15 +55,15 @@ module Pages
         def count_badge(counted)
           return unless counted["models_count"]
           render(UI::Tooltip::Component.new(text: translation(".models", number: number_with_delimiter(counted["models_count"])))) do |tooltip|
-            tooltip.with_body { tag.ul(safe_join(counted["example_ids"].map { example_item(it) }), class: "tw:space-y-1 tw:p-1") }
+            tooltip.with_body { tag.ul(safe_join(counted["example_ids"].map { example_item(it) }), class: "tw:list-disc tw:space-y-1 tw:py-1 tw:pr-1 tw:pl-5") }
             tag.span(render(UI::Badge::Component.new(text: number_display(counted["models_count"]), size: :xs)), class: "tw:*:cursor-pointer")
           end
         end
 
         def example_item(id)
-          representative = tag.span(translation(".representative"), class: "tw:shrink-0 tw:text-gray-500") if @representative_ids.include?(id)
+          representative = tag.span(translation(".representative"), class: "tw:text-gray-500") if @representative_ids.include?(id)
           link = link_to(id, ReadableQuery.path(bikebook_path, "vehicle_models" => id), class: "twlink tw:font-mono")
-          tag.li(safe_join([link, representative].compact, " "), class: "tw:flex tw:items-center tw:gap-1")
+          tag.li(safe_join([link, representative].compact, " "))
         end
 
         # each value's place counting down from the most models, for CSS order to sort the lines by
