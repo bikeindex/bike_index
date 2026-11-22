@@ -70,7 +70,7 @@ module Atoms
           end
 
           def wrapper_class
-            "tw:inline-flex tw:gap-1 #{"tw:gap-x-3" if @full_text}"
+            "tw:inline-flex tw:gap-1 #{"tw:flex-wrap tw:gap-x-3" if @full_text}"
           end
 
           def badges
