@@ -54,16 +54,24 @@ module Pages
         # counted: a value, or a string or number field, counting the models filling it
         def count_badge(counted)
           return unless counted["models_count"]
-          render(UI::Tooltip::Component.new(text: translation(".models", number: number_with_delimiter(counted["models_count"])))) do |tooltip|
-            tooltip.with_body { tag.ul(safe_join(counted["example_ids"].map { example_item(it) }), class: "tw:space-y-1 tw:p-1") }
-            tag.span(render(UI::Badge::Component.new(text: number_display(counted["models_count"]), size: :xs)), class: "tw:*:cursor-pointer")
+          render(UI::Badge::Component.new(text: number_display(counted["models_count"]), size: :xs,
+            title: translation(".models", number: number_with_delimiter(counted["models_count"])))) do |badge|
+            badge.with_tooltip_body { tag.ul(safe_join(counted["example_ids"].map { example_item(it) }), class: "tw:list-disc tw:space-y-1 tw:py-1 tw:pr-1 tw:pl-5") }
           end
         end
 
         def example_item(id)
-          representative = tag.span(translation(".representative"), class: "tw:shrink-0 tw:text-gray-500") if @representative_ids.include?(id)
+          representative = representative_badge if @representative_ids.include?(id)
           link = link_to(id, ReadableQuery.path(bikebook_path, "vehicle_models" => id), class: "twlink tw:font-mono")
-          tag.li(safe_join([link, representative].compact, " "), class: "tw:flex tw:items-center tw:gap-1")
+          file = link_to(translation(".file"), "#{Integrations::Bikebook::Catalog::GITHUB_FILES_URL}/vehicle_models/#{id.delete_prefix("m/")}.json", class: "gray-link")
+          tag.li(safe_join([link, file, representative].compact, " "))
+        end
+
+        def representative_badge
+          label = translation(".representative_vehicle_lowercase")
+          render(UI::Badge::Component.new(text: translation(".representative_initial"), title: label, size: :xs)) do |badge|
+            badge.with_tooltip_body { safe_join([label, link_to(translation(".view_list"), "#{Integrations::Bikebook::Catalog::GITHUB_FILES_URL}/representative_vehicles.csv", class: "twlink")], " - ") }
+          end
         end
 
         # each value's place counting down from the most models, for CSS order to sort the lines by

@@ -18,11 +18,10 @@ module Atoms
           def initialize(user:, full_text: false)
             @user = user
             @full_text = full_text
-            @tags = compute_tags
           end
 
           def render?
-            @tags.any? || banned? || email_banned?
+            badges.any?
           end
 
           private
@@ -50,19 +49,6 @@ module Atoms
             @email_bans.map { EmailBan.reason_humanized(it.reason) }.join(", ")
           end
 
-          def compute_tags
-            return [] if @user&.id.blank?
-            return [:superuser] if @user.superuser?
-
-            result = []
-            result << :donor if @user.donor?
-            result << :member if @user.membership_active.present?
-            result << :recovery if @user.recovered_records.limit(1).any?
-            result << :theft_alert if @user.theft_alert_purchaser?
-            result << :organization_role if organization.present?
-            result
-          end
-
           def organization
             @organization ||= @user&.organization_prioritized
           end
@@ -84,20 +70,36 @@ module Atoms
           end
 
           def wrapper_class
-            "tw:inline-flex tw:gap-1 #{"tw:gap-x-3" if @full_text}"
+            "tw:inline-flex tw:gap-1 #{"tw:flex-wrap tw:gap-x-3" if @full_text}"
           end
 
-          def badge_color(variant)
-            {
-              donor: :success,
-              member: :success,
-              organization_role: :notice,
-              superuser: :purple,
-              recovery: :warning,
-              theft_alert: :cyan,
-              banned: :error,
-              email_banned: :error
-            }[variant]
+          def badges
+            @badges ||= [
+              *user_badges,
+              (badge("B", banned_text, :error) if banned?),
+              (badge("EB", "Email Banned: #{email_banned_text}", :error) if email_banned?)
+            ].compact
+          end
+
+          def user_badges
+            return [] if @user&.id.blank?
+            return [badge("S", "Superuser", :purple)] if @user.superuser?
+
+            [
+              (badge("D", "Donor", :success, link: ["payments", admin_payments_path(user_id: @user.id)]) if @user.donor?),
+              (badge("M", "Member", :success, link: ["memberships", admin_memberships_path(user_id: @user.id)]) if @user.membership_active.present?),
+              (badge(org_icon_text, org_full_text, :notice, link: [organization.name, admin_organization_path(organization)]) if organization.present?),
+              (badge("R", "Recovered bike", :warning) if @user.recovered_records.limit(1).any?),
+              (badge("P", "Promoted alert purchaser", :cyan, link: ["alerts", admin_theft_alerts_path(user_id: @user.id)]) if @user.theft_alert_purchaser?)
+            ]
+          end
+
+          def badge(text, label, color, link: nil) = {text:, label:, color:, link:}
+
+          def description(badge)
+            return badge[:label] unless badge[:link]
+
+            safe_join([badge[:label], link_to(*badge[:link], class: "twlink")], " - ")
           end
         end
       end

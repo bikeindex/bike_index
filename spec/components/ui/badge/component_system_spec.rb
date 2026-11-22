@@ -20,6 +20,20 @@ RSpec.describe UI::Badge::Component, :js, type: :system do
     expect(tooltip).to be_visible
   end
 
+  it "shows a tooltip body in place of the title, which names the trigger" do
+    visit "/rails/view_components/ui/badge/component/gray_xs_with_tooltip_body"
+
+    tooltip = find("[role='tooltip']", visible: :all)
+    expect(tooltip).not_to be_visible
+    trigger = find("button[aria-label='representative vehicle']", text: "R")
+    expect(trigger.find("span.tw\\:cursor-help")).to be_present
+
+    trigger.click
+
+    expect(tooltip).to have_link("view list", href: "https://github.com/bikeindex/bikebook/blob/main/representative_vehicles.csv")
+    expect_axe_clean
+  end
+
   it "renders badges without a tooltip when no custom title is provided" do
     visit "/rails/view_components/ui/badge/component/success"
 

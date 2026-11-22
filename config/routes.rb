@@ -74,9 +74,9 @@ Rails.application.routes.draw do
   end
 
   get "bikebook", to: "bikebook#show"
+  get "bikebook_schemas", to: "bikebook#schema_viewer"
   # before the glob below, which would take it for a model
   get "bikebook/license", to: "bikebook#license", as: :bikebook_license
-  get "bikebook/schema_viewer", to: "bikebook#schema_viewer", as: :bikebook_schema_viewer
   get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
   get ":spelling(/*rest)", to: redirect { |params, request| request.fullpath.sub(params[:spelling], "bikebook") },
     constraints: {spelling: /bike[-_]?book/i}, format: false

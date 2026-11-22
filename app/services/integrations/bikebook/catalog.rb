@@ -14,8 +14,8 @@ module Integrations
       MANIFEST = "manifest.#{FORMAT}.json"
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/#{MANIFEST}" : "#{URL}#{MANIFEST}"
       GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
+      GITHUB_FILES_URL = "#{GITHUB_REPO_URL}/blob/main"
       MODEL_ID = %r{\Am/([a-z0-9_-]+/\d{4})/[a-z0-9_-]+\z}
-      SCHEMA_VIEWER = Rails.root.join("config/bikebook_schema_viewer.json")
       # a model's, a component's or a classification's id, or a block's key: its maker and year
       CATALOG_ID = %r{\A(?:(?:m|c|evc)/[a-z0-9_/-]+|[a-z0-9_-]+/\d{4})\z}
       # The ids in a link's params: vehicle_models' among what's picked for each, and the electric filter's US classes
@@ -91,11 +91,9 @@ module Integrations
       # so it keeps while it's published
       def file(path) = cached(["bikebook_catalog/file", 2, path], expires_in: 1.week) { read(path) }
 
-      # Each schema document's fields, with the count of models holding each value and a few of them, and the digest
-      # of its contents that its rendering is cached under
-      # TODO: read the catalog's published file, file(manifest["schema_viewer"]), once it publishes one, whose name
-      # carries its digest
-      def schema_viewer = SCHEMA_VIEWER.read.then { {**JSON.parse(it), "digest" => Digest::SHA256.hexdigest(it)} }
+      # Each schema document's fields, with the count of models holding each value and a few of them, and the file's
+      # name, which carries a digest of its contents. nil while the catalog doesn't answer or names none
+      def schema_viewer = manifest&.dig("schema_viewer")&.then { |name| file(name)&.merge("file" => name) }
 
       # Schema 2.0.0's ids are dashed. An older catalog's are underscored and never dashed, so they read as 2.0.0's
       # TODO: once the published catalog is at 2.0.0, remove this
