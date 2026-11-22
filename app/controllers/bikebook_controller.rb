@@ -27,6 +27,13 @@ class BikebookController < ApplicationController
       by_count: params[:by_count].to_s.split(","))
   end
 
+  def schema
+    json = Integrations::Bikebook::RepositoryRecord.json(params[:id])
+    json ? render(json:) : render(json: {error: "Not found"}, status: :not_found)
+  rescue Integrations::Bikebook::RepositoryRecord::Unreachable
+    render json: {error: "The Bike Book repository isn't answering"}, status: :service_unavailable
+  end
+
   # For uptime monitoring: the page breaks whenever the catalog doesn't answer in the format it reads. Green or red, as /up is
   def up
     up = Integrations::Bikebook::Catalog.readable?
