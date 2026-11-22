@@ -17,7 +17,7 @@ module Pages
 
         private
 
-        def tabs = @viewer["documents"].keys.map { ComponentStructs::Shapes.tab(it.humanize, bikebook_schema_path(document: it), active: it == @document) }
+        def tabs = @viewer["documents"].keys.map { ComponentStructs::Shapes.tab(it.humanize, bikebook_schemas_path(document: it), active: it == @document) }
 
         def url = @viewer.dig("documents", @document, "url")
       end

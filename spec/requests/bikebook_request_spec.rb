@@ -348,7 +348,7 @@ RSpec.describe BikebookController, type: :request do
     let(:example_id) { fields.dig("manufacturer", "example_ids").first }
 
     it "renders the vehicle model's fields with how many models fill each, opening what the URL names and the folds around it" do
-      get "/bikebook_schema", params: {open: "type,frame.mounts", by_count: "type"}
+      get "/bikebook_schemas", params: {open: "type,frame.mounts", by_count: "type"}
 
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
@@ -366,7 +366,7 @@ RSpec.describe BikebookController, type: :request do
 
     context "with another document" do
       it "renders its fields" do
-        get "/bikebook_schema", params: {document: "e_vehicle_classification"}
+        get "/bikebook_schemas", params: {document: "e_vehicle_classification"}
 
         expect(response).to have_http_status(:ok)
         expect(Capybara.string(response.body)).to have_css("[aria-current='page']", text: "E vehicle classification")
@@ -387,11 +387,11 @@ RSpec.describe BikebookController, type: :request do
       it "renders a newly published schema viewer's counts rather than the cached ones" do
         # model and first_year fill as many models as manufacturer does
         old_badge = "button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']"
-        get "/bikebook_schema"
+        get "/bikebook_schemas"
         old_badges = Capybara.string(response.body).all(old_badge).count
 
         stub_bikebook_catalog_update
-        travel(5.minutes + 1.second) { get "/bikebook_schema" }
+        travel(5.minutes + 1.second) { get "/bikebook_schemas" }
 
         expect(Capybara.string(response.body)).to have_css("button[aria-label='12,345,678 models']")
           .and have_css(old_badge, count: old_badges - 1)
@@ -400,20 +400,20 @@ RSpec.describe BikebookController, type: :request do
       it "caches a field's fields inside its fragment, and on their own only where it renders afresh" do
         written = []
         record = ->(*, payload) { written << payload[:key].to_s }
-        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook_schema" }
+        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook_schemas" }
         expect(written.count { it.include?("/frame/") }).to eq 1
         expect(written.count { it.include?("/frame.mounts/") }).to eq 0
 
         written.clear
-        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook_schema", params: {open: "frame"} }
+        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook_schemas", params: {open: "frame"} }
         expect(written.count { it.include?("/frame.mounts/") }).to eq 1
       end
 
       it "renders a field the URL opens anything in afresh, rather than as cached closed" do
-        get "/bikebook_schema"
+        get "/bikebook_schemas"
         expect(Capybara.string(response.body)).to have_css("details:not([open])[data-schema-path='type']")
 
-        get "/bikebook_schema", params: {open: "type", by_count: "type"}
+        get "/bikebook_schemas", params: {open: "type", by_count: "type"}
 
         page = Capybara.string(response.body)
         expect(page).to have_css("details[open][data-schema-path='type']")
@@ -427,7 +427,7 @@ RSpec.describe BikebookController, type: :request do
       before { WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}#{Integrations::Bikebook::Catalog::MANIFEST}").to_return(status: 503) }
 
       it "says so" do
-        get "/bikebook_schema", params: {document: "component"}
+        get "/bikebook_schemas", params: {document: "component"}
 
         expect(response).to have_http_status(:service_unavailable)
         expect(Capybara.string(response.body)).to have_content("Bike Book's catalog isn't answering")
@@ -437,7 +437,7 @@ RSpec.describe BikebookController, type: :request do
 
     context "with a document the catalog doesn't publish" do
       it "renders the vehicle model's" do
-        get "/bikebook_schema", params: {document: "vocabulary"}
+        get "/bikebook_schemas", params: {document: "vocabulary"}
 
         expect(Capybara.string(response.body)).to have_css("[aria-current='page']", text: "Vehicle model")
       end
