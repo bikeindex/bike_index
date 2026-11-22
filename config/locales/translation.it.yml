@@ -7166,14 +7166,18 @@ it:
           less: meno
           models: "%{number} modelli"
           more: "+%{count} altro"
-          representative: "(rappresentante)"
           schema_order: ordine dello schema
+          file: file
+          representative_initial: R
+          representative_vehicle_lowercase: veicolo rappresentativo
+          view_list: visualizza elenco
         schema_viewer:
           documents: Documenti Schema
           subtitle_html: La forma di un file %{document} nello schema %{version},
             pubblicato come %{url}
-          title: Schema del libro delle biciclette
-          versioning: 'Versioning:'
+          schemas_title: Schemi del libro delle biciclette
+          unavailable: Il catalogo di Bike Book non risponde, quindi i suoi schemi
+            non possono essere visualizzati al momento. Riprova tra un minuto.
       ebike_rules:
         class_tile:
           class: Classe
