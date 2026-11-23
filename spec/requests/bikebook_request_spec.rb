@@ -73,6 +73,7 @@ RSpec.describe BikebookController, type: :request do
       end
 
       it "keeps the correction form, which takes the session's token from outside it" do
+        log_in(FactoryBot.create(:user_confirmed))
         2.times { get "/bikebook" }
 
         page = Capybara.string(response.body)
@@ -96,13 +97,13 @@ RSpec.describe BikebookController, type: :request do
       it "doesn't autofocus the search, which would take the host page's focus" do
         get "/bikebook"
         expect(Capybara.string(response.body)).to have_css("#vehicle_models[autofocus]")
-          .and have_button("Submit a correction")
+          .and have_link("Submit a correction")
 
         get "/bikebook", headers: {"Sec-Fetch-Dest" => "iframe"}
         expect(response).to have_http_status(:ok)
         expect(Capybara.string(response.body)).to have_css("#vehicle_models")
           .and have_no_css("#vehicle_models[autofocus]")
-          .and have_no_button("Submit a correction")
+          .and have_no_link("Submit a correction")
       end
     end
 
@@ -238,86 +239,84 @@ RSpec.describe BikebookController, type: :request do
   end
 
   describe "correction" do
-    let(:page_url) { "http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3-pro" }
-    let(:correction) { {body: "The GT3 Pro's top speed is 50 mph", email: "rider@example.com", additional: ""} }
+    let(:page_url) { "http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3-pro,m/segway/2025/gt3-pro{size:M}" }
+    let(:correction) { {body: "The GT3 Pro's top speed is 50 mph", page_url:} }
 
     def post_correction
-      post "/bikebook/corrections", params: {bug_report: correction}, headers: {"HTTP_REFERER" => page_url}
+      post "/bikebook/corrections", params: {correction:}
     end
 
-    it "creates a bug report with the page it was sent from, and goes back there" do
-      expect { post_correction }.to change(BugReport, :count).by(1)
+    context "signed out" do
+      it "links to signing in, back to the page with the form open, and files nothing" do
+        stub_bikebook_catalog
+        get "/bikebook"
+        page = Capybara.string(response.body)
+        expect(page).to have_link("Submit a correction", href: "/session/new?return_to=%2Fbikebook%3Fmodal_bikebook-correction%3D1", count: 2)
+        expect(page).to have_no_css("dialog#bikebook-correction")
 
-      expect(response).to redirect_to(page_url)
-      expect(flash[:success]).to eq "Thanks for the correction! We'll look into it."
-      expect(BugReport.last).to have_attributes(email: "rider@example.com", user_id: nil, subject: "Bike Book correction",
-        tags: ["bikebook_correction"], body: "The GT3 Pro's top speed is 50 mph\n\n#{page_url}")
-    end
-
-    it "renders the form to the signed-out, asking for their email" do
-      stub_bikebook_catalog
-      get "/bikebook"
-
-      form = Capybara.string(response.body).find("dialog#bikebook-correction form[action='/bikebook/corrections']")
-      expect(form).to have_field("bug_report[email]").and have_field("bug_report[body]")
+        expect { post_correction }.not_to change(BugReport, :count)
+        expect(response).to redirect_to(new_session_path)
+      end
     end
 
     context "signed in" do
       include_context :request_spec_logged_in_as_user
-      let(:correction) { {body: "Wrong battery size"} }
+      before { stub_bikebook_catalog }
 
-      it "files it as the user's, without asking for an email" do
-        stub_bikebook_catalog
+      it "files it as the user's, naming the vehicles picked on the page, and goes back there" do
         get "/bikebook"
-        expect(Capybara.string(response.body).find("dialog#bikebook-correction")).to have_field("bug_report[body]")
-          .and have_no_field("bug_report[email]")
+        expect(Capybara.string(response.body).find("dialog#bikebook-correction")).to have_field("correction[body]")
 
         expect { post_correction }.to change(BugReport, :count).by(1)
-        expect(BugReport.last).to have_attributes(email: current_user.email, user_id: current_user.id)
-      end
-    end
-
-    context "without a body" do
-      let(:correction) { {body: " ", email: "rider@example.com"} }
-
-      it "saves nothing, and says so" do
-        expect { post_correction }.not_to change(BugReport, :count)
-
         expect(response).to redirect_to(page_url)
-        expect(flash[:error]).to match(/wasn't sent/)
+        expect(flash[:success]).to eq "Thanks for the correction! We'll look into it."
+        expect(BugReport.last).to have_attributes(email: current_user.email, user_id: current_user.id, tags: ["bikebook_correction"],
+          subject: "Bike Book correction: Segway GT3 Pro",
+          body: "The GT3 Pro's top speed is 50 mph\n\nSegway GT3 Pro (m/segway/2025/gt3-pro)\n\n#{page_url}")
       end
-    end
 
-    context "from a bot, which fills the honeypot" do
-      let(:correction) { super().merge(additional: "buy now") }
+      context "while the catalog doesn't answer" do
+        before { stub_bikebook_catalog(status: 503) }
 
-      it "thanks it without saving" do
-        expect { post_correction }.not_to change(BugReport, :count)
-
-        expect(flash[:success]).to be_present
-      end
-    end
-
-    describe "rack_attack" do
-      include_context :rack_attack
-
-      it "throttles corrections past the hourly limit" do
-        throttled = rack_attack_throttled_response(limit: 10) do
+        it "names the vehicles by their ids" do
           post_correction
-          response
+
+          expect(BugReport.last.subject).to eq "Bike Book correction: m/segway/2025/gt3-pro"
         end
-        expect(throttled).to have_http_status(:too_many_requests)
       end
-    end
 
-    context "from another site" do
-      let(:page_url) { "https://example.org/bikebook" }
+      context "without a body" do
+        let(:correction) { {body: " ", page_url:} }
 
-      it "goes back to Bike Book, leaving the URL out" do
-        post_correction
+        it "saves nothing, and says so" do
+          expect { post_correction }.not_to change(BugReport, :count)
 
-        expect(response).to redirect_to("/bikebook")
-        expect(BugReport.last.body).to eq correction[:body]
+          expect(response).to redirect_to(page_url)
+          expect(flash[:error]).to match(/wasn't sent/)
+        end
+      end
+
+      context "from another site" do
+        let(:page_url) { "https://example.org/bikebook?vehicle_models=m/segway/2025/gt3-pro" }
+
+        it "goes back to Bike Book, leaving the URL and its vehicles out" do
+          post_correction
+
+          expect(response).to redirect_to("/bikebook")
+          expect(BugReport.last).to have_attributes(subject: "Bike Book correction", body: correction[:body])
+        end
+      end
+
+      describe "rack_attack" do
+        include_context :rack_attack
+
+        it "throttles corrections past the hourly limit" do
+          throttled = rack_attack_throttled_response(limit: 10) do
+            post_correction
+            response
+          end
+          expect(throttled).to have_http_status(:too_many_requests)
+        end
       end
     end
   end

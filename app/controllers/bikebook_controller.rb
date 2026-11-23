@@ -2,6 +2,7 @@
 
 class BikebookController < ApplicationController
   before_action :redirect_to_dashed_ids, only: :show
+  before_action :authenticate_user, only: :correction
 
   def show
     entries = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
@@ -27,15 +28,15 @@ class BikebookController < ApplicationController
       by_count: params[:by_count].to_s.split(",")), status: viewer ? :ok : :service_unavailable
   end
 
-  # The page it was sent from goes in the report, since it names the models and filters being corrected
+  # The page it was sent from goes in the report, with the vehicles picked on it named, as they're what's being corrected
   def correction
-    correction = params.require(:bug_report).permit(:body, :email, :additional)
-    page_url = url_from(request.referer)
-    bug_report = BugReport.new(email: current_user&.email || correction[:email],
-      from_name: current_user&.name, subject: "Bike Book correction", tags: ["bikebook_correction"], received_at: Time.current,
-      body: [correction[:body], page_url].compact_blank.join("\n\n"))
-    # a filled honeypot is a bot's, thanked without saving
-    if correction[:additional].present? || (correction[:body].present? && bug_report.save)
+    correction = params.require(:correction).permit(:body, :page_url)
+    page_url = url_from(correction[:page_url]) || url_from(request.referer)
+    vehicles = page_vehicles(page_url)
+    bug_report = BugReport.new(email: current_user.email, from_name: current_user.name, tags: ["bikebook_correction"],
+      subject: ["Bike Book correction", vehicles.map(&:first).join(", ").presence].compact.join(": "), received_at: Time.current,
+      body: [correction[:body], vehicles.map { "#{it.first} (#{it.last})" }.join("\n").presence, page_url].compact_blank.join("\n\n"))
+    if correction[:body].present? && bug_report.save
       flash[:success] = translation(:thanks_for_the_correction)
     else
       flash[:error] = translation(:correction_failed)
@@ -61,6 +62,20 @@ class BikebookController < ApplicationController
   end
 
   private
+
+  # [title, id] of each model picked on the page, titled by its id while the catalog doesn't answer
+  def page_vehicles(page_url)
+    vehicle_models = Rack::Utils.parse_query(URI(page_url.to_s).query)["vehicle_models"]
+    ids = Integrations::Bikebook::Catalog.vehicle_entries(vehicle_models).map { Integrations::Bikebook::Catalog.vehicle_id(it) }
+      .grep(Integrations::Bikebook::Catalog::MODEL_ID).uniq
+    ids.map { [vehicle_title(it) || it, it] }
+  end
+
+  def vehicle_title(id)
+    Integrations::Bikebook::Catalog.vehicle(id)&.dig(:title)
+  rescue Integrations::Bikebook::Catalog::Unreachable
+    nil
+  end
 
   # A model picked alone is its own page, canonically without the search's other params
   def render_vehicle(id)

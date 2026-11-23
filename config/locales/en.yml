@@ -1661,9 +1661,7 @@ en:
           think you should be able to.
     bikebook:
       correction:
-        correction_failed: >-
-          Your correction wasn't sent. Please say what's wrong, and give an email
-          we can reply to.
+        correction_failed: Your correction wasn't sent. Please say what's wrong.
         thanks_for_the_correction: Thanks for the correction! We'll look into it.
     bikes:
       assign_bike_stickers:
