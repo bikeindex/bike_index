@@ -1,7 +1,7 @@
 // Searches the published catalog off the main thread, by the rules the catalog's own search follows
 /* global self */
 
-const FORMAT = 4
+const FORMAT = 5
 
 let models = []
 let byId = new Map()
@@ -51,7 +51,7 @@ const fetchJson = async (url) => {
 // Schema 2.0.0's ids are dashed. An older catalog's are underscored and never dashed, so they read as 2.0.0's, as
 // Integrations::Bikebook::Catalog.dashed_ids reads them
 // TODO: once the published catalog is at 2.0.0, remove this
-const CATALOG_ID = /^(?:(?:m|c|evc)\/[a-z0-9_/-]+|[a-z0-9_-]+\/\d{4})$/
+const CATALOG_ID = /^(?:(?:m|c|evc)\/[a-z0-9_/-]+(?:@[A-Z]+)?|[a-z0-9_-]+\/\d{4})$/
 const dashed = (value) => typeof value === 'string' ? value.replaceAll('_', '-') : value
 const dashedIds = (value) => {
   if (Array.isArray(value)) return value.map(dashedIds)
@@ -242,15 +242,12 @@ const merged = (record, changes) => Object.entries(changes).reduce((out, [key, v
 }, record)
 const except = (record, key) => Object.fromEntries(Object.entries(record).filter(([each]) => each !== key))
 
-// From schema 1.1.0, a market's model sits in its home market's record, under `market_variants` keyed by the market
-// suffixing its id, as what differs from it; before, it's a record of its own. Integrations::Bikebook::MarketVariants
-// expands them the same way
+// From schema 1.1.0, a market's model sits in its home market's record, under `market_variants` keyed by the market its
+// citation key names, as what differs from it; before, it's a record of its own. Its id is its home market's, as in a
+// format 5 block. Integrations::Bikebook::MarketVariants expands them the same way
 const withMarketVariants = (models) => Object.fromEntries(Object.entries(models).flatMap(([id, record]) => {
   const home = except(record, 'market_variants')
-  return [[id, home], ...Object.entries(record.market_variants ?? {}).map(([market, changes]) => {
-    const variantId = `${id}-${market.toLowerCase()}`
-    return [variantId, { ...merged(home, changes), id: variantId }]
-  })]
+  return [[id, home], ...Object.entries(record.market_variants ?? {}).map(([market, changes]) => [`${id}@${market}`, merged(home, changes)])]
 }))
 
 // A failed fetch is forgotten, so the next ask tries again
@@ -332,7 +329,8 @@ function matching (params) {
   const passes = filter(params)
   const filtered = sorted(params).filter(passes)
   const needle = (params.q ?? '').trim().toLowerCase()
-  const exact = needle.startsWith('m/') && byId.get(dashedIds(needle))
+  // a citation key's market is upper case: m/specialized/2025/haul-st@CA
+  const exact = needle.startsWith('m/') && byId.get(dashedIds(needle.replace(/@[a-z]+$/, (market) => market.toUpperCase())))
   const words = needle.split(/\s+/).filter(Boolean)
   const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))).map((model) => soldIn(model, params.market))
   const whole = ({ searchText }) => searchText.includes(needle)

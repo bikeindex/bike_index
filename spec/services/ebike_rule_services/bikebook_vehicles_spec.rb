@@ -31,7 +31,7 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
     end
 
     it "reads a market's model from its home market's record" do
-      expect(described_class.find("m/specialized/2025/haul-st-ca")).to have_attributes(bikebook_id: "m/specialized/2025/haul-st-ca",
+      expect(described_class.find("m/specialized/2025/haul-st@CA")).to have_attributes(bikebook_id: "m/specialized/2025/haul-st@CA",
         model: "Haul ST", e_bike_class: 2, e_vehicle_classifications: [], watts: 500, top_assist_kmh: nil, throttle_kmh: 32,
         photo_url: "https://bikebook.bikeindex.org/specialized/2025/haul_st_ca.webp")
     end

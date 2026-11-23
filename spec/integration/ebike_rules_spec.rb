@@ -187,13 +187,13 @@ RSpec.describe "E-bike rules", :js, type: :system do
     expect(page).to have_css("[role='option']", count: 1)
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
     expect(page).to have_css("[role='status']", text: "The Specialized Haul ST is legal to ride in Ontario under the Power-Assisted Bicycle rules.")
-    expect(page).to have_current_path("/ebike-rules/CA/ON?vehicle_models=m/specialized/2025/haul-st-ca")
+    expect(page).to have_current_path("/ebike-rules/CA/ON?vehicle_models=m/specialized/2025/haul-st@CA")
     expect(page).to have_title("Ontario e-bike laws")
     expect(page).to have_checked_field("top_speed", with: "32", visible: :all).and have_field("Motor wattage (W)", with: "500", visible: :all)
 
     # clearing the province leaves the bike waiting on Canada's page
     find("[data-ebike-rules--lookup-target='state'] .hw-combobox__handle").click
-    expect(page).to have_current_path("/ebike-rules/CA?vehicle_models=m/specialized/2025/haul-st-ca")
+    expect(page).to have_current_path("/ebike-rules/CA?vehicle_models=m/specialized/2025/haul-st@CA")
     expect(page).to have_no_css("[role='status']")
     expect(page).to have_css("#ebike-rules-classes h2", text: "E-bike laws in Canada")
   end
