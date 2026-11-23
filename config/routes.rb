@@ -81,7 +81,7 @@ Rails.application.routes.draw do
   get ":spelling(/*rest)", to: redirect { |params, request| request.fullpath.sub(params[:spelling], "bikebook") },
     constraints: {spelling: /bike[-_]?book/i}, format: false
   # a catalog model's own id, its manufacturer, year and model
-  get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9_-]+/\d{4}/[a-z0-9_-]+}}
+  get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9_-]+/\d{4}/[a-z0-9_-]+(?:@[A-Z]+)?}}
   # an e-vehicle classification's id, whose card the page shows
   get "evc/*classification", to: redirect(status: 302) { |params, _request| "/bikebook?classifications=evc/#{params[:classification]}" },
     format: false, constraints: {classification: %r{[a-z0-9_-]+(/[a-z0-9_-]+)*}}

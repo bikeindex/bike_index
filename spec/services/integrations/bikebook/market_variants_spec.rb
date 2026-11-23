@@ -21,7 +21,7 @@ RSpec.describe Integrations::Bikebook::MarketVariants do
 
       expect(described_class.expand(models)).to eq({
         "m/acme/2025/one" => home,
-        "m/acme/2025/one-ca" => {"id" => "m/acme/2025/one-ca", "markets" => ["CA"], "years" => {"2025" => {"url" => "ca"}},
+        "m/acme/2025/one@CA" => {"id" => "m/acme/2025/one", "markets" => ["CA"], "years" => {"2025" => {"url" => "ca"}},
                                  "wheels" => [{"position" => "front", "bsd" => 406}, {"position" => "rear", "bsd" => 507}],
                                  "motors" => [{"rated_power" => 500, "operating_modes" => [{"mode" => "assist", "max_speed" => 32}, {"mode" => "throttle", "max_speed" => 32}]}]},
         "m/acme/2025/two" => other

@@ -10,14 +10,14 @@ module Integrations
       LOCAL_PATH = "/bikebook_catalog"
       URL = "https://bikebook-catalog.bikeindex.org/catalog/"
       # the published format bikebook/catalog_worker.js and similarity.js read
-      FORMAT = 4
+      FORMAT = 5
       MANIFEST = "manifest.#{FORMAT}.json"
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/#{MANIFEST}" : "#{URL}#{MANIFEST}"
       GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
       GITHUB_FILES_URL = "#{GITHUB_REPO_URL}/blob/main"
-      MODEL_ID = %r{\Am/([a-z0-9_-]+/\d{4})/[a-z0-9_-]+\z}
+      MODEL_ID = %r{\Am/([a-z0-9_-]+/\d{4})/[a-z0-9_-]+(?:@[A-Z]+)?\z}
       # a model's, a component's or a classification's id, or a block's key: its maker and year
-      CATALOG_ID = %r{\A(?:(?:m|c|evc)/[a-z0-9_/-]+|[a-z0-9_-]+/\d{4})\z}
+      CATALOG_ID = %r{\A(?:(?:m|c|evc)/[a-z0-9_/-]+(?:@[A-Z]+)?|[a-z0-9_-]+/\d{4})\z}
       # The ids in a link's params: vehicle_models' among what's picked for each, and the electric filter's US classes
       LINKED_ID = %r{\b(?:(?:m|c|evc)/[a-z0-9_/-]+|class_\d\b)}
       # Schema 2.0.0's slugs for the vocabulary Bike Index reads values of, which an older catalog underscores, and where
@@ -172,7 +172,7 @@ module Integrations
         end
       end
 
-      # A block's models by id, each market variant's beside its home market's
+      # A block's models by citation key, each market variant's beside its home market's
       def models_of(block) = Integrations::Bikebook::MarketVariants.expand(block["models"]).transform_values { it.merge("type" => current_slug(it["type"])) }
 
       def once(key) = Reads.values.fetch(key) { Reads.values[key] = yield }

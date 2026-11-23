@@ -870,7 +870,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_css("#vehicle-models-count", exact_text: "(7 matching models)", wait: 10)
     # its Canadian model, under the US model's row, which is all the index lists of it
     type_into(vehicle_field, "haul")
-    expect(page).to have_css(vehicle_option, count: 1).and have_css("#{vehicle_option}[data-value='m/specialized/2025/haul-st-ca']")
+    expect(page).to have_css(vehicle_option, count: 1).and have_css("#{vehicle_option}[data-value='m/specialized/2025/haul-st@CA']")
     expect(page).to have_no_css(vehicle_option, text: "(CA)")
     # beside its activity, whether it's electric
     expect(find(vehicle_option)).to have_css("span", exact_text: "⚡")
@@ -886,7 +886,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     # named for the market it's sold in, which the visitor's isn't
     expect(page).to have_css(vehicle_option, count: 1, text: "Specialized Haul ST (US)")
       .and have_css("#{vehicle_option}[data-value='m/specialized/2025/haul-st']")
-    type_into(vehicle_field, "m/specialized/2025/haul-st-ca")
+    type_into(vehicle_field, "m/specialized/2025/haul-st@CA")
     expect(page).to have_css(".hw-combobox__group__label", exact_text: "(1 matching model)")
 
     # its listbox closed, which covers the filters
@@ -1031,8 +1031,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(find("#group-m-specialized-2025-haul-st").ancestor("li")).to have_css("img[src$='/haul_st_gloss_white_mountains.png']", visible: :all)
     click_on "More filters", match: :first
     choose_option("Market", "Canada")
-    expect(page).to have_css("#group-m-specialized-2025-haul-st-ca")
-    expect(group_models.call).to eq(["m-specialized-2025-haul-st-ca"])
+    expect(page).to have_css("#group-m-specialized-2025-haul-st-CA")
+    expect(group_models.call).to eq(["m-specialized-2025-haul-st-CA"])
 
     # a checked class keeps its jurisdiction in the URL, as another's would uncheck it
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "US", "CF-Region" => "New Jersey") }
@@ -2087,7 +2087,7 @@ RSpec.describe "Bike Book", :js, type: :system do
 
     # beside its Canadian model, sold outside the visitor's market, the Overview has each one's under its price, and names it after
     # whichever of them the market picked doesn't sell
-    visit bikebook_path(vehicle_models: "m/specialized/2025/haul-st,m/specialized/2025/haul-st-ca", filters: 1)
+    visit bikebook_path(vehicle_models: "m/specialized/2025/haul-st,m/specialized/2025/haul-st@CA", filters: 1)
     expect(page).to have_css("[aria-label='Overview comparison'] tbody tr:nth-child(2)", text: /\AMarkets\s*United States\s*Canada\z/, wait: 10)
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", text: /Haul ST\s+\(CA\)/)
       .and have_no_css("[aria-label='Overview comparison'] thead th", text: "(US)")
@@ -2116,7 +2116,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(markets).to have_no_css("[role='button']")
 
     # its Canadian model, published resolved from it: its own market, price and motor, and no US class
-    visit bikebook_path(vehicle_models: "m/specialized/2025/haul-st,m/specialized/2025/haul-st-ca", view: "all")
+    visit bikebook_path(vehicle_models: "m/specialized/2025/haul-st,m/specialized/2025/haul-st@CA", view: "all")
     expect(page).to have_css("[data-comparison] article", count: 2, wait: 10)
     canadian = all("article").last
     expect(canadian).to have_css("div", text: /\AMarkets\s*Canada\z/).and have_css("span[title='Canadian Dollar']")
@@ -2353,10 +2353,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     visit bikebook_path(vehicle_models: "m/aventon/2026/level-4-rec", market: "CA", similar: 1, skip_manufacturer: 1, vehicle_type: "bike,cargo",
       search: 1, filters: 1, adjust: 1)
     expect(page).to have_unchecked_field("Include bikes that are not current", wait: 10)
-    expect(page).to have_css("#similar-m-specialized-2025-haul-st-ca").and have_no_css("#similar-m-specialized-2025-haul-st")
+    expect(page).to have_css("#similar-m-specialized-2025-haul-st-CA").and have_no_css("#similar-m-specialized-2025-haul-st")
     expect(find("legend", text: /\AOther settings/).ancestor("fieldset").first("label")).to have_text("Include bikes that are not current")
     # and one no longer sold matches any year's by default
-    visit bikebook_path(vehicle_models: "m/specialized/2025/haul-st-ca", similar: 1, adjust: 1, search: 1, filters: 1)
+    visit bikebook_path(vehicle_models: "m/specialized/2025/haul-st@CA", similar: 1, adjust: 1, search: 1, filters: 1)
     expect(page).to have_checked_field("Include cargo bikes that are not current", wait: 10)
     # the other propulsion's where they're included, without its e-bike fields counting against them, a frame only
     # without same_configuration, other wheel sizes only without same_wheels,
@@ -2374,7 +2374,7 @@ RSpec.describe "Bike Book", :js, type: :system do
         const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value]])) }
         const model = (id, electric, handlebar_type, suspension, activity = 'commuting') => ({ id, electric, handlebar_type, suspension, vehicle_type: 'bike', model_configuration: 'complete', manufacturer: id, group_key: id, primary_activity: activity, markets: ['US'], variants: [] })
         const urban = [{ slug: 'commuting', family: 'urban' }]
-        const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: 4, fields: { ...fields, ...extra } }, activities)
+        const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: 5, fields: { ...fields, ...extra } }, activities)
         const score = scoring([model('e', true), model('other_e', true), model('acoustic', false)], { battery_size: [500, 500, null] })
         const propulsions = [() => true, ({ electric }) => !electric].map((included) => score('e', settingsFrom(new URLSearchParams()), included).models.map(({ id }) => id))
         const materials = scoring([model('a', false), model('steel', false), model('aluminum', false)], { frame_material: ['aluminum', 'steel', 'aluminum'] })
