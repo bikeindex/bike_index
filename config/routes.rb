@@ -78,6 +78,7 @@ Rails.application.routes.draw do
   # before the glob below, which would take it for a model
   get "bikebook/license", to: "bikebook#license", as: :bikebook_license
   get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
+  get "bikebook_schemas/*id", to: "bikebook#schema", format: false
   get ":spelling(/*rest)", to: redirect { |params, request| request.fullpath.sub(params[:spelling], "bikebook") },
     constraints: {spelling: /bike[-_]?book/i}, format: false
   # a catalog model's own id, its manufacturer, year and model
