@@ -7,16 +7,16 @@ module Pages
       # viewer: Integrations::Bikebook::Catalog.schema_viewer, nil while the catalog doesn't answer
       # open: the paths of the folded objects and enums rendered open
       # by_count: the paths of the open enums ordering their values by count
-      # record_id: the record whose file shows in place of the fields, its JSON record_json, nil while the bikebook
+      # record_id: the record whose file shows in place of the fields, record its file parsed, nil while the bikebook
       # repository doesn't answer
       class Component < ApplicationComponent
-        def initialize(viewer:, document:, open: [], by_count: [], record_id: nil, record_json: nil)
+        def initialize(viewer:, document:, open: [], by_count: [], record_id: nil, record: nil)
           @viewer = viewer
           @document = document
           @open = open
           @by_count = by_count
           @record_id = record_id
-          @record_json = record_json
+          @record = record
         end
 
         private
@@ -28,7 +28,7 @@ module Pages
         def fields = @viewer&.dig("documents", @document, "fields")
 
         # what the combobox shows for the record, as /bikebook names it
-        def record_display = @record_json && JSON.parse(@record_json).then { [it["manufacturer"], it["model"] || it["name"]].compact.join(" ") }
+        def record_display = @record && [@record["manufacturer"], @record["model"] || @record["name"]].compact.join(" ")
       end
     end
   end
