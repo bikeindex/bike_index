@@ -21,18 +21,16 @@ module Integrations
 
       def github_url(id) = "#{Integrations::Bikebook::Catalog::GITHUB_FILES_URL}/#{path(id)}"
 
-      # nil for an id with no file. A failure is kept for a minute, so GitHub being down holds up one request a minute
-      def json(id)
-        return unless path(id)
-
-        Rails.cache.fetch(["bikebook/repository_record", path(id)], expires_in: 1.hour) do |_key, options|
-          Faraday.new(url: URL, request: {open_timeout: 2, timeout: 7}) { it.response :raise_error }.get(path(id)).body
-        rescue Faraday::ResourceNotFound
-          nil
-        rescue Faraday::Error
-          options.expires_in = 1.minute
-          false
-        end.tap { raise Unreachable if it == false }
+      # The record's file parsed, nil for an id with no file. Raises Unreachable while GitHub doesn't answer
+      def record(id)
+        path(id)&.then do |path|
+          record = Integrations::Bikebook::Catalog.cached(["bikebook/repository_record", path], expires_in: 1.hour) do
+            JSON.parse(Faraday.new(url: URL, request: {open_timeout: 2, timeout: 7}) { it.response :raise_error }.get(path).body)
+          rescue Faraday::ResourceNotFound
+            {}
+          end
+          (record || raise(Unreachable)).presence
+        end
       end
     end
   end

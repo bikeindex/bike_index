@@ -7,6 +7,8 @@ RSpec.describe "Bike Book schema viewer", :js, type: :system do
 
   def toggle(path) = find("details[data-schema-path='#{path}'] > summary").click
 
+  def lookup = find_field("View a model's or e-vehicle classification's file", disabled: false, wait: 10)
+
   it "keeps what's opened and what's ordered by count in the URL, while it shows, and renders a model searched for" do
     visit "/bikebook_schemas"
     expect(page).to have_no_css("details[open]")
@@ -32,11 +34,11 @@ RSpec.describe "Bike Book schema viewer", :js, type: :system do
       WebMock.stub_request(:get, "#{Integrations::Bikebook::RepositoryRecord::URL}vehicle_models/#{path}.json")
         .to_return(body: {id: "m/#{path}", manufacturer:, model:}.to_json)
     end
-    type_into(find_field("View a model's or e-vehicle classification's file", disabled: false, wait: 10), "gt3")
+    type_into(lookup, "gt3")
     retry_on_detach { find("[role='option']", text: "Segway GT3 Pro").click }
     expect(page).to have_current_path("/bikebook_schemas/m/segway/2025/gt3-pro")
     expect(page).to have_css("pre", text: %("manufacturer": "Segway",)).and have_no_css("[data-schema-path]")
-    field = find_field("View a model's or e-vehicle classification's file", disabled: false, wait: 10)
+    field = lookup
     expect(field.value).to eq "Segway GT3 Pro"
     # a click selects the pick, to type another over
     field.click
@@ -46,7 +48,7 @@ RSpec.describe "Bike Book schema viewer", :js, type: :system do
     expect(page).to have_css("pre", text: %("manufacturer": "Specialized",))
 
     # Escape closes a search without picking from it, back to the pick
-    field = find_field("View a model's or e-vehicle classification's file", disabled: false, wait: 10)
+    field = lookup
     field.click
     field.send_keys("gt3")
     expect(page).to have_css("[role='option']", text: "Segway GT3 Pro")

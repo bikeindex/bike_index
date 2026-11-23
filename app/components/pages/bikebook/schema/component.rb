@@ -5,23 +5,22 @@ module Pages
     module Schema
       # A record's file in the bikebook repository, pretty-printed in its own key order, each line commented with the
       # schema viewer's description of its field and of its value.
-      # json: nil while the repository doesn't answer
+      # record: the file parsed, nil while the repository doesn't answer
       # fields: its document's in the schema viewer, nil while the catalog doesn't answer, which leaves it uncommented
       class Component < ApplicationComponent
         UNCOMMENTED = ["bikebook-hosted copy of the manufacturer's photo of this colorway"].freeze
         LINE = /\A( *)("(?:[^"\\]|\\.)*": )?(.*?)(,?)\z/
 
-        def initialize(id:, json:, fields:)
+        def initialize(id:, record:, fields:)
           @id = id
-          @json = json
+          @record = record
           @fields = fields
         end
 
         private
 
         def code
-          record = JSON.parse(@json)
-          lines = JSON.pretty_generate(record).lines(chomp: true).zip(comments(record, {"fields" => @fields}))
+          lines = JSON.pretty_generate(@record).lines(chomp: true).zip(comments(@record, {"fields" => @fields}))
           tag.pre(safe_join(lines.map { line_tag(*it) }), class: "twgutter-bleed tw:overflow-x-auto tw:font-mono tw:text-sm tw:leading-6 tw:[--gutter:--spacing(5)]")
         end
 

@@ -39,7 +39,7 @@
   <% end %>
 
   <% if @record_id %>
-    <%= render(Pages::Bikebook::Schema::Component.new(id: @record_id, json: @record_json, fields:)) %>
+    <%= render(Pages::Bikebook::Schema::Component.new(id: @record_id, record: @record, fields:)) %>
   <% elsif @viewer %>
     <div
       class="tw:overflow-x-auto tw:font-mono tw:text-sm tw:leading-6"
