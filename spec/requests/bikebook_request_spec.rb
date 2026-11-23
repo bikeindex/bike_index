@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe BikebookController, type: :request do
+  include ActiveSupport::Testing::TimeHelpers
+
   describe "show" do
     before { stub_bikebook_catalog }
 
@@ -152,6 +154,17 @@ RSpec.describe BikebookController, type: :request do
         expect(page.find("[inert]", visible: :all)[:class]).to eq "tw:hidden"
       end
 
+      context "a market's, by its citation key" do
+        let(:params) { {vehicle_models: "m/specialized/2025/haul-st@CA"} }
+
+        it "renders its page, with its own photo" do
+          expect(response).to have_http_status(:ok)
+          expect(page).to have_title("Specialized Haul ST", exact: true)
+            .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/specialized/2025/haul_st_ca.webp']", visible: :all)
+            .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/specialized/2025/haul-st@CA']", visible: :all)
+        end
+      end
+
       context "that the catalog hasn't" do
         let(:params) { {vehicle_models: "m/segway-ninebot/2025/gt-9"} }
 
@@ -218,6 +231,8 @@ RSpec.describe BikebookController, type: :request do
     it "redirects to the page with that vehicle picked" do
       get "/bikebook/m/segway/2025/gt3-pro"
       expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3-pro")
+      get "/bikebook/m/specialized/2025/haul-st@CA"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/specialized/2025/haul-st@CA")
     end
 
     it "redirects from the vehicle's id alone, an older link's for show to dash" do
@@ -264,12 +279,8 @@ RSpec.describe BikebookController, type: :request do
     end
   end
 
-  describe "up", vcr: {cassette_name: "bikebook-up"} do
-    # WebMock stubs outlive their examples here, and answer ahead of the cassette
-    before do
-      WebMock.reset!
-      Rails.cache.clear
-    end
+  describe "up" do
+    before { stub_bikebook_catalog }
 
     it "is ok, in the format the browser's reader reads" do
       get "/up/bikebook"
@@ -289,9 +300,9 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
-    context "with no catalog published", vcr: {cassette_name: "bikebook-up_not_found"} do
+    context "with no catalog published" do
       it "is unavailable" do
-        stub_const("Integrations::Bikebook::Catalog::URL", "https://bikebook-catalog.bikeindex.org/not_a_catalog/")
+        stub_bikebook_catalog(status: 404)
         get "/up/bikebook"
         expect(response).to have_http_status(:service_unavailable)
         expect(response.body).to include(%(<body style="background-color: red">))
@@ -339,16 +350,18 @@ RSpec.describe BikebookController, type: :request do
   end
 
   describe "schema_viewer" do
+    before { stub_bikebook_catalog }
+
     let(:fields) { Integrations::Bikebook::Catalog.schema_viewer.dig("documents", "vehicle_model", "fields") }
     let(:manufacturer_count) { fields.dig("manufacturer", "models_count") }
     let(:example_id) { fields.dig("manufacturer", "example_ids").first }
 
     it "renders the vehicle model's fields with how many models fill each, opening what the URL names and the folds around it" do
-      get "/bikebook/schema_viewer", params: {open: "type,frame.mounts", by_count: "type"}
+      get "/bikebook_schemas", params: {open: "type,frame.mounts", by_count: "type"}
 
       expect(response).to have_http_status(:ok)
       page = Capybara.string(response.body)
-      expect(page).to have_title("Bike Book schema | Bike Index", exact: true)
+      expect(page).to have_title("Bike Book schemas | Bike Index", exact: true)
         .and have_css("[aria-current='page']", text: "Vehicle model")
         .and have_css("details[open][data-schema-path='type']")
         .and have_css("details:not([open])[data-schema-path='type_detail']")
@@ -362,7 +375,7 @@ RSpec.describe BikebookController, type: :request do
 
     context "with another document" do
       it "renders its fields" do
-        get "/bikebook/schema_viewer", params: {document: "e_vehicle_classification"}
+        get "/bikebook_schemas", params: {document: "e_vehicle_classification"}
 
         expect(response).to have_http_status(:ok)
         expect(Capybara.string(response.body)).to have_css("[aria-current='page']", text: "E vehicle classification")
@@ -380,36 +393,36 @@ RSpec.describe BikebookController, type: :request do
         ActionController::Base.cache_store = :null_store
       end
 
-      context "when a new schema file is published" do
-        let(:published) { Pathname(Dir.mktmpdir).join("bikebook_schema_viewer.json") }
-        let(:viewer) { Integrations::Bikebook::Catalog.schema_viewer.except("digest") }
-        # the same published_at, so only its contents tell the two apart
-        let(:republished) { viewer.deep_merge("documents" => {"vehicle_model" => {"fields" => {"manufacturer" => {"models_count" => 12_345_678}}}}) }
+      it "renders a newly published schema viewer's counts rather than the cached ones" do
+        # model and first_year fill as many models as manufacturer does
+        old_badge = "button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']"
+        get "/bikebook_schemas"
+        old_badges = Capybara.string(response.body).all(old_badge).count
 
-        before do
-          published.write(viewer.to_json)
-          stub_const("Integrations::Bikebook::Catalog::SCHEMA_VIEWER", published)
-        end
+        stub_bikebook_catalog_update
+        travel(5.minutes + 1.second) { get "/bikebook_schemas" }
 
-        it "renders the new file's counts rather than the cached ones" do
-          # model and first_year fill as many models as manufacturer does
-          old_badge = "button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']"
-          get "/bikebook/schema_viewer"
-          old_badges = Capybara.string(response.body).all(old_badge).count
+        expect(Capybara.string(response.body)).to have_css("button[aria-label='12,345,678 models']")
+          .and have_css(old_badge, count: old_badges - 1)
+      end
 
-          published.write(republished.to_json)
-          get "/bikebook/schema_viewer"
+      it "caches a field's fields inside its fragment, and on their own only where it renders afresh" do
+        written = []
+        record = ->(*, payload) { written << payload[:key].to_s }
+        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook_schemas" }
+        expect(written.count { it.include?("/frame/") }).to eq 1
+        expect(written.count { it.include?("/frame.mounts/") }).to eq 0
 
-          expect(Capybara.string(response.body)).to have_css("button[aria-label='12,345,678 models']")
-            .and have_css(old_badge, count: old_badges - 1)
-        end
+        written.clear
+        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook_schemas", params: {open: "frame"} }
+        expect(written.count { it.include?("/frame.mounts/") }).to eq 1
       end
 
       it "renders a field the URL opens anything in afresh, rather than as cached closed" do
-        get "/bikebook/schema_viewer"
+        get "/bikebook_schemas"
         expect(Capybara.string(response.body)).to have_css("details:not([open])[data-schema-path='type']")
 
-        get "/bikebook/schema_viewer", params: {open: "type", by_count: "type"}
+        get "/bikebook_schemas", params: {open: "type", by_count: "type"}
 
         page = Capybara.string(response.body)
         expect(page).to have_css("details[open][data-schema-path='type']")
@@ -419,12 +432,126 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
+    context "while the catalog doesn't answer" do
+      before { WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}#{Integrations::Bikebook::Catalog::MANIFEST}").to_return(status: 503) }
+
+      it "says so" do
+        get "/bikebook_schemas", params: {document: "component"}
+
+        expect(response).to have_http_status(:service_unavailable)
+        expect(Capybara.string(response.body)).to have_content("Bike Book's catalog isn't answering")
+          .and have_no_css("[aria-current='page']")
+      end
+    end
+
     context "with a document the catalog doesn't publish" do
       it "renders the vehicle model's" do
-        get "/bikebook/schema_viewer", params: {document: "vocabulary"}
+        get "/bikebook_schemas", params: {document: "vocabulary"}
 
         expect(Capybara.string(response.body)).to have_css("[aria-current='page']", text: "Vehicle model")
       end
+    end
+  end
+
+  describe "schema" do
+    include ActiveSupport::Testing::TimeHelpers
+
+    let(:url) { Integrations::Bikebook::RepositoryRecord::URL }
+    # WebMock's request counts outlive examples
+    before do
+      WebMock.reset!
+      stub_bikebook_catalog
+    end
+
+    def lines = Nokogiri::HTML5(response.body).css("pre > span").map(&:text)
+
+    it "pretty-prints a record's file in its own key order, commented with the schema's descriptions, and keeps it" do
+      component = WebMock.stub_request(:get, "#{url}components/aventon/2024/a100.json").to_return(body: <<~JSON)
+        {"schema_version": "2.0.0", "id": "c/aventon/2024/a100", "type": "ebike-motor", "manufacturer": "Aventon", "model": "A100",
+         "first_year": 2024, "motor": {"spindle": "ISIS", "kind": "mid-drive"}, "aliases": []}
+      JSON
+      model = WebMock.stub_request(:get, "#{url}vehicle_models/segway/2025/gt3-pro.json").to_return(body: <<~JSON)
+        {"id": "m/segway/2025/gt3-pro", "markets": ["US"], "years": {"2025": {"colorways": [{"name": "Grey", "stock_photo": "grey.png"}], "url_live": true}}}
+      JSON
+
+      2.times { get "/bikebook_schemas/c/aventon/2024/a100" }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("<title>c/aventon/2024/a100 | Bike Book</title>")
+      expect(lines).to eq([
+        "{",
+        '  "schema_version": "2.0.0",',
+        '  "id": "c/aventon/2024/a100",',
+        '  "type": "ebike-motor", // E-vehicle Motor',
+        '  "manufacturer": "Aventon",',
+        '  "model": "A100",',
+        '  "first_year": 2024, // year it launched',
+        '  "motor": { // E-vehicle Motor only',
+        '    "spindle": "ISIS", // a mid drive\'s crank interface, e.g. ISIS',
+        '    "kind": "mid-drive"',
+        "  },",
+        '  "aliases": [] // other names it\'s specced under',
+        "}"
+      ])
+      page = Capybara.string(response.body)
+      expect(page).to have_link("View this file on GitHub", href: "https://github.com/bikeindex/bikebook/blob/main/components/aventon/2024/a100.json")
+        .and have_css("[aria-current='page']", text: "Component")
+        .and have_text("The shape of a component file")
+        .and have_no_css("[data-schema-path]")
+      # the search picks it, named as /bikebook names it, once the catalog loads
+      lookup = page.find("[data-controller='bikebook--schema-lookup']")
+      expect(lookup["data-bikebook--schema-lookup-display-value"]).to eq "Aventon A100"
+      expect(lookup["data-bikebook--schema-lookup-cleared-url-value"]).to eq "/bikebook_schemas?document=component"
+      expect(lookup).to have_field("vehicle_models", disabled: true, placeholder: "Loading the catalog…")
+      WebMock::API.assert_requested(component, times: 1)
+
+      get "/bikebook_schemas/m/segway/2025/gt3-pro"
+      expect(lines).to eq([
+        "{",
+        '  "id": "m/segway/2025/gt3-pro",',
+        '  "markets": [ // ISO 3166-1 alpha-2 country codes, or EU',
+        '    "US" // United States',
+        "  ],",
+        '  "years": { // one record per model year, keyed by year, newest first',
+        '    "2025": {',
+        '      "colorways": [ // one per paint',
+        "        {",
+        '          "name": "Grey",',
+        '          "stock_photo": "grey.png"',
+        "        }",
+        "      ],",
+        '      "url_live": true // whether the manufacturer\'s page is still up; false for an archive capture, which shows it as it was',
+        "    }",
+        "  }",
+        "}"
+      ])
+      # a market variant's citation key, whose record is in its home model's file
+      get "/bikebook_schemas/m/segway/2025/gt3-pro@CA"
+      expect(lines.second).to eq '  "id": "m/segway/2025/gt3-pro",'
+      expect(response.body).to include("<title>m/segway/2025/gt3-pro@CA | Bike Book</title>")
+      WebMock::API.assert_requested(model, times: 1)
+    end
+
+    it "is not found for an id the repository has no file for, or that isn't a record's" do
+      missing = WebMock.stub_request(:get, "#{url}vehicle_models/segway/2025/nope.json").to_return(status: 404)
+
+      2.times { get "/bikebook_schemas/m/segway/2025/nope" }
+      expect(response).to have_http_status(:not_found)
+      WebMock::API.assert_requested(missing, times: 1)
+      get "/bikebook_schemas/aventon/2025"
+      expect(response).to have_http_status(:not_found)
+      get "/bikebook_schemas/m/../config/secrets"
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "is unavailable while GitHub doesn't answer, asking again after a minute" do
+      down = WebMock.stub_request(:get, "#{url}components/aventon/2024/a100.json").to_return(status: 503)
+
+      2.times { get "/bikebook_schemas/c/aventon/2024/a100" }
+      expect(response).to have_http_status(:service_unavailable)
+      expect(Capybara.string(response.body)).to have_text("The Bike Book repository isn't answering. Try again in a minute.")
+      WebMock::API.assert_requested(down, times: 1)
+      travel_to(2.minutes.from_now) { get "/bikebook_schemas/c/aventon/2024/a100" }
+      WebMock::API.assert_requested(down, times: 2)
     end
   end
 end

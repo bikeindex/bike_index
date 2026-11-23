@@ -6,9 +6,11 @@
 module BikebookCatalogHelpers
   FIXTURES = Rails.root.join("spec/fixtures/bikebook_catalog")
 
-  # For the server's reads. The test cache is a file store, so a catalog cached by an earlier run goes first
+  # For the server's reads. The test cache is a file store, so a catalog cached by an earlier run goes first, as does
+  # what an earlier example read outside a request
   def stub_bikebook_catalog(status: 200)
     Rails.cache.clear
+    Integrations::Bikebook::Catalog::Reads.reset
     WebMock.stub_request(:get, /\A#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}/o).to_return do |request|
       file = FIXTURES.join(request.uri.path.delete_prefix(URI(Integrations::Bikebook::Catalog::URL).path))
       file.file? ? {status:, body: file.read} : {status: 404}
@@ -19,6 +21,23 @@ module BikebookCatalogHelpers
   def sync_bikebook_models
     stub_bikebook_catalog
     BikebookModelsSyncJob.new.perform
+  end
+
+  # The catalog as it is once it publishes again: a new vocabulary, Segway's 2025 block with a new description, and a
+  # schema viewer counting 12,345,678 models with a manufacturer
+  def stub_bikebook_catalog_update
+    url = Integrations::Bikebook::Catalog::URL
+    block = JSON.parse(FIXTURES.join("models/segway/2025.json").read)
+    block["models"]["m/segway/2025/gt3-pro"]["description"] = "Updated"
+    WebMock.stub_request(:get, "#{url}models/segway/2025.v2.json").to_return(body: block.to_json)
+    WebMock.stub_request(:get, "#{url}vocabulary.v2.json").to_return(body: FIXTURES.join("vocabulary.json").read)
+    viewer = JSON.parse(FIXTURES.join("schema_viewer.json").read)
+    viewer["documents"]["vehicle_model"]["fields"]["manufacturer"]["models_count"] = 12_345_678
+    WebMock.stub_request(:get, "#{url}schema_viewer.v2.json").to_return(body: viewer.to_json)
+    manifest = JSON.parse(FIXTURES.join(Integrations::Bikebook::Catalog::MANIFEST).read)
+    manifest = manifest.merge("vocabulary" => "vocabulary.v2.json", "schema_viewer" => "schema_viewer.v2.json",
+      "blocks" => manifest["blocks"].merge("segway/2025" => "models/segway/2025.v2.json"))
+    WebMock.stub_request(:get, "#{url}#{Integrations::Bikebook::Catalog::MANIFEST}").to_return(body: manifest.to_json)
   end
 
   # For the browser's and the server's both, with no stock photos, which render their placeholder
@@ -48,8 +67,9 @@ end
 RSpec.configure { it.include BikebookCatalogHelpers }
 
 # Unless a spec serves the fixture catalog, the catalog doesn't answer. VCR passes it by, so a cassette never records
-# it, and the stub is global and after the local ones, so it outlasts WebMock.reset! and stub_bikebook_catalog outranks it
-VCR.configure { |config| config.ignore_request { it.uri.start_with?(Integrations::Bikebook::Catalog::URL) } }
+# it, and the stub is global and after the local ones, so it outlasts WebMock.reset! and stub_bikebook_catalog outranks it.
+# By host, as WebMock's URI carries the port
+VCR.configure { |config| config.ignore_request { URI(it.uri).host == URI(Integrations::Bikebook::Catalog::URL).host } }
 WebMock.globally_stub_request(:after_local_stubs) do |request|
-  {status: 404} if request.uri.to_s.start_with?(Integrations::Bikebook::Catalog::URL)
+  {status: 404} if request.uri.host == URI(Integrations::Bikebook::Catalog::URL).host
 end

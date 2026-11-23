@@ -7,8 +7,11 @@ module EbikeRuleServices
 
     # nil for an id the catalog lacks, a model with no motor, or a catalog that doesn't answer
     def find(id)
-      record = Integrations::Bikebook::Catalog.block_models(id)&.dig(id)
-      Bike.new(**attributes_from(record)) if record && record["motors"].present?
+      record = Integrations::Bikebook::Catalog.model(id)
+      # a market variant's record has its base's id
+      Bike.new(**attributes_from(record), bikebook_id: id) if record && record["motors"].present?
+    rescue Integrations::Bikebook::Catalog::Unreachable
+      nil
     end
 
     #
@@ -24,7 +27,6 @@ module EbikeRuleServices
       classifications = modes.flat_map { Array(it["e_vehicle_classifications"]) }.uniq
       tiers = classifications - EbikeRuleServices::StateLaws.e_bike_law_ids
       {
-        bikebook_id: record["id"],
         manufacturer_name: record["manufacturer"],
         model: record["model"],
         first_year: record["first_year"],

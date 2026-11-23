@@ -337,7 +337,7 @@ RSpec.describe EbikeRulesController, type: :request do
     end
 
     it "renders Canada's page: a province to pick, its federal law in km/h, and nothing of the US" do
-      get "/ebike-rules/CA", params: {vehicle_models: "m/specialized/2025/haul-st-ca"}
+      get "/ebike-rules/CA", params: {vehicle_models: "m/specialized/2025/haul-st@CA"}
 
       expect(response).to have_http_status(:ok)
       expect(page).to have_title("Canada e-bike laws", exact: true)
@@ -375,7 +375,7 @@ RSpec.describe EbikeRulesController, type: :request do
     end
 
     it "checks a bike against a province's law, in km/h" do
-      get "/ebike-rules/CA/ON", params: {vehicle_models: "m/specialized/2025/haul-st-ca"}
+      get "/ebike-rules/CA/ON", params: {vehicle_models: "m/specialized/2025/haul-st@CA"}
 
       expect(page).to have_title("Ontario e-bike laws", exact: true)
         .and have_css("[data-hw-combobox-prefilled-display-value='Ontario (ON)']")

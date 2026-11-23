@@ -6842,6 +6842,25 @@ nb:
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
             Index. Hjelp oss med å betale serverkostnadene våre.
           region: Doner til Bike Index
+        schema_fields:
+          by_count: etter antall
+          by_count_label: "%{path} etter antall"
+          explain: forklare
+          less: mindre
+          models: "%{number}-modeller"
+          more: "+%{count} mer"
+          schema_order: skjemarekkefølge
+          file: fil
+          representative_initial: R
+          representative_vehicle_lowercase: representativt kjøretøy
+          view_list: se liste
+        schema_viewer:
+          documents: Skjemadokumenter
+          subtitle_html: Formen på en %{document}-fil på skjema %{version}, publisert
+            som %{url}
+          schemas_title: Sykkelbokskjemaer
+          unavailable: Bike Books katalog svarer ikke, så skjemaene kan ikke vises
+            akkurat nå. Prøv igjen om et øyeblikk.
       ebike_rules:
         class_tile:
           class: Klasse

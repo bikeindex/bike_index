@@ -154,12 +154,15 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
       expect(page).to have_css('[aria-expanded="false"]', wait: 10)
       expect(find_field("Cycle type").value).to eq "Bike"
 
+      # A pick made before form-persist connects writes no draft
+      wait_for_stimulus("form-persist")
       find_field("Cycle type").click
       find('[role="option"]', text: "Unicycle", exact_text: true).click
 
       visit "/rails/view_components/ui/forms/combobox/component/persisted"
 
-      expect(find_field("Cycle type").value).to eq "Unicycle"
+      # The page renders "Bike", and the restore replaces it a tick after form-persist connects
+      expect(page).to have_field("Cycle type", with: "Unicycle")
       expect(find("input[name='cycle_type']", visible: :hidden).value).to eq "unicycle"
     end
   end

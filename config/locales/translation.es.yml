@@ -7140,6 +7140,25 @@ es:
           pitch: Este fantástico producto es posible gracias a la organización sin
             ánimo de lucro Bike Index. Ayúdanos a cubrir los gastos de nuestro servidor.
           region: Dona a Bike Index
+        schema_fields:
+          by_count: por conteo
+          by_count_label: "%{path} por recuento"
+          explain: explicar
+          less: menos
+          models: "%{number} modelos"
+          more: "+%{count} más"
+          schema_order: orden del esquema
+          file: archivo
+          representative_initial: R
+          representative_vehicle_lowercase: vehículo representativo
+          view_list: ver lista
+        schema_viewer:
+          documents: Documentos de esquema
+          subtitle_html: La forma de un archivo %{document} en el esquema %{version},
+            publicado como %{url}
+          schemas_title: Esquemas del libro de bicicletas
+          unavailable: El catálogo de Bike Book no responde, por lo que sus esquemas
+            no se pueden mostrar en este momento. Inténtalo de nuevo en un minuto.
       ebike_rules:
         class_tile:
           class: Clase
