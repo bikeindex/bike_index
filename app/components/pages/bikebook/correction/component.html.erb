@@ -1,0 +1,29 @@
+<%= render(UI::Button::Component.new(color: :primary, commandfor: MODAL_ID, command: "show-modal",
+  html_class: "tw:fixed tw:right-4 tw:bottom-4 tw:z-40 tw:rounded-full! tw:shadow-lg tw:print:hidden")) do %>
+  <%= helpers.inline_svg_tag("icons/chat.svg", class: "tw:size-4", aria_hidden: true) %>
+  <%= translation(".submit_a_correction") %>
+<% end %>
+
+<%= render(UI::Modal::Component.new(id: MODAL_ID, title: translation(".submit_a_correction"))) do |modal| %>
+  <% modal.with_body do %>
+    <p class="tw:mb-4 tw:text-sm">
+      <%= translation(".description") %>
+    </p>
+
+    <%= form_with model: BugReport.new, url: bikebook_corrections_path do |f| %>
+      <% unless @user %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
+          <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true)) %>
+        <% end %>
+      <% end %>
+
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, required: true,
+        label_text: translation(".whats_wrong"), html_options: {rows: 5})) %>
+
+      <%= render(UI::Forms::Honeypot::Component.new(form_builder: f)) %>
+
+      <%= render(UI::Button::Component.new(text: translation(".send"), color: :primary, type: "submit",
+        html_class: "tw:w-full")) %>
+    <% end %>
+  <% end %>
+<% end %>

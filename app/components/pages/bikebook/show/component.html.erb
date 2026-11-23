@@ -485,3 +485,9 @@
     </div>
   </div>
 </div>
+
+<%#
+  Outside bikebook--page, whose submit action would take the form for a search. Not in a frame, where the
+  SameSite session cookie, and so the form's CSRF token, doesn't reach
+%>
+<%= render(Pages::Bikebook::Correction::Component.new(user: @current_user)) unless @framed %>

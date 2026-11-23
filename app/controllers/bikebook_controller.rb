@@ -1,7 +1,10 @@
 # frozen_string_literal: true
 
 class BikebookController < ApplicationController
+  CORRECTION_TAG = "bikebook_correction"
+
   before_action :redirect_to_dashed_ids, only: :show
+  rate_limit to: 10, within: 1.hour, by: -> { forwarded_ip_address }, only: :correction
 
   def show
     entries = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
@@ -25,6 +28,22 @@ class BikebookController < ApplicationController
     @page_title = "Bike Book schemas | Bike Index"
     render Pages::Bikebook::SchemaViewer::Component.new(viewer:, document:, open: params[:open].to_s.split(","),
       by_count: params[:by_count].to_s.split(",")), status: viewer ? :ok : :service_unavailable
+  end
+
+  # The page it was sent from goes in the report, since it names the models and filters being corrected
+  def correction
+    correction = params.require(:bug_report).permit(:body, :email, :additional)
+    page_url = url_from(request.referer)
+    bug_report = BugReport.new(user: current_user, email: current_user&.email || correction[:email],
+      from_name: current_user&.name, subject: "Bike Book correction", tags: [CORRECTION_TAG], received_at: Time.current,
+      body: [correction[:body], page_url].compact_blank.join("\n\n"))
+    # a filled honeypot is a bot's, thanked without saving
+    if correction[:additional].present? || (correction[:body].present? && bug_report.save)
+      flash[:success] = translation(:thanks_for_the_correction)
+    else
+      flash[:error] = translation(:correction_failed)
+    end
+    redirect_to page_url || bikebook_path
   end
 
   # For uptime monitoring: the page breaks whenever the catalog doesn't answer in the format it reads. Green or red, as /up is
@@ -63,7 +82,7 @@ class BikebookController < ApplicationController
     # the icon is taller than wide, which the large card crops to a banner
     @twitter_card = "summary" unless @page_image
     @page_image ||= helpers.image_url("logos/bikebook.png")
-    render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
+    render Pages::Bikebook::Show::Component.new(current_user:, manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
       market: request.env["HTTP_CF_IPCOUNTRY"], state: EbikeRuleServices::StateLaws.state_from_location(request_location_hash),
       query: request.query_parameters, paint_colors: Color.displays, framed: request.headers["Sec-Fetch-Dest"] == "iframe"), status:
   end

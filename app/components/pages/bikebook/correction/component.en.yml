@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      bikebook:
+        correction:
+          description: >-
+            See something wrong or missing? Tell us and we'll fix it. We'll include
+            the page you're on.
+          send: Send
+          submit_a_correction: Submit a correction
+          whats_wrong: What's wrong?
