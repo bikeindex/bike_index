@@ -191,11 +191,13 @@ module Integrations
 
       # An uncached file can take over 5s to start answering. A page waits on up to three - the manifest, the
       # vocabulary and a model's block - which give up inside rack-timeout's 30s unless a body trickles in
-      def body(path, timeout: 7) = LOCAL_DIRECTORY ? File.read(File.join(LOCAL_DIRECTORY, path)) : connection(timeout).get(path).body
+      def body(path, timeout: 7)
+        return File.read(File.join(LOCAL_DIRECTORY, path)) if LOCAL_DIRECTORY
 
-      def connection(timeout) = Faraday.new(url: URL, request: {open_timeout: 2, timeout:}) { it.response :raise_error }
+        Faraday.new(url: URL, request: {open_timeout: 2, timeout:}) { it.response :raise_error }.get(path).body
+      end
 
-      conceal :manifest_part, :manifest_key, :fetched_manifest, :models_of, :once, :read, :body, :connection
+      conceal :manifest_part, :manifest_key, :fetched_manifest, :models_of, :once, :read, :body
     end
   end
 end

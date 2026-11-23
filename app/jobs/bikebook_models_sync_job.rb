@@ -18,7 +18,7 @@ class BikebookModelsSyncJob < ScheduledJob
     return if rows.blank?
 
     rows.each_slice(1_000) { BikebookModel.upsert_all(it, unique_by: :catalog_id) }
-    BikebookModel.where(catalog_id: BikebookModel.pluck(:catalog_id) - rows.pluck(:catalog_id)).delete_all
+    BikebookModel.where.not(catalog_id: rows.pluck(:catalog_id)).delete_all
     Rails.cache.write(SYNCED_INDEX_KEY, index)
   end
 

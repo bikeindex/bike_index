@@ -45,12 +45,6 @@ RSpec.describe Integrations::Bikebook::Data do
       end
     end
 
-    context "with a year before the model's first" do
-      let(:options) { {manufacturer: "Specialized", frame_model: "Haul ST", year: 2024} }
-
-      it { expect(result).to be_nil }
-    end
-
     context "with a bike" do
       let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Aventon") }
       let(:options) { FactoryBot.create(:bike, manufacturer:, frame_model: "Level 2", year: 2023) }

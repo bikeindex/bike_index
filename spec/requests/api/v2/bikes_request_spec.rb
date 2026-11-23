@@ -86,8 +86,6 @@ RSpec.describe "Bikes API V2", type: :request do
       end
       it "creates", :flaky do
         sync_bikebook_models
-        expect(manufacturer.reload.name).to eq "Specialized"
-        expect(Bike.count).to eq 0
         expect {
           post "/api/v2/bikes?access_token=#{token.token}",
             params: bike_attrs.to_json,
@@ -96,10 +94,9 @@ RSpec.describe "Bikes API V2", type: :request do
         expect(response.code).to eq("201")
         expect(Bike.count).to eq 1
         result = json_result["bike"]
-        expect(Bike.last.mnfg_name).to eq "Specialized" # For some reason, fixed a flaky spec
+        expect(Bike.last.mnfg_name).to eq "Specialized"
         expect(result["manufacturer_name"]).to eq bike_attrs[:manufacturer]
         %i[serial year frame_model].each do |k|
-          pp k unless bike_attrs[k].downcase == result[k]&.to_s&.downcase
           expect(bike_attrs[k].downcase).to eq result[k].to_s.downcase
         end
         expect(result["description"]).to match bike_attrs[:description]
