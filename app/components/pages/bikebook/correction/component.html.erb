@@ -1,6 +1,6 @@
 <% cache(@user.present?) do %>
-  <%= render(UI::Button::Component.new(color: :primary, commandfor: MODAL_ID, command: "show-modal",
-  html_class: "tw:fixed tw:right-4 tw:bottom-4 tw:z-40 tw:rounded-full! tw:shadow-lg tw:print:hidden")) do %>
+  <%= render(UI::Button::Component.new(color: :primary, size: :callout_sm, commandfor: MODAL_ID, command: "show-modal",
+  html_class: "tw:fixed tw:right-4 tw:bottom-4 tw:z-40 tw:shadow-lg tw:print:hidden")) do %>
     <%= helpers.inline_svg_tag("icons/chat.svg", class: "tw:size-4", aria_hidden: true) %>
     <%= translation(".submit_a_correction") %>
   <% end %>
