@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
-import { CURRENT_MARK, CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
-import { clearCombobox, localSources } from 'utils/hw_combobox_patch'
+import { CURRENT_MARK, loadCatalog, mountCatalogCombobox } from 'bikebook/catalog'
+import { clearCombobox } from 'utils/hw_combobox_patch'
 import { readable, replaceUrl } from 'bikebook/replace_url'
 import { collapse, collapseField, COLLAPSE_DURATION_MS } from 'utils/collapse_utils'
 
@@ -26,21 +26,9 @@ export default class extends Controller {
     this.lastUrl = window.location.href.split('#')[0]
     this.classesPath = window.location.pathname
     this.observers = [this.#watchCleared(this.#stateField, () => this.chooseState())]
-    let catalog
-    try {
-      catalog = await loadCatalog(this.manifestUrlValue)
-    } catch (error) {
-      console.error(error)
-      this.comboboxSlotTarget.querySelector('input').placeholder = this.failedTextValue
-      return
-    }
-    const fragment = this.comboboxTarget.content.cloneNode(true)
-    const combobox = fragment.querySelector('.hw-combobox')
-    // with an async source the server can only prefill the id, which the gem would display
-    if (this.displayValue) combobox.dataset.hwComboboxPrefilledDisplayValue = this.displayValue
-    localSources.set(combobox, new CatalogComboboxSource(catalog))
-    this.comboboxSlotTarget.replaceChildren(fragment)
-    const bikeField = this.comboboxSlotTarget.querySelector('input[type=hidden]')
+    const bikeField = await mountCatalogCombobox(loadCatalog(this.manifestUrlValue), this.comboboxTarget, this.comboboxSlotTarget,
+      { display: this.displayValue, failedText: this.failedTextValue })
+    if (!bikeField) return
     this.model = bikeField.value
     this.observers.push(this.#watchCleared(bikeField, () => { if (this.model) this.#clearModel() }))
   }

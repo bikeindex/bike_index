@@ -9,6 +9,38 @@
         url: link_to(url, url, class: "twlink tw:break-all tw:underline"), version: @viewer["schema_version"]) %>
     </p>
 
+    <%= tag.div(class: "tw:mb-6", data: {controller: "bikebook--schema-lookup", action: "hw-combobox:selection->bikebook--schema-lookup#pick input->bikebook--schema-lookup#clear",
+      "bikebook--schema-lookup-manifest-url-value": Integrations::Bikebook::Catalog::MANIFEST_URL,
+      "bikebook--schema-lookup-path-value": bikebook_schemas_path,
+      "bikebook--schema-lookup-cleared-url-value": bikebook_schemas_path(document: @document),
+      "bikebook--schema-lookup-display-value": record_display,
+      "bikebook--schema-lookup-failed-text-value": translation(".catalog_failed")}) do %>
+      <%= render(UI::Card::Component.new(additional_classes: "tw:py-6")) do %>
+        <%= render(UI::Forms::Group::Component.new(attribute: :vehicle_models, label_text: translation(".lookup_label"), optional_badge: false, wrapper_class: nil)) do %>
+          <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
+          <template data-bikebook--schema-lookup-target="combobox">
+            <%= render(UI::Forms::Combobox::Component.new(name: "vehicle_models", src: bikebook_path, dialog_label: translation(".lookup_label"),
+              html_options: {value: @record_id, placeholder: translation(".search_placeholder")})) %>
+          </template>
+
+          <div data-bikebook--schema-lookup-target="slot">
+            <input
+              id="vehicle_models"
+              type="text"
+              class="twinput"
+              placeholder="<%= translation(".loading_catalog") %>"
+              autocomplete="off"
+              disabled
+            >
+          </div>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+
+  <% if @record_id %>
+    <%= render(Pages::Bikebook::Schema::Component.new(id: @record_id, record: @record, fields:)) %>
+  <% elsif @viewer %>
     <div
       class="tw:overflow-x-auto tw:font-mono tw:text-sm tw:leading-6"
       data-controller="bikebook--schema-fields"
@@ -16,8 +48,8 @@
       <div>{</div>
 
       <div class="tw:pl-4">
-        <%= render(Pages::Bikebook::SchemaFields::Component.new(fields: @viewer.dig("documents", @document, "fields"),
-          open: @open, by_count: @by_count, representative_ids: @viewer["representative_ids"], cache_key: [@viewer["file"], @document])) %>
+        <%= render(Pages::Bikebook::SchemaFields::Component.new(fields:, open: @open, by_count: @by_count,
+          representative_ids: @viewer["representative_ids"], cache_key: [@viewer["file"], @document])) %>
       </div>
 
       <div>}</div>

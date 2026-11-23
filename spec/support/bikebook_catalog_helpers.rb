@@ -59,3 +59,8 @@ module BikebookCatalogHelpers
 end
 
 RSpec.configure { it.include BikebookCatalogHelpers }
+
+# Unless a spec stubs it, the catalog 404s, and a cassette never records it. By host, as WebMock's URI carries the port
+catalog_host = URI(Integrations::Bikebook::Catalog::URL).host
+VCR.configure { |config| config.ignore_request { URI(it.uri).host == catalog_host } }
+WebMock.globally_stub_request(:after_local_stubs) { |request| {status: 404} if request.uri.host == catalog_host }
