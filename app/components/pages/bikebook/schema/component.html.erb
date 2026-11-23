@@ -1,6 +1,6 @@
 <% if @json %>
   <p class="tw:mb-4">
-    <%= link_to(translation(".view_on_github"), github_url, class: "twlink tw:underline") %>
+    <%= link_to(translation(".view_on_github"), Integrations::Bikebook::RepositoryRecord.github_url(@id), class: "twlink tw:underline") %>
   </p>
 
   <%= code %>

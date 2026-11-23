@@ -74,7 +74,7 @@ module Integrations
       # The index's models, nil while the catalog doesn't answer. Too big to cache, and read by a job, outside rack-timeout
       def index_models(path)
         read(path, timeout: 60)["models"]
-      rescue Faraday::Error, JSON::ParserError, SystemCallError
+      rescue *FAILURES
         nil
       end
 
@@ -187,10 +187,10 @@ module Integrations
 
       def once(key) = Reads.values.fetch(key) { Reads.values[key] = yield }
 
+      def read(path, **) = dashed_ids(JSON.parse(body(path, **)))
+
       # An uncached file can take over 5s to start answering. A page waits on up to three - the manifest, the
       # vocabulary and a model's block - which give up inside rack-timeout's 30s unless a body trickles in
-      def read(path, timeout: 7) = dashed_ids(JSON.parse(body(path, timeout:)))
-
       def body(path, timeout: 7) = LOCAL_DIRECTORY ? File.read(File.join(LOCAL_DIRECTORY, path)) : connection(timeout).get(path).body
 
       def connection(timeout) = Faraday.new(url: URL, request: {open_timeout: 2, timeout:}) { it.response :raise_error }

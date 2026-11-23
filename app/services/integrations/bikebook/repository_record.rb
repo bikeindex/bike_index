@@ -19,6 +19,8 @@ module Integrations
 
       def path(id) = document(id)&.then { "#{it}s/#{id[ID, 2]}.json" }
 
+      def github_url(id) = "#{Integrations::Bikebook::Catalog::GITHUB_FILES_URL}/#{path(id)}"
+
       # nil for an id with no file. A failure is kept for a minute, so GitHub being down holds up one request a minute
       def json(id)
         return unless path(id)
