@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 # The fixture catalog in place of the published one, its models at 1.0.0 but the Haul ST, at 1.1.0, whose CA is in
-# its market_variants; every other market variant is a record of its own. Its ids and its vocabulary's names are
-# 2.0.0's, but Aventon's 2022 models' ids and every model's values are 1.x's
+# its market_variants; every other market variant is a record of its own. Its ids, its vocabulary's names, its
+# index's manufacturer slugs and its components' types are 2.0.0's, but Aventon's 2022 models' ids and every model's
+# other values are 1.x's
 module BikebookCatalogHelpers
   FIXTURES = Rails.root.join("spec/fixtures/bikebook_catalog")
 

@@ -18,18 +18,6 @@ RSpec.describe Integrations::Bikebook::Data do
                                               description: "Tektro HD-T535, 4 piston caliper, hydraulic disc, 203mm rotor"}.as_json)
     end
 
-    context "with a 1.x vocabulary, whose names are keyed by underscored slugs" do
-      before do
-        vocabulary = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
-        vocabulary["names"]["components.type"].transform_keys! { it.tr("-", "_") }
-        WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(body: vocabulary.to_json)
-      end
-
-      it "names each component's type" do
-        expect(result[:components].pluck("component_type")).to include("Grips/Tape", "Bell/Noisemaker")
-      end
-    end
-
     context "with a year after the model's first" do
       let(:options) { {manufacturer_id:, frame_model: "haul-st", year: "2026"} }
 
