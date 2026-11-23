@@ -23,6 +23,7 @@ HwComboboxController.prototype.connect = function () {
   if (source?.prime) this.element.querySelector('.hw_combobox__pagination__wrapper turbo-frame')?.remove()
   this.element.addEventListener('mousedown', keepFocusOnPick)
   connect.call(this)
+  this.picked = { value: this._fieldValueString, display: this._fullQuery }
   source?.prime?.(this)
   searchEarlyTyping(this)
 }
@@ -83,10 +84,17 @@ HwComboboxController.prototype._filterAsync = async function (inputType) {
 }
 
 // Closing on Enter clears a query that matches nothing, so it stays open to say so - unless it's free text to
-// keep. And a multiselect's Escape makes no chip of the option the gem locks in, but the gem still announces it
+// keep. And a multiselect's Escape makes no chip of the option the gem locks in, but the gem still announces it.
+// A local source's single select picks as it's typed into, which Escape would lock in, so it goes back to its pick
 const close = HwComboboxController.prototype.close
 HwComboboxController.prototype.close = function (inputType) {
   if (inputType === 'hw:keyHandler:enter' && this._isQueried && !this._allowNew && !this._visibleOptionElements.length) return
+  if (inputType === 'hw:keyHandler:escape' && this._isSingleSelect && this._isOpen && localSources.get(this.element)?.filter) {
+    this.expandedValue = false
+    this._fieldValue = this.picked.value
+    this._fullQuery = this.picked.display
+    return
+  }
 
   this.dismissing = this._isMultiselect && inputType === 'hw:keyHandler:escape'
   close.call(this, inputType)
@@ -95,7 +103,10 @@ HwComboboxController.prototype.close = function (inputType) {
 
 const dispatchSelectionEvent = HwComboboxController.prototype._dispatchSelectionEvent
 HwComboboxController.prototype._dispatchSelectionEvent = function (previousValue) {
-  if (!this.dismissing) dispatchSelectionEvent.call(this, previousValue)
+  if (this.dismissing) return
+
+  dispatchSelectionEvent.call(this, previousValue)
+  this.picked = { value: this._fieldValueString, display: this._fullQuery }
 }
 
 // The gem swallows Enter whether or not the listbox is open, so a combobox with

@@ -38,14 +38,27 @@ RSpec.describe "Bike Book schema viewer", :js, type: :system do
     expect(page).to have_css("pre", text: %("manufacturer": "Segway",)).and have_no_css("[data-schema-path]")
     field = find_field("View a model's or e-vehicle classification's file", disabled: false, wait: 10)
     expect(field.value).to eq "Segway GT3 Pro"
-    # a click selects the pick, to delete for another
+    # a click selects the pick, to type another over
     field.click
-    field.send_keys(:backspace, "haul")
+    field.send_keys("haul")
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
     expect(page).to have_current_path("/bikebook_schemas/m/specialized/2025/haul-st")
     expect(page).to have_css("pre", text: %("manufacturer": "Specialized",))
 
-    find(".hw-combobox__handle").click
+    # Escape closes a search without picking from it, back to the pick
+    field = find_field("View a model's or e-vehicle classification's file", disabled: false, wait: 10)
+    field.click
+    field.send_keys("gt3")
+    expect(page).to have_css("[role='option']", text: "Segway GT3 Pro")
+    field.send_keys(:escape)
+    expect(page).to have_no_css("[role='option']")
+    expect(field.value).to eq "Specialized Haul ST"
+    expect(page).to have_current_path("/bikebook_schemas/m/specialized/2025/haul-st")
+
+    # deleting the pick goes back to the document's fields, as its clear does
+    find("h1", text: "Bike Book schemas").click
+    field.click
+    field.send_keys(:backspace)
     expect(page).to have_current_path("/bikebook_schemas?document=vehicle_model")
     expect(page).to have_css("[data-schema-path='type']").and have_no_css("pre")
   end

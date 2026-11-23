@@ -9,7 +9,7 @@
         url: link_to(url, url, class: "twlink tw:break-all tw:underline"), version: @viewer["schema_version"]) %>
     </p>
 
-    <%= tag.div(class: "tw:mb-6", data: {controller: "bikebook--schema-lookup", action: "hw-combobox:selection->bikebook--schema-lookup#pick click->bikebook--schema-lookup#clear",
+    <%= tag.div(class: "tw:mb-6", data: {controller: "bikebook--schema-lookup", action: "hw-combobox:selection->bikebook--schema-lookup#pick input->bikebook--schema-lookup#clear",
       "bikebook--schema-lookup-manifest-url-value": Integrations::Bikebook::Catalog::MANIFEST_URL,
       "bikebook--schema-lookup-path-value": bikebook_schemas_path,
       "bikebook--schema-lookup-cleared-url-value": bikebook_schemas_path(document: @document),

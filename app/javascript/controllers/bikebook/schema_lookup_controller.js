@@ -35,13 +35,14 @@ export default class extends Controller {
     this.loading.abort()
   }
 
-  // The gem announces the prefilled pick on connecting, which is this page's own
+  // Picking nothing - the handle's clear, or Escape once it's closed - leaves the pick. The gem announces the
+  // prefilled pick on connecting, which is this page's own
   pick ({ detail: { value } }) {
-    if (value && value !== this.picked) Turbo.visit(`${this.pathValue}/${value}`)
+    if (value !== this.picked) Turbo.visit(value ? `${this.pathValue}/${value}` : this.clearedUrlValue)
   }
 
-  // The handle's clear, which no selection event announces. Typing over the pick empties the field too, but searches
+  // Deleting the pick's name, which the gem announces only once it closes. Typing over the pick searches
   clear ({ target }) {
-    if (this.picked && target.closest('.hw-combobox__handle')) Turbo.visit(this.clearedUrlValue)
+    if (this.picked && !target.value) Turbo.visit(this.clearedUrlValue)
   }
 }
