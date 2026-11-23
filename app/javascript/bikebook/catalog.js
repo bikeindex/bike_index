@@ -61,6 +61,10 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
   }
 }
 
+const catalogs = new Map()
+// One catalog, and its worker, for everything on the page that reads it at `manifestUrl`, which a Turbo visit keeps
+export const catalogAt = (manifestUrl) => catalogs.get(manifestUrl) ?? catalogs.set(manifestUrl, loadCatalog(manifestUrl)).get(manifestUrl)
+
 // Answers a hotwire_combobox async filter with the markup the gem's own turbo-stream response would
 // carry, so its selection and paging run unchanged
 export class CatalogComboboxSource {

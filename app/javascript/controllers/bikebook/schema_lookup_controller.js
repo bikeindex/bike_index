@@ -1,9 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
-import { CatalogComboboxSource, loadCatalog } from 'bikebook/catalog'
+import { CatalogComboboxSource, catalogAt } from 'bikebook/catalog'
 import { localSources } from 'utils/hw_combobox_patch'
-
-/* global AbortController */
 
 // Connects to data-controller='bikebook--schema-lookup'
 // /bikebook's search, picking a single model or classification, whose file a pick visits and clearing it leaves. The
@@ -13,10 +11,9 @@ export default class extends Controller {
   static values = { manifestUrl: String, path: String, clearedUrl: String, display: String, failedText: String }
 
   async connect () {
-    this.loading = new AbortController()
     let catalog
     try {
-      catalog = await loadCatalog(this.manifestUrlValue, [], {}, {}, { signal: this.loading.signal })
+      catalog = await catalogAt(this.manifestUrlValue)
     } catch (error) {
       console.error(error)
       this.slotTarget.querySelector('input').placeholder = this.failedTextValue
@@ -31,18 +28,20 @@ export default class extends Controller {
     this.picked = this.slotTarget.querySelector('input[type=hidden]').value
   }
 
-  disconnect () {
-    this.loading.abort()
-  }
-
   // Picking nothing - the handle's clear, or Escape once it's closed - leaves the pick. The gem announces the
   // prefilled pick on connecting, which is this page's own
   pick ({ detail: { value } }) {
-    if (value !== this.picked) Turbo.visit(value ? `${this.pathValue}/${value}` : this.clearedUrlValue)
+    if (value !== this.picked) this.#visit(value, value ? `${this.pathValue}/${value}` : this.clearedUrlValue)
   }
 
   // Deleting the pick's name, which the gem announces only once it closes. Typing over the pick searches
   clear ({ target }) {
-    if (this.picked && !target.value) Turbo.visit(this.clearedUrlValue)
+    if (this.picked && !target.value) this.#visit('', this.clearedUrlValue)
+  }
+
+  // the gem announces a deletion once it closes, which mustn't visit again
+  #visit (picked, url) {
+    this.picked = picked
+    Turbo.visit(url)
   }
 }

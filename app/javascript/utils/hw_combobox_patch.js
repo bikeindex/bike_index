@@ -7,6 +7,8 @@ import HwComboboxController from 'controllers/hw_combobox_controller'
 // gem's lazy turbo-frame (`source.prime(controller)`), in the browser rather than asking the server
 export const localSources = new WeakMap()
 
+const searchesLocally = (combobox) => !!localSources.get(combobox.element)?.filter
+
 // Pressing the list - an option, a label, "No matches" - or the field beside its chips would blur the input
 // onto the page, leaving it open with nothing focused to hear Escape or to blur from. The click back in still
 // selects the display, as it did after that blur
@@ -89,11 +91,9 @@ HwComboboxController.prototype._filterAsync = async function (inputType) {
 const close = HwComboboxController.prototype.close
 HwComboboxController.prototype.close = function (inputType) {
   if (inputType === 'hw:keyHandler:enter' && this._isQueried && !this._allowNew && !this._visibleOptionElements.length) return
-  if (inputType === 'hw:keyHandler:escape' && this._isSingleSelect && this._isOpen && localSources.get(this.element)?.filter) {
+  if (inputType === 'hw:keyHandler:escape' && this._isSingleSelect && this._isOpen && searchesLocally(this)) {
     this.expandedValue = false
-    this._fieldValue = this.picked.value
-    this._fullQuery = this.picked.display
-    return
+    return this.restore(this.picked)
   }
 
   this.dismissing = this._isMultiselect && inputType === 'hw:keyHandler:escape'
@@ -115,7 +115,7 @@ HwComboboxController.prototype._dispatchSelectionEvent = function (previousValue
 const navigate = HwComboboxController.prototype.navigate
 // A query in a local source's combobox is to pick from, though it's closed, rather than submit
 HwComboboxController.prototype.navigate = function (event) {
-  if (event.key === 'Enter' && localSources.get(this.element)?.filter && this._fullQuery) {
+  if (event.key === 'Enter' && searchesLocally(this) && this._fullQuery) {
     if (this.edits !== this.answeredEdits) {
       this.enterPending = true
       return event.preventDefault()
