@@ -24,7 +24,7 @@ module Pages
         def code
           record = JSON.parse(@json)
           lines = JSON.pretty_generate(record).lines(chomp: true).zip(comments(record, {"fields" => @fields}))
-          tag.pre(safe_join(lines.map { line_tag(*it) }), class: "tw:overflow-x-auto tw:font-mono tw:text-sm tw:leading-6")
+          tag.pre(safe_join(lines.map { line_tag(*it) }), class: "twgutter-bleed tw:overflow-x-auto tw:font-mono tw:text-sm tw:leading-6 tw:[--gutter:--spacing(5)]")
         end
 
         # One for each of JSON.pretty_generate's lines, an object or array closing on a line of its own
