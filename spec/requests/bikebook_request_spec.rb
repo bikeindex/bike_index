@@ -523,6 +523,10 @@ RSpec.describe BikebookController, type: :request do
         "  }",
         "}"
       ])
+      # a market variant's citation key, whose record is in its home model's file
+      get "/bikebook_schemas/m/segway/2025/gt3-pro@CA"
+      expect(lines.second).to eq '  "id": "m/segway/2025/gt3-pro",'
+      expect(response.body).to include("<title>m/segway/2025/gt3-pro@CA | Bike Book</title>")
       WebMock::API.assert_requested(model, times: 1)
     end
 

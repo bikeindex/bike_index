@@ -9,7 +9,8 @@ module Integrations
 
       URL = "https://raw.githubusercontent.com/bikeindex/bikebook/main/"
       DOCUMENTS = {"m" => "vehicle_model", "c" => "component", "evc" => "e_vehicle_classification"}.freeze
-      ID = %r{\A(m|c|evc)/([a-z0-9/-]+)\z}
+      # a market variant's citation key, its home record's id and @ its market, is in its home record's file
+      ID = %r{\A(m|c|evc)/([a-z0-9/-]+)(?:@[A-Z]+)?\z}
 
       Unreachable = Class.new(StandardError)
 
@@ -22,7 +23,7 @@ module Integrations
       def json(id)
         return unless path(id)
 
-        Rails.cache.fetch(["bikebook/repository_record", id], expires_in: 1.hour) do |_key, options|
+        Rails.cache.fetch(["bikebook/repository_record", path(id)], expires_in: 1.hour) do |_key, options|
           Faraday.new(url: URL, request: {open_timeout: 2, timeout: 7}) { it.response :raise_error }.get(path(id)).body
         rescue Faraday::ResourceNotFound
           nil
