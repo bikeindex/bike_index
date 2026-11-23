@@ -8,6 +8,7 @@ module Pages
       # json: nil while the repository doesn't answer
       # fields: its document's in the schema viewer, nil while the catalog doesn't answer, which leaves it uncommented
       class Component < ApplicationComponent
+        UNCOMMENTED = ["bikebook-hosted copy of the manufacturer's photo of this colorway"].freeze
         LINE = /\A( *)("(?:[^"\\]|\\.)*": )?(.*?)(,?)\z/
 
         def initialize(id:, json:, fields:)
@@ -28,7 +29,8 @@ module Pages
 
         # One for each of JSON.pretty_generate's lines, an object or array closing on a line of its own
         def comments(value, field)
-          comment = [field["description"], field["values"]&.find { it["value"] == value }&.dig("description")].compact.join("; ").presence
+          description = field["description"] unless UNCOMMENTED.include?(field["description"])
+          comment = [description, field["values"]&.find { it["value"] == value }&.dig("description")].compact.join("; ").presence
           children = case value
           when Hash then value.flat_map { |name, each| comments(each, child(field, name)) }
           when Array then value.flat_map { comments(it, item(field)) }

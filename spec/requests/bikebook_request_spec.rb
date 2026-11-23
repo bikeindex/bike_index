@@ -471,7 +471,7 @@ RSpec.describe BikebookController, type: :request do
          "first_year": 2024, "motor": {"spindle": "ISIS", "kind": "mid-drive"}, "aliases": []}
       JSON
       model = WebMock.stub_request(:get, "#{url}vehicle_models/segway/2025/gt3-pro.json").to_return(body: <<~JSON)
-        {"id": "m/segway/2025/gt3-pro", "markets": ["US"], "years": {"2025": {"colorways": [{"name": "Grey"}], "url_live": true}}}
+        {"id": "m/segway/2025/gt3-pro", "markets": ["US"], "years": {"2025": {"colorways": [{"name": "Grey", "stock_photo": "grey.png"}], "url_live": true}}}
       JSON
 
       2.times { get "/bikebook_schemas/c/aventon/2024/a100" }
@@ -515,7 +515,8 @@ RSpec.describe BikebookController, type: :request do
         '    "2025": {',
         '      "colorways": [ // one per paint',
         "        {",
-        '          "name": "Grey"',
+        '          "name": "Grey",',
+        '          "stock_photo": "grey.png"',
         "        }",
         "      ],",
         '      "url_live": true // whether the manufacturer\'s page is still up; false for an archive capture, which shows it as it was',
