@@ -7,33 +7,33 @@
 # Table name: bikebook_models
 # Database name: primary
 #
-#  id                :bigint           not null, primary key
-#  final_year        :integer
-#  first_year        :integer          not null
-#  manufacturer_slug :string           not null
-#  markets           :string           default([]), not null, is an Array
-#  model_slug        :string           not null
-#  name              :string           not null
-#  variants          :jsonb            not null
-#  created_at        :datetime         not null
-#  updated_at        :datetime         not null
-#  catalog_id        :string           not null
+#  id              :bigint           not null, primary key
+#  final_year      :integer
+#  first_year      :integer          not null
+#  markets         :string           default([]), not null, is an Array
+#  model_slug      :string           not null
+#  name            :string           not null
+#  variants        :jsonb            not null
+#  created_at      :datetime         not null
+#  updated_at      :datetime         not null
+#  catalog_id      :string           not null
+#  manufacturer_id :bigint           not null
 #
 # Indexes
 #
-#  index_bikebook_models_on_catalog_id                        (catalog_id) UNIQUE
-#  index_bikebook_models_on_manufacturer_slug_and_model_slug  (manufacturer_slug,model_slug)
+#  index_bikebook_models_on_catalog_id                      (catalog_id) UNIQUE
+#  index_bikebook_models_on_manufacturer_id_and_model_slug  (manufacturer_id,model_slug)
 #
 class BikebookModel < ApplicationRecord
-  # The catalog's manufacturer slugs are Slugifyer.legacy_manufacturer's, dashed as schema 2.0.0's are
-  scope :for_manufacturer, ->(name) { where(manufacturer_slug: Slugifyer.legacy_manufacturer(name)&.tr("_", "-")) }
+  belongs_to :manufacturer
+
   scope :sold_in_year, ->(year) { where(first_year: ..year, final_year: [nil, year..]) }
 
   # The catalog id of the manufacturer's model of that name sold in that year, nil for one the catalog lacks. Of
   # several, the one sold in `market`, a country's ISO code, then the latest
-  def self.catalog_id_for(manufacturer:, name:, year:, market: nil)
+  def self.catalog_id_for(manufacturer_id:, name:, year:, market: nil)
     market = Integrations::Bikebook::Catalog.market(market)
-    models = for_manufacturer(manufacturer).where(model_slug: Slugifyer.book_slug(name)).sold_in_year(year).order(first_year: :desc, catalog_id: :asc).to_a
+    models = where(manufacturer_id:, model_slug: Slugifyer.book_slug(name)).sold_in_year(year).order(first_year: :desc, catalog_id: :asc).to_a
     (models.find { it.sold_in?(market) } || models.first)&.catalog_id_in(market)
   end
 

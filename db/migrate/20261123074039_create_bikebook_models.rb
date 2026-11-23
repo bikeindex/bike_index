@@ -2,7 +2,7 @@ class CreateBikebookModels < ActiveRecord::Migration[8.1]
   def change
     create_table :bikebook_models do |t|
       t.string :catalog_id, null: false
-      t.string :manufacturer_slug, null: false
+      t.references :manufacturer, null: false, index: false
       t.string :name, null: false
       t.string :model_slug, null: false
       t.integer :first_year, null: false
@@ -13,6 +13,6 @@ class CreateBikebookModels < ActiveRecord::Migration[8.1]
       t.timestamps
     end
     add_index :bikebook_models, :catalog_id, unique: true
-    add_index :bikebook_models, %i[manufacturer_slug model_slug]
+    add_index :bikebook_models, %i[manufacturer_id model_slug]
   end
 end

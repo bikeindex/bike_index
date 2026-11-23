@@ -189,7 +189,7 @@ module BikeServices
       return nil unless b_param.bike["frame_model"].present? && b_param.bike["year"].present?
 
       bb_data = Integrations::Bikebook::Data.get_model({
-        manufacturer: Manufacturer.find(b_param.bike["manufacturer_id"]).name,
+        manufacturer_id: b_param.bike["manufacturer_id"],
         year: b_param.bike["year"],
         frame_model: b_param.bike["frame_model"],
         market: b_param.address_record.country_iso

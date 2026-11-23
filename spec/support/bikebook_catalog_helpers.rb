@@ -17,9 +17,12 @@ module BikebookCatalogHelpers
     end
   end
 
-  # The fixture catalog, its index synced to BikebookModel
+  # The fixture catalog, its index synced to BikebookModel, creating the manufacturers it lists
   def sync_bikebook_models
     stub_bikebook_catalog
+    JSON.parse(FIXTURES.join("index.json").read)["manufacturers"].each_value do
+      Manufacturer.friendly_find(it) || FactoryBot.create(:manufacturer, name: it)
+    end
     BikebookModelsSyncJob.new.perform
   end
 

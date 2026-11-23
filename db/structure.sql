@@ -735,7 +735,7 @@ ALTER SEQUENCE public.bike_versions_id_seq OWNED BY public.bike_versions.id;
 CREATE TABLE public.bikebook_models (
     id bigint NOT NULL,
     catalog_id character varying NOT NULL,
-    manufacturer_slug character varying NOT NULL,
+    manufacturer_id bigint NOT NULL,
     name character varying NOT NULL,
     model_slug character varying NOT NULL,
     first_year integer NOT NULL,
@@ -6719,10 +6719,10 @@ CREATE UNIQUE INDEX index_bikebook_models_on_catalog_id ON public.bikebook_model
 
 
 --
--- Name: index_bikebook_models_on_manufacturer_slug_and_model_slug; Type: INDEX; Schema: public; Owner: -
+-- Name: index_bikebook_models_on_manufacturer_id_and_model_slug; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_bikebook_models_on_manufacturer_slug_and_model_slug ON public.bikebook_models USING btree (manufacturer_slug, model_slug);
+CREATE INDEX index_bikebook_models_on_manufacturer_id_and_model_slug ON public.bikebook_models USING btree (manufacturer_id, model_slug);
 
 
 --

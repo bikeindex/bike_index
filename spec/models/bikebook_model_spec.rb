@@ -7,7 +7,7 @@ RSpec.describe BikebookModel, type: :model do
 
   describe "catalog_id_for" do
     def catalog_id(name, year, market = nil, manufacturer: "Specialized")
-      described_class.catalog_id_for(manufacturer:, name:, year:, market:)
+      described_class.catalog_id_for(manufacturer_id: Manufacturer.friendly_find(manufacturer).id, name:, year:, market:)
     end
 
     it "is the model sold that year, its market's variant or the model sold there" do

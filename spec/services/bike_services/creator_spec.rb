@@ -848,7 +848,7 @@ RSpec.describe BikeServices::Creator do
     end
     context "a model in Bike Book" do
       before { sync_bikebook_models }
-      let(:manufacturer_name) { "Specialized" }
+      let(:manufacturer) { Manufacturer.friendly_find("Specialized") }
       let(:bike_params) do
         {
           serial_number: "Some serial",

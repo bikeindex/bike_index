@@ -4,7 +4,8 @@ RSpec.describe Integrations::Bikebook::Data do
   before { sync_bikebook_models }
 
   describe "get_model" do
-    let(:options) { {manufacturer: "Specialized", frame_model: "Haul ST", year: 2025} }
+    let(:manufacturer_id) { Manufacturer.friendly_find("Specialized").id }
+    let(:options) { {manufacturer_id:, frame_model: "Haul ST", year: 2025} }
     let(:result) { described_class.get_model(options) }
 
     it "returns the model's bike and component params" do
@@ -30,7 +31,7 @@ RSpec.describe Integrations::Bikebook::Data do
     end
 
     context "with a year after the model's first" do
-      let(:options) { {manufacturer: "Specialized", frame_model: "haul-st", year: "2026"} }
+      let(:options) { {manufacturer_id:, frame_model: "haul-st", year: "2026"} }
 
       it "returns the model" do
         expect(result[:bike][:cycle_type]).to eq "cargo"
@@ -38,7 +39,7 @@ RSpec.describe Integrations::Bikebook::Data do
     end
 
     context "in its market variant's market" do
-      let(:options) { {manufacturer: "Specialized", frame_model: "Haul ST", year: 2025, market: "CA"} }
+      let(:options) { {manufacturer_id:, frame_model: "Haul ST", year: 2025, market: "CA"} }
 
       it "returns the variant" do
         expect(result[:bike][:stock_photo_url]).to eq "https://bikebook.bikeindex.org/specialized/2025/haul_st_ca.webp"
@@ -46,8 +47,7 @@ RSpec.describe Integrations::Bikebook::Data do
     end
 
     context "with a bike" do
-      let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Aventon") }
-      let(:options) { FactoryBot.create(:bike, manufacturer:, frame_model: "Level 2", year: 2023) }
+      let(:options) { FactoryBot.create(:bike, manufacturer: Manufacturer.friendly_find("Aventon"), frame_model: "Level 2", year: 2023) }
 
       it "returns the model" do
         expect(result[:bike][:cycle_type]).to eq "bike"
@@ -56,7 +56,7 @@ RSpec.describe Integrations::Bikebook::Data do
     end
 
     context "with a manufacturer the catalog lacks" do
-      let(:options) { {manufacturer: "Some crazy manufacturer we have nothing on", frame_model: "Haul ST", year: 2025} }
+      let(:manufacturer_id) { FactoryBot.create(:manufacturer, name: "Some crazy manufacturer we have nothing on").id }
 
       it { expect(result).to be_nil }
     end
