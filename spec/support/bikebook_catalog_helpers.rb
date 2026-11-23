@@ -17,6 +17,12 @@ module BikebookCatalogHelpers
     end
   end
 
+  # The fixture catalog, its index synced to BikebookModel
+  def sync_bikebook_models
+    stub_bikebook_catalog
+    BikebookModelsSyncJob.new.perform
+  end
+
   # The catalog as it is once it publishes again: a new vocabulary, Segway's 2025 block with a new description, and a
   # schema viewer counting 12,345,678 models with a manufacturer
   def stub_bikebook_catalog_update

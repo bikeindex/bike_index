@@ -188,10 +188,11 @@ module BikeServices
       return nil unless b_param&.bike.present? && b_param.manufacturer_id.present?
       return nil unless b_param.bike["frame_model"].present? && b_param.bike["year"].present?
 
-      bb_data = Integrations::Bikebook::Data.new.get_model({
+      bb_data = Integrations::Bikebook::Data.get_model({
         manufacturer: Manufacturer.find(b_param.bike["manufacturer_id"]).name,
         year: b_param.bike["year"],
-        frame_model: b_param.bike["frame_model"]
+        frame_model: b_param.bike["frame_model"],
+        market: b_param.address_record.country_iso
       })
 
       return true unless bb_data && bb_data["bike"].present?
@@ -208,7 +209,6 @@ module BikeServices
         end
       end
       b_param.params["bike"]["rear_wheel_bsd"] = bb_data["bike"]["rear_wheel_bsd"] if bb_data["bike"]["rear_wheel_bsd"].present?
-      b_param.params["bike"]["rear_tire_narrow"] = bb_data["bike"]["rear_tire_narrow"] if bb_data["bike"]["rear_tire_narrow"].present?
       b_param.params["bike"]["stock_photo_url"] = bb_data["bike"]["stock_photo_url"] if bb_data["bike"]["stock_photo_url"].present?
       b_param.params["components"] = bb_data["components"] && bb_data["components"].map { |c| c.merge("is_stock" => true) }
       b_param.clean_params # if we just rely on the before_save filter, b_param needs to be reloaded

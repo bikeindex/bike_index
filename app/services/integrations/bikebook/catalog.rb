@@ -68,6 +68,16 @@ module Integrations
         (record || raise(Unreachable)).presence
       end
 
+      # The catalog's market for a country's ISO code: it lists an EU member's models under the EU
+      def market(iso) = EbikeRuleServices::Places::EU_MEMBERS.include?(iso) ? "EU" : iso
+
+      # The index's models, nil while the catalog doesn't answer. Too big to cache, and read by a job, outside rack-timeout
+      def index_models(path)
+        read(path, timeout: 60)["models"]
+      rescue *FAILURES
+        nil
+      end
+
       # vehicle_models' entries: each vehicle's id, then in braces what's picked for it, m/trek/2026/marlin-5{size:M}{json}.
       # A name's commas are inside its braces
       def vehicle_entries(vehicle_models) = vehicle_models.to_s.scan(/(?:[^,{]|\{[^}]*\})+/)
@@ -177,13 +187,13 @@ module Integrations
 
       def once(key) = Reads.values.fetch(key) { Reads.values[key] = yield }
 
-      def read(path) = dashed_ids(JSON.parse(body(path)))
-
-      def body(path) = LOCAL_DIRECTORY ? File.read(File.join(LOCAL_DIRECTORY, path)) : connection.get(path).body
+      def read(path, **) = dashed_ids(JSON.parse(body(path, **)))
 
       # An uncached file can take over 5s to start answering. A page waits on up to three - the manifest, the
       # vocabulary and a model's block - which give up inside rack-timeout's 30s unless a body trickles in
-      def connection = Faraday.new(url: URL, request: {open_timeout: 2, timeout: 7}) { it.response :raise_error }
+      def body(path, timeout: 7) = LOCAL_DIRECTORY ? File.read(File.join(LOCAL_DIRECTORY, path)) : connection(timeout).get(path).body
+
+      def connection(timeout) = Faraday.new(url: URL, request: {open_timeout: 2, timeout:}) { it.response :raise_error }
 
       conceal :manifest_part, :manifest_key, :fetched_manifest, :models_of, :once, :read, :body, :connection
     end
