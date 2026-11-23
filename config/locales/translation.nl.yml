@@ -7077,6 +7077,15 @@ nl:
           unavailable: De catalogus van Bike Book reageert niet, daarom kunnen de
             schema's momenteel niet worden weergegeven. Probeer het over een minuut
             opnieuw.
+          catalog_failed: De catalogus van Bike Book kon niet worden geladen, waardoor
+            er niet in gezocht kan worden.
+          loading_catalog: De catalogus wordt geladen…
+          lookup_label: Bekijk het bestand met de classificatie van een model of e-voertuig.
+          search_placeholder: Zoeken op fabrikant of model…
+        schema:
+          unreachable: De Bike Book-database reageert niet. Probeer het over een minuut
+            opnieuw.
+          view_on_github: Bekijk dit bestand op GitHub
       ebike_rules:
         class_tile:
           class: Klas
