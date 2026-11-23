@@ -154,6 +154,17 @@ RSpec.describe BikebookController, type: :request do
         expect(page.find("[inert]", visible: :all)[:class]).to eq "tw:hidden"
       end
 
+      context "a market's, by its citation key" do
+        let(:params) { {vehicle_models: "m/specialized/2025/haul-st@CA"} }
+
+        it "renders its page, with its own photo" do
+          expect(response).to have_http_status(:ok)
+          expect(page).to have_title("Specialized Haul ST", exact: true)
+            .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/specialized/2025/haul_st_ca.webp']", visible: :all)
+            .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/specialized/2025/haul-st@CA']", visible: :all)
+        end
+      end
+
       context "that the catalog hasn't" do
         let(:params) { {vehicle_models: "m/segway-ninebot/2025/gt-9"} }
 
@@ -220,6 +231,8 @@ RSpec.describe BikebookController, type: :request do
     it "redirects to the page with that vehicle picked" do
       get "/bikebook/m/segway/2025/gt3-pro"
       expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3-pro")
+      get "/bikebook/m/specialized/2025/haul-st@CA"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/specialized/2025/haul-st@CA")
     end
 
     it "redirects from the vehicle's id alone, an older link's for show to dash" do

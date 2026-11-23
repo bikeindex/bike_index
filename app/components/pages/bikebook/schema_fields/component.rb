@@ -63,7 +63,7 @@ module Pages
         def example_item(id)
           representative = representative_badge if @representative_ids.include?(id)
           link = link_to(id, ReadableQuery.path(bikebook_path, "vehicle_models" => id), class: "twlink tw:font-mono")
-          file = link_to(translation(".file"), "#{Integrations::Bikebook::Catalog::GITHUB_FILES_URL}/vehicle_models/#{id.delete_prefix("m/")}.json", class: "gray-link")
+          file = link_to(translation(".file"), "#{Integrations::Bikebook::Catalog::GITHUB_FILES_URL}/vehicle_models/#{id.delete_prefix("m/").split("@").first}.json", class: "gray-link")
           tag.li(safe_join([link, file, representative].compact, " "))
         end
 

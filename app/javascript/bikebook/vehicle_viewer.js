@@ -232,7 +232,7 @@ export class VehicleViewer {
     const picked = vehiclesOf(url)
     const active = picked.some(({ id }) => id === model.id)
     const next = active ? picked.filter(({ id }) => id !== model.id) : [...picked, { id: model.id }]
-    const id = `${idPrefix}-${model.id.replaceAll('/', '-')}`
+    const id = `${idPrefix}-${model.id.replace(/[/@]/g, '-')}`
     return modelCard({
       model: photos.has(model.id) ? { ...model, stock_photo: photos.get(model.id) } : model,
       href: active || picked.length < MAX_COMPARE ? pathWith(withVehicles(url, next)) : null,
