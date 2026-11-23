@@ -3,9 +3,10 @@
 module Pages
   module Bikebook
     module Correction
-      # A floating button opening a form that files a BugReport. A signed-in user isn't asked for an email
+      # A floating button opening a form that files a BugReport
       class Component < ApplicationComponent
         MODAL_ID = "bikebook-correction"
+        FORM_ID = "bikebook-correction-form"
 
         def initialize(user: nil)
           @user = user

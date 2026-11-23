@@ -72,6 +72,14 @@ RSpec.describe BikebookController, type: :request do
           .and include("github.com/bikeindex/bikebook")
       end
 
+      it "keeps the correction form, which takes the session's token from outside it" do
+        2.times { get "/bikebook" }
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css("#bikebook-correction-form").and have_no_css("#bikebook-correction-form [name='authenticity_token']", visible: :all)
+        expect(page.find("input[form='bikebook-correction-form'][name='authenticity_token']", visible: :all).value).to be_present
+      end
+
       it "isn't kept while the catalog doesn't answer, which leaves the state laws out" do
         WebMock.stub_request(:get, /#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}/o).to_return(status: 503)
         shells = 2.times.map do
@@ -94,7 +102,6 @@ RSpec.describe BikebookController, type: :request do
         expect(response).to have_http_status(:ok)
         expect(Capybara.string(response.body)).to have_css("#vehicle_models")
           .and have_no_css("#vehicle_models[autofocus]")
-          # the session cookie doesn't reach a frame, so its form's CSRF check would fail
           .and have_no_button("Submit a correction")
       end
     end
@@ -244,7 +251,7 @@ RSpec.describe BikebookController, type: :request do
       expect(response).to redirect_to(page_url)
       expect(flash[:success]).to eq "Thanks for the correction! We'll look into it."
       expect(BugReport.last).to have_attributes(email: "rider@example.com", user_id: nil, subject: "Bike Book correction",
-        tags: [BikebookController::CORRECTION_TAG], body: "The GT3 Pro's top speed is 50 mph\n\n#{page_url}")
+        tags: ["bikebook_correction"], body: "The GT3 Pro's top speed is 50 mph\n\n#{page_url}")
     end
 
     it "renders the form to the signed-out, asking for their email" do
@@ -288,6 +295,18 @@ RSpec.describe BikebookController, type: :request do
         expect { post_correction }.not_to change(BugReport, :count)
 
         expect(flash[:success]).to be_present
+      end
+    end
+
+    describe "rack_attack" do
+      include_context :rack_attack
+
+      it "throttles corrections past the hourly limit" do
+        throttled = rack_attack_throttled_response(limit: 10) do
+          post_correction
+          response
+        end
+        expect(throttled).to have_http_status(:too_many_requests)
       end
     end
 

@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 class BikebookController < ApplicationController
-  CORRECTION_TAG = "bikebook_correction"
-
   before_action :redirect_to_dashed_ids, only: :show
-  rate_limit to: 10, within: 1.hour, by: -> { forwarded_ip_address }, only: :correction
 
   def show
     entries = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
@@ -34,8 +31,8 @@ class BikebookController < ApplicationController
   def correction
     correction = params.require(:bug_report).permit(:body, :email, :additional)
     page_url = url_from(request.referer)
-    bug_report = BugReport.new(user: current_user, email: current_user&.email || correction[:email],
-      from_name: current_user&.name, subject: "Bike Book correction", tags: [CORRECTION_TAG], received_at: Time.current,
+    bug_report = BugReport.new(email: current_user&.email || correction[:email],
+      from_name: current_user&.name, subject: "Bike Book correction", tags: ["bikebook_correction"], received_at: Time.current,
       body: [correction[:body], page_url].compact_blank.join("\n\n"))
     # a filled honeypot is a bot's, thanked without saving
     if correction[:additional].present? || (correction[:body].present? && bug_report.save)
