@@ -6861,6 +6861,14 @@ nb:
           schemas_title: Sykkelbokskjemaer
           unavailable: Bike Books katalog svarer ikke, så skjemaene kan ikke vises
             akkurat nå. Prøv igjen om et øyeblikk.
+          catalog_failed: Bike Books katalog lastet ikke inn, så den kan ikke søkes
+            i
+          loading_catalog: Laster inn katalogen…
+          lookup_label: Vis en modells eller en elbilklassifiseringsfil
+          search_placeholder: Søk etter produsent eller modell…
+        schema:
+          unreachable: Sykkelbok-arkivet svarer ikke. Prøv igjen om et øyeblikk.
+          view_on_github: Se denne filen på GitHub
       ebike_rules:
         class_tile:
           class: Klasse
