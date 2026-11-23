@@ -45,7 +45,7 @@ module Pages
           indent, key, value, comma = line.match(LINE).captures
           value = tag.span(value, class: Pages::Bikebook::SchemaFields::Component::VALUE_CLASSES) unless %w[{ [ } ]].include?(value)
           code = tag.span(safe_join([indent, key && tag.span(key, class: "tw:text-blue-700 tw:dark:text-blue-300"), value, comma].compact), class: "tw:shrink-0")
-          comment &&= tag.span("// #{comment}", class: "tw:min-w-0 tw:whitespace-pre-wrap tw:text-gray-400 tw:dark:text-gray-500")
+          comment &&= tag.span("// #{comment}", class: "tw:whitespace-pre tw:md:min-w-0 tw:md:whitespace-pre-wrap tw:text-gray-400 tw:dark:text-gray-500")
           tag.span(safe_join([code, comment].compact, " "), class: "tw:flex tw:gap-2")
         end
       end
