@@ -9,8 +9,8 @@ RSpec.describe Integrations::Bikebook::Data do
     let(:result) { described_class.get_model(options) }
 
     it "returns the model's bike and component params" do
-      expect(result[:bike]).to match(cycle_type: "cargo", paint_description: nil, description: /\AWhatever you’re into/,
-        rear_wheel_bsd: 406, stock_photo_url: "https://bikebook.bikeindex.org/specialized/2025/haul_st.png")
+      expect(result[:bike]).to match(cycle_type: "cargo-rear", paint_description: nil, description: /\AWhatever you’re into.* 60 miles/,
+        rear_wheel_bsd: 406, stock_photo_url: "https://bikebook.bikeindex.org/specialized/2025/haul-st.png")
       expect(result[:components].count).to eq 32
       expect(result[:components]).to include({component_type: "Grips/Tape", description: "Globe closed end slip on type, 155mm",
                                               manufacturer: "Globe", front: false, rear: false}.as_json)
@@ -22,7 +22,7 @@ RSpec.describe Integrations::Bikebook::Data do
       let(:options) { {manufacturer_id:, frame_model: "haul-st", year: "2026"} }
 
       it "returns the model" do
-        expect(result[:bike][:cycle_type]).to eq "cargo"
+        expect(result[:bike][:cycle_type]).to eq "cargo-rear"
       end
     end
 
@@ -30,7 +30,7 @@ RSpec.describe Integrations::Bikebook::Data do
       let(:options) { {manufacturer_id:, frame_model: "Haul ST", year: 2025, market: "CA"} }
 
       it "returns the variant" do
-        expect(result[:bike][:stock_photo_url]).to eq "https://bikebook.bikeindex.org/specialized/2025/haul_st_ca.webp"
+        expect(result[:bike][:description]).to include("up to 100 km")
       end
     end
 

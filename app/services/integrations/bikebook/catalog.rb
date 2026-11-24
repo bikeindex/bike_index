@@ -52,7 +52,7 @@ module Integrations
 
       # The index's models, nil while the catalog doesn't answer. Too big to cache, and read by a job, outside rack-timeout
       def index_models(path)
-        JSON.parse(body(path, timeout: 60))["models"]
+        read(path, timeout: 60)["models"]
       rescue *FAILURES
         nil
       end

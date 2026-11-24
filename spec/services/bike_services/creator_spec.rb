@@ -867,7 +867,7 @@ RSpec.describe BikeServices::Creator do
         expect(b_param.params["components"]).to all(include("is_stock" => true))
         expect(b_param.bike["description"]).to start_with("Input description Whatever you’re into")
         expect(b_param.bike).to include("serial_number" => "Some serial", "primary_frame_color_id" => color.id,
-          "cycle_type" => "cargo", "stock_photo_url" => "https://bikebook.bikeindex.org/specialized/2025/haul_st.png")
+          "cycle_type" => "cargo-rear", "stock_photo_url" => "https://bikebook.bikeindex.org/specialized/2025/haul-st.png")
       end
     end
   end
