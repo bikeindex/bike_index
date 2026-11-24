@@ -176,6 +176,7 @@ module Integrations
         once(:fetched_manifest) do
           body = body(MANIFEST)
           manifest = dashed_ids(JSON.parse(body))
+          BikebookModelsSyncJob.enqueue_for(manifest["index"])
           {head: manifest.slice("format", "vocabulary").merge("digest" => Digest::SHA256.hexdigest(body)), manifest:}
         rescue *FAILURES
           nil

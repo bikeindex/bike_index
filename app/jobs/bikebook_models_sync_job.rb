@@ -11,6 +11,11 @@ class BikebookModelsSyncJob < ScheduledJob
 
   def self.frequency = 62.minutes
 
+  # For a fresh read of the catalog's manifest, so a publish syncs without waiting on the schedule
+  def self.enqueue_for(index)
+    perform_async unless index.blank? || Rails.cache.read(SYNCED_KEY)&.first == index || enqueued?
+  end
+
   def perform
     index = Integrations::Bikebook::Catalog.manifest&.dig("index")
     synced = [index, Manufacturer.maximum(:updated_at)]

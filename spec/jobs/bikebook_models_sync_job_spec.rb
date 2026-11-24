@@ -34,6 +34,20 @@ RSpec.describe BikebookModelsSyncJob, type: :job do
     expect(BikebookModel.where(manufacturer: segway).pluck(:catalog_id)).to eq ["m/segway/2025/gt3-pro"]
   end
 
+  describe "enqueue_for" do
+    it "is enqueued by a manifest read naming an index it hasn't synced" do
+      Integrations::Bikebook::Catalog.manifest
+      expect(described_class.jobs.count).to eq 1
+
+      described_class.drain
+      synced = Rails.cache.read(described_class::SYNCED_KEY)
+      stub_bikebook_catalog
+      Rails.cache.write(described_class::SYNCED_KEY, synced)
+      Integrations::Bikebook::Catalog.manifest
+      expect(described_class.jobs.count).to eq 0
+    end
+  end
+
   context "with the catalog unreachable" do
     before { stub_bikebook_catalog(status: 500) }
 
