@@ -478,8 +478,9 @@ RSpec.describe BikebookController, type: :request do
         "}"
       ])
       page = Capybara.string(response.body)
-      expect(page).to have_link("View this file on GitHub", href: "https://github.com/bikeindex/bikebook/blob/main/components/aventon/2024/a100.json")
-        .and have_css("[aria-current='page']", text: "Component")
+      expect(page.find("[data-controller='bikebook--schema-lookup']"))
+        .to have_link("View this file on GitHub", href: "https://github.com/bikeindex/bikebook/blob/main/components/aventon/2024/a100.json")
+      expect(page).to have_css("[aria-current='page']", text: "Component")
         .and have_text("The shape of a component file")
         .and have_no_css("[data-schema-path]")
       # the search picks it, named as /bikebook names it, once the catalog loads
