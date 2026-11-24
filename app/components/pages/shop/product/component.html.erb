@@ -8,18 +8,8 @@
     <%= tag.div(media, class: media_classes) %>
 
     <div>
-      <div class="tw:mb-3.5 tw:flex tw:items-center tw:gap-3">
+      <div class="tw:mb-3.5">
         <%= render(UI::Badge::Component.new(text: @category, color: :yellow)) %>
-
-        <span
-          class="
-            tw:font-header tw:text-[28px] tw:font-extrabold
-            tw:text-purple-500 tw:dark:text-purple-300
-          "
-          aria-hidden="true"
-        >
-          <%= @sound %>
-        </span>
       </div>
 
       <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: @name, intro: @description,

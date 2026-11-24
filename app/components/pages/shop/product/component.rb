@@ -11,11 +11,10 @@ module Pages
         renders_one :pricing
         renders_one :note
 
-        def initialize(name:, category:, sound:, description:, url:, price: nil, flip: false, band: false, id: nil)
+        def initialize(name:, category:, description:, url:, price: nil, flip: false, band: false, id: nil)
           @name = name
           @price = price
           @category = category
-          @sound = sound
           @description = description
           @url = url
           @flip = flip
@@ -26,7 +25,7 @@ module Pages
         private
 
         # 696px: two of twwiderow's 320px columns and this row's 56px gap
-        def media_classes = ["tw:relative", ("tw:@min-[696px]/twwiderow:order-2" if @flip)]
+        def media_classes = ("tw:@min-[696px]/twwiderow:order-2" if @flip)
       end
     end
   end

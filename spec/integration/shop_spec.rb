@@ -22,9 +22,9 @@ RSpec.describe "shop", :js, type: :system do
     expect(page.evaluate_script("window.location.hash")).to eq ""
     expect(page.evaluate_script("document.activeElement.id")).to eq "caped-registrant-cap"
 
-    # The pink cap's image is on the right wherever the row has two columns, down to where it wraps
-    image = find("img[alt^='Illustration of the pink ripstop']")
-    heading = find("h2", text: "Pink or Black Bike Index cap")
+    # The sticker's image is on the right wherever the row has two columns, down to where it wraps
+    image = find("img[alt^='How not to get your bike stolen']")
+    heading = find("h2", text: "Bike Index registration stickers")
     [1280, 760].each do |width|
       resize_window(width:, height: 900)
       wait_for { corner(image).first > corner(heading).first }
