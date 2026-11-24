@@ -729,6 +729,44 @@ ALTER SEQUENCE public.bike_versions_id_seq OWNED BY public.bike_versions.id;
 
 
 --
+-- Name: bikebook_models; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bikebook_models (
+    id bigint NOT NULL,
+    catalog_id character varying NOT NULL,
+    manufacturer_id bigint NOT NULL,
+    name character varying NOT NULL,
+    model_slug character varying NOT NULL,
+    first_year integer NOT NULL,
+    final_year integer,
+    markets character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    variants jsonb DEFAULT '[]'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: bikebook_models_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bikebook_models_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bikebook_models_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bikebook_models_id_seq OWNED BY public.bikebook_models.id;
+
+
+--
 -- Name: bikes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4793,6 +4831,13 @@ ALTER TABLE ONLY public.bike_versions ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: bikebook_models id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bikebook_models ALTER COLUMN id SET DEFAULT nextval('public.bikebook_models_id_seq'::regclass);
+
+
+--
 -- Name: bikes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5620,6 +5665,14 @@ ALTER TABLE ONLY public.bike_stickers
 
 ALTER TABLE ONLY public.bike_versions
     ADD CONSTRAINT bike_versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bikebook_models bikebook_models_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bikebook_models
+    ADD CONSTRAINT bikebook_models_pkey PRIMARY KEY (id);
 
 
 --
@@ -6656,6 +6709,20 @@ CREATE INDEX index_bike_versions_on_owner_id ON public.bike_versions USING btree
 --
 
 CREATE INDEX index_bike_versions_on_primary_activity_id ON public.bike_versions USING btree (primary_activity_id);
+
+
+--
+-- Name: index_bikebook_models_on_catalog_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_bikebook_models_on_catalog_id ON public.bikebook_models USING btree (catalog_id);
+
+
+--
+-- Name: index_bikebook_models_on_manufacturer_id_and_model_slug; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikebook_models_on_manufacturer_id_and_model_slug ON public.bikebook_models USING btree (manufacturer_id, model_slug);
 
 
 --
@@ -8173,6 +8240,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261123074039'),
 ('20261121050440'),
 ('20261119180000'),
 ('20261119102802'),

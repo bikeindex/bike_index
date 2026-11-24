@@ -2,6 +2,9 @@ import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 import { replaceUrl } from 'bikebook/replace_url'
 
+// So a ui--collapse that never loads can't leave a frame loop running
+const COLLAPSE_WAIT_MS = 10000
+
 // Connects to data-controller='ebike-rules--state-filter'
 // Narrows the state list to names matching the field. A state's hash is in the URL while it's open,
 // replacing rather than adding history, and opens and scrolls to it on load
@@ -11,13 +14,18 @@ export default class extends Controller {
   connect () {
     this.allCount = this.countTarget.innerHTML
     const linked = this.stateTargets.find((state) => `#${state.id}` === window.location.hash)
-    if (!linked) return
+    if (linked) this.open(linked)
+  }
 
-    // each state's ui--collapse connects after this, its ancestor
-    window.requestAnimationFrame(() => {
-      linked.querySelector('[data-ui--collapse-target~="trigger"]').click()
-      linked.scrollIntoView({ block: 'start' })
-    })
+  // A state's ui--collapse registers whenever its lazily loaded module resolves, which isn't ordered against this
+  // one, and until then its trigger's click does nothing - so it's waited for
+  open (state, deadline = Date.now() + COLLAPSE_WAIT_MS) {
+    if (!this.application.getControllerForElementAndIdentifier(state, 'ui--collapse')) {
+      if (Date.now() < deadline) window.requestAnimationFrame(() => this.open(state, deadline))
+      return
+    }
+    state.querySelector('[data-ui--collapse-target~="trigger"]').click()
+    state.scrollIntoView({ block: 'start' })
   }
 
   // Runs after the trigger's own toggle, so aria-expanded is already the new state
