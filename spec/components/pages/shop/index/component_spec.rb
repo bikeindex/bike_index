@@ -18,6 +18,7 @@ RSpec.describe Pages::Shop::Index::Component, type: :component do
   it "scrolls the hero's button to the first product and offers bulk orders by email" do
     expect(component).to have_link("Shop the gear", href: "#caped-registrant-cap")
     expect(component).to have_css("section#caped-registrant-cap")
+    expect(component).to have_css("section#registration-stickers")
     expect(component).to have_link("Contact us", href: "mailto:support@bikeindex.org")
   end
 end

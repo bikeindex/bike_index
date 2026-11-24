@@ -7,14 +7,15 @@ module Pages
       # flip puts the media on the right once the row is two columns
       class Component < ApplicationComponent
         # Template Dependency: SharedBlocks::Marketing::Wrapper::Component
-        BAND_CLASSES = "tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800/60"
+        BAND_CLASSES = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800/60"
 
         renders_one :media
-        renders_one :price
+        renders_one :pricing
         renders_one :note
 
-        def initialize(name:, category:, sound:, description:, url:, flip: false, band: false, id: nil)
+        def initialize(name:, category:, sound:, description:, url:, price: nil, flip: false, band: false, id: nil)
           @name = name
+          @price = price
           @category = category
           @sound = sound
           @description = description

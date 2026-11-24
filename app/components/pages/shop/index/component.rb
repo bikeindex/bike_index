@@ -7,13 +7,14 @@ module Pages
       # customer picks options and checks out, so there is no cart - and the prices are copy that
       # has to be kept in step with the store
       class Component < ApplicationComponent
-        # Template Dependency: Pages::Shop::Product::Component
+        # Template Dependency: SharedBlocks::Marketing::Wrapper::Component
         STORE_URL = "https://bikeindex.myshopify.com/products"
         FIRST_PRODUCT_ID = "caped-registrant-cap"
+        STICKERS_ID = "registration-stickers"
+        PRICES = {caped_cap: "$20.00", cycling_cap: "$15.00", sticker: "$7.99"}.freeze
 
         BURST_CLASSES = "tw:absolute tw:font-[Bangers,_cursive] tw:text-[44px] tw:tracking-[.02em] " \
           "tw:[-webkit-text-stroke:2px_#000]"
-        PRICE_CLASSES = "tw:m-0 tw:font-header tw:font-extrabold"
 
         def before_render
           helpers.content_for(:header) do

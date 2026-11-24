@@ -39,8 +39,8 @@ failed after the whole capture round — leaving a comment that can never hold i
    or a backtick before `https://`.
 3. **Rewritten: stop.** Don't capture, host or retry — every retry stacks another
    rewrite. Update the comment to a body with no URLs: `## Screenshots` and a line
-   saying the screenshots couldn't be posted from this session (that goes through;
-   the footer still gets appended). Then tell the user the sandbox's comment tools
+   saying the screenshots couldn't be posted from this session (that goes through).
+   Then tell the user the sandbox's comment tools
    rewrite URLs, so the screenshots have to be captured and attached by hand — and
    skip the rest of this file.
 4. **Posted: carry on.** The probe is the comment you edit in place with the real body.
@@ -63,10 +63,8 @@ The blob stays reachable through the branch's history, so those URLs keep servin
 after the deletion while the PR's **Files changed** stays empty.
 
 **Post the tags verbatim — never rewrap them as `![](url)`.** Widths belong to the caller —
-the `pr` skill's table wants `width="500"` desktop, `"250"` mobile. Create the comment
-with `add_issue_comment`, then `update_issue_comment` it with the same body, and read
-it back: whether either tool leaves an `<img>` alone depends on the session, which is
-what the probe below is for.
+the `pr` skill's table wants `width="500"` desktop, `"250"` mobile. Post them with
+`update_issue_comment` onto the probe's comment, and read it back.
 
 **Call it once, after every capture including the base branch's.** Each call costs
 two commits and a push, and it refuses on a detached HEAD, so it can't run mid-checkout

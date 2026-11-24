@@ -15,6 +15,10 @@ en:
           caped_cap_sound: SWISH!
           contact_us: Contact us
           cycling_cap: Cycling cap
+          cycling_cap_description: >-
+            A lightweight cycling cap in pink or black, with an elastic band. The
+            Bike Index stripes and shield are printed under the brim. Wear it under
+            your helmet or around town.
           for_riders_and_shops: For riders and shops
           for_shops: For shops
           gear_that_helps_get_bikes_home: Gear that helps get bikes home.
@@ -29,10 +33,6 @@ en:
           pink_cap_brim_alt: 'Underside of the brim: blue and navy stripes with the
             Bike Index shield'
           pink_cap_burst: POW!
-          pink_cap_description: >-
-            A lightweight pink ripstop cycling cap with an elastic band. The Bike
-            Index stripes and shield are printed under the brim. Wear it under your
-            helmet or around town.
           pink_cap_name: Pink or Black Bike Index cap
           pink_cap_sound: ZOOM!
           shop_the_gear: Shop the gear

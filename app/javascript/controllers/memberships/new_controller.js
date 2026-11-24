@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='memberships--new'
 export default class extends Controller {
-  static targets = ['plans', 'summary', 'join']
+  static targets = ['summary', 'join']
 
   // The browser restores checked radios on reload and back navigation without firing change
   connect () {
@@ -16,10 +16,5 @@ export default class extends Controller {
 
     this.summaryTarget.textContent = labels.summary
     this.joinTargets.forEach(element => { element.textContent = labels.join })
-  }
-
-  scrollToPlans (event) {
-    event.preventDefault()
-    this.plansTarget.scrollIntoView({ behavior: 'smooth' })
   }
 }
