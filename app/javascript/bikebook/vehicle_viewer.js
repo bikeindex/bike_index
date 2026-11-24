@@ -98,7 +98,7 @@ export class VehicleViewer {
     const drawing = (data, size, { figure, legend, typicalKind }) => {
       const notes = [legend.some(({ calculated }) => calculated) && 'Light purple figures are calculated from the listed ones.',
         legend.some(({ listed, calculated }) => !listed && !calculated) &&
-          `Gray figures aren't listed, so they're estimated from ${typicalKind ? 'typical' : 'average'} values on ${typicalKind ?? typeName(presenter, data).toLowerCase()}s.`]
+          `Gray figures aren't listed, so they're estimated from ${typicalKind ? 'typical' : 'average'} values on ${typicalKind ?? typeNoun(presenter, data)}s.`]
         .filter(Boolean)
       return html`<figure class="tw:space-y-1"><div class="tw:mx-auto tw:max-w-xl tw:text-gray-800 tw:dark:text-gray-200">${figure}</div>${notes.length
         ? html`<figcaption class="tw:text-center tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${present(size?.name) && array(data.sizes).length > 1 ? `${size.name} drawn. ` : ''}${notes.join(' ')}</figcaption>`
@@ -178,7 +178,7 @@ export class VehicleViewer {
     // a model opened alone, its search hidden, has a tab to show it filtered to its type: "Search other cargo bikes"
     const lone = !searching(url) && vehicles.length === 1 && vehicles[0].data
     const searchTab = lone && {
-      label: `Search other ${typeName(presenter, lone).toLowerCase()}s`,
+      label: `Search other ${typeNoun(presenter, lone)}s`,
       href: pathWith(url, { search: '1', vehicle_type: lone.type || 'bike' })
     }
     return html`${this.similarModels(baseline, similar, url, photos)}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
@@ -207,7 +207,7 @@ export class VehicleViewer {
     return {
       vehicle: value,
       current,
-      type: typeName(this.presenter, data).toLowerCase(),
+      type: typeNoun(this.presenter, data),
       complete: (data.model_configuration ?? 'complete') === 'complete',
       settings: similar,
       groups: similar.results?.groups,
@@ -218,7 +218,7 @@ export class VehicleViewer {
   // What opens the models most like the first of `vehicles` from the search's More filters lines, where `similar` offers them
   compareToggle (vehicles, similar) {
     if (!similar) return nothing
-    return compareToggle({ type: typeName(this.presenter, vehicles[0].data).toLowerCase(), model: modelName(this.presenter, vehicles[0].data), waiting: similar.waiting })
+    return compareToggle({ type: typeNoun(this.presenter, vehicles[0].data), model: modelName(this.presenter, vehicles[0].data), waiting: similar.waiting })
   }
 
   // The cards of the models most like the first at `url`, those it compares showing `photos`' photo of them
@@ -261,5 +261,13 @@ const pathWith = (url, params = {}) => {
   const query = toQuery({ ...Object.fromEntries(url.searchParams), ...params })
   return query ? `${url.pathname}?${query}` : url.pathname
 }
-const typeName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike'
+// A type mid-sentence, "other cargo bikes", where its vocabulary name doesn't read as one: "Cargo Bike Rear"
+const TYPE_NOUNS = {
+  'cargo-rear': 'rear-loading cargo bike',
+  'cargo-trike-rear': 'rear-loading cargo tricycle',
+  'personal-mobility': 'e-personal mobility device',
+  'trail-behind': 'trail-behind bike',
+  'e-atv': 'e-ATV'
+}
+const typeNoun = (presenter, data) => TYPE_NOUNS[data.type] ?? (presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike').toLowerCase()
 const modelName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).model

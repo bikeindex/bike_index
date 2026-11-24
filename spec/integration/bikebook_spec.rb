@@ -2383,7 +2383,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(find("legend", text: /\AOther settings/).ancestor("fieldset").first("label")).to have_text("Include bikes that are not current")
     # and one no longer sold matches any year's by default
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul-st@CA", similar: 1, adjust: 1, search: 1, filters: 1)
-    expect(page).to have_checked_field("Include cargo bike rears that are not current", wait: 10)
+    expect(page).to have_checked_field("Include rear-loading cargo bikes that are not current", wait: 10)
     # the other propulsion's where they're included, without its e-bike fields counting against them, a frame only
     # without same_configuration, other wheel sizes only without same_wheels,
     # more tire clearance nearer than as much less but not than less that's nearer, a frame's weight not held against it,
