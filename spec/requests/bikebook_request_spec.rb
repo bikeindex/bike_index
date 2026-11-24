@@ -279,12 +279,8 @@ RSpec.describe BikebookController, type: :request do
     end
   end
 
-  describe "up", vcr: {cassette_name: "bikebook-up"} do
-    # WebMock stubs outlive their examples here, and answer ahead of the cassette
-    before do
-      WebMock.reset!
-      Rails.cache.clear
-    end
+  describe "up" do
+    before { stub_bikebook_catalog }
 
     it "is ok, in the format the browser's reader reads" do
       get "/up/bikebook"
@@ -304,9 +300,9 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
-    context "with no catalog published", vcr: {cassette_name: "bikebook-up_not_found"} do
+    context "with no catalog published" do
       it "is unavailable" do
-        stub_const("Integrations::Bikebook::Catalog::URL", "https://bikebook-catalog.bikeindex.org/not_a_catalog/")
+        stub_bikebook_catalog(status: 404)
         get "/up/bikebook"
         expect(response).to have_http_status(:service_unavailable)
         expect(response.body).to include(%(<body style="background-color: red">))
@@ -454,6 +450,108 @@ RSpec.describe BikebookController, type: :request do
 
         expect(Capybara.string(response.body)).to have_css("[aria-current='page']", text: "Vehicle model")
       end
+    end
+  end
+
+  describe "schema" do
+    include ActiveSupport::Testing::TimeHelpers
+
+    let(:url) { Integrations::Bikebook::RepositoryRecord::URL }
+    # WebMock's request counts outlive examples
+    before do
+      WebMock.reset!
+      stub_bikebook_catalog
+    end
+
+    def lines = Nokogiri::HTML5(response.body).css("pre > span").map(&:text)
+
+    it "pretty-prints a record's file in its own key order, commented with the schema's descriptions, and keeps it" do
+      component = WebMock.stub_request(:get, "#{url}components/aventon/2024/a100.json").to_return(body: <<~JSON)
+        {"schema_version": "2.0.0", "id": "c/aventon/2024/a100", "type": "ebike-motor", "manufacturer": "Aventon", "model": "A100",
+         "first_year": 2024, "motor": {"spindle": "ISIS", "kind": "mid-drive"}, "aliases": []}
+      JSON
+      model = WebMock.stub_request(:get, "#{url}vehicle_models/segway/2025/gt3-pro.json").to_return(body: <<~JSON)
+        {"id": "m/segway/2025/gt3-pro", "markets": ["US"], "years": {"2025": {"colorways": [{"name": "Grey", "stock_photo": "grey.png"}], "url_live": true}}}
+      JSON
+
+      2.times { get "/bikebook_schemas/c/aventon/2024/a100" }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("<title>c/aventon/2024/a100 | Bike Book</title>")
+      expect(lines).to eq([
+        "{",
+        '  "schema_version": "2.0.0",',
+        '  "id": "c/aventon/2024/a100",',
+        '  "type": "ebike-motor", // E-vehicle Motor',
+        '  "manufacturer": "Aventon",',
+        '  "model": "A100",',
+        '  "first_year": 2024, // year it launched',
+        '  "motor": { // E-vehicle Motor only',
+        '    "spindle": "ISIS", // a mid drive\'s crank interface, e.g. ISIS',
+        '    "kind": "mid-drive"',
+        "  },",
+        '  "aliases": [] // other names it\'s specced under',
+        "}"
+      ])
+      page = Capybara.string(response.body)
+      expect(page).to have_link("View this file on GitHub", href: "https://github.com/bikeindex/bikebook/blob/main/components/aventon/2024/a100.json")
+        .and have_css("[aria-current='page']", text: "Component")
+        .and have_text("The shape of a component file")
+        .and have_no_css("[data-schema-path]")
+      # the search picks it, named as /bikebook names it, once the catalog loads
+      lookup = page.find("[data-controller='bikebook--schema-lookup']")
+      expect(lookup["data-bikebook--schema-lookup-display-value"]).to eq "Aventon A100"
+      expect(lookup["data-bikebook--schema-lookup-cleared-url-value"]).to eq "/bikebook_schemas?document=component"
+      expect(lookup).to have_field("vehicle_models", disabled: true, placeholder: "Loading the catalog…")
+      WebMock::API.assert_requested(component, times: 1)
+
+      get "/bikebook_schemas/m/segway/2025/gt3-pro"
+      expect(lines).to eq([
+        "{",
+        '  "id": "m/segway/2025/gt3-pro",',
+        '  "markets": [ // ISO 3166-1 alpha-2 country codes, or EU',
+        '    "US" // United States',
+        "  ],",
+        '  "years": { // one record per model year, keyed by year, newest first',
+        '    "2025": {',
+        '      "colorways": [ // one per paint',
+        "        {",
+        '          "name": "Grey",',
+        '          "stock_photo": "grey.png"',
+        "        }",
+        "      ],",
+        '      "url_live": true // whether the manufacturer\'s page is still up; false for an archive capture, which shows it as it was',
+        "    }",
+        "  }",
+        "}"
+      ])
+      # a market variant's citation key, whose record is in its home model's file
+      get "/bikebook_schemas/m/segway/2025/gt3-pro@CA"
+      expect(lines.second).to eq '  "id": "m/segway/2025/gt3-pro",'
+      expect(response.body).to include("<title>m/segway/2025/gt3-pro@CA | Bike Book</title>")
+      WebMock::API.assert_requested(model, times: 1)
+    end
+
+    it "is not found for an id the repository has no file for, or that isn't a record's" do
+      missing = WebMock.stub_request(:get, "#{url}vehicle_models/segway/2025/nope.json").to_return(status: 404)
+
+      2.times { get "/bikebook_schemas/m/segway/2025/nope" }
+      expect(response).to have_http_status(:not_found)
+      WebMock::API.assert_requested(missing, times: 1)
+      get "/bikebook_schemas/aventon/2025"
+      expect(response).to have_http_status(:not_found)
+      get "/bikebook_schemas/m/../config/secrets"
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "is unavailable while GitHub doesn't answer, asking again after a minute" do
+      down = WebMock.stub_request(:get, "#{url}components/aventon/2024/a100.json").to_return(status: 503)
+
+      2.times { get "/bikebook_schemas/c/aventon/2024/a100" }
+      expect(response).to have_http_status(:service_unavailable)
+      expect(Capybara.string(response.body)).to have_text("The Bike Book repository isn't answering. Try again in a minute.")
+      WebMock::API.assert_requested(down, times: 1)
+      travel_to(2.minutes.from_now) { get "/bikebook_schemas/c/aventon/2024/a100" }
+      WebMock::API.assert_requested(down, times: 2)
     end
   end
 end

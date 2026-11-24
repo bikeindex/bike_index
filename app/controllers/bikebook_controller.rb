@@ -27,6 +27,17 @@ class BikebookController < ApplicationController
       by_count: params[:by_count].to_s.split(",")), status: viewer ? :ok : :service_unavailable
   end
 
+  def schema
+    record = begin
+      Integrations::Bikebook::RepositoryRecord.record(params[:id]) || raise(ActiveRecord::RecordNotFound)
+    rescue Integrations::Bikebook::RepositoryRecord::Unreachable
+    end
+    @page_title = "#{params[:id]} | Bike Book"
+    render Pages::Bikebook::SchemaViewer::Component.new(viewer: Integrations::Bikebook::Catalog.schema_viewer,
+      document: Integrations::Bikebook::RepositoryRecord.document(params[:id]), record_id: params[:id], record:),
+      status: record ? :ok : :service_unavailable
+  end
+
   # For uptime monitoring: the page breaks whenever the catalog doesn't answer in the format it reads. Green or red, as /up is
   def up
     up = Integrations::Bikebook::Catalog.readable?

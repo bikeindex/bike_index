@@ -4,6 +4,7 @@ import { inlineBadge } from 'bikebook/templates/ui/badge'
 import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { fragmentOf, renderInto } from 'bikebook/render'
+import { localSources } from 'utils/hw_combobox_patch'
 
 /* global IntersectionObserver, Worker */
 
@@ -59,6 +60,30 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
     if (!ids.length) worker.terminate()
     throw error
   }
+}
+
+const catalogs = new Map()
+// One catalog, and its worker, for everything on the page that reads it at `manifestUrl`, which a Turbo visit keeps
+export const catalogAt = (manifestUrl) => catalogs.get(manifestUrl) ?? catalogs.set(manifestUrl, loadCatalog(manifestUrl)).get(manifestUrl)
+
+// Stamps a template's catalog combobox into `slot`, in place of its stand-in field, once `loading` resolves, since the
+// combobox must have its source before it connects. Returns its hidden field, nothing when the catalog fails
+export async function mountCatalogCombobox (loading, template, slot, { display, failedText }) {
+  let catalog
+  try {
+    catalog = await loading
+  } catch (error) {
+    console.error(error)
+    slot.querySelector('input').placeholder = failedText
+    return
+  }
+  const fragment = template.content.cloneNode(true)
+  const combobox = fragment.querySelector('.hw-combobox')
+  // with an async source the server can only prefill the id, which the gem would display
+  if (display) combobox.dataset.hwComboboxPrefilledDisplayValue = display
+  localSources.set(combobox, new CatalogComboboxSource(catalog))
+  slot.replaceChildren(fragment)
+  return slot.querySelector('input[type=hidden]')
 }
 
 // Answers a hotwire_combobox async filter with the markup the gem's own turbo-stream response would
