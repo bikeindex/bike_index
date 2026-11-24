@@ -373,6 +373,23 @@ RSpec.describe OrganizedMailer, type: :mailer do
     end
   end
 
+  describe "shop_welcome" do
+    let(:organization) { FactoryBot.create(:organization, kind: "bike_shop", name: "Shifty Bike Shop") }
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:mail) { OrganizedMailer.shop_welcome(organization, user) }
+
+    it "renders in the email layout, replying to Bike Index" do
+      expect(mail.subject).to eq "Your Bike Index shop dashboard is ready"
+      expect(mail.to).to eq([user.email])
+      expect(mail.reply_to).to eq(["contact@bikeindex.org"])
+      expect(mail.tag).to eq "shop_welcome"
+      expect(mail.body.encoded).to match("Shifty Bike Shop is set up on Bike Index")
+      expect(mail.body.encoded).to match("binx-wrapper")
+      expect(mail.body.encoded).to match("The Bike Index Team")
+      expect_render_donation(true, mail)
+    end
+  end
+
   describe "organization_invitation" do
     let(:organization_role) { FactoryBot.create(:organization_role, organization: organization) }
     let(:mail) { OrganizedMailer.organization_invitation(organization_role) }

@@ -51,6 +51,16 @@ RSpec.describe OrganizationLandingPage, type: :model do
       expect(organization_landing_page.enabled_mismatch_error).to be_nil
     end
 
+    context "with an organization routed by its previous slug" do
+      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills University", previous_slug: "brakebills") }
+
+      it "is env_enabled" do
+        expect(organization_landing_page.env_enabled?).to be_truthy
+        organization_landing_page.update!(enabled: true)
+        expect(organization_landing_page.enabled_mismatch_error).to be_nil
+      end
+    end
+
     context "with an organization that isn't routed" do
       let(:organization) { FactoryBot.create(:organization) }
 

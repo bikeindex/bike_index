@@ -41,7 +41,7 @@ module Admin
       # Only routed at boot from LandingPageOrganizations::SLUGS; outside it, the members' preview is all there is.
       # Nil-safe because the view passes it for a mail snippet too, which has no landing page
       def landing_page_url
-        return "#{root_url}#{@organization.to_param}" if @landing_page&.env_enabled?
+        return "#{root_url}#{@organization.landing_page_slug}" if @landing_page&.env_enabled?
 
         organization_landing_url(organization_id: @organization.to_param)
       end

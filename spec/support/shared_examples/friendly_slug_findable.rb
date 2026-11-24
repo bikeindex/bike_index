@@ -46,5 +46,13 @@ RSpec.shared_examples "friendly_slug_findable" do
         expect(subject.class.friendly_find_id(" #{instance.name}")).to eq instance.id
       end
     end
+
+    context "with an -amp- slug" do
+      let(:instance) { FactoryBot.create(model_sym, name: "Nuts & Bolts") }
+      it "finds by the -and- slug" do
+        expect(instance.slug).to eq "nuts-and-bolts"
+        expect(subject.class.friendly_find("nuts-amp-bolts")).to eq instance
+      end
+    end
   end
 end

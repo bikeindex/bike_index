@@ -80,7 +80,7 @@
 
     <div>
       Whole normalized:
-      <span class="tw:font-mono"><%= @bike.serial_normalized_no_space %></span>
+      <%= render(UI::Code::Inline::Component.new(text: @bike.serial_normalized_no_space)) %>
     </div>
 
     <div class="<%= muted %>">

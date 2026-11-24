@@ -9,7 +9,7 @@ module Pages
                   messages: "Messages", emails: "Emails", ambassador_tasks: "Ambassador tasks"}.freeze
 
           # The Messages tab's sections, which it counts together
-          MESSAGE_KINDS = %i[marketplace_messages alerts notifications feedbacks].freeze
+          MESSAGE_KINDS = %i[marketplace_messages alerts notifications feedbacks bug_reports].freeze
 
           def self.records(user, tab)
             case tab
@@ -21,6 +21,7 @@ module Pages
             when :organization_roles then user.organization_roles
             when :notifications then Notification.notifications_sent_or_received_by(user)
             when :feedbacks then user.feedbacks
+            when :bug_reports then user.bug_reports
             when :emails then user.user_emails
             when :ambassador_tasks then user.ambassador_task_assignments
             end

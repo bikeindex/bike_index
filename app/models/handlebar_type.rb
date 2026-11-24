@@ -21,7 +21,7 @@ class HandlebarType
 
   # API clients still send the former slugs
   def self.find_sym(str)
-    str.to_s.strip.match?(/\A(flat|riser|bmx( style)?)\z/i) ? :horizontal : super
+    %w[flat riser bmx bmx-style].include?(Slugifyer.slugify(str)) ? :horizontal : super
   end
 
   # The API still emits horizontal's slug from before the rename

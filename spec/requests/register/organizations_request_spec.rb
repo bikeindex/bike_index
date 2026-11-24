@@ -46,6 +46,15 @@ RSpec.describe Register::OrganizationsController, type: :request do
     end
   end
 
+  context "target=landing, routed by the previous slug" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills University", previous_slug: "brakebills") }
+
+    it "links to the routed slug" do
+      get "/register/#{organization.slug}.png?target=landing"
+      expect(assigns(:qr_url)).to eq "http://www.example.com/brakebills"
+    end
+  end
+
   context "unknown organization" do
     it "is not found" do
       get "/register/not-an-organization.png"

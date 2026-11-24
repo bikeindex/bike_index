@@ -1,0 +1,78 @@
+---
+en:
+  components:
+    emails:
+      shop_welcome:
+        bike_book_body: >-
+          Compare specifications, geometry, and a host of other features across thousands
+          of bike models.
+        bookmark_it: Bookmark it. You'll log in with this email address.
+        browse_bike_book: Browse Bike Book →
+        check_serials: Search the registry to keep used-bike trade-ins safe.
+        check_serials_lead: Check serials before you buy.
+        check_your_state: Check your state →
+        connect_pos_body: >-
+          Without a POS connection, registering bikes depends on someone remembering
+          to do it during a busy day. Once you connect, every bike sale becomes a
+          Bike Index registration in the background. No extra forms at the counter
+          and no staff training. Your customer gets an email to claim their bike,
+          with the serial and details already filled in.
+        connect_pos_footnote: >-
+          Need a hand? Reply to this email and we'll walk you through it. No supported
+          POS? You can still register bikes from your dashboard.
+        connect_pos_heading: Connect your POS so no bike gets missed.
+        connect_pos_impact: >-
+          The more bikes registered, the more stolen bikes get recognized and returned,
+          and the harder it gets to sell stolen bikes in your community.
+        connect_your_pos_now: Connect your POS now
+        create_your_shop_account: Create your shop account
+        dashboard_intro: Your shop account is more than a sign-up. It's your home
+          base on Bike Index.
+        dashboard_items_heading: What you can do from your dashboard
+        ebike_checker: E-bike checker
+        ebike_checker_body: >-
+          State-by-state rules on e-bike classes, where they can ride, and age and
+          equipment requirements. Handy when a customer asks what's legal before they
+          buy.
+        email_preferences: Email preferences
+        free_tools: New ones are on the way, and shop accounts get them first.
+        free_tools_heading: Tools to help customers choose
+        free_tools_intro: Use them on the sales floor, or send customers the link.
+        free_tools_lead: Use our free tools.
+        hero_body: >-
+          %{name} is set up on Bike Index. Your dashboard is where every bike your
+          shop registers lives.
+        hero_body_connect_pos: >-
+          %{name} is set up on Bike Index. Your dashboard is where every bike your
+          shop registers lives. One step left: connect your POS so every bike you
+          sell registers automatically.
+        hero_heading: You're in. Your shop has a dashboard.
+        included_free: Included free
+        most_important_next_step: Your most important next step
+        nonprofit: Bike Index, a 501(c)(3) nonprofit
+        open_your_dashboard: Open your dashboard
+        preheader: Your shop dashboard is live. Every bike your shop registers lives
+          there.
+        preheader_connect_pos: >-
+          Your shop dashboard is live. One step left: connect your POS so every bike
+          you sell gets registered.
+        privacy_policy: Privacy policy
+        questions: >-
+          Questions about setup or your dashboard? Reply to this email and a real
+          person on our shop team will help.
+        receiving_because: >-
+          You're receiving this because you created a shop account for %{name} on
+          Bike Index.
+        see_every_bike: Each sale shows up in one list, with serial and details.
+        see_every_bike_lead: See every bike you've registered.
+        shopify_soon: Shopify soon
+        stat_bikes: bikes registered
+        stat_partners: partner shops, police, and cities
+        stat_recoveries: stolen bikes recovered
+        sticker_pos_step: Connect your POS · about 10 minutes
+        track_pos: See it working as each sale registers.
+        track_pos_lead: Track your POS connection.
+        why_shops_body: >-
+          Your customers get free theft protection, and you become a shop they trust.
+          It's free for you and for them, and we never sell or share customer data.
+        why_shops_heading: Why shops use Bike Index

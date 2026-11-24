@@ -1,0 +1,82 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        rule_note:
+          class_1_throttle: Class 1 bikes can't have a throttle
+          class_3_optional_throttle_within_html: Optional throttle stops at %{mph}
+            mph
+          class_3_speed_with_throttle_html: Assists to %{mph} mph, not allowed with
+            a throttle
+          class_3_throttle: Throttle must cut out at 20 mph
+          class_3_throttle_over_html: Throttle runs to %{mph} mph, past the 20 mph
+            a Class 3's throttle is allowed
+          class_3_throttle_past: Throttle runs past the 20 mph a Class 3's throttle
+            is allowed
+          class_3_throttle_within_html: Throttle stops at %{mph} mph
+          class_n: Class %{n}
+          class_unknown_in_bike_book_label: Bike Book doesn't list its class or top
+            speed, so check the class on its label
+          classes_not_permitted_in: It is a %{classes} e-bike, which is not permitted
+            in %{state}
+          classes_not_recognized_in:
+            one: Class %{n} isn't recognized in %{state}
+            other: Classes %{n} aren't recognized in %{state}
+          classes_recognized:
+            one: Class %{n} is recognized
+            other: Classes %{n} are recognized
+          classes_start_on: Classes take effect %{date}. Until then, check the state's
+            current rules
+          has_throttle: Has a throttle
+          limits_start_on: These limits take effect %{date}
+          no_e_bike_category: >-
+            There's no e-bike category here, so check this one's licence, registration
+            and helmet rules
+          no_speed_cap: No speed cap in state law
+          no_speed_cap_in_law: No speed cap in its law
+          no_throttle: No throttle
+          no_watt_cap: No power cap in state law
+          no_watt_cap_in_law: No power cap in its law
+          not_classified: It isn't a Class 1, 2 or 3 e-bike
+          optional_classes_not_recognized_in:
+            one: Class %{n} isn't recognized in %{state}, so it's legal only as sold
+            other: Classes %{n} aren't recognized in %{state}, so it's legal only
+              as sold
+          optional_throttle_not_allowed: It's legal only without its optional throttle
+          own_classes: The state sets its own limits rather than the three standard
+            classes
+          speed_not_provided: Top speed not provided
+          speed_over_cap_html: Assists to %{mph} mph, over the %{cap} mph limit
+          speed_over_cap_kmh_html: Assists to %{kmh} km/h, over the %{cap} km/h limit
+          speed_past_cap_html: Assists past %{past} mph, over the %{cap} mph limit
+          speed_past_cap_kmh_html: Assists past %{past} km/h, over the %{cap} km/h
+            limit
+          speed_past_html: Assists past %{past} mph; check that it stops by %{cap}
+            mph
+          speed_past_kmh_html: Assists past %{past} km/h; check that it stops by %{cap}
+            km/h
+          speed_to_check_bike_book_kmh_html: >-
+            Bike Book doesn't list its top speed, so check that the motor stops by
+            %{cap} km/h
+          speed_within_cap_html: Assists to %{mph} mph, within the limit
+          speed_within_cap_kmh_html: Assists to %{kmh} km/h, within the limit
+          throttle_allowed: Throttle allowed for Class 2
+          throttle_allowed_in_law: Throttle allowed
+          throttle_not_allowed: The state doesn't allow a throttle
+          throttle_not_allowed_in_law: Its law doesn't allow a throttle
+          throttle_not_stated: The state's law doesn't say whether a throttle is allowed
+          throttle_not_stated_in_law: Its law doesn't say whether a throttle is allowed
+          throttle_past_cap_kmh_html: Throttle runs past %{past} km/h, over the %{cap}
+            km/h limit
+          throttle_past_kmh_html: Throttle runs past %{past} km/h; check that it stops
+            by %{cap} km/h
+          throttle_speed_over_cap_html: Throttle runs to %{mph} mph, over the %{cap}
+            mph limit
+          throttle_speed_within_cap_html: Throttle runs to %{mph} mph, within the
+            limit
+          throttle_with_class_3_assist: Not allowed with Class 3 assist
+          watts_not_provided: Motor wattage not provided
+          watts_over_cap_html: "%{watts}W motor exceeds the %{cap}W cap"
+          watts_to_check_html: Check that its motor is rated %{cap}W or less
+          watts_within_cap_html: "%{watts}W motor is within the cap"

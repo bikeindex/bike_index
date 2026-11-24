@@ -158,6 +158,7 @@ class Organization < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
+  after_create_commit :enqueue_shop_welcome, if: :bike_shop?
 
   default_scope { order(:name) }
   scope :name_ordered, -> { order(arel_table["name"].lower) }
@@ -235,8 +236,8 @@ class Organization < ApplicationRecord
       :taken if name_taken_by(name).present?
     end
 
-    # Short names are unique, and cut to 30 characters - so a long name can be taken by a different one
-    def name_taken_by(name) = find_by("LOWER(short_name) = ?", shorten_name(sanitize_name(name)).downcase)
+    # Short names are cut to 30 characters, and slugs drop punctuation - so a name can be taken by a different one
+    def name_taken_by(name) = shorten_name(sanitize_name(name)).then { find_by("LOWER(short_name) = ?", it.downcase) || find_by(slug: slug_for(it)) }
 
     def sanitize_name(str) = Binxtils::InputNormalizer.sanitize(str&.strip).gsub("&amp;", "&")
 
@@ -259,8 +260,9 @@ class Organization < ApplicationRecord
       return find_by_id(n) if integer_string?(n)
 
       slug = Slugifyer.slugify(n)
-      # First try slug, then previous slug, and finally, just give finding by name a shot
-      find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
+      # The -amp- slug's -and- form goes last, so an exact previous slug wins
+      find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first ||
+        Slugifyer.amp_as_and(slug)&.then { friendly_find(it) }
     end
 
     def admin_text_search(n)
@@ -338,6 +340,9 @@ class Organization < ApplicationRecord
   def to_param
     slug
   end
+
+  # The slug ORGANIZATIONS_WITH_LANDING_PAGES routes, which can be the previous one
+  def landing_page_slug = [slug, previous_slug].find { LandingPageOrganizations::SLUGS.include?(it) }
 
   def restrict_invitations?
     !enabled?("passwordless_users") && !user_email_domain.present?
@@ -606,7 +611,7 @@ class Organization < ApplicationRecord
     return true unless name.present?
 
     self.name = self.class.sanitize_name(name)
-    self.name = "Stop messing about" unless name[/\d|\w/].present?
+    self.name = "Stop messing about" if Slugifyer.slugify(name).length < 2
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = name_shortener(short_name.presence || name)
     self.ascend_name = nil if ascend_name.blank?
@@ -675,6 +680,8 @@ class Organization < ApplicationRecord
   end
 
   private
+
+  def enqueue_shop_welcome = EmailJobs::ShopWelcomeJob.perform_in(EmailJobs::ShopWelcomeJob::DELAY, id)
 
   # Returning an address no account holds would leave auto_user blank, so every
   # later ensure_auto_user would save again and re-enqueue UpdateOrganizationAssociationsJob

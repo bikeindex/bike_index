@@ -34,18 +34,28 @@ RSpec.describe OrgServices::Signup do
 
   describe "save_start" do
     let(:organization_signup) { FactoryBot.create(:organization_signup, email: nil) }
-    let(:start_params) { {name: "Shifty Bike Shop", kind: "bike_shop", email: " Org_Admin@bikeindex.org"} }
+    let(:start_params) { {name: "Shifty Bike Shop", kind: "bike_shop", email: " Org_Admin@bikeindex.org", pos_kind: "ascend_pos"} }
     let(:user) { nil }
     let(:saved) { described_class.save_start(organization_signup, user:, **start_params) }
 
     it "saves" do
       expect(saved).to be_truthy
       expect(organization_signup.reload).to have_attributes(name: "Shifty Bike Shop", kind: "bike_shop",
-        email: "org_admin@bikeindex.org", likely_spam: false)
+        email: "org_admin@bikeindex.org", pos_kind: "ascend_pos", likely_spam: false)
+    end
+
+    context "a POS already saved, and none sent" do
+      let(:organization_signup) { FactoryBot.create(:organization_signup, email: nil, pos_kind: "shopify_pos") }
+      let(:start_params) { {name: "Shifty Bike Shop", kind: "bike_shop", email: "org_admin@bikeindex.org"} }
+
+      it "keeps it" do
+        expect(saved).to be_truthy
+        expect(organization_signup.reload.pos_kind).to eq "shopify_pos"
+      end
     end
 
     context "missing everything" do
-      let(:start_params) { {name: " ", kind: "ambassador", email: "not-an-email"} }
+      let(:start_params) { {name: " ", kind: "ambassador", email: "not-an-email", pos_kind: "square_pos"} }
 
       it "doesn't save, with the errors" do
         expect(saved).to be_falsey
@@ -61,6 +71,16 @@ RSpec.describe OrgServices::Signup do
       it "doesn't save" do
         expect(saved).to be_falsey
         expect(organization_signup.errors.full_messages).to eq(["There's already an organization called Shifty Bike Shop on Bike Index. Choose another name, or contact support@bikeindex.org if it's yours"])
+      end
+    end
+
+    context "a name that only differs by punctuation" do
+      let!(:organization) { FactoryBot.create(:organization, name: "Craig's Cycles") }
+      let(:start_params) { {name: "Craigs Cycles", kind: "bike_shop", email: "org_admin@bikeindex.org"} }
+
+      it "names the organization that has it" do
+        expect(saved).to be_falsey
+        expect(organization_signup.errors.full_messages.first).to start_with("There's already an organization called Craig's Cycles")
       end
     end
 
@@ -215,7 +235,32 @@ RSpec.describe OrgServices::Signup do
       UserJobs::ProcessOrganizationRoleJob.drain
       expect(Notification.where(kind: "organization_invitation").count).to eq 0
       expect(organization_signup.reload.organization_id).to eq organization.id
-      expect(Feedback.last.feedback_type).to eq "organization_created"
+      expect(Feedback.last).to have_attributes(feedback_type: "organization_created", body: "Shifty Bike Shop created an account")
+    end
+
+    context "with a POS" do
+      let(:organization_signup) { FactoryBot.create(:organization_signup_details_completed, pos_kind: "other_or_none_pos") }
+
+      it "tells the admins which" do
+        described_class.complete(organization_signup, user:)
+        expect(Feedback.last.body).to eq "Shifty Bike Shop created an account. POS: Other or none"
+      end
+    end
+
+    it "sends the shop welcome email a few minutes later" do
+      organization = described_class.complete(organization_signup, user:)
+      expect(organization.reload.auto_user).to eq user
+      expect(EmailJobs::ShopWelcomeJob.jobs.map { it["args"] }).to eq([[organization.id]])
+      expect(EmailJobs::ShopWelcomeJob.jobs.first["at"]).to be_within(5).of(EmailJobs::ShopWelcomeJob::DELAY.from_now.to_f)
+    end
+
+    context "not a bike shop" do
+      let(:organization_signup) { FactoryBot.create(:organization_signup_details_completed, kind: "school") }
+
+      it "sends no shop welcome email" do
+        expect(described_class.complete(organization_signup, user:)).to be_persisted
+        expect(EmailJobs::ShopWelcomeJob.jobs.count).to eq 0
+      end
     end
 
     context "the name was taken since step 1" do

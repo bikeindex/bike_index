@@ -707,6 +707,7 @@ en:
         cargo_rear: Cargo Bike Rear (e.g. longtail)
         cargo_trike: Cargo Tricycle (trike with front storage, e.g. Christiania bike)
         cargo_trike_rear: Cargo Tricycle (trike with rear storage)
+        e_atv: e-ATV (e-Quad, electric all-terrain vehicle)
         e_motorcycle: e-Motorcycle (e-Dirt bike, e-bike with no pedals)
         e_scooter: e-Scooter
         elliptical: Elliptical bike
@@ -1853,14 +1854,14 @@ en:
           We couldn't finish setting up your organization (%{errors}). Contact support@bikeindex.org
           and we'll sort it out.
       confirm_email:
+        accept_terms: >-
+          Agree to the Terms of Service and the Terms of Service for Organizations
+          to activate the organization
         link_invalid: >-
           That link doesn't work anymore. Use the newest email we sent to %{email},
           or send another below.
         link_invalid_resent: That link doesn't work anymore, so we've emailed a new
           one to %{email}.
-        sign_out_to_confirm: >-
-          You're signed in as %{email}. Sign out, then open the link again to activate
-          the organization.
         switched_signup: >-
           You're now finishing %{name}. To finish %{replaced_name} too, open the link
           in its email.
@@ -2021,11 +2022,9 @@ en:
         safety_rules_updated: The safety rules have been updated — please review them
           again
       confirm_email:
+        accept_terms: Agree to the Terms of Service to continue
         confirmation_link_expired: That confirmation link has expired — check your
           email for a new one
-        sign_out_to_agree: >-
-          You're signed in as %{email}. Sign out, then open the link again to agree
-          to the safety rules.
         signed_in_as_other: >-
           You're signed in as %{email}, so we kept you in that account. The registration
           is still saved to the address we emailed.
@@ -3739,9 +3738,6 @@ en:
     feedbacks_index: Help using Bike Index. Frequently asked questions and other things.
     feedbacks_new: Contact Bike Index. Your words are our muse, whisper them in our
       ear.
-    feedbacks_vendor_signup: >-
-      Sign up with Bike Index to register your customers' bikes quickly, easily and
-      for free.
     info_about: Why we made Bike Index and who we are
     info_protect_your_bike: >-
       Prevent bike theft. Recommendations and best practices for protecting your bike
@@ -3789,6 +3785,9 @@ en:
       Index
     sessions_create: Log in to Bike Index
     sessions_new: Log in to Bike Index
+    shop_index: >-
+      Bike Index cap and registration stickers. Every purchase helps keep the registry
+      free.
     stolen_index: Bike Index helps recover your stolen bike
     stolen_merging: >-
       StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest
@@ -3805,7 +3804,6 @@ en:
     documentation_api_v1: Bike Index API documentation
     feedbacks_index: Help with Bike Index
     feedbacks_new: Contact Bike Index
-    feedbacks_vendor_signup: Shop sign up - Bike Index
     info_about: About Bike Index
     info_serials: Bike serial numbers
     info_spokecard: Spoke cards - Bike Index
@@ -3847,6 +3845,7 @@ en:
     search_registrations_index: Search results
     sessions_create: Log in
     sessions_new: Log in
+    shop_index: Shop - Bike Index
     stolen_index: Bike registry
     strava_search_index: Bike Index Strava Search
     users_accept_terms: Terms of use - Bike Index
@@ -4604,6 +4603,8 @@ en:
       subject: Finish reporting your stolen %{cycle_type}
     partial_registration:
       subject: Finish your %{organization_name}Bike Index registration!
+    shop_welcome:
+      subject: Your Bike Index shop dashboard is ready
   payments:
     form:
       donation_header: Help support our efforts!

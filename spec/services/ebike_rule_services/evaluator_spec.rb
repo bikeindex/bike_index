@@ -122,7 +122,7 @@ RSpec.describe EbikeRuleServices::Evaluator do
 
   context "with a bike that is both Class 2 and Class 3" do
     let(:attributes) do
-      super().merge(e_bike_class: 3, e_vehicle_classifications: %w[evc/us/class_2 evc/us/class_3], top_assist_mph: 28, throttle: true, stock_throttle: true, throttle_mph: 20)
+      super().merge(e_bike_class: 3, e_vehicle_classifications: %w[evc/us/class-2 evc/us/class-3], top_assist_mph: 28, throttle: true, stock_throttle: true, throttle_mph: 20)
     end
 
     it "recognizes both" do
@@ -182,7 +182,7 @@ RSpec.describe EbikeRuleServices::Evaluator do
   context "with a Class 1 bike whose optional throttle makes it Class 2, in a state with Class 1 alone and no throttle" do
     let(:abbreviation) { "NJ" }
     let(:attributes) do
-      super().merge(e_bike_class: 2, e_vehicle_classifications: %w[evc/us/class_1 evc/us/class_2], optional_classes: {2 => "throttle"}, throttle: true)
+      super().merge(e_bike_class: 2, e_vehicle_classifications: %w[evc/us/class-1 evc/us/class-2], optional_classes: {2 => "throttle"}, throttle: true)
     end
 
     it "is legal as sold, with the throttle to leave off" do
