@@ -55,6 +55,12 @@ RSpec.describe PosRegistrationMatch, type: :model do
       match.pos_bike.current_ownership.update!(user: FactoryBot.create(:user_confirmed), claimed: true)
       expect(match.reload.mergeable?).to be_falsey
     end
+
+    it "isn't mergeable once the POS registration is transferred, so the next owner isn't asked" do
+      BikeServices::OwnershipTransferer.find_or_create(match.pos_bike, updator: match.pos_bike.creator,
+        new_owner_email: "next-owner@example.com")
+      expect(match.reload.mergeable?).to be_falsey
+    end
   end
 
   describe "owners_pos_registration?" do

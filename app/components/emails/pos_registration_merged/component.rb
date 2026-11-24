@@ -3,9 +3,8 @@
 module Emails
   module PosRegistrationMerged
     class Component < ApplicationComponent
-      def initialize(pos_bike:, pos_registration_match:)
-        @pos_bike = pos_bike
-        @pos_registration_match = pos_registration_match
+      def initialize(pos_registration_match:)
+        @pos_bike = pos_registration_match.pos_bike
       end
 
       private

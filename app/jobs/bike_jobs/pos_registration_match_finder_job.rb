@@ -46,19 +46,17 @@ module BikeJobs
       ownership&.self_made? && !ownership.pos? && CUSTOMER_ORIGINS.include?(ownership.origin)
     end
 
-    # The group's bikes (bikes has no index on serial) the shop's POS registered, still with their first owner: the
-    # owner, or another email no account has claimed. The register flow credits a customer's registration to their
-    # shop by default, so it can share the POS bike's organization
+    # The group's POS registrations still with their first owner: the owner, or another email no account has
+    # claimed. Starts from ownerships so most runs never query bikes. The register flow credits a customer's
+    # registration to their shop by default, so it can share the POS bike's organization
     def earlier_pos_bikes(bike, duplicate_bike_group_id)
-      BikeDuplicatesServices::Finder.serial_bikes(bike).includes(:current_ownership)
-        .where(id: NormalizedSerialSegment.where(duplicate_bike_group_id:).select(:bike_id),
-          created_at: (bike.created_at - 365.days)...bike.created_at)
-        .select do |pos_bike|
-          ownership = pos_bike.current_ownership
-          ownership&.initial? && ownership.pos_kind.in?(BikeDuplicatesServices::Finder::POS_KINDS) &&
-            (ownership.user_id == bike.user_id || !ownership.claimed?) &&
-            bike.creation_organization_id.in?([nil, pos_bike.creation_organization_id])
-        end
+      pos_bike_ids = Ownership.current.initial.where(pos_kind: BikeDuplicatesServices::Finder::POS_KINDS,
+        bike_id: NormalizedSerialSegment.where(duplicate_bike_group_id:).select(:bike_id))
+        .where("ownerships.user_id = ? OR ownerships.claimed IS NOT TRUE", bike.user_id).pluck(:bike_id)
+      return [] if pos_bike_ids.none?
+
+      BikeDuplicatesServices::Finder.serial_bikes(bike).where(id: pos_bike_ids, created_at: (bike.created_at - 365.days)...bike.created_at)
+        .select { bike.creation_organization_id.in?([nil, it.creation_organization_id]) }
     end
 
     def record_match(bike, pos_bike, duplicate_bike_group_id, reasons)

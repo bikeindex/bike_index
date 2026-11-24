@@ -209,7 +209,7 @@ class CustomerMailer < ApplicationMailer
   def pos_registration_merged_email(pos_registration_match, user)
     @user = user
     pos_bike = pos_registration_match.pos_bike
-    component = Emails::PosRegistrationMerged::Component.new(pos_bike:, pos_registration_match:)
+    component = Emails::PosRegistrationMerged::Component.new(pos_registration_match:)
 
     I18n.with_locale(@user.preferred_language) do
       mail(to: @user.email, subject: default_i18n_subject(bike_type: pos_bike.type), tag: __callee__) do |format|

@@ -19,8 +19,7 @@ class PosRegistrationMatchesController < ApplicationController
   private
 
   def find_pos_registration_match
-    @pos_registration_match = PosRegistrationMatch.where.not(token: nil).find_by(token: params[:id].to_s)
-    raise ActiveRecord::RecordNotFound if @pos_registration_match.blank?
+    @pos_registration_match = PosRegistrationMatch.find_by!(token: params[:id].to_s)
   end
 
   # The emailed link stays the same as the match changes. answered is whether the answer was just recorded

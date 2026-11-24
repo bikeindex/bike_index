@@ -29,7 +29,6 @@
 class PosRegistrationMatch < ApplicationRecord
   STATUS_ENUM = {pending: 0, confirmed: 1, declined: 2, merged: 3}.freeze
   BUCKETS = %w[merge_candidate review_candidate].freeze
-  # The answer page's buttons
   ANSWERS = {"merge" => true, "decline" => false}.freeze
   REVIEW_REASONS = {
     "stolen_history" => "Stolen history on the serial",
@@ -106,10 +105,10 @@ class PosRegistrationMatch < ApplicationRecord
   def confirmable? = pending? && mergeable?
 
   # Still the same bike (an edited serial or manufacturer could otherwise slip past the stolen veto), both live,
-  # and both theirs - or for another email, the shop's still unclaimed by any account
+  # and both theirs - or for another email, the shop's still with that email and unclaimed by any account
   def mergeable?
     merge_candidate? && [bike, pos_bike].all? { it&.current_with_user_hidden? } && bike.user_id.present? &&
-      (different_email? ? !pos_bike.claimed? : self.class.owners_pos_registration?(bike, pos_bike)) &&
+      pos_registration_still_matched? &&
       bike.serial_normalized_no_space == pos_bike.serial_normalized_no_space && bike.manufacturer_id == pos_bike.manufacturer_id
   end
 
@@ -144,4 +143,12 @@ class PosRegistrationMatch < ApplicationRecord
   end
 
   def bucket = merge_candidate? ? "merge_candidate" : "review_candidate"
+
+  private
+
+  def pos_registration_still_matched?
+    return self.class.owners_pos_registration?(bike, pos_bike) unless different_email?
+
+    pos_bike.current_ownership&.initial? && !pos_bike.claimed?
+  end
 end
