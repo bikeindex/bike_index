@@ -58,7 +58,7 @@ RSpec.describe Integrations::Bikebook::Catalog do
 
     it "is the model's title, description and image, cached without its block, and reads neither again" do
       expect(described_class.vehicle("m/segway/2025/gt3-pro")).to match(title: "Segway GT3 Pro",
-        description: a_string_starting_with("Experience elite performance"), image_url: "https://bikebook.bikeindex.org/segway/2025/gt3_pro.png")
+        description: a_string_starting_with("Experience elite performance"), image_url: "https://bikebook.bikeindex.org/segway/2025/gt3-pro.png")
       expect(Rails.cache.exist?(["bikebook_catalog/file", "models/segway/2025.json"])).to be false
       expect(Rails.cache.exist?(["bikebook_catalog/model", described_class.head["digest"], "m/segway/2025/gt3-pro"])).to be true
       Rails.cache.delete(["bikebook_catalog/manifest", described_class::MANIFEST])
