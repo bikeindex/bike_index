@@ -26,6 +26,8 @@
           <%= progress_percent %>% (<%= number_display(downloaded_count) %> /
           <%= number_display(total_count) %>) <%= translation(".downloaded") %>
         </span>
+
+        <span class="tw:block tw:text-sm"><%= translation(".sync_running_in_background") %></span>
       </span>
       <% if @strava_integration.persisted? %>
         <span
@@ -38,7 +40,9 @@
       <%= number_display(downloaded_count) %> <%= translation(".activities_synced", count: downloaded_count) %>
       <% if strava_bikes.any? %>
         ·
-        <%= translation(".bikes_linked_html", linked: number_display(strava_bikes.count { it.item_id.present? }), total: number_display(strava_bikes.size)) %>
+        <strong><%= number_display(strava_bikes.count { it.item_id.present? }) %></strong>
+        / <%= number_display(strava_bikes.size) %>
+        <%= translation(".strava_bikes_connected") %>
       <% end %>
     <% elsif error? %>
       <%= translation(".sync_error_description") %>

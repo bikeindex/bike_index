@@ -4,12 +4,11 @@ require "rails_helper"
 
 RSpec.describe Pages::MyAccount::Show::Component, type: :component do
   let(:user) { FactoryBot.create(:user_confirmed, name: "Alexandra") }
-  let(:view) { :list }
   let(:locks_tab) { false }
   let(:pagy) { Pagy::Offset.new(count: user.bikes.count, page: 1, limit: 10) }
   let(:page_params) { {} }
   let(:component) do
-    render_inline(described_class.new(user: user.reload, bikes: user.bikes.reorder(:id), pagy:, locks: user.locks, view:, locks_tab:, page_params:))
+    render_inline(described_class.new(user: user.reload, bikes: user.bikes.reorder(:id), pagy:, locks: user.locks, locks_tab:, page_params:))
   end
 
   context "without bikes or locks" do
@@ -26,10 +25,9 @@ RSpec.describe Pages::MyAccount::Show::Component, type: :component do
     context "on the locks tab" do
       let(:locks_tab) { true }
 
-      it "renders the locks empty state, with no view toggle" do
+      it "renders the locks empty state" do
         expect(component).to have_text("No locks registered yet")
         expect(component).to have_link("Add a lock")
-        expect(component).not_to have_link("Grid view")
       end
     end
   end
@@ -38,30 +36,12 @@ RSpec.describe Pages::MyAccount::Show::Component, type: :component do
     let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:, serial_number: "LISTED-123") }
     let!(:lock) { FactoryBot.create(:lock, user:, key_serial: "KEY-9") }
 
-    it "renders the counts, the bikes and the view toggle" do
+    it "renders the counts and the bikes" do
       expect(component).to have_text(/1 bike ·\s+1 lock/)
       expect(component).to have_link("Bikes")
       expect(component).to have_link("Locks", href: "/my_account?active_tab=locks")
       expect(component).to have_text("LISTED-123")
-      expect(component).to have_link("Grid view", href: "/my_account?view=grid")
-      expect(component).to have_css("a[aria-current=true][aria-label='List view']")
-    end
-
-    context "paged" do
-      let(:page_params) { {page: "3", per_page: "50"}.with_indifferent_access }
-
-      it "keeps the page when switching view" do
-        expect(component).to have_link("Grid view", href: "/my_account?page=3&per_page=50&view=grid")
-      end
-    end
-
-    context "in the grid" do
-      let(:view) { :grid }
-
-      it "marks the grid as the current view" do
-        expect(component).to have_css("a[aria-current=true][aria-label='Grid view']")
-        expect(component).to have_text("LISTED-123")
-      end
+      expect(component).not_to have_link(href: /view=/)
     end
 
     context "with an unassigned_bike_org alert" do
@@ -73,17 +53,6 @@ RSpec.describe Pages::MyAccount::Show::Component, type: :component do
       it "renders it with its bike, saying 'this one'" do
         expect(component).to have_css("li [role=alert]", text: "but this one is not")
         expect(component).not_to have_css("[role=alert] a[href='/bikes/#{bike.id}']")
-      end
-
-      context "in the grid" do
-        let(:view) { :grid }
-
-        it "stacks it above the tiles, naming the bike, and leaves the tile alone" do
-          expect(component).to have_css("[role=alert]", count: 1, text: "but #{bike.title_string} is not")
-          expect(component).to have_css("[role=alert] a[href='/bikes/#{bike.id}']", text: bike.title_string)
-          expect(component).not_to have_css("li [role=alert]")
-          expect(component).to have_css("form[action='/user_alerts/#{user_alert.id}?add_bike_organization=true'] button", text: "Add it now!")
-        end
       end
     end
 

@@ -4,7 +4,7 @@ module Pages
   module MyAccount
     module Show
       module BikeBox
-        # A registration as a card, in a list row or a grid tile. The alerts render outside
+        # A registration as a card in the list. The alerts render outside
         # the cache, since resolving or dismissing one doesn't touch the bike. Each is loaded
         # once for the page, and each box picks out its own
         class Component < ApplicationComponent
@@ -19,10 +19,9 @@ module Pages
               .select { it.unfinished_registration?(user) }.index_by(&:created_bike_id)
           end
 
-          def initialize(bike:, current_user:, view: :list, user_alerts: [], unfinished_b_params: {})
+          def initialize(bike:, current_user:, user_alerts: [], unfinished_b_params: {})
             @bike = bike
             @current_user = current_user
-            @view = view
             @user_alerts = user_alerts.select { it.bike_id == bike.id }
             @unfinished_b_param = unfinished_b_params[bike.id]
           end
@@ -30,14 +29,14 @@ module Pages
           private
 
           def cache_key
-            [self.class.cache_digest, @view, @bike, impound_claim]
+            [self.class.cache_digest, @bike, impound_claim]
           end
-
-          def grid? = @view == :grid
 
           def accent_classes = Atoms::RegistrationStatusBadge::Component.border_class(@bike)
 
-          def thumb_image_url = @thumb_image_url ||= BikeServices::Displayer.thumb_image_url(@bike)
+          def thumb_image_url
+            @thumb_image_url ||= @bike.public_images.first&.image_url(:small) || BikeServices::Displayer.thumb_image_url(@bike)
+          end
 
           # A stock photo fills the frame, but the owner still hasn't added one of their own
           def photo_path
@@ -73,6 +72,19 @@ module Pages
               bike_path(claimed_bike), class: "twlink-underlined")
             tag.div(translation(".impound_claim_html", status: impound_claim.status_humanized.titleize, claimed_bike: claimed_bike_link),
               class: "tw:text-sm tw:text-yellow-800 tw:dark:text-yellow-300")
+          end
+
+          def bike_sticker_codes
+            @bike_sticker_codes ||= @bike.bike_stickers.includes(:bike_sticker_batch).map(&:pretty_code)
+          end
+
+          # A marketplace listing shows its own address
+          def location
+            record = @bike.current_event_record
+            return if record.blank? || @bike.is_for_sale
+            return record.formatted_address_string unless record.is_a?(ImpoundRecord)
+
+            record.address_record&.formatted_address_string(visible_attribute: :street)
           end
 
           def sale_link_text

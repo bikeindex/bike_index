@@ -10,17 +10,8 @@
       tw:gap-5
     "
   >
-    <div class="tw:flex tw:flex-col tw:gap-1.5">
-      <%= render(UI::Header::Component.new(text: translation(".header_title", current_user_name: @user.display_name), html_class: "tw:m-0! tw:font-header tw:text-[40px] tw:leading-tight tw:text-pretty")) %>
-
-      <div class="tw:text-[15px] tw:text-gray-500 tw:dark:text-gray-400">
-        <%= translation(".bike_count", count: bike_count) %> ·
-        <%= translation(".lock_count", count: @locks.size) %>
-        <% if membership.present? %>
-          ·
-          <%= translation(".membership_subtitle", level: membership.basic? ? "" : membership.level_humanized) %>
-        <% end %>
-      </div>
+    <div>
+      <%= render(UI::Header::Component.new(text: translation(".header_title", current_user_name: @user.display_name), subtitle:)) %>
     </div>
 
     <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
@@ -29,24 +20,14 @@
     </div>
   </div>
 
-  <div class="tw:flex tw:items-end">
-    <div class="tw:min-w-0 tw:flex-1">
-      <%= render(UI::Tabs::Component.new(tabs:, nav_label: translation(".your_registrations"), margin_classes: "tw:mb-0")) %>
-    </div>
-
-    <% unless @locks_tab %>
-      <div class="tw:border-b tw:border-gray-300 tw:pb-2 tw:dark:border-gray-700">
-        <%= render(UI::ButtonGroup::Component.new(entries: view_entries, kind: :toggle)) %>
-      </div>
-    <% end %>
-  </div>
+  <%= render(UI::Tabs::Component.new(tabs:, nav_label: translation(".your_registrations"), margin_classes: "tw:mb-0")) %>
 
   <% if @locks_tab %>
     <% if @locks.any? %>
       <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3.5 tw:p-0">
         <% @locks.each do |lock| %>
           <li>
-            <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4 tw:rounded-[10px]!")) do %>
+            <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4")) do %>
               <div class="tw:flex tw:flex-col tw:gap-1.5">
                 <div class="tw:text-lg">
                   <strong><%= lock.mnfg_name %></strong> <%= lock.lock_type&.name %>
@@ -63,7 +44,10 @@
                     <span class="tw:font-mono"><%= lock.combination %></span>
                   <% end %>
 
-                  <%= translation(".registered") %> <%= render(UI::Time::Component.new(time: lock.created_at)) %>
+                  <%= translation(".registered") %>
+                  <%= render(UI::Time::Component.new(time: lock.created_at)) %>
+                  · <%= translation(".updated") %>
+                  <%= render(UI::Time::Component.new(time: lock.updated_at)) %>
                 </div>
               </div>
 
@@ -92,18 +76,9 @@
       </div>
     <% end %>
   <% elsif @bikes.any? %>
-    <% if @view == :grid && bikes_with_alerts.any? %>
-      <div class="tw:flex tw:flex-col tw:gap-4">
-        <% bikes_with_alerts.each do |bike| %>
-          <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike:, current_user: @user, named: true,
-                user_alerts: user_alerts.select { it.bike_id == bike.id }, unfinished_b_param: unfinished_b_params[bike.id])) %>
-        <% end %>
-      </div>
-    <% end %>
-
-    <ul class="<%= class_names("tw:m-0 tw:grid tw:list-none tw:p-0", "tw:grid-cols-[repeat(auto-fill,minmax(230px,1fr))] tw:gap-[18px]": @view == :grid, "tw:gap-3.5": @view == :list) %>">
+    <ul class="tw:m-0 tw:flex tw:list-none tw:flex-col tw:gap-3.5 tw:p-0">
       <% @bikes.each do |bike| %>
-        <%= render(Pages::MyAccount::Show::BikeBox::Component.new(bike:, current_user: @user, view: @view, user_alerts:, unfinished_b_params:)) %>
+        <%= render(Pages::MyAccount::Show::BikeBox::Component.new(bike:, current_user: @user, user_alerts:, unfinished_b_params:)) %>
       <% end %>
     </ul>
 
@@ -139,7 +114,7 @@
     <% bar.with_subtext { translation(".donations_keep_the_registry_running") } %>
 
     <% bar.with_action do %>
-      <%= render(UI::ButtonLink::Component.new(text: translation(".donate"), href: donate_url, color: :yellow, size: :callout_sm, target: "_blank", rel: "noopener")) %>
+      <%= render(UI::ButtonLink::Component.new(text: translation(".donate"), href: donate_url, color: :purple, size: :callout_sm, target: "_blank", rel: "noopener")) %>
     <% end %>
   <% end %>
 </div>

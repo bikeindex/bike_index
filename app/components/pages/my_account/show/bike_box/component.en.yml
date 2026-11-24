@@ -6,11 +6,14 @@ en:
         show:
           bike_box:
             add_a_photo: Add a photo
-            edit: Edit
+            bike_sticker: Bike Sticker
             edit_registration: Edit %{bike_type}
             impound_claim_html: "%{status} claim to %{claimed_bike}"
             list_for_sale: List for sale
+            location: Location
+            registered: Registered
             report_stolen: Mark stolen
             this_claimed_bike_type: this %{kind} %{bike_type}
             update_listing: Update listing
+            updated: Updated
             user_hidden: Hidden from other users

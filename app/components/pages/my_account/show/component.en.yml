@@ -19,11 +19,9 @@ en:
             We're a nonprofit. Donations keep the registry running and stolen bikes
             getting home.
           edit: Edit
-          grid_view: Grid view
           header_title: "%{current_user_name} on Bike Index"
           helps_shops_and_police: Helps shops and police reach you if a bike is found.
           key_serial: Key serial
-          list_view: List view
           lock_count:
             one: "%{count} lock"
             other: "%{count} locks"
@@ -36,4 +34,5 @@ en:
           registered: Registered
           tell_us_more_about_yourself: Tell us more about yourself.
           update_profile: Update profile
+          updated: Updated
           your_registrations: Your registrations

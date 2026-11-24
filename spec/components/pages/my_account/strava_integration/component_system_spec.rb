@@ -33,7 +33,7 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :system do
       visit(preview_path)
       expect(page).to have_content "Connected"
       expect(page).to have_content(/150\s+activities synced/)
-      expect(page).to have_content "0 / 2 bikes linked"
+      expect(page).to have_content %r{0\s+/ 2\s+Strava bikes connected to Bike Index bikes}
       expect(page).to have_link "Disconnect"
     end
   end

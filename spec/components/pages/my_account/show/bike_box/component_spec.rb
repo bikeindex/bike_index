@@ -37,6 +37,24 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     end
   end
 
+  context "with a Bike Book catalog stock photo" do
+    let(:stock_photo_url) { "https://bikebook.bikeindex.org/aventon/2022/level-2.jpg" }
+    before { bike.update(stock_photo_url:) }
+
+    it "shows it" do
+      expect(component).to have_css("img[src='#{stock_photo_url}']")
+    end
+  end
+
+  context "with a public image" do
+    let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+
+    it "is the public image's small url" do
+      expect(component).to have_css("img[src='#{public_image.reload.image_url(:small)}']")
+      expect(component).not_to have_text("Add a photo")
+    end
+  end
+
   context "with a photo of their own" do
     before { bike.update_column(:thumb_path, "https://files.bikeindex.org/uploads/Pu/1/small_bike.jpg") }
 
@@ -96,27 +114,25 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     end
   end
 
-  context "in the grid" do
-    let(:component) { render_inline(described_class.new(bike: bike.reload, current_user: user, view: :grid)) }
+  context "with a bike sticker" do
+    before { FactoryBot.create(:bike_sticker_claimed, code: "A40340", bike:, user:) }
 
-    context "with alerts" do
-      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
-      let!(:user_alert) { FactoryBot.create(:user_alert, user:, bike:, organization:, kind: "unassigned_bike_org") }
+    it "lists its code, with the registered and updated dates" do
+      expect(component).to have_text(/Bike Sticker:\s+A 403 40/)
+      expect(component).to have_text("Registered")
+      expect(component).to have_text("Updated")
+    end
+  end
 
-      before { UserAlert.refresh_alert_slugs(user) }
-
-      it "leaves them to the page, so the tile keeps its height" do
-        grid = render_inline(described_class.new(bike: bike.reload, current_user: user, view: :grid, user_alerts: described_class.user_alerts(user.reload)))
-        expect(grid).not_to have_css("[role=alert]")
-      end
+  context "stolen, with an address" do
+    before do
+      FactoryBot.create(:stolen_record, bike:, street: "100 W 1st St", city: "Chicago", postal_code: "60608")
+      bike.update(updated_at: Time.current)
     end
 
-    it "renders the tile, with the shorter action names" do
-      expect(component).to have_css("strong", text: "Surly")
-      expect(component).to have_text("SUR-77120934")
-      expect(component).to have_link("Edit", exact_text: true)
-      expect(component).to have_link("List for sale")
-      expect(component).to have_link("Mark stolen")
+    it "shows where" do
+      expect(component).to have_text("Location: ")
+      expect(component).to have_text("Chicago")
     end
   end
 
@@ -126,7 +142,8 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     it "offers to update the listing, and says it's for sale" do
       expect(component).to have_text("For Sale")
       expect(component).to have_link("Update listing")
-      expect(component).not_to have_css(".localizeTime")
+      # Registered and updated, but no occurred time in the badge
+      expect(component).to have_css(".localizeTime", count: 2)
     end
   end
 

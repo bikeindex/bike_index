@@ -70,13 +70,13 @@ RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :component 
       end
 
       it "renders gear list" do
-        expect(component).to have_text("0 / 1 bikes linked")
+        expect(component).to have_text(%r{0\s+/ 1\s+Strava bikes connected to Bike Index bikes})
       end
     end
 
     it "does not render gear section without gear" do
       expect(component).to have_text("Connected")
-      expect(component).not_to have_text("bikes linked")
+      expect(component).not_to have_text("Strava bikes connected")
     end
 
     it "renders disconnect button" do
