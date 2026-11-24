@@ -25,7 +25,7 @@ module Backfills
     # notification's subject and Reply-To are the feedback's own, which a reply or forward's aren't
     def feedback_notification?(bug_report)
       feedback = Feedback.find_by(id: bug_report.feedback_id)
-      feedback.present? && feedback.title == bug_report.subject &&
+      feedback&.title == bug_report.subject &&
         EmailNormalizer.normalize(feedback.email) == bug_report.email
     end
 
@@ -36,7 +36,7 @@ module Backfills
 
       triage_tags = bug_report.tags.select { |tag| tag.start_with?(*TRIAGE_TAG_PREFIXES) || tag == "bug" }
       bug_report.update(tags: bug_report.tags - triage_tags + tags,
-        status: bug_report.resolved? ? bug_report.status : :ignored)
+        status: bug_report.resolved? ? :resolved : :ignored)
     end
   end
 end

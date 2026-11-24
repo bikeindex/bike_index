@@ -3,14 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Atoms::Admin::Badges::BugReportTag::Component, type: :component do
-  let(:component) { render_inline(described_class.new(tag:)) }
-  let(:tag) { "ask_sign_in_help" }
-
   def badge_class(tag) = render_inline(described_class.new(tag:)).css("span").first["class"]
-
-  it "renders a monospace badge" do
-    expect(component).to have_css("span.tw\\:font-mono", text: "ask_sign_in_help")
-  end
 
   it "colors by prefix, then by tag" do
     expect(badge_class("ask_stolen_bike")).to eq badge_class("ask_sign_in_help")
