@@ -56,6 +56,11 @@ RSpec.describe PosRegistrationMatch, type: :model do
       expect(match.reload.mergeable?).to be_falsey
     end
 
+    it "isn't mergeable once the owner's registration is transferred, since its account was who the email was asked about" do
+      BikeServices::OwnershipTransferer.find_or_create(match.bike, updator: user, new_owner_email: "next-owner@example.com")
+      expect(match.reload.mergeable?).to be_falsey
+    end
+
     it "isn't mergeable once the POS registration is transferred, so the next owner isn't asked" do
       BikeServices::OwnershipTransferer.find_or_create(match.pos_bike, updator: match.pos_bike.creator,
         new_owner_email: "next-owner@example.com")

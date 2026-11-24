@@ -20,7 +20,7 @@ module Emails
 
       def answer_url
         if @pos_registration_match.different_email?
-          pos_registration_match_url(@pos_registration_match.token)
+          pos_registration_match_url(@pos_registration_match, token: @pos_registration_match.token)
         else
           my_account_pos_registration_match_url(@pos_registration_match)
         end

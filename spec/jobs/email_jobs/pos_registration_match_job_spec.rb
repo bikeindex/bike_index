@@ -39,7 +39,7 @@ RSpec.describe EmailJobs::PosRegistrationMatchJob, type: :job do
       }.to change(Notification, :count).by 1
       mail = ActionMailer::Base.deliveries.sole
       expect(mail.to).to eq(["shop-customer@example.com"])
-      expect(mail.html_part.body.to_s).to include("/pos_registration_matches/#{match.token}")
+      expect(mail.html_part.body.to_s).to include("/pos_registration_matches/#{match.id}?token=#{match.token}")
       expect(mail.html_part.body.to_s).not_to include(user.email)
       expect(Notification.last).to have_attributes(kind: "pos_registration_match", user_id: nil,
         message_channel_target: "shop-customer@example.com", delivery_status: "delivery_success")

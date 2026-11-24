@@ -149,6 +149,7 @@ class PosRegistrationMatch < ApplicationRecord
   def pos_registration_still_matched?
     return self.class.owners_pos_registration?(bike, pos_bike) unless different_email?
 
-    pos_bike.current_ownership&.initial? && !pos_bike.claimed?
+    # Both still with who the token's email was asked about
+    pos_bike.current_ownership&.initial? && !pos_bike.claimed? && bike.current_ownership&.initial?
   end
 end

@@ -2,9 +2,9 @@
 
 <p>
   <% if shop_name.present? %>
-    <%= translation("shop_registered_it_html", shop_name:, bike_type:, shop_email:) %>
+    <%= translation("shop_registered_it_html", shop_name:, bike_type:) %>
   <% else %>
-    <%= translation("pos_registered_it", bike_type:, shop_email:) %>
+    <%= translation("pos_registered_it", bike_type:) %>
   <% end %>
 </p>
 

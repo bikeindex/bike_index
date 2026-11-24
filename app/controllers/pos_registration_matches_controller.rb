@@ -5,6 +5,11 @@ class PosRegistrationMatchesController < ApplicationController
   before_action :find_pos_registration_match
 
   def show
+    # Moved to the session, so the token isn't in the page's URL for its analytics to see
+    if params[:token].present?
+      session[:pos_registration_match_token] = params[:token]
+      return redirect_to(pos_registration_match_path(@pos_registration_match))
+    end
     return redirect_by_status unless @pos_registration_match.confirmable?
 
     render(Pages::MyAccount::PosRegistrationMatches::Show::Component.new(bike: @pos_registration_match.bike,
@@ -13,20 +18,23 @@ class PosRegistrationMatchesController < ApplicationController
 
   def update
     redirect_by_status(@pos_registration_match.answer!(merge: PosRegistrationMatch::ANSWERS[params[:answer]],
-      token: params[:id], user: current_user))
+      token: session[:pos_registration_match_token], user: current_user))
   end
 
   private
 
   def find_pos_registration_match
-    @pos_registration_match = PosRegistrationMatch.find_by!(token: params[:id].to_s)
+    @pos_registration_match = PosRegistrationMatch.find(params[:id])
+    token = params[:token].presence || session[:pos_registration_match_token]
+    raise ActiveRecord::RecordNotFound unless @pos_registration_match.different_email? &&
+      @pos_registration_match.answerable_by?(token:)
   end
 
   # The emailed link stays the same as the match changes. answered is whether the answer was just recorded
   def redirect_by_status(answered = false)
     match = @pos_registration_match
     # Nothing was recorded, e.g. no answer was given
-    return redirect_to(pos_registration_match_path(match.token)) if match.confirmable?
+    return redirect_to(pos_registration_match_path(match)) if match.confirmable?
 
     flash[answered ? :success : :notice] = if answered
       match.declined? ? translation(:kept_separate) : translation(:combining_thanks)

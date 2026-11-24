@@ -141,11 +141,11 @@ module BikeJobs
       end
 
       # The registration address is the initial ownership's, so the owner's goes with their registration info. One
-      # the shop registered to another email keeps it, and is claimed for the owner's account
+      # the shop registered to another email takes the owner's, or confirming an account with it would claim it
       owner_ownership = bike.current_ownership
       pos_ownership = pos_bike.current_ownership
       owner_ownership&.address_record&.update!(bike_id: pos_bike.id)
-      pos_ownership.update!(claimed: true, token: nil, user_id: bike.user_id,
+      pos_ownership.update!(claimed: true, token: nil, user_id: bike.user_id, owner_email: bike.user&.email || pos_ownership.owner_email,
         registration_info: pos_ownership.registration_info.to_h.merge(owner_ownership&.registration_info.to_h.compact_blank),
         address_record_id: owner_ownership&.address_record_id || pos_ownership.address_record_id)
 

@@ -84,7 +84,7 @@ RSpec.describe CustomerMailer, type: :mailer do
         mail = CustomerMailer.pos_registration_match_email(match, "shop-customer@example.com")
         expect(mail.to).to eq ["shop-customer@example.com"]
         body = mail.body.encoded
-        expect(body).to include("/pos_registration_matches/#{match.token}", EmailNormalizer.obfuscate(match.bike.user.email),
+        expect(body).to include("/pos_registration_matches/#{match.id}?token=#{match.token}", EmailNormalizer.obfuscate(match.bike.user.email),
           "moves this registration to that account")
         expect(body).not_to include(match.bike.user.email)
       end
@@ -99,7 +99,7 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.subject).to eq "We combined your bike's registrations"
       expect(mail.to).to eq [match.bike.user.email]
       expect(mail.tag).to eq "pos_registration_merged_email"
-      expect(mail.body.encoded).to include(EmailNormalizer.obfuscate("shop-customer@example.com"), "reply to this email")
+      expect(mail.body.encoded).to include("another email address", "reply to this email")
     end
   end
 

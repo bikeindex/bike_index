@@ -11,7 +11,8 @@ en:
           you entered.
         pos_registered_it: >-
           The shop it was bought from registered a %{bike_type} with the same serial
-          to %{shop_email}, which told us they're the same %{bike_type}.
+          to another email address, which told us they're the same %{bike_type}.
         shop_registered_it_html: >-
           <strong>%{shop_name}</strong> registered a %{bike_type} with the same serial
-          to %{shop_email} when it was bought, which told us they're the same %{bike_type}.
+          to another email address when it was bought, which told us they're the same
+          %{bike_type}.

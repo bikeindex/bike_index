@@ -26,6 +26,6 @@
   <% end %>
 </p>
 
-<%= link_to translation("review_and_combine"), answer_url, class: "binx-button" %>
+<%= render(Emails::Partials::TokenLink::Component.new(href: answer_url, text: translation("review_and_combine"))) %>
 
 <p><%= translation("if_theyre_different") %></p>

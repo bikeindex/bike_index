@@ -33,7 +33,7 @@ module Pages
 
           def answer_path
             if different_email?
-              pos_registration_match_path(@pos_registration_match.token)
+              pos_registration_match_path(@pos_registration_match)
             else
               my_account_pos_registration_match_path(@pos_registration_match)
             end
