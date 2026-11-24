@@ -45,9 +45,13 @@ export default class extends Controller {
     this.pointermoveBetween = this.pointermoveBetween.bind(this)
   }
 
-  // A popover's UA overflow clips the arrow hanging off its edge
   tooltipTargetConnected (tooltip) {
+    // Fragment caches still hold markup rendered with it
+    tooltip.classList.remove('tw:pointer-events-none')
+    // A press holds it open, so a selection dragged past its edge survives the mouseleave
+    tooltip.addEventListener('pointerdown', () => this.showPersistent())
     if (!POPOVER) return
+    // A popover's UA overflow clips the arrow hanging off its edge
     tooltip.popover = 'manual'
     tooltip.style.overflow = 'visible'
   }

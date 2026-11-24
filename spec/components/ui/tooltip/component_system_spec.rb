@@ -177,6 +177,15 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     find("body").click
     expect(tooltip).not_to be_visible
 
+    # So can one hovered onto, without a click first
+    find("body").hover
+    trigger.hover
+    glide_onto(tooltip)
+    drag_select(tooltip, past: 120)
+    expect(tooltip).to be_visible
+    find("body").click
+    expect(tooltip).not_to be_visible
+
     # Tabbing from the trigger into a link in the popup keeps the tooltip open
     commit_tooltip = find("a[href*='commit']", visible: :all).find(:xpath, "ancestor::*[@role='tooltip']", visible: :all)
     commit_trigger = find("[aria-describedby='#{commit_tooltip[:id]}']")
