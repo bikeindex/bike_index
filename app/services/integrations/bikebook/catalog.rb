@@ -73,9 +73,9 @@ module Integrations
       # The file the catalog's laws and classifications are in, whose name is a digest of them
       def vocabulary = head&.dig("vocabulary")
 
-      # The vocabulary's classifications, cached without the rest of the file. nil while the catalog doesn't answer
-      def e_vehicle_classifications
-        vocabulary&.then { |path| cached(["bikebook_catalog/e_vehicle_classifications", path], expires_in: 1.week) { read(path)["e_vehicle_classifications"] } }
+      # What's at `keys` in the vocabulary, cached without the rest of the file. nil while the catalog doesn't answer
+      def vocabulary_dig(*keys)
+        vocabulary&.then { |path| cached(["bikebook_catalog/vocabulary_dig", path, *keys], expires_in: 1.week) { read(path).dig(*keys) } }
       end
 
       # Whether the catalog answers in the format /bikebook reads

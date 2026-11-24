@@ -41,8 +41,7 @@ module Integrations
 
       # A component's type by the name its Ctype has
       def component_attributes(record)
-        vocabulary = Integrations::Bikebook::Catalog.vocabulary
-        names = vocabulary && Integrations::Bikebook::Catalog.file(vocabulary)&.dig("names", "components.type")
+        names = Integrations::Bikebook::Catalog.vocabulary_dig("names", "components.type")
         record["components"].to_a.map do |component|
           position = Array(component["position"])
           {component_type: names&.dig(component["type"]) || component["type"]&.humanize, description: component["description"],

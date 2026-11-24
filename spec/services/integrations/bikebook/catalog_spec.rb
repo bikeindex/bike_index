@@ -92,18 +92,18 @@ RSpec.describe Integrations::Bikebook::Catalog do
     end
   end
 
-  describe "e_vehicle_classifications" do
-    it "caches the vocabulary's classifications alone" do
-      expect(described_class.e_vehicle_classifications).to include("evc/us/class-3")
-      cached = Rails.cache.read(["bikebook_catalog/e_vehicle_classifications", "vocabulary.json"])
-      expect(cached).to eq described_class.e_vehicle_classifications
+  describe "vocabulary_dig" do
+    it "caches what is at the keys alone" do
+      expect(described_class.vocabulary_dig("names", "components.type")).to include("saddle" => "Saddle")
+      cached = Rails.cache.read(["bikebook_catalog/vocabulary_dig", "vocabulary.json", "names", "components.type"])
+      expect(cached).to eq described_class.vocabulary_dig("names", "components.type")
     end
 
     context "while the catalog doesn't answer" do
       before { stub_bikebook_catalog(status: 503) }
 
       it "is nil" do
-        expect(described_class.e_vehicle_classifications).to be_nil
+        expect(described_class.vocabulary_dig("e_vehicle_classifications")).to be_nil
       end
     end
   end
