@@ -26,7 +26,6 @@ class MyAccountsController < ApplicationController
 
   def update
     @user = current_user
-    # A passwordless user's digest is random, so there's no current password to give
     if params.dig(:user, :password).present? && !@user.passwordless_user?
       unless @user.authenticate(params.dig(:user, :current_password))
         @user.errors.add(:base, translation(:current_password_doesnt_match))
