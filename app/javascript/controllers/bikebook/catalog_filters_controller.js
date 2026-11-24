@@ -181,7 +181,8 @@ export default class extends Controller {
     const inputs = [...field.querySelectorAll('input[name]')]
     // what the catalog names, which leaves out a value while it loads
     if (field.matches('.hw-combobox')) {
-      return inputs[0].value.split(',').filter(Boolean)
+      // a single choice's value can hold a comma, as target riders' "kid,woman" does
+      return (field.matches('.hw-combobox--multiple') ? inputs[0].value.split(',') : [inputs[0].value]).filter(Boolean)
         .flatMap((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? [])
         .join(', ')
     }

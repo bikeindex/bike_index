@@ -195,7 +195,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     # its ID a copy away, beside its name, which its tooltip shows
     copy_id = find("[aria-label='Overview'] thead button[aria-label='Copy ID (m/aventon/2026/level-4-rec-step-through)']")
     copy_id.hover
-    expect(page).to have_css("[role='tooltip']", exact_text: "Copy ID (m/aventon/2026/level-4-rec-step-through)", visible: true)
+    expect(page).to have_css("[role='tooltip']", exact_text: "Copy ID (m/aventon/2026/level-4-rec-step-through) or view JSON", visible: true)
+    expect(page).to have_link("view JSON", href: "/bikebook_schemas/m/aventon/2026/level-4-rec-step-through", visible: true)
     # its certifications as /ebike-rules shows them, each a tooltip of what it means
     certifications = find("[aria-label='Overview'] tr", text: /\AElectric Certification/)
     expect(certifications).to have_text(/UL 2849 Certified\s*E-bike electrical system\s*UL 2271 Certified\s*Battery pack\z/)
@@ -776,6 +777,11 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_current_path(/[?&]frame_material=composite\b/).and have_current_path(/[?&]handlebar_type=drop_bar\b/)
     within("#vehicle-filters") { click_link "Clear filters" }
     expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)")
+    choose_option("Target riders", "Women's")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(1 matching model)")
+    expect(page).to have_current_path(/[?&]target_riders=woman\b/)
+    within("#vehicle-filters") { click_link "Clear filters" }
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)")
     # and from the open panel, where the market, how it narrows and e-bike classification are nothing to clear, and stay
     # through a clear
     find_field("Market").click
@@ -1184,10 +1190,12 @@ RSpec.describe "Bike Book", :js, type: :system do
     # each with why, from /ebike-rules
     reasons = "[aria-label='Overview comparison'] td turbo-frame p"
     expect(page).to have_css(reasons, count: 2)
-    expect(all(reasons).map(&:text)).to eq ["It is a Class 2 and Class 3 e-bike, which is not permitted. Assists to 28 mph, not allowed with a throttle.",
+    expect(all(reasons).map(&:text)).to eq ["It is a Class 2 and Class 3 e-bike, which is not permitted in California. Assists to 28 mph, not allowed with a throttle.",
       "It's legal only without its optional throttle."]
     choose_option("Jurisdiction", "New Jersey")
     expect(page).to have_css(reasons, text: "Classes 2 and 3 aren't recognized in New Jersey.", count: 2)
+    # sold as a Class 3, which New Jersey doesn't recognize, each an e-moto there as /ebike-rules has it
+    expect(tiles.call).to eq [["E-moto, not an e-bike"], ["E-moto, not an e-bike"]]
     choose_option("Jurisdiction", "Colorado")
     expect(page).to have_no_css("[aria-label='Overview comparison'] td button[aria-label='E-moto, not an e-bike']")
     expect(page).to have_no_css(reasons)
@@ -1551,7 +1559,7 @@ RSpec.describe "Bike Book", :js, type: :system do
       })()
     JS
     expect(cargo.first).to include("label" => "Cargo length", "value" => 600, "listed" => true)
-    expect(cargo.last.gsub(/[[:space:]]/, " ")).to eq "#{cargo.first["letter"]}Length600 mmWidth500 mmVolume120 L"
+    expect(cargo.last.gsub(/[[:space:]]/, " ")).to eq "#{cargo.first["letter"]}Length60 cmWidth50 cmVolume120 L"
     # a bottom bracket above the axles, as a BMX's is, drops a negative amount
     bb_drop = page.evaluate_script(<<~JS)
       import('bikebook/templates/vehicles/cycle_drawing').then(({ cycleDrawing }) => {
@@ -1620,10 +1628,10 @@ RSpec.describe "Bike Book", :js, type: :system do
         const container = document.createElement('div')
         document.body.append(container)
         render(geometryCard({ presenter, size: { name: 'M', geometry: {
-          seat_angle: 73.5, seat_angle_actual: 71, seat_height_min: 760, seat_height_max: 760, seat_height_bb_min: 650, seat_height_bb_max: 780,
+          seat_tube_ct: 544.6, seat_angle: 73.5, seat_angle_actual: 71, seat_height_min: 760, seat_height_max: 760, seat_height_bb_min: 650, seat_height_bb_max: 780,
           total_weight: 3.1, frame_weight: 1.9, fork_weight: 1.2, rider_height_min: 1600, rider_height_max: 1750, rider_inseam_min: 720,
           rider_inseam_max: 820, rider_age_min: 8, bb_drop: 70
-        }, geometry_settings: [{ name: 'low', geometry: { bb_drop: 78, extra_measurements: { bb_offset: 5 } } }] }, others: [] }), container)
+        }, geometry_settings: [{ name: 'low', geometry: { bb_drop: 78, extra_measurements: { bb_offset: 5 } } }] }, others: [], cargo: { length: 914.4 } }), container)
         const rows = (dl) => [...dl.querySelectorAll(':scope > div')].map((row) => [row.querySelector('dt').textContent.trim(), row.querySelector('dd').innerText.replace(/\\s+/g, ' ').trim()])
         const groups = [[...container.querySelectorAll('h4')].map((heading) => heading.textContent), [...container.querySelectorAll('dl')].map(rows)]
         container.remove()
@@ -1631,11 +1639,11 @@ RSpec.describe "Bike Book", :js, type: :system do
         return [groups, fragmentOf(runningGearOf({ presenter, data: fork, others: [] })).textContent.replace(/\\s+/g, ' ')]
       })()
     JS
-    expect(fit.first).to match([["Low setting"], [[
-      ["Seat Angle (effective)", /\A73\.5\W*°\z/], ["Seat Angle (actual)", /\A71\W*°\z/], ["BB Drop", /\A70\W*mm\z/], ["Seat height from ground", /\A760\W*mm\z/],
-      ["Seat height from BB", /\A650\W*–\W*780\W*mm\z/], ["Total vehicle weight at this size", /\A3\.1\W*kg\z/], ["Frame weight", /\A1\.9\W*kg\z/],
-      ["Fork weight", /\A1\.2\W*kg\z/], ["Rider height", /\A160\W*–\W*175\W*cm\z/], ["Rider inseam", /\A720\W*–\W*820\W*mm\z/], ["Rider age", /\A8\W*yr min\z/]
-    ], [["BB Drop", /\A78\W*mm\z/], ["BB offset", /\A5\W*mm\z/]]]])
+    expect(fit.first).to match([["Low setting", "Cargo"], [[
+      ["Seat Tube center-to-top", /\A54\.5\W*cm\z/], ["Seat Angle (effective)", /\A73\.5\W*°\z/], ["Seat Angle (actual)", /\A71\W*°\z/], ["BB Drop", /\A70\W*mm\z/], ["Seat height from ground", /\A76\W*cm\z/],
+      ["Seat height from BB", /\A65\W*–\W*78\W*cm\z/], ["Total vehicle weight at this size", /\A3\.1\W*kg\z/], ["Frame weight", /\A1\.9\W*kg\z/],
+      ["Fork weight", /\A1\.2\W*kg\z/], ["Rider height", /\A160\W*–\W*175\W*cm\z/], ["Rider inseam", /\A72\W*–\W*82\W*cm\z/], ["Rider age", /\A8\W*yr min\z/]
+    ], [["BB Drop", /\A78\W*mm\z/], ["BB offset", /\A5\W*mm\z/]], [["Length", /\A91\.4\W*cm\z/]]]])
     expect(fit.last).to match(/Axle: 15\W*×\W*110\W*mm/).and match(/Offset: 44\W*mm/).and(satisfy { !it.include?("Axle diameter") })
     # a tandem's captain's figures under a bike's keys and its stoker's prefixed, and its front end as a bike's: its head
     # tube's bottom up its fork's length from the front axle, square to the steering axis by its rake, its fork's length

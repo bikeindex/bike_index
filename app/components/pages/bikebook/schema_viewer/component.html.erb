@@ -19,7 +19,7 @@
         <%= render(UI::Forms::Group::Component.new(attribute: :vehicle_models, label_text: translation(".lookup_label"), optional_badge: false, wrapper_class: nil)) do %>
           <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
           <template data-bikebook--schema-lookup-target="combobox">
-            <%= render(UI::Forms::Combobox::Component.new(name: "vehicle_models", src: bikebook_path, dialog_label: translation(".lookup_label"),
+            <%= render(UI::Forms::Combobox::Component.new(name: "vehicle_models", src: bikebook_path, rich_display: :inline, dialog_label: translation(".lookup_label"),
               html_options: {value: @record_id, placeholder: translation(".search_placeholder")})) %>
           </template>
 
@@ -33,6 +33,12 @@
               disabled
             >
           </div>
+        <% end %>
+
+        <% if @record %>
+          <p class="tw:mt-3">
+            <%= link_to(translation(".view_on_github"), Integrations::Bikebook::RepositoryRecord.github_url(@record_id), class: "twlink tw:underline") %>
+          </p>
         <% end %>
       <% end %>
     <% end %>

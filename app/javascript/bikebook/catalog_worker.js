@@ -106,7 +106,7 @@ const classified = ({ e_vehicle_classifications: records }, jurisdictions) => Ob
 }))
 
 // What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in, the kit and the vocabulary
-function start ({ manifestUrl, ids, jurisdictions, comparing }) {
+function start ({ manifestUrl, ids, jurisdictions, riders, comparing }) {
   opened = fetchCatalog(manifestUrl).then((published) => {
     if (published.format !== FORMAT) throw new Error(`catalog format ${published.format} isn't ${FORMAT}`)
 
@@ -115,7 +115,7 @@ function start ({ manifestUrl, ids, jurisdictions, comparing }) {
     ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
   })
   started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchCatalog(new URL(file, base)))))
-    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, names: withCurrentNames(vocabulary.names), e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
+    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, names: withCurrentNames({ target_riders: riders, ...vocabulary.names }), e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
   if (comparing) fetchComparison()
   return started
 }
@@ -189,6 +189,9 @@ async function compare () {
   return { comparable: true, frameMaterials: named('frame_material', 'frame.material', (await started).vocabulary.names) }
 }
 
+// a model's riders as a single choice: "kid,woman" is the kids' women's models alone
+const ridersOf = ({ target_riders: riders }) => (riders ?? []).join(',')
+
 const counted = (name, choices) => choices.map(([value, display]) => ({ value, display, count: models.filter(filter({ [name]: value })).length }))
 
 // by the vocabulary, as the index offers no choices of these
@@ -208,6 +211,9 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
       .map(([value, display]) => ({ value, name: display, display: `${display} (${value})` })),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))])),
     handlebar_type: named('handlebar_type', 'handlebar_type', names),
+    target_riders: counted('target_riders', [...new Set(models.map(ridersOf).filter(Boolean))]
+      .map((value) => [value, value.split(',').map((rider) => names.target_riders[rider] ?? rider).join(' & ')]))
+      .sort((a, b) => b.count - a.count),
     frame_material: []
   }
 }
@@ -474,6 +480,7 @@ function filter (params) {
     (types.length === 0 || types.includes(model.vehicle_type)) &&
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
     (!params.handlebar_type || model.handlebar_type === params.handlebar_type) &&
+    (!params.target_riders || ridersOf(model) === params.target_riders) &&
     (!params.frame_material || comparison?.fields.frame_material?.[model.position] === params.frame_material) &&
     (!params.market || inMarket(model, params.market, params.market_scope)) &&
     (yearMin == null || model.sortYear >= yearMin) &&

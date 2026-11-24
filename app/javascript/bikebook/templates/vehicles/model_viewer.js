@@ -63,6 +63,8 @@ const WEIGHT_LOADS = {
 const INCLUDED = 'included-not-installed'
 
 export const US_CLASS = /^evc\/us\/class-(\d)$/
+// a state's e-bike law, the first it has, as EbikeRuleServices::StateLaws picks it
+const E_BIKE_LAWS = ['electric-bicycle', 'low-speed-electric-bicycle', 'bicycle']
 const classNumbers = (mode) => mode.ids.map((id) => id.match(US_CLASS)?.[1]).filter(Boolean)
 // (tire_width / 25.4).round(1) is a Float, so a whole inch still reads 2.0
 const tireInches = (presenter, millimeters) => presenter.labeled(presenter.rounded(millimeters / 25.4).toFixed(1), 'in', presenter.kit.inches)
@@ -176,7 +178,7 @@ class ModelViewer {
       this.suspension(),
       this.frame()
     ], [this.electricSummary(), ...this.motorSections()], [
-      section({ heading: 'Cargo', content: presenter.measurementRows(this.specRows('cargo')) }),
+      section({ heading: 'Cargo', content: presenter.measurementRows(presenter.rowsFor(this.kit.schemas.vehicle.cargo.fields, vehicle.cargo, { others: this.others.map((other) => other.cargo), prefix: 'cargo.' })) }),
       this.weightLimits(),
       this.wheels(),
       this.positioned('Brakes', 'brakes', 'Brake', (brake) => this.brakeSummary(brake)),
@@ -351,7 +353,7 @@ class ModelViewer {
         row('Vehicle type', 'type_name'),
         row('Propulsion', 'propulsion', list),
         this.classifications(),
-        row('Primary activity', 'primary_activity', (each) => this.withoutParenthetical(each)),
+        row('Primary activity', 'primary_activity'),
         row('Handlebar', 'handlebar_type', (each) => this.withoutParenthetical(each))
       ])
     })
@@ -378,7 +380,7 @@ class ModelViewer {
       cargo_vehicle: isCargo(this.data),
       cargo: this.cargo(),
       // "Kids & Women's MTB: Trail", its riders ahead of the activity rather than in its type
-      primary_activity: presence(join([array(vehicle.target_riders).join(' & '), this.withoutParenthetical(vehicle.primary_activity)].filter(present), ' ')),
+      primary_activity: presence(join([array(vehicle.target_riders).join(' & '), vehicle.primary_activity].filter(present), ' ')),
       frame_material: present(vehicle.frame?.material) && present(vehicle.frame.material_detail)
         ? html`${vehicle.frame.material} <span class="tw:text-xs less-strong">${vehicle.frame.material_detail}</span>`
         : vehicle.frame?.material,
@@ -461,12 +463,13 @@ class ModelViewer {
   }
 
   // As /ebike-rules shows them: its US classes' tiles in order, an optional one's outlined, and an e-moto's, alone where
-  // it's out of class as sold, and outlined in place of its optional throttle's where that would put it there, both with
-  // that jurisdiction's ID. Without any, its classes' names
+  // it's out of class as sold, with that jurisdiction's ID, or sold in no class the jurisdiction recognizes, and outlined
+  // in place of its optional throttle's where that would put it there. Without any, its classes' names
   #classTiles () {
     if (this.outOfClass === 'stock') return classBadges([`emoto/${this.outOfClassId}`])
     const numbers = [...new Set(this.vehicle.classifiedModes.flatMap(classNumbers))].sort()
     const optional = this.#optionalClasses()
+    if (this.#unrecognized(numbers.filter((number) => !optional.has(number)))) return classBadges(['emoto'])
     const throttled = this.outOfClass === 'throttle'
     const classes = numbers.filter((number) => !(throttled && optional.get(number) === 'throttle'))
       .map((number) => optional.has(number) ? `${number}/${optional.get(number)}` : number)
@@ -484,6 +487,16 @@ class ModelViewer {
       ? html`<turbo-frame id=${`ebike-rules-reasons-${where}-${id.replace(/[^\w-]/g, '-')}`} class="tw:min-w-48 tw:flex-1" data-permanent=${place}
         src=${`/ebike-rules/${place}?${new URLSearchParams({ vehicle_models: id })}`}></turbo-frame>`
       : nothing}</div><p class="tw:mt-2 tw:text-sm">Learn more on <a class="twlink" href=${`/ebike-rules?vehicle_models=${id}`}>e-bike rules</a></p>`
+  }
+
+  // As Pages::EbikeRules::Results#unrecognized_classes? has it: the classes it's `sold` as, none of them one the viewing
+  // `state`'s e-bike law recognizes, as a Class 3 in New Jersey. Not while the law's limits are still ahead
+  #unrecognized (sold) {
+    const classifications = this.presenter.vocabulary.e_vehicle_classifications
+    const law = this.state && E_BIKE_LAWS.map((name) => classifications[`evc/us/${this.state.toLowerCase()}/${name}`]).find(Boolean)
+    if (!law || law.limits_start_on > new Date().toISOString().slice(0, 10)) return false
+    const recognized = classNumbers({ ids: array(law.groups) })
+    return recognized.length > 0 && sold.length > 0 && !sold.some((number) => recognized.includes(number))
   }
 
   // As EbikeRuleServices::BikebookVehicles has them: the US classes only a mode it isn't sold with brings, by that mode,
