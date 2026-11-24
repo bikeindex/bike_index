@@ -34,6 +34,7 @@ module CallbackJobs
       # Also, we we need to process with the previous email, not the user's current email
       associate_organization_role_invites(user, email, skip_confirm: true)
       associate_ownerships(user, email)
+      associate_bug_reports(user, email)
     end
 
     def perform_confirmed_jobs(user, email)
@@ -47,6 +48,7 @@ module CallbackJobs
       import_user_attributes(user)
       if user.confirmed?
         associate_ownerships(user, email)
+        associate_bug_reports(user, email)
         associate_graduated_notifications(user.reload)
       end
     end
@@ -64,6 +66,12 @@ module CallbackJobs
       Ownership.where(owner_email: email).each do |ownership|
         ownership.update(user_id: user.id)
       end
+    end
+
+    # A report only links to a confirmed address, so one sent before the account existed - or before
+    # it was confirmed - is picked up here
+    def associate_bug_reports(user, email)
+      BugReport.where(user_id: nil, email: EmailNormalizer.normalize(email)).find_each { it.update(user:) }
     end
 
     def associate_graduated_notifications(user)

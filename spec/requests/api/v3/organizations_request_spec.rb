@@ -123,6 +123,9 @@ RSpec.describe "Organization API V3", type: :request do
           expect(response).to be_created
           expect(response.code).to eq("201")
           expect(json_result["organization"]).to match_hash_indifferently target_response
+          organization = Organization.last
+          expect(organization.auto_user).to eq user
+          expect(EmailJobs::ShopWelcomeJob.jobs.map { it["args"] }).to eq([[organization.id]])
         end
 
         context "with explicit short_name" do

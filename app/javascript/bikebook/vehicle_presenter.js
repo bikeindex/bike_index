@@ -18,8 +18,9 @@ const mark = (content) => html`<span class="tw:spec-diff">${content}</span>`
 const MATERIALS = 'frame.material'
 const TOP_TUBES = 'frame.top_tube'
 const INTERFACES = 'frame.mounts.interface'
-// lengths in centimeters, with an imperial viewer's feet and inches after
-const IN_CENTIMETERS = ['wheelbase', 'standover', 'standover_above_bb']
+export const TARGET_RIDERS = { kid: 'Kids', woman: "Women's", adaptive: 'Adaptive' }
+// lengths charts list in centimeters, to the tenth, with an imperial viewer's feet or inches after
+const IN_CENTIMETERS = /^(wheelbase|standover|seat_tube_ctc?$|seat_height|rider_inseam|cargo\.(length|width)$)/
 const SINGULAR = { feet: 'foot', inches: 'inch' }
 
 // The names, units and lookups the vehicle templates present a model's data with
@@ -32,16 +33,14 @@ export class VehiclePresenter {
     // explains it, and the actual seat angle without the catalog's note on it
     this.kit = {
       ...kit,
-      // TODO: once the catalog publishes its 1.0.0 kit, which has volts, take its units as they are
-      units: { v: { label: 'V', name: 'volts' }, ...kit.units },
       acronyms: { ...kit.acronyms, bb: 'BB' },
       geometry: { ...kit.geometry, labels: { ...kit.geometry.labels, standover_above_bb: 'Standover above BB', seat_angle_actual: 'Seat Angle (actual)' } }
     }
-    // the catalog names carbon "Carbon or Composite", and leaves its top tubes, target riders and rack interfaces unnamed
-    const materials = { ...vocabulary.names[MATERIALS], carbon: 'Carbon/Composite' }
+    // the catalog names composite "Carbon or Composite", and leaves its top tubes, target riders and rack interfaces unnamed
+    const materials = { ...vocabulary.names[MATERIALS], composite: 'Carbon/Composite' }
     const interfaces = { mik: 'MIK', mik_hd: 'MIK HD', racktime_snapit: 'Racktime SnapIt', atranvelo_avs: 'Atranvelo AVS', thule_yepp_easyfit: 'Thule Yepp EasyFit', ...vocabulary.names[INTERFACES] }
     const topTubes = { step_through: 'Step-through', sloping: 'Sloping', horizontal: 'Horizontal', ...vocabulary.names[TOP_TUBES] }
-    const riders = { kid: 'Kids', woman: "Women's", adaptive: 'Adaptive', ...vocabulary.names.target_riders }
+    const riders = { ...TARGET_RIDERS, ...vocabulary.names.target_riders }
     this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials, [TOP_TUBES]: topTubes, [INTERFACES]: interfaces, target_riders: riders } }
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
@@ -82,7 +81,7 @@ export class VehiclePresenter {
     }))
   }
 
-  // TODO: once the catalog publishes its 1.0.0 kit, whose mounts have an interface field, `named` names it and this goes
+  // TODO: once the vocabulary names frame.mounts.interface, `named` names it and this goes
   interfaceName (slug) {
     return this.vocabulary.names[INTERFACES][slug] ?? slug
   }
@@ -115,7 +114,7 @@ export class VehiclePresenter {
 
     const parts = this.#imperialParts(unit, key)
     const feet = parts.length === 2
-    const inCentimeters = IN_CENTIMETERS.includes(key)
+    const inCentimeters = IN_CENTIMETERS.test(key)
     const metric = feet || inCentimeters
       ? this.labeled(this.rounded(value / this.kit.conversions.mm.cm), 'cm', this.kit.presenter.centimeters)
       : this.labeled(value, unit)
@@ -128,19 +127,21 @@ export class VehiclePresenter {
     return this.#unitSystems(metric, inCentimeters ? join([metric, ' ', html`<span class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">(${shown})</span>`]) : shown)
   }
 
-  // "760–890 mm", one figure where they're equal, or the end it has: "18 yr min". A height in feet and inches reads in
-  // centimeters in metric, as measurement has it
+  // "760–890 mm", one figure where they're equal, or the end it has: "18 yr min". A height in feet and inches, or a length
+  // charts list in centimeters, reads in centimeters in metric, as measurement has it
   range (min, max, unit, key) {
     if (min == null || max == null) return join([this.measurement(min ?? max, unit, key), min == null ? ' max' : ' min'])
     if (min === max) return this.measurement(min, unit, key)
 
     const parts = this.#imperialParts(unit, key)
     const ends = (convert, ...label) => join([this.labeled(this.rounded(convert(min))), '–', this.labeled(this.rounded(convert(max)), ...label)])
+    const metric = parts.length === 2 || IN_CENTIMETERS.test(key)
+      ? ends((mm) => mm / this.kit.conversions.mm.cm, 'cm', this.kit.presenter.centimeters)
+      : ends((value) => value, unit)
     if (parts.length === 2) {
       const feet = (mm) => join(this.#significant(parts, mm).map(({ part, convert }) => this.labeled(convert(mm), unit, part)), ' ')
-      return this.#unitSystems(ends((mm) => mm / this.kit.conversions.mm.cm, 'cm', this.kit.presenter.centimeters), join([feet(min), '–', feet(max)]))
+      return this.#unitSystems(metric, join([feet(min), '–', feet(max)]))
     }
-    const metric = ends((value) => value, unit)
     return parts.length ? this.#unitSystems(metric, ends(parts[0].convert, unit, parts[0].part)) : metric
   }
 
@@ -216,7 +217,8 @@ export class VehiclePresenter {
   }
 
   // `display` presents a field's value, as it does the others'
-  rowsFor (definition, source, { labels = {}, others = [], collapse = [], display = (value) => value } = {}) {
+  // `prefix` keys the rows' measurements, as a cargo area's length is its cargo.length
+  rowsFor (definition, source, { labels = {}, others = [], collapse = [], display = (value) => value, prefix = '' } = {}) {
     const values = isHash(source) ? source : {}
     const otherSources = others.map((other) => isHash(other) ? other : {})
     return Object.entries(definition).flatMap(([key, meta]) => {
@@ -226,9 +228,9 @@ export class VehiclePresenter {
 
       const label = labels[key] ?? this.humanize(key)
       if (meta.fields && !collapse.includes(key) && [value, ...otherValues].some(isHash)) {
-        return this.rowsFor(meta.fields, value, { others: otherValues, display }).map(([rowLabel, ...row]) => [`${label} ${String(rowLabel).toLowerCase()}`, ...row])
+        return this.rowsFor(meta.fields, value, { others: otherValues, display, prefix: prefix && `${prefix}${key}.` }).map(([rowLabel, ...row]) => [`${label} ${String(rowLabel).toLowerCase()}`, ...row])
       }
-      return [[label, display(value, key), meta.unit, otherValues.some((other) => !equal(other, value)), key, otherValues.map((other) => display(other, key))]]
+      return [[label, display(value, key), meta.unit, otherValues.some((other) => !equal(other, value)), `${prefix}${key}`, otherValues.map((other) => display(other, key))]]
     })
   }
 

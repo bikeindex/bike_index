@@ -323,6 +323,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
 
         # The emailed link finishes a step like any other, and fails like one
         visit confirmation_link
+        check "I agree to Bike Index's Terms of Service"
         click_button "Continue"
 
         # Confirming proves the address, which leaves the theft it's reporting

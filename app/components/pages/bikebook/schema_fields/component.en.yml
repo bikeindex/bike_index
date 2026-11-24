@@ -1,0 +1,17 @@
+---
+en:
+  components:
+    pages:
+      bikebook:
+        schema_fields:
+          by_count: by count
+          by_count_label: "%{path} by count"
+          explain: explain
+          file: file
+          less: less
+          models: "%{number} models"
+          more: "+%{count} more"
+          representative_initial: R
+          representative_vehicle_lowercase: representative vehicle
+          schema_order: schema order
+          view_list: view list

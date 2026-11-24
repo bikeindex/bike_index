@@ -263,12 +263,6 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page).not_to have_current_path(/page=2/)
     expect(page).to have_css("tbody tr", count: 1)
 
-    # Chart test must run before the custom-range click below: that submission
-    # writes session[:timezone] from Intl.DateTimeFormat (varies between local
-    # Chrome and CI's headless Chrome), and set_timezone prefers session over
-    # cookie — so the cookie override only takes effect while session is empty.
-    expect(browser_cookie_value("timezone")).to be_present
-
     # 6 AM UTC is past midnight in Chicago and before it in LA, with or without daylight saving
     chart_bike_created_at = 14.days.ago.utc.beginning_of_day + 6.hours
     bike2.update_columns(created_at: chart_bike_created_at)
@@ -276,9 +270,8 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     cdt_date_key = chart_bike_created_at.in_time_zone("America/Chicago").strftime("%Y-%-m-%-d")
     expect(la_date_key).not_to eq(cdt_date_key)
 
-    # Replace the cookie via JS the same way the app does, so attributes (SameSite, path)
-    # match and Chrome reliably overwrites the existing cookie set on previous loads.
-    page.execute_script("document.cookie = 'timezone=America/Los_Angeles;path=/;max-age=31536000;SameSite=Lax'")
+    emulate_timezone("America/Los_Angeles")
+    page.refresh
     expect(browser_cookie_value("timezone")).to eq("America/Los_Angeles")
 
     # Switch to past 30 days, for daily chart bucketing
@@ -299,8 +292,6 @@ RSpec.describe "Organized registrations search", :js, type: :system do
     expect(page.html).to include(%(["#{cdt_date_key}",null]))
 
     # Custom time range narrowed to a ±1 day window around bike2.created_at — matches bike2 only.
-    # Runs after the chart test because the Stimulus submit posts a timezone param that pins
-    # session[:timezone], which would otherwise override the cookie set above.
     choose("period_year", allow_label_click: true, visible: :all)
     expect(page).to have_current_path(/period=year/, wait: 10)
     # Let the period navigation land before submitting. The search posts the

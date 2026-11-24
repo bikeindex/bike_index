@@ -8,35 +8,35 @@
 //     the front tire, as BMX spec sheets list no stack, reach or fork length
 //   seat_tube: a BMX's seat tube, center to top, in mm, which slopes its top tube down to it
 // Touring's are drawn on the road wheels they're built from, `mtb` gets no wheel for its fat bikes, which no one tire
-// draws, and `bmx_cruiser` none of a BMX's, its frames sized for 24" and 26" wheels
+// draws, and `bmx-cruiser` none of a BMX's, its frames sized for 24" and 26" wheels
 
 const inches = (width) => Math.round(width * 25.4)
 const BMX = { kind: 'BMX bike', fork_rake: 28, head_tube: 100, crown: 63, seat_tube: 240 }
 
 export const TYPICAL_GEOMETRY = {
-  track_racing: { kind: 'track bike', rim: 622, tire: 23, fork_rake: 40 },
-  road_biking: { kind: 'road bike', rim: 622, tire: 25, fork_rake: 45 },
-  road_triathlon: { kind: 'triathlon bike', rim: 622, tire: 25, fork_rake: 43 },
-  road_time_trial: { kind: 'time trial bike', rim: 622, tire: 25, fork_rake: 43 },
-  road_aero: { kind: 'aero road bike', rim: 622, tire: 28, fork_rake: 45 },
-  road_endurance: { kind: 'endurance road bike', rim: 622, tire: 28, fork_rake: 49 },
-  road_climbing: { kind: 'climbing road bike', rim: 622, tire: 28, fork_rake: 47 },
-  road_all_road: { kind: 'all-road bike', rim: 622, tire: 32, fork_rake: 50 },
-  road_bike_touring: { kind: 'touring bike', rim: 622, tire: 33, fork_rake: 50 },
-  atb_cyclocross: { kind: 'cyclocross bike', rim: 622, tire: 33, fork_rake: 50 },
-  atb_gravel: { kind: 'gravel bike', rim: 622, tire: 44, fork_rake: 50 },
+  'track-racing': { kind: 'track bike', rim: 622, tire: 23, fork_rake: 40 },
+  'road-biking': { kind: 'road bike', rim: 622, tire: 25, fork_rake: 45 },
+  'road-triathlon': { kind: 'triathlon bike', rim: 622, tire: 25, fork_rake: 43 },
+  'road-time-trial': { kind: 'time trial bike', rim: 622, tire: 25, fork_rake: 43 },
+  'road-aero': { kind: 'aero road bike', rim: 622, tire: 28, fork_rake: 45 },
+  'road-endurance-sportive': { kind: 'endurance road bike', rim: 622, tire: 28, fork_rake: 49 },
+  'road-climbing': { kind: 'climbing road bike', rim: 622, tire: 28, fork_rake: 47 },
+  'road-all-road': { kind: 'all-road bike', rim: 622, tire: 32, fork_rake: 50 },
+  'road-bike-touring': { kind: 'touring bike', rim: 622, tire: 33, fork_rake: 50 },
+  'atb-cyclocross': { kind: 'cyclocross bike', rim: 622, tire: 33, fork_rake: 50 },
+  'atb-gravel': { kind: 'gravel bike', rim: 622, tire: 44, fork_rake: 50 },
   commuting: { kind: 'commuter bike', rim: null, tire: 50, fork_rake: 50 },
   cargo: { kind: 'cargo bike', rim: null, tire: 58 },
   mtb: { kind: 'mountain bike', fork_rake: 48 },
-  mtb_cross_country: { kind: 'cross-country mountain bike', rim: 622, tire: inches(2.25), fork_rake: 44 },
-  mtb_bikepacking: { kind: 'bikepacking bike', rim: 622, tire: inches(2.2), fork_rake: 45 },
-  mtb_trail_all_mountain: { kind: 'trail mountain bike', rim: null, tire: inches(2.4), fork_rake: 44 },
-  mtb_enduro: { kind: 'enduro mountain bike', rim: null, tire: inches(2.5), fork_rake: 44 },
-  mtb_downhill: { kind: 'downhill mountain bike', rim: null, tire: inches(2.5), fork_rake: 52 },
-  mtb_freeride: { kind: 'freeride mountain bike', rim: null, tire: inches(2.3) },
+  'mtb-cross-country': { kind: 'cross-country mountain bike', rim: 622, tire: inches(2.25), fork_rake: 44 },
+  'mtb-bikepacking': { kind: 'bikepacking bike', rim: 622, tire: inches(2.2), fork_rake: 45 },
+  'mtb-trail-all-mountain': { kind: 'trail mountain bike', rim: null, tire: inches(2.4), fork_rake: 44 },
+  'mtb-enduro': { kind: 'enduro mountain bike', rim: null, tire: inches(2.5), fork_rake: 44 },
+  'mtb-downhill': { kind: 'downhill mountain bike', rim: null, tire: inches(2.5), fork_rake: 52 },
+  'mtb-freeride': { kind: 'freeride mountain bike', rim: null, tire: inches(2.3) },
   dj: { kind: 'dirt jump bike', rim: 559, tire: inches(2.25) },
   bmx: BMX,
-  bmx_race: BMX,
-  bmx_freestyle: BMX,
-  bmx_flatland: BMX
+  'bmx-race': BMX,
+  'bmx-freestyle': BMX,
+  'bmx-flatland': BMX
 }

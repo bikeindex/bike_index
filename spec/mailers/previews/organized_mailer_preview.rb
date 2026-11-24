@@ -59,6 +59,14 @@ class OrganizedMailerPreview < ActionMailer::Preview
     OrganizedMailer.hot_sheet(sheet)
   end
 
+  def shop_welcome(organization_id: params[:organization_id])
+    render_shop_welcome(connect_pos: true, organization_id:)
+  end
+
+  def shop_welcome_pos_connected(organization_id: params[:organization_id])
+    render_shop_welcome(connect_pos: false, organization_id:)
+  end
+
   def impound_claim_submitted(impound_claim_id: params[:impound_claim_id])
     claim = impound_claim_id ? ImpoundClaim.find(impound_claim_id) : ImpoundClaim.submitted.last
     OrganizedMailer.impound_claim_submitted(claim)
@@ -74,6 +82,18 @@ class OrganizedMailerPreview < ActionMailer::Preview
   # The link is the whole email, so only a registration still holding a token renders one
   def b_params_awaiting_confirmation
     BParam.where("(params -> 'email_confirmation_token') IS NOT NULL").order(:created_at)
+  end
+
+  def render_shop_welcome(connect_pos:, organization_id:)
+    organization = organization_id ? Organization.find(organization_id) : example_shop(connect_pos)
+    OrganizedMailer.shop_welcome(organization, organization.auto_user || User.new(email: "shop@example.com"))
+  end
+
+  def example_shop(connect_pos)
+    Organization.bike_shop.reorder(id: :desc).limit(100)
+      .find { OrgServices::Displayer.bike_shop_display_integration_alert?(it) == connect_pos } ||
+      Organization.new(name: "Example Bike Shop", slug: "example-bike-shop", kind: "bike_shop",
+        pos_kind: connect_pos ? "no_pos" : "lightspeed_pos")
   end
 
   def render_finished_registration(bikes, bike_id: nil)

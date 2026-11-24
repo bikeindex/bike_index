@@ -1,7 +1,7 @@
 // Searches the published catalog off the main thread, by the rules the catalog's own search follows
 /* global self */
 
-const FORMAT = 4
+const FORMAT = 5
 
 let models = []
 let byId = new Map()
@@ -63,7 +63,7 @@ const classified = ({ e_vehicle_classifications: records }, jurisdictions) => Ob
 }))
 
 // What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in, the kit and the vocabulary
-function start ({ manifestUrl, ids, jurisdictions, comparing }) {
+function start ({ manifestUrl, ids, jurisdictions, riders, comparing }) {
   opened = fetchJson(manifestUrl).then((published) => {
     if (published.format !== FORMAT) throw new Error(`catalog format ${published.format} isn't ${FORMAT}`)
 
@@ -72,7 +72,7 @@ function start ({ manifestUrl, ids, jurisdictions, comparing }) {
     ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
   })
   started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base)))))
-    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
+    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, names: { ...vocabulary.names, target_riders: { ...riders, ...vocabulary.names.target_riders } }, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
   if (comparing) fetchComparison()
   return started
 }
@@ -125,6 +125,9 @@ async function compare () {
   return { comparable: true, frameMaterials: named('frame_material', 'frame.material', (await started).vocabulary.names) }
 }
 
+// a model's riders as a single choice: "kid,woman" is the kids' women's models alone
+const ridersOf = ({ target_riders: riders }) => (riders ?? []).join(',')
+
 const counted = (name, choices) => choices.map(([value, display]) => ({ value, display, count: models.filter(filter({ [name]: value })).length }))
 
 // by the vocabulary, as the index offers no choices of these
@@ -144,6 +147,9 @@ function options ({ manufacturers, vehicle_types: vehicleTypes, filter_options: 
       .map(([value, display]) => ({ value, name: display, display: `${display} (${value})` })),
     ...Object.fromEntries(Object.entries(filterOptions).map(([name, labels]) => [name, counted(name, Object.entries(labels))])),
     handlebar_type: named('handlebar_type', 'handlebar_type', names),
+    target_riders: counted('target_riders', [...new Set(models.map(ridersOf).filter(Boolean))]
+      .map((value) => [value, value.split(',').map((rider) => names.target_riders[rider] ?? rider).join(' & ')]))
+      .sort((a, b) => b.count - a.count),
     frame_material: []
   }
 }
@@ -231,7 +237,8 @@ function matching (params) {
   const passes = filter(params)
   const filtered = sorted(params).filter(passes)
   const needle = (params.q ?? '').trim().toLowerCase()
-  const exact = needle.startsWith('m/') && byId.get(needle)
+  // a citation key's market is upper case: m/specialized/2025/haul-st@CA
+  const exact = needle.startsWith('m/') && byId.get(needle.replace(/@[a-z]+$/, (market) => market.toUpperCase()))
   const words = needle.split(/\s+/).filter(Boolean)
   const found = exact ? [exact] : filtered.filter(({ searchText }) => words.every((word) => searchText.includes(word))).map((model) => soldIn(model, params.market))
   const whole = ({ searchText }) => searchText.includes(needle)
@@ -375,6 +382,7 @@ function filter (params) {
     (types.length === 0 || types.includes(model.vehicle_type)) &&
     (!params.model_configuration || model.model_configuration === params.model_configuration) &&
     (!params.handlebar_type || model.handlebar_type === params.handlebar_type) &&
+    (!params.target_riders || ridersOf(model) === params.target_riders) &&
     (!params.frame_material || comparison?.fields.frame_material?.[model.position] === params.frame_material) &&
     (!params.market || inMarket(model, params.market, params.market_scope)) &&
     (yearMin == null || model.sortYear >= yearMin) &&
@@ -383,13 +391,13 @@ function filter (params) {
       (priceMin == null || model.msrp_cents >= priceMin * 100) && (priceMax == null || model.msrp_cents <= priceMax * 100)))
 }
 
-// evc/out_of_class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class,
-// and evc/out_of_class/us/ca its marker for one in no class in that state alone, where it's out of class rather than the US
+// evc/out-of-class is the catalog's own marker, as a model with no classified mode is unknown rather than out of class,
+// and evc/out-of-class/us/ca its marker for one in no class in that state alone, where it's out of class rather than the US
 // classes it carries. A state's class matches the models carrying its groups
 function propelled ({ electric, e_vehicle_classifications: carried = [] }, propulsion, jurisdiction) {
   if (propulsion === '0' || propulsion === '1') return electric === (propulsion === '1')
-  const id = propulsion.replace(/^class_/, 'evc/us/class_')
-  if (/^evc\/(out_of_class|us\/class_\d)$/.test(id) && carried.includes(`evc/out_of_class/us/${jurisdiction?.toLowerCase()}`)) return id === 'evc/out_of_class'
+  const id = propulsion.replace(/^class-/, 'evc/us/class-')
+  if (/^evc\/(out-of-class|us\/class-\d)$/.test(id) && carried.includes(`evc/out-of-class/us/${jurisdiction?.toLowerCase()}`)) return id === 'evc/out-of-class'
   return [id, ...(classifications[id]?.groups ?? [])].some((classification) => carried.includes(classification))
 }
 

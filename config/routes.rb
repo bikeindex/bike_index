@@ -19,8 +19,8 @@ Rails.application.routes.draw do
     controllers authorized_applications: "oauth/authorized_applications"
   end
 
-  get "/shop", to: redirect("https://bikeindex.org/info/bike-index-store"), as: :shop
-  get "/store", to: redirect("https://bikeindex.org/info/bike-index-store"), as: :store
+  get "/shop", to: "shop#index", as: :shop
+  get "/store", to: redirect(path: "/shop")
   get "/discuss", to: redirect("https://discuss.bikeindex.org"), as: :discuss
   get "discourse_authentication", to: "discourse_authentication#index"
 
@@ -74,16 +74,18 @@ Rails.application.routes.draw do
   end
 
   get "bikebook", to: "bikebook#show"
+  get "bikebook_schemas", to: "bikebook#schema_viewer"
   # before the glob below, which would take it for a model
   get "bikebook/license", to: "bikebook#license", as: :bikebook_license
   get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
+  get "bikebook_schemas/*id", to: "bikebook#schema", format: false
   get ":spelling(/*rest)", to: redirect { |params, request| request.fullpath.sub(params[:spelling], "bikebook") },
     constraints: {spelling: /bike[-_]?book/i}, format: false
   # a catalog model's own id, its manufacturer, year and model
-  get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9_]+/\d{4}/[a-z0-9_]+}}
+  get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9-]+/\d{4}/[a-z0-9-]+(?:@[A-Z]+)?}}
   # an e-vehicle classification's id, whose card the page shows
   get "evc/*classification", to: redirect(status: 302) { |params, _request| "/bikebook?classifications=evc/#{params[:classification]}" },
-    format: false, constraints: {classification: %r{[a-z0-9_]+(/[a-z0-9_]+)*}}
+    format: false, constraints: {classification: %r{[a-z0-9-]+(/[a-z0-9-]+)*}}
   if Integrations::Bikebook::Catalog::LOCAL_DIRECTORY
     mount Rack::Files.new(Integrations::Bikebook::Catalog::LOCAL_DIRECTORY) => Integrations::Bikebook::Catalog::LOCAL_PATH
   end
@@ -174,6 +176,7 @@ Rails.application.routes.draw do
     resource :membership, only: %i[show], controller: "my_accounts/memberships"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
     resources :organization_roles, only: %i[update destroy], controller: "my_accounts/organization_roles"
+    resources :pos_registration_matches, only: %i[show update], controller: "my_accounts/pos_registration_matches"
   end
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
 

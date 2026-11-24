@@ -39,6 +39,12 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     JS
   end
 
+  # Capybara's hover jumps there in one move, never crossing the gap between trigger and tooltip
+  def glide_onto(element)
+    box = element.native.bounding_box
+    page.driver.with_playwright_page { it.mouse.move(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2, steps: 12) }
+  end
+
   def scroll_container(delta)
     page.driver.with_playwright_page { it.mouse.wheel(delta, 0) }
   end
@@ -142,12 +148,16 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     find("body").click
     expect(tooltip).not_to be_visible
 
-    # Clicking the trigger persists the tooltip through mouseleave until a body click,
-    # and only a held-open tooltip takes pointer events rather than being click-through
+    # The pointer can move from the trigger onto a hovered tooltip without it closing
     trigger.hover
-    expect(tooltip[:class]).to include "tw:pointer-events-none"
+    glide_onto(tooltip)
+    expect(tooltip).to be_visible
+    expect(tooltip).to match_css(":hover")
+    find("body").hover
+    expect(tooltip).not_to be_visible
+
+    # Clicking the trigger persists the tooltip through mouseleave until a body click
     trigger.click
-    expect(tooltip[:class]).not_to include "tw:pointer-events-none"
     find("body").hover
     expect(tooltip).to be_visible
     find("body").click
@@ -162,6 +172,15 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     expect(tooltip).to be_visible
     expect(selected_tooltip_id).to eq tooltip_ids.first
     # A selection dragged past the tooltip's edge ends in a click outside it
+    drag_select(tooltip, past: 120)
+    expect(tooltip).to be_visible
+    find("body").click
+    expect(tooltip).not_to be_visible
+
+    # So can one hovered onto, without a click first
+    find("body").hover
+    trigger.hover
+    glide_onto(tooltip)
     drag_select(tooltip, past: 120)
     expect(tooltip).to be_visible
     find("body").click

@@ -27,65 +27,43 @@
         <%= image_tag("kelsey/illustrations/comic-assets_logo-cape.png", alt: "",
           class: "tw:absolute tw:-top-9.5 tw:-right-3 tw:h-20 tw:md:-top-11.5 tw:md:-right-6 tw:md:h-24") %>
 
-        <%# A signup returns here, which :target turns into the thank you in place of the form %>
-        <div
-          id="shop-signed-up"
-          class="
-            tw:peer tw:hidden tw:scroll-mt-20 tw:px-2 tw:py-9 tw:text-center
-            tw:target:block
-          "
-        >
-          <div class="tw:text-5xl tw:leading-none tw:text-blue-600 <%= HEADING_CLASSES %>">
-            <%= translation(".ding") %>
-          </div>
+        <h2 class="tw:mb-1 tw:pr-20 tw:text-[22px] <%= HEADING_CLASSES %>">
+          <%= translation(".sign_up_your_shop") %>
+        </h2>
 
-          <h2 class="tw:mt-2.5 tw:mb-1.5 tw:text-[22px] <%= HEADING_CLASSES %>">
-            <%= translation(".youre_in") %>
-          </h2>
+        <p class="tw:m-0 tw:mb-4.5 tw:text-sm <%= MUTED %>">
+          <%= translation(".free_forever") %>
+        </p>
 
-          <p class="tw:m-0 tw:leading-relaxed <%= MUTED %>">
-            <%= translation(".well_email_you") %>
-          </p>
-        </div>
+        <%= form_with(url: organization_signup_path, scope: :organization_signup, data: form_data) do |f| %>
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name,
+            label_text: translation(".shop_name"), required: true,
+            html_options: {required: true, maxlength: 255, autocomplete: "organization", placeholder: translation(".shop_name_placeholder")})) %>
 
-        <div class="tw:peer-target:hidden">
-          <h2 class="tw:mb-1 tw:pr-20 tw:text-[22px] <%= HEADING_CLASSES %>">
-            <%= translation(".sign_up_your_shop") %>
-          </h2>
-
-          <p class="tw:m-0 tw:mb-4.5 tw:text-sm <%= MUTED %>">
-            <%= translation(".free_forever") %>
-          </p>
-
-          <%= form_for @feedback, html: {data: {controller: "form-persist strip-inputs",
-            action: "input->form-persist#save submit->strip-inputs#submit submit->form-persist#clear"}} do |f| %>
-            <%= render(UI::Alerts::ObjectError::Component.new(object: @feedback, name: translation(".signup_name"))) %>
-
-            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name,
-              label_text: translation(".shop_name"), required: true,
-              html_options: {required: true, maxlength: 255, placeholder: translation(".shop_name_placeholder")})) %>
-
+          <% if @current_user.present? %>
+            <p class="tw:mb-4.5 tw:text-sm <%= MUTED %>">
+              <%= translation(".signed_in_as_admin_html", email: tag.strong(@current_user.email)) %>
+            </p>
+          <% else %>
             <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email, required: true)) do %>
               <%= render(UI::Forms::Email::Component.new(form_builder: f, required: true,
-                html_options: {value: @feedback.email.presence || @current_user&.email, maxlength: 255,
-                  placeholder: translation(".email_placeholder")})) %>
+                html_options: {maxlength: 255, placeholder: translation(".email_placeholder")})) %>
             <% end %>
-
-            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body,
-              label_text: translation(".your_pos"), required: true)) do %>
-              <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :body, option_tags: pos_options,
-                options: {prompt: translation(".choose_your_pos")}, required: true)) %>
-            <% end %>
-
-            <%= render(UI::Forms::Honeypot::Component.new(form_builder: f)) %>
-
-            <%= f.hidden_field :feedback_type, value: "lead_for_bike_shop" %>
-            <%= hidden_field_tag :return_to, for_bike_shops_path(anchor: "shop-signed-up"), id: nil %>
-
-            <%= render(UI::Button::Component.new(text: translation(".sign_up_free"), color: :primary,
-              size: :callout, type: "submit", html_class: "tw:w-full")) %>
           <% end %>
-        </div>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :pos_kind,
+            label_text: translation(".your_pos"), required: true)) do %>
+            <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :pos_kind, option_tags: pos_options,
+              options: {prompt: translation(".choose_your_pos")}, required: true)) %>
+          <% end %>
+
+          <%= render(UI::Forms::Honeypot::Component.new) %>
+          <%= f.hidden_field :kind, value: "bike_shop" %>
+          <%= render(UI::Forms::Turnstile::Component.new(user: @current_user)) %>
+
+          <%= render(UI::Button::Component.new(text: translation(".sign_up_free"), color: :primary,
+            size: :callout, type: "submit", html_class: "tw:w-full")) %>
+        <% end %>
       <% end %>
     </div>
   </div>
@@ -155,7 +133,7 @@
   </div>
 </section>
 
-<section class="tw:border-y <%= BAND %>">
+<section class="tw:border-y <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>">
   <div class="tw:py-12 tw:md:py-18 <%= SECTION_CLASSES %>">
     <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".what_your_customers_get"),
       html_class: "tw:mb-8 tw:max-w-170")) %>
@@ -197,7 +175,7 @@
 
       <%= render(SharedBlocks::Marketing::NumberBlocks::Component.new(items: sticker_prices, html_class: "tw:mb-6.5 tw:max-w-90")) %>
 
-      <%= render(UI::ButtonLink::Component.new(href: "https://bikeindex.myshopify.com/", text: translation(".order_stickers"),
+      <%= render(UI::ButtonLink::Component.new(href: shop_path(anchor: Pages::Shop::Index::Component::STICKERS_ID), text: translation(".order_stickers"),
         color: :primary, size: :callout)) %>
 
       <p class="tw:m-0 tw:mt-3.5 tw:text-[15px]">
@@ -268,7 +246,7 @@
   </div>
 </section>
 
-<section class="tw:border-t <%= BAND %>">
+<section class="tw:border-t <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>">
   <div class="tw:grid tw:gap-8 tw:py-12 tw:md:py-16 tw:lg:grid-cols-[0.7fr_1.3fr] tw:lg:gap-12 <%= SECTION_CLASSES %>">
     <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".faq"),
       intro: translation(".something_else_html",
