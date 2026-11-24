@@ -29,6 +29,7 @@ module UserJobs
       old_user.received_stolen_notifications.update_all(receiver_id: user_id)
       old_user.theft_alerts.update_all(user_id:)
       old_user.bike_sticker_updates.update_all(user_id:)
+      old_user.bug_reports.update_all(user_id:)
       old_user.email_bans.each { |eb| eb.update(user_id:) }
 
       BikeVersion.unscoped.where(owner_id: old_user.id).each { |i| i.update(owner_id: user_id) }

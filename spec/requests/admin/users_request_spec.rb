@@ -93,7 +93,7 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(response.body).to include(user_email.email)
         get "#{base_url}/#{user_subject.id}?active_tab=messages"
         sections = Nokogiri::HTML(response.body).css("h2").map { |heading| heading.text.squish }
-        expect(sections).to eq(["Marketplace messages 0", "Alerts 1", "Notifications 0", "Feedbacks 1", "Emails to contact@bikeindex.org 1"])
+        expect(sections).to eq(["Marketplace messages 0", "Alerts 1", "Notifications 0", "Feedbacks 1", "Bug reports 1"])
         expect(response.body).to include(admin_feedback_path(feedback))
         expect(response.body).to include("IGNORED-REPORT")
         get "#{base_url}/#{user_subject.id}?active_tab=payments"

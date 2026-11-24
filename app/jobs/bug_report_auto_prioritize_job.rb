@@ -12,8 +12,7 @@ class BugReportAutoPrioritizeJob < ApplicationJob
   }.freeze
   # Recovery feedback's titles - people write in with the same words, so only the feedback panel's count
   RECOVERY_SUBJECT_REGEX = /\A((stolen )?bike recover(y|ed)!?|recovered bike)\z/i
-  # Emails or domains whose messages are an organization's automated ticket system, tagged as
-  # auto-replies whatever their subject. Configured
+  # Emails or domains whose messages are an organization's automated ticket system. Configured
   # per-environment so no partner address lives in the repo; expandable without a code change.
   ORGANIZATION_AUTO_REPLY_SENDERS = ENV.fetch("BUG_REPORT_ORGANIZATION_AUTO_REPLY_SENDERS", "")
     .split(",").map { it.strip.downcase }.reject(&:blank?).freeze

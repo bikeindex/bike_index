@@ -33,6 +33,7 @@ RSpec.describe UserJobs::MergeAdditionalEmailJob, type: :job do
       let(:lock) { FactoryBot.create(:lock, user: old_user) }
       let(:payment) { FactoryBot.create(:payment, user: old_user) }
       let(:user_phone) { FactoryBot.create(:user_phone, user: old_user) }
+      let(:bug_report) { FactoryBot.create(:bug_report, user: old_user) }
       let(:customer_contact) { FactoryBot.create(:customer_contact, user: old_user, creator: old_user) }
       let(:stolen_notification) { FactoryBot.create(:stolen_notification, sender: old_user, receiver: old_user) }
       let(:oauth_application) { Doorkeeper::Application.create(name: "MyApp", redirect_uri: "https://app.com") }
@@ -58,6 +59,7 @@ RSpec.describe UserJobs::MergeAdditionalEmailJob, type: :job do
         expect(stolen_notification).to be_present
         expect(theft_alert).to be_present
         expect(user_phone.user_id).to eq old_user.id
+        expect(bug_report.user_id).to eq old_user.id
       end
 
       def expect_merged_bikes_and_organization_roles(ownerships_count: 2)
@@ -102,6 +104,7 @@ RSpec.describe UserJobs::MergeAdditionalEmailJob, type: :job do
         expect(pre_created_ownership.creator_id).to eq user.id
         expect(user_phone.reload.user_id).to eq user.id
         expect(payment.reload.user_id).to eq user.id
+        expect(bug_report.reload.user_id).to eq user.id
       end
 
       it "merges bikes and organization_roles and deletes user" do

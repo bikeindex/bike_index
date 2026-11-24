@@ -14,6 +14,7 @@ RSpec.describe Backfills::BugReportTagsJob, type: :job do
         status: :investigate_priority_low)
     end
     let!(:resolved) { FactoryBot.create(:bug_report, subject: "Stolen Bike Recovered!", tags: %w[bug feedback], status: :resolved) }
+    let!(:old_recovery) { FactoryBot.create(:bug_report, subject: "Bike recovered", tags: %w[bike_index_notification], status: :ignored) }
     let!(:written) { FactoryBot.create(:bug_report, subject: "Stolen bike recovery", tags: %w[ask_stolen_bike], status: :investigate_priority_low) }
 
     it "replaces the organization tag, tags feedback notifications and retags by subject" do
@@ -26,6 +27,7 @@ RSpec.describe Backfills::BugReportTagsJob, type: :job do
       expect(reply.reload.tags).to eq []
       expect(recovery.reload).to have_attributes(tags: %w[bike_index_notification feedback parking], status: "ignored")
       expect(resolved.reload).to have_attributes(tags: %w[bike_index_notification feedback], status: "resolved")
+      expect(old_recovery.reload).to have_attributes(tags: [], status: "investigate_priority_low")
       expect(written.reload).to have_attributes(tags: %w[ask_stolen_bike], status: "investigate_priority_low")
     end
   end

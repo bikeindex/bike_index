@@ -6,9 +6,9 @@ module Atoms
       module BugReportTag
         class ComponentPreview < ApplicationComponentPreview
           def default
-            tags = %w[ask_sign_in_help ask_stolen_bike area_emails area_registration bug spam auto_replies
-              bike_index_notification parking search]
-            safe_join(tags.map { render(Atoms::Admin::Badges::BugReportTag::Component.new(tag: it)) }, " ")
+            render_with_template(template: "atoms/admin/badges/bug_report_tag/component_preview/default",
+              locals: {tags: %w[ask_sign_in_help ask_stolen_bike area_emails area_registration bug spam feedback
+                auto_replies bike_index_notification parking search]})
           end
         end
       end
