@@ -41,7 +41,7 @@
 
     <%= render(UI::Tooltip::Component.new) do |tooltip| %>
       <% tooltip.with_body do %>
-        <div class="tw:w-96 tw:text-left">
+        <div>
           <%= content_tag(:strong, bug_report.display_subject) %>
 
           <%# truncated because the tooltip has no scroll container %>
@@ -56,9 +56,11 @@
   <% end %>
 
   <% table.column(hideable: :tags_cell) do |bug_report| %>
-    <% bug_report.tags.each do |tag| %>
-      <%= render(UI::Code::Inline::Component.new(text: tag, small: true)) %>
-    <% end %>
+    <div class="tw:flex tw:flex-wrap tw:gap-1">
+      <% bug_report.tags.each do |tag| %>
+        <%= render(Atoms::Admin::Badges::BugReportTag::Component.new(tag:)) %>
+      <% end %>
+    </div>
   <% end %>
 
   <% table.column(hideable: :member_cell, classes: "tw:text-center") do |bug_report| %>

@@ -81,6 +81,7 @@ RSpec.describe Admin::UsersController, type: :request do
       let!(:user_alert) { FactoryBot.create(:user_alert, user: user_subject) }
       let!(:membership) { FactoryBot.create(:membership, user: user_subject) }
       let!(:payment) { FactoryBot.create(:payment, user: user_subject) }
+      let!(:bug_report) { FactoryBot.create(:bug_report, user: user_subject, subject: "IGNORED-REPORT", status: :ignored) }
 
       it "renders each tab" do
         Pages::Admin::Users::Show::Component::TABS.each do |tab|
@@ -92,8 +93,9 @@ RSpec.describe Admin::UsersController, type: :request do
         expect(response.body).to include(user_email.email)
         get "#{base_url}/#{user_subject.id}?active_tab=messages"
         sections = Nokogiri::HTML(response.body).css("h2").map { |heading| heading.text.squish }
-        expect(sections).to eq(["Marketplace messages 0", "Alerts 1", "Notifications 0", "Feedbacks 1"])
+        expect(sections).to eq(["Marketplace messages 0", "Alerts 1", "Notifications 0", "Feedbacks 1", "Emails to contact@bikeindex.org 1"])
         expect(response.body).to include(admin_feedback_path(feedback))
+        expect(response.body).to include("IGNORED-REPORT")
         get "#{base_url}/#{user_subject.id}?active_tab=payments"
         sections = Nokogiri::HTML(response.body).css("h2").map { |heading| heading.text.squish }
         expect(sections).to eq(["Memberships 1", "Payments 1"])
