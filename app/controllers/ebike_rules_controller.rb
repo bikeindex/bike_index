@@ -3,8 +3,6 @@
 class EbikeRulesController < ApplicationController
   LOOKUP_PARAMS = %i[vehicle_models manual top_speed watts throttle throttle_speed].freeze
 
-  before_action :redirect_to_dashed_ids, only: :show
-
   def show
     # a form's place - the lookup's without JavaScript, or the country switch's - which can't send it to the place's own page
     query = request.query_parameters

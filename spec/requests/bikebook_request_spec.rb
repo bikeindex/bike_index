@@ -115,19 +115,6 @@ RSpec.describe BikebookController, type: :request do
       end
     end
 
-    it "moves an older link's underscored ids to the catalog's dashed ones, leaving what's picked and the search as they are" do
-      get "/bikebook", params: {vehicle_models: "m/aventon/2022/level_2{size:M/L}{color:Sage_Green},m/segway/2025/gt3_pro",
-                                classifications: "evc/us/class_3,evc/out_of_class/us/ca", electric: "class_2,1", q: "level_2"}
-      expect(response).to have_http_status(:moved_permanently)
-      expect(response).to redirect_to("/bikebook?classifications=evc/us/class-3,evc/out-of-class/us/ca&electric=class-2,1&q=level_2" \
-        "&vehicle_models=m/aventon/2022/level-2{size:M/L}{color:Sage_Green},m/segway/2025/gt3-pro")
-      # its filters' slugs too, which 2.0.0 renamed some of
-      get "/bikebook", params: {manufacturer: "riese_and_muller,trek", vehicle_type: "bike,cargo_bike_rear", primary_activity: "road_endurance,atb_gravel",
-                                frame_material: "carbon", handlebar_type: "drop_bar"}
-      expect(response).to redirect_to("/bikebook?frame_material=composite&handlebar_type=drop_bar&manufacturer=riese-and-muller,trek" \
-        "&primary_activity=road-endurance-sportive,atb-gravel&vehicle_type=bike,cargo-rear")
-    end
-
     context "a model alone" do
       include BikebookCatalogHelpers
 
@@ -147,7 +134,7 @@ RSpec.describe BikebookController, type: :request do
         expect(page).to have_title("Segway GT3 Pro", exact: true)
           .and have_css("[data-controller='bikebook--page'][data-bikebook--page-title-value='Bike Book']")
         expect(page).to have_css("meta[name='description'][content^='Experience elite performance with the Segway GT3 Pro']", visible: :all)
-          .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/segway/2025/gt3_pro.png']", visible: :all)
+          .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/segway/2025/gt3-pro.png']", visible: :all)
           .and have_css("meta[name='twitter:card'][content='summary_large_image']", visible: :all)
           .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3-pro']", visible: :all)
         # its search hidden from the start, as the browser hides it
@@ -157,10 +144,10 @@ RSpec.describe BikebookController, type: :request do
       context "a market's, by its citation key" do
         let(:params) { {vehicle_models: "m/specialized/2025/haul-st@CA"} }
 
-        it "renders its page, with its own photo" do
+        it "renders its page" do
           expect(response).to have_http_status(:ok)
           expect(page).to have_title("Specialized Haul ST", exact: true)
-            .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/specialized/2025/haul_st_ca.webp']", visible: :all)
+            .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/specialized/2025/haul-st.png']", visible: :all)
             .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/specialized/2025/haul-st@CA']", visible: :all)
         end
       end
@@ -235,9 +222,7 @@ RSpec.describe BikebookController, type: :request do
       expect(response).to redirect_to("/bikebook?vehicle_models=m/specialized/2025/haul-st@CA")
     end
 
-    it "redirects from the vehicle's id alone, an older link's for show to dash" do
-      get "/m/velotric/2024/fold_1"
-      expect(response).to redirect_to("/bikebook?vehicle_models=m/velotric/2024/fold_1")
+    it "redirects from the vehicle's id alone" do
       get "/m/super-73/2024/s-adv"
       expect(response).to redirect_to("/bikebook?vehicle_models=m/super-73/2024/s-adv")
     end
@@ -245,14 +230,14 @@ RSpec.describe BikebookController, type: :request do
     it "redirects from an e-vehicle classification's id to its card" do
       get "/evc/us/class-3"
       expect(response).to redirect_to("/bikebook?classifications=evc/us/class-3")
-      get "/evc/off_highway_motorcycle"
-      expect(response).to redirect_to("/bikebook?classifications=evc/off_highway_motorcycle")
+      get "/evc/off-highway-motorcycle"
+      expect(response).to redirect_to("/bikebook?classifications=evc/off-highway-motorcycle")
     end
 
     context "without its m/, and with vehicles already picked" do
       it "picks it ahead of them, keeping the query" do
-        get "/bikebook/segway/2025/gt3_pro", params: {vehicle_models: "m/aventon/2022/level_2,m/segway/2025/gt3_pro", filters: "1"}
-        expect(response).to redirect_to("/bikebook?filters=1&vehicle_models=m/segway/2025/gt3_pro,m/aventon/2022/level_2")
+        get "/bikebook/segway/2025/gt3-pro", params: {vehicle_models: "m/aventon/2022/level-2,m/segway/2025/gt3-pro", filters: "1"}
+        expect(response).to redirect_to("/bikebook?filters=1&vehicle_models=m/segway/2025/gt3-pro,m/aventon/2022/level-2")
       end
 
       context "with what's picked for each" do

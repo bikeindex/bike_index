@@ -8,7 +8,7 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
   # Level 2 as the catalog would publish it without classifications, each mode changed by the block
   def stub_unclassified_level_2
     block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2022.json").read)
-    block["models"]["m/aventon/2022/level_2"]["motors"].flat_map { it["operating_modes"] }.each do |mode|
+    block["models"]["m/aventon/2022/level-2"]["motors"].flat_map { it["operating_modes"] }.each do |mode|
       mode.delete("e_vehicle_classifications")
       yield mode if block_given?
     end
@@ -30,17 +30,17 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
       expect(described_class.find("m/aventon/2026/level-4-rec-step-through")).to have_attributes(ul2849: :certified, ul2271: :certified)
     end
 
-    it "reads a market's model from its home market's record" do
+    it "reads a market's model by its citation key" do
       expect(described_class.find("m/specialized/2025/haul-st@CA")).to have_attributes(bikebook_id: "m/specialized/2025/haul-st@CA",
-        model: "Haul ST", e_bike_class: 2, e_vehicle_classifications: [], watts: 500, top_assist_kmh: nil, throttle_kmh: 32,
-        photo_url: "https://bikebook.bikeindex.org/specialized/2025/haul_st_ca.webp")
+        model: "Haul ST", e_bike_class: 2, e_vehicle_classifications: ["evc/ca/power-assisted-bicycle"], watts: 500, top_assist_kmh: nil, throttle_kmh: 32,
+        photo_url: "https://bikebook.bikeindex.org/specialized/2025/haul-st.png")
     end
 
     it "has a stock throttle from a throttle mode sold with it, or a throttle propulsion with no throttle mode" do
-      expect(described_class.find("m/aventon/2026/level-4-adv")).to have_attributes(throttle: true, stock_throttle: true)
+      expect(described_class.find("m/aventon/2026/level-4-rec")).to have_attributes(throttle: true, stock_throttle: true)
 
       block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2022.json").read)
-      block["models"]["m/aventon/2022/level_2"]["motors"].each { it["operating_modes"].reject! { it["mode"] == "throttle" } }
+      block["models"]["m/aventon/2022/level-2"]["motors"].each { it["operating_modes"].reject! { it["mode"] == "throttle" } }
       WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}models/aventon/2022.json").to_return(body: block.to_json)
       expect(described_class.find("m/aventon/2022/level-2")).to have_attributes(throttle: false, stock_throttle: true)
     end
@@ -50,7 +50,7 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
 
       # Class 1 assist an app updates to Class 3, and a throttle sold separately
       block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2022.json").read)
-      modes = block["models"]["m/aventon/2022/level_2"]["motors"].first["operating_modes"]
+      modes = block["models"]["m/aventon/2022/level-2"]["motors"].first["operating_modes"]
       modes.find { it["mode"] == "assist" }.merge!("max_speed" => 32, "e_vehicle_classifications" => ["evc/us/class-1"])
       modes.find { it["mode"] == "throttle" }["availability"] = "upgrade"
       modes << {"mode" => "assist", "availability" => "app_update", "max_speed" => 45, "e_vehicle_classifications" => ["evc/us/class-3"]}
@@ -78,7 +78,7 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
     end
 
     it "gives no class to a model classified as something else" do
-      expect(described_class.find("m/sur-ron/2026/ultra-bee-hp-x-us"))
+      expect(described_class.find("m/sur-ron/2026/ultra-bee-hp-x"))
         .to have_attributes(e_bike_class: nil, class_unknown: false, e_vehicle_classifications: %w[evc/off-highway-motorcycle])
     end
 
