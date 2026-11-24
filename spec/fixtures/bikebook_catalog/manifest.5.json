@@ -1,7 +1,7 @@
 {
   "format": 5,
-  "published_at": "2026-10-09T18:43:06Z",
-  "schema_version": "0.25.3",
+  "published_at": "2026-11-23T22:42:48Z",
+  "schema_version": "2.1.0",
   "index": "index.json",
   "vocabulary": "vocabulary.json",
   "schema_viewer": "schema_viewer.json",
@@ -13,7 +13,7 @@
     "segway/2025": "models/segway/2025.json",
     "specialized/2025": "models/specialized/2025.json",
     "specialized/2027": "models/specialized/2027.json",
-    "sur-ron/2026": "models/sur_ron/2026.json"
+    "sur-ron/2026": "models/sur-ron/2026.json"
   },
   "kit": "kit.json",
   "comparison": "comparison.json"

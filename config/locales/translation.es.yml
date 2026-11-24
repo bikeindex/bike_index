@@ -7159,6 +7159,15 @@ es:
           schemas_title: Esquemas del libro de bicicletas
           unavailable: El catálogo de Bike Book no responde, por lo que sus esquemas
             no se pueden mostrar en este momento. Inténtalo de nuevo en un minuto.
+          catalog_failed: El catálogo de Bike Book no se cargó, por lo que no se puede
+            realizar la búsqueda.
+          loading_catalog: Cargando el catálogo…
+          lookup_label: Ver el archivo de clasificación de un modelo o vehículo eléctrico.
+          search_placeholder: Buscar por fabricante o modelo…
+        schema:
+          unreachable: El repositorio de Bike Book no responde. Inténtalo de nuevo
+            en un minuto.
+          view_on_github: Ver este archivo en GitHub
       ebike_rules:
         class_tile:
           class: Clase

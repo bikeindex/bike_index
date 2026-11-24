@@ -57,7 +57,8 @@ module Pages
             translation(".optional_classes_not_recognized_in", count: @row[:args][:e_bike_classes].size, state: @state[:name], **args)
           when :optional_throttle_not_allowed then translation(".optional_throttle_not_allowed")
           when :classes_not_permitted
-            translation(".classes_not_permitted", classes: @row[:args][:e_bike_classes].map { translation(".class_n", n: it) }.to_sentence)
+            translation(".classes_not_permitted_in", classes: @row[:args][:e_bike_classes].map { translation(".class_n", n: it) }.to_sentence,
+              state: @state[:name])
           when :not_classified then translation(".not_classified")
           when :class_unknown then translation(".class_unknown_in_bike_book_label")
           when :own_classes then translation(".own_classes")

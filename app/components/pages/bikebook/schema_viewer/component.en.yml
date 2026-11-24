@@ -4,10 +4,15 @@ en:
     pages:
       bikebook:
         schema_viewer:
+          catalog_failed: Bike Book's catalog didn't load, so it can't be searched
           documents: Schema documents
+          loading_catalog: Loading the catalog…
+          lookup_label: View a model's or e-vehicle classification's file
           schemas_title: Bike Book schemas
+          search_placeholder: Search by manufacturer or model…
           subtitle_html: The shape of a %{document} file at schema %{version}, published
             as %{url}
           unavailable: >-
             Bike Book's catalog isn't answering, so its schemas can't show right now.
             Try again in a minute.
+          view_on_github: View this file on GitHub

@@ -66,7 +66,7 @@ RSpec.describe Pages::EbikeRules::Reasons::Component, type: :component do
 
     it "says its classes aren't permitted, and why" do
       expect(component).to have_css("turbo-frame p",
-        exact_text: "It is a Class 2 and Class 3 e-bike, which is not permitted. Assists to 28 mph, not allowed with a throttle.")
+        exact_text: "It is a Class 2 and Class 3 e-bike, which is not permitted in California. Assists to 28 mph, not allowed with a throttle.")
     end
 
     context "that's optional" do

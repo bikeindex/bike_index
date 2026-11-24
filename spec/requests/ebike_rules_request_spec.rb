@@ -50,6 +50,9 @@ RSpec.describe EbikeRulesController, type: :request do
         .and have_css("label", text: "Dirt Bike")
         .and have_no_css("h3", text: "Class 1")
         .and have_no_css("#ebike-rules-check")
+        # what its motorcycle needs, in place of most states'
+        .and have_css("li", text: "Titled, registered and insured with the Motor Vehicle Commission")
+        .and have_no_text("Most states treat these")
 
       # rather than a located visitor's state
       get "/ebike-rules", headers: frame.merge(indiana)
@@ -57,18 +60,17 @@ RSpec.describe EbikeRulesController, type: :request do
       expect(page).to have_css("h2", text: "E-bike classes, explained").and have_css("h3", text: "Class 1")
         .and have_text("Often comes with a helmet rule").and have_text("Most states treat these as mopeds or motorcycles")
 
-      # a three-class state's own Class 3 limits, and what its motorcycle needs, in place of most states'
+      # a three-class state's own Class 3 limits
       get "/ebike-rules/US/CA", headers: frame
       expect(page).to have_css("h3", text: "Class 3").and have_css("[role=button]", text: "California specifics")
         .and have_css("[role=button]", text: "California E-bike rules")
         .and have_css("[role=button]", text: "California non-e-bike rules")
         .and have_css("label", text: "Off-Highway Electric Motorcycle")
         .and have_css("#ebike-rules-classes h3", text: "Rider rules")
-        .and have_css("li", text: "Ridden wherever bicycles may go")
+        .and have_css("li", text: "Riders must be 16 or older to ride a Class 3")
         .and have_css("li", text: "Registered and plated with the DMV, and must carry liability insurance")
         .and have_no_css("[class*='group/class-cards'] li", text: "Allowed on freeways")
         .and have_no_text("Often comes with a helmet rule")
-        .and have_no_text("Most states treat these")
     end
 
     it "renders each of a state's non-e-bike classifications' rules in the classes frame, by category and cited, the ones still to come dated" do
@@ -76,7 +78,8 @@ RSpec.describe EbikeRulesController, type: :request do
       travel_to(Time.zone.local(2026, 11, 4)) { get "/ebike-rules/US/CA", headers: frame }
       expect(page).to have_css("##{Pages::EbikeRules::Classes::Component::NON_E_BIKE_RULES_ID}[role=button]", text: "California non-e-bike rules")
       off_highway = page.find("[data-classification='off-highway-electric-motorcycle']")
-      expect(off_highway.all("h3").map { it.text.strip }).to eq ["Off-Highway Electric Motorcycle", "Rider rules", "Seller rules", "Vehicle definition", "Sources"]
+      expect(off_highway.all("h3").map { it.text.strip }).to eq ["Off-Highway Electric Motorcycle", "Rider rules", "Seller rules", "Vehicle definition"]
+      expect(page.find("[data-classification='off-highway-motor-vehicle']")).to have_css("h3", text: "Sources")
       rider_rules = off_highway.first("ul").all("li")
       expect(rider_rules.map(&:text)).to match [a_string_including("Ridden only"), a_string_including("Identified with a California OHV Green Sticker"),
         a_string_including("Can't be registered"), a_string_including("No driver's license needed")]
@@ -94,13 +97,13 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/US/CA", params: {e_bike_class: 3}, headers: frame.call(3)
       expect(page).to have_css("turbo-frame#ebike-rules-class-card-3 h3", text: "Class 3")
         .and have_css("[role=button]", text: "California specifics")
-        .and have_css("li", text: "Ridden wherever bicycles may go")
+        .and have_css("li", text: "Riders must be 16 or older to ride a Class 3")
         .and have_no_css("li a")
         .and have_no_css("h3", text: "Class 1").and have_no_css("#ebike-rules-classes")
 
-      get "/ebike-rules/US/CA", params: {e_bike_class: "12"}, headers: frame.call("emoto")
+      get "/ebike-rules/US/NJ", params: {e_bike_class: "12"}, headers: frame.call("emoto")
       expect(page).to have_css("turbo-frame#ebike-rules-class-card-emoto h3", text: "Not an e-bike")
-        .and have_css("li", text: "Registered and plated with the DMV, and must carry liability insurance")
+        .and have_css("li", text: "Titled, registered and insured with the Motor Vehicle Commission")
 
       get "/ebike-rules", params: {classification: "evc/moped"}, headers: frame.call("evc-moped")
       expect(page).to have_css("turbo-frame#ebike-rules-class-card-evc-moped h3", text: "Moped, up to 2 hp and 30 mph")
@@ -128,7 +131,7 @@ RSpec.describe EbikeRulesController, type: :request do
       get "/ebike-rules/US/CO", params: {vehicle_models: "m/specialized/2025/haul-st"}, headers: frame
       expect(page).to have_css("turbo-frame#ebike-rules-reasons-overview-m-specialized-2025-haul_st").and have_no_css("p")
       # without a state, an e-moto's against the US classes' limits
-      get "/ebike-rules/US", params: {vehicle_models: "m/sur-ron/2026/ultra-bee-hp-x-us"}, headers: frame
+      get "/ebike-rules/US", params: {vehicle_models: "m/sur-ron/2026/ultra-bee-hp-x"}, headers: frame
       expect(page).to have_css("turbo-frame p", text: "over the 28 mph limit.")
     end
 
@@ -255,23 +258,23 @@ RSpec.describe EbikeRulesController, type: :request do
     end
 
     it "checks a Class 3 with a stock throttle as out of class in California alone" do
-      get "/ebike-rules/US/CA", params: {vehicle_models: "m/aventon/2026/level-4-adv"}
+      get "/ebike-rules/US/CA", params: {vehicle_models: "m/aventon/2026/level-4-rec"}
 
-      expect(page).to have_css("[role='status']", text: "The Aventón Level 4 ADV is not classified as an e-bike in California.")
+      expect(page).to have_css("[role='status']", text: "The Aventón Level 4 REC is not classified as an e-bike in California.")
       top_line = page.all("[role='status'] > div > ul > li").map { it.text.strip }
-      expect(top_line.first).to eq "It is a Class 2 and Class 3 e-bike, which is not permitted. In California, it may fall under Moped."
+      expect(top_line.first).to eq "It is a Class 2 and Class 3 e-bike, which is not permitted in California. In California, it may fall under Moped."
       expect(top_line.second).to start_with "Kept off bike paths and trails"
       # its speed and throttle fail too, which the classes' note already gives as the reason
       speed = page.find("li", text: /28\W*mph top assisted speed\s*Assists to 28\W*mph, not allowed with a throttle/)
       throttle = page.find("li", text: /Throttle allowed\s*Not allowed with Class 3 assist/)
       [speed, throttle].each { expect(it).to have_css("[role='img'][aria-label='Does not meet this rule']") }
 
-      get "/ebike-rules/US/CO", params: {vehicle_models: "m/aventon/2026/level-4-adv"}
-      expect(page).to have_css("[role='status']", text: "The Aventón Level 4 ADV is a Class 2 and 3 e-bike in Colorado")
+      get "/ebike-rules/US/CO", params: {vehicle_models: "m/aventon/2026/level-4-rec"}
+      expect(page).to have_css("[role='status']", text: "The Aventón Level 4 REC is a Class 2 and 3 e-bike in Colorado")
 
       # as is one entered by hand, which is both classes as such a model is
       get "/ebike-rules/US/CA", params: {manual: "1", top_speed: "28", throttle: "1"}
-      expect(page).to have_css("[role='status'] li", text: "It is a Class 2 and Class 3 e-bike, which is not permitted.")
+      expect(page).to have_css("[role='status'] li", text: "It is a Class 2 and Class 3 e-bike, which is not permitted in California.")
       # under the e-moto's tile rather than its classes', with California's out of class ID
       expect(page.all("section[aria-live] [data-controller~='ui--tooltip'] > button[aria-label$='e-bike']").map { it[:"aria-label"] }).to eq ["E-moto, not an e-bike"]
       expect(page.find("section[aria-live] [role='tooltip'] code", visible: :all).text(:all).strip).to eq "evc/out-of-class/us/ca"
@@ -286,12 +289,6 @@ RSpec.describe EbikeRulesController, type: :request do
         .to eq ["Class 3 e-bike", "E-moto, not an e-bike"]
       expect(page).to have_css("section[aria-live] div:has(> [data-controller~='ui--tooltip'] [aria-label='E-moto, not an e-bike']) > span", text: "w/ optional throttle")
       expect(page.all("section[aria-live] [role='tooltip'] code", visible: :all).map { it.text(:all).strip }).to eq ["evc/us/class-3", "evc/out-of-class/us/ca"]
-    end
-
-    it "moves an older link's underscored catalog ids to the catalog's dashed ones" do
-      get "/ebike-rules/US/CA", params: {vehicle_models: "m/aventon/2022/level_2", non_e_bike_rules: "1", non_e_bike_type: "motor_driven_cycle"}
-      expect(response).to redirect_to("/ebike-rules/US/CA?non_e_bike_rules=1&non_e_bike_type=motor-driven-cycle&vehicle_models=m/aventon/2022/level-2")
-      expect(response).to have_http_status(:moved_permanently)
     end
 
     it "moves a place from the query, or another form of its path, to its own page, and 404s one that isn't a place" do
@@ -532,14 +529,17 @@ RSpec.describe EbikeRulesController, type: :request do
 
     it "fills a model's details from what its record has: its peak power without a rating, its class without a speed" do
       block = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/aventon/2026.json").read)
-      block["models"]["m/aventon/2026/level-4-adv"]["motors"].each { it["operating_modes"].each { it.delete("max_speed") } }
+      block["models"]["m/aventon/2026/level-4-adv"]["motors"].each do |motor|
+        motor.delete("rated_power")
+        motor["operating_modes"].each { it.delete("max_speed") }
+      end
       WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}models/aventon/2026.json").to_return(body: block.to_json)
 
       get "/ebike-rules/US/CO", params: {vehicle_models: "m/aventon/2026/level-4-adv"}
       expect(page).to have_checked_field("top_speed", with: "28").and have_field("watts", with: "750")
 
       # a speed over 28 mph, and peak power, for a vehicle the catalog rates no motor of
-      get "/ebike-rules/US/CO", params: {vehicle_models: "m/sur-ron/2026/ultra-bee-hp-x-us"}
+      get "/ebike-rules/US/CO", params: {vehicle_models: "m/sur-ron/2026/ultra-bee-hp-x"}
       expect(page).to have_checked_field("top_speed", with: "29")
         .and have_checked_field("throttle", with: "1")
         .and have_field("watts", with: "24500")

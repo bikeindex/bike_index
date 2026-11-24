@@ -112,8 +112,18 @@
               <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "primary_activity",
           label: translation(".activities"), placeholder: translation(".any_activity"), note: translation(".activity_examples"), multiselect: true)) %>
 
-              <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "vehicle_type",
-          label: translation(".vehicle_types"), placeholder: translation(".any_vehicle_type"), multiselect: true)) %>
+              <div
+                class="
+                  tw:grid tw:gap-4 tw:sm:grid-cols-2
+                  tw:[&_[role=combobox]]:leading-(--hw-line-height--multiple)!
+                "
+              >
+                <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "vehicle_type",
+            label: translation(".vehicle_types"), placeholder: translation(".any_vehicle_type"), multiselect: true)) %>
+
+                <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "target_riders",
+            label: translation(".target_riders"), placeholder: translation(".any_target_riders"), any: false)) %>
+              </div>
 
               <%= render(Pages::Bikebook::Show::FilterCombobox::Component.new(name: "manufacturer",
           label: translation(".manufacturers"), placeholder: translation(".any_manufacturer"), note: tag.span(id: "manufacturer-count"), multiselect: true)) %>

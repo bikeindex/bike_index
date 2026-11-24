@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class BikebookController < ApplicationController
-  before_action :redirect_to_dashed_ids, only: :show
   before_action :authenticate_user, only: :correction
 
   def show
@@ -26,6 +25,17 @@ class BikebookController < ApplicationController
     @page_title = "Bike Book schemas | Bike Index"
     render Pages::Bikebook::SchemaViewer::Component.new(viewer:, document:, open: params[:open].to_s.split(","),
       by_count: params[:by_count].to_s.split(",")), status: viewer ? :ok : :service_unavailable
+  end
+
+  def schema
+    record = begin
+      Integrations::Bikebook::RepositoryRecord.record(params[:id]) || raise(ActiveRecord::RecordNotFound)
+    rescue Integrations::Bikebook::RepositoryRecord::Unreachable
+    end
+    @page_title = "#{params[:id]} | Bike Book"
+    render Pages::Bikebook::SchemaViewer::Component.new(viewer: Integrations::Bikebook::Catalog.schema_viewer,
+      document: Integrations::Bikebook::RepositoryRecord.document(params[:id]), record_id: params[:id], record:),
+      status: record ? :ok : :service_unavailable
   end
 
   # The page it was sent from goes in the report, with the vehicles picked on it named, as they're what's being corrected

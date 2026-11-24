@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
-# The fixture catalog in place of the published one, its models at 1.0.0 but the Haul ST, at 1.1.0, whose CA is in
-# its market_variants; every other market variant is a record of its own. Its ids and its vocabulary's names are
-# 2.0.0's, but Aventon's 2022 models' ids and every model's values are 1.x's
+# The fixture catalog in place of the published one: its blocks' models' published records, and an index of their
+# published rows beside cases of its own, which regenerating it from the published catalog would drop: the Specialized
+# 2025 models and the Reactive Adaptations Nuke only the index lists, Kris Holm's unicycles sold in Canada but for
+# kh24-us, and the Segway GT3 Pro sold in the UAE and China
 module BikebookCatalogHelpers
   FIXTURES = Rails.root.join("spec/fixtures/bikebook_catalog")
 
@@ -59,3 +60,8 @@ module BikebookCatalogHelpers
 end
 
 RSpec.configure { it.include BikebookCatalogHelpers }
+
+# Unless a spec stubs it, the catalog 404s, and a cassette never records it. By host, as WebMock's URI carries the port
+catalog_host = URI(Integrations::Bikebook::Catalog::URL).host
+VCR.configure { |config| config.ignore_request { URI(it.uri).host == catalog_host } }
+WebMock.globally_stub_request(:after_local_stubs) { |request| {status: 404} if request.uri.host == catalog_host }
