@@ -1,10 +1,7 @@
 # frozen_string_literal: true
 
 module Search
-  # Backs the async comboboxes: from the Autocomplete index, the search query items
-  # (Pages::Search::EverythingCombobox::Component) - options and selection chips - and the
-  # manufacturer picker (UI::Forms::ComboboxManufacturer::Component); from BikebookModel,
-  # registration's model field.
+  # Backs the async comboboxes - each action's route names the combobox it serves
   class ComboboxController < ApplicationController
     PER_PAGE = 15
 

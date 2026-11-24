@@ -75,12 +75,12 @@ RSpec.describe Pages::Register::Views::Step2::Component, type: :component do
 
     context "for a manufacturer with Bike Book models" do
       let(:manufacturer) { Manufacturer.friendly_find("Specialized") }
-      let(:params) { {bike: {owner_email: "owner@bikeindex.org", manufacturer_id: manufacturer.id, frame_model: "Haul ST"}} }
+      let(:params) { super().deep_merge(bike: {manufacturer_id: manufacturer.id, frame_model: "Haul ST"}) }
       before { sync_bikebook_models }
 
       it "autocompletes from them, keeping what was entered" do
         render_step_2
-        expect(page.find(combobox)["data-hw-combobox-async-src-value"]).to include("manufacturer_id=#{manufacturer.id}")
+        expect(page).to have_css("#{combobox}[data-hw-combobox-async-src-value*='manufacturer_id=#{manufacturer.id}']")
         expect(page).to have_field("bike[frame_model]", type: :hidden, with: "Haul ST")
       end
     end

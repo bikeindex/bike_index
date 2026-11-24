@@ -37,7 +37,6 @@ class BikebookModel < ApplicationRecord
     (models.find { it.sold_in?(market) } || models.first)&.catalog_id_in(market)
   end
 
-  # A page of the model names with every word of `query` in them, each name once
   def self.names_matching(query, page:, per_page:)
     query.to_s.split.reduce(all) { |models, word| models.where("name ILIKE ?", "%#{sanitize_sql_like(word)}%") }
       .distinct.order(:name).offset((page - 1) * per_page).limit(per_page).pluck(:name)
