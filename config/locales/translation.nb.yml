@@ -6837,6 +6837,8 @@ nb:
             siden.'
           load_failed: Katalogen lastet ikke inn.
           try_again: Prøv igjen
+          any_target_riders: Alle målsyklister
+          target_riders: Målryttere
         donate_strip:
           donate: Donere
           pitch: Dette kule produktet er levert av den ideelle organisasjonen Bike
@@ -6866,9 +6868,9 @@ nb:
           loading_catalog: Laster inn katalogen…
           lookup_label: Vis en modells eller en elbilklassifiseringsfil
           search_placeholder: Søk etter produsent eller modell…
+          view_on_github: Se denne filen på GitHub
         schema:
           unreachable: Sykkelbok-arkivet svarer ikke. Prøv igjen om et øyeblikk.
-          view_on_github: Se denne filen på GitHub
       ebike_rules:
         class_tile:
           class: Klasse
@@ -7280,7 +7282,6 @@ nb:
           class_n: Klasse %{n}
           class_unknown_in_bike_book_label: Bike Book oppgir ikke klasse eller toppfart,
             så sjekk klassen på etiketten.
-          classes_not_permitted: Det er en %{classes} elsykkel, som ikke er tillatt
           classes_not_recognized_in:
             one: Klassen %{n} gjenkjennes ikke i %{state}
             other: Klassene %{n} gjenkjennes ikke i %{state}
@@ -7338,6 +7339,8 @@ nb:
           watts_over_cap_html: "%{watts}W-motoren overskrider %{cap}W-grensen"
           watts_to_check_html: Sjekk at motoren er nominell til %{cap}W eller mindre
           watts_within_cap_html: "%{watts}W-motoren er innenfor hetten"
+          classes_not_permitted_in: Det er en %{classes} elsykkel, som ikke er tillatt
+            i %{state}
       memberships:
         new:
           become_a_member: Bli medlem
