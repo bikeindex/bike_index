@@ -2,7 +2,7 @@ import { readably } from 'bikebook/replace_url'
 import { vehicleIds } from 'bikebook/vehicle_models'
 
 export const LISTS = ['primary_activity', 'manufacturer', 'vehicle_type']
-export const SINGLES = ['suspension', 'model_configuration', 'frame_material', 'handlebar_type', 'market']
+export const SINGLES = ['suspension', 'model_configuration', 'frame_material', 'handlebar_type', 'target_riders', 'market']
 export const RANGES = ['year_min', 'year_max', 'price_min', 'price_max']
 export const paramList = (url, name) => String(url.searchParams.get(name) ?? '').split(',').filter(Boolean)
 // Whether the search shows: asked for, or with anything but a single model picked - a classification's card counts, as

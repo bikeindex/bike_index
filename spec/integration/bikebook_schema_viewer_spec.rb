@@ -40,6 +40,8 @@ RSpec.describe "Bike Book schema viewer", :js, type: :system do
     expect(page).to have_css("pre", text: %("manufacturer": "Segway",)).and have_no_css("[data-schema-path]")
     field = lookup
     expect(field.value).to eq "Segway GT3 Pro"
+    # shown as /bikebook's chip shows it, a current model's badge after its name
+    expect(page).to have_css("[data-ui--forms--combobox-display-target='overlay']", exact_text: "Segway GT3 Pro current")
     # a click selects the pick, to type another over
     field.click
     field.send_keys("haul")
