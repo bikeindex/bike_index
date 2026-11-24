@@ -7154,6 +7154,8 @@ it:
             artificiale: scaricate i dati da lì, non da questa pagina.'
           load_failed: Il catalogo non si è caricato.
           try_again: Riprova
+          any_target_riders: Qualsiasi motociclista bersaglio
+          target_riders: ciclisti Target
         donate_strip:
           donate: Donare
           pitch: Questo fantastico prodotto è offerto dall'organizzazione no-profit
@@ -7178,6 +7180,15 @@ it:
           schemas_title: Schemi del libro delle biciclette
           unavailable: Il catalogo di Bike Book non risponde, quindi i suoi schemi
             non possono essere visualizzati al momento. Riprova tra un minuto.
+          catalog_failed: Il catalogo di Bike Book non si è caricato, quindi non è
+            possibile effettuare ricerche al suo interno.
+          loading_catalog: Caricamento del catalogo…
+          lookup_label: Visualizza il file di classificazione di un modello o di un
+            veicolo elettrico
+          search_placeholder: Cerca per produttore o modello…
+          view_on_github: Visualizza questo file su GitHub
+        schema:
+          unreachable: Il repository Bike Book non risponde. Riprova tra un minuto.
       ebike_rules:
         class_tile:
           class: Classe
@@ -7623,7 +7634,6 @@ it:
           class_n: Classe %{n}
           class_unknown_in_bike_book_label: Bike Book non indica la sua classe o la
             velocità massima, quindi controlla la classe sull'etichetta.
-          classes_not_permitted: Si tratta di una e-bike %{classes}, che non è consentita
           classes_not_recognized_in:
             one: La classe %{n} non è riconosciuta in %{state}
             other: Le classi %{n} non sono riconosciute in %{state}
@@ -7685,6 +7695,8 @@ it:
           watts_to_check_html: Verifica che il suo motore abbia una potenza nominale
             pari o inferiore a %{cap}W.
           watts_within_cap_html: "%{watts}Il motore W è all'interno del tappo"
+          classes_not_permitted_in: Si tratta di una e-bike %{classes}, che non è
+            consentita in %{state}
       memberships:
         new:
           become_a_member: Diventa membro

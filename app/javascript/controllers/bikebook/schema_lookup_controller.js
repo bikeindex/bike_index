@@ -10,7 +10,7 @@ export default class extends Controller {
 
   async connect () {
     const field = await mountCatalogCombobox(catalogAt(this.manifestUrlValue), this.comboboxTarget, this.slotTarget,
-      { display: this.displayValue, failedText: this.failedTextValue })
+      { display: this.displayValue, failedText: this.failedTextValue, richPick: true })
     this.picked = field?.value
   }
 

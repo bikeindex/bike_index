@@ -18,7 +18,8 @@ en:
           class_n: Class %{n}
           class_unknown_in_bike_book_label: Bike Book doesn't list its class or top
             speed, so check the class on its label
-          classes_not_permitted: It is a %{classes} e-bike, which is not permitted
+          classes_not_permitted_in: It is a %{classes} e-bike, which is not permitted
+            in %{state}
           classes_not_recognized_in:
             one: Class %{n} isn't recognized in %{state}
             other: Classes %{n} aren't recognized in %{state}

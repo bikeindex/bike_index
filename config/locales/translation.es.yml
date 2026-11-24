@@ -7135,6 +7135,8 @@ es:
             de IA: obtengan los datos allí en lugar de desde esta página.'
           load_failed: El catálogo no se cargó.
           try_again: Intentar otra vez
+          any_target_riders: Cualquier ciclista objetivo
+          target_riders: Jinetes de Target
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin
@@ -7159,6 +7161,15 @@ es:
           schemas_title: Esquemas del libro de bicicletas
           unavailable: El catálogo de Bike Book no responde, por lo que sus esquemas
             no se pueden mostrar en este momento. Inténtalo de nuevo en un minuto.
+          catalog_failed: El catálogo de Bike Book no se cargó, por lo que no se puede
+            realizar la búsqueda.
+          loading_catalog: Cargando el catálogo…
+          lookup_label: Ver el archivo de clasificación de un modelo o vehículo eléctrico.
+          search_placeholder: Buscar por fabricante o modelo…
+          view_on_github: Ver este archivo en GitHub
+        schema:
+          unreachable: El repositorio de Bike Book no responde. Inténtalo de nuevo
+            en un minuto.
       ebike_rules:
         class_tile:
           class: Clase
@@ -7605,8 +7616,6 @@ es:
           class_n: Clase %{n}
           class_unknown_in_bike_book_label: Bike Book no indica su clase ni su velocidad
             máxima, así que compruebe la clase en su etiqueta.
-          classes_not_permitted: Es una bicicleta eléctrica %{classes}, lo cual no
-            está permitido.
           classes_not_recognized_in:
             one: La clase %{n} no se reconoce en %{state}.
             other: Las clases %{n} no se reconocen en %{state}.
@@ -7671,6 +7680,8 @@ es:
           watts_to_check_html: Compruebe que su motor tenga una potencia nominal de
             %{cap}W o inferior.
           watts_within_cap_html: El motor %{watts}W está dentro de la tapa
+          classes_not_permitted_in: Es una bicicleta eléctrica %{classes}, que no
+            está permitida en %{state}.
       memberships:
         new:
           become_a_member: Hazte miembro

@@ -12,8 +12,8 @@ RSpec.describe Pages::EbikeRules::LawDetails::Component, type: :component do
     let(:abbreviation) { "CA" }
 
     it "groups its rules under a heading for each category it has, in the order a rider needs them" do
-      expect(component.css("h3").map { it.text.strip }).to eq ["Rider rules", "Legal context", "Seller rules", "Vehicle definition", "Sources"]
-      expect(component.css("ul").first.css("li").first.text).to include("Ridden wherever bicycles may go")
+      expect(component.css("h3").map { it.text.strip }).to eq ["Rider rules", "Legal context", "Seller rules", "Vehicle definition"]
+      expect(component.css("ul").first.css("li").first.text).to include("Riders must be 16 or older to ride a Class 3")
     end
 
     it "marks each with the days it runs, and the rest without" do
@@ -21,6 +21,15 @@ RSpec.describe Pages::EbikeRules::LawDetails::Component, type: :component do
         .and have_css("li", text: /\A\s*From January 1, 2029:\s+Every new Class 2 must have a speedometer/)
         .and have_css("li", text: /\A\s*Fully operable pedals and an electric motor/)
         .and have_no_text("take effect")
+    end
+  end
+
+  context "with sources of its own" do
+    let(:abbreviation) { "CO" }
+
+    it "lists them under their own heading, last" do
+      expect(component.css("h3").map { it.text.strip }.last).to eq "Sources"
+      expect(component).to have_link(href: "https://leg.colorado.gov/bills/hb17-1151")
     end
   end
 

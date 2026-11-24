@@ -141,12 +141,18 @@ RSpec.describe "E-bike rules", :js, type: :system do
     end
 
     # as a link to them does, on the classification it names
-    visit "/ebike-rules/US/CA?non_e_bike_rules=1&non_e_bike_type=motor_driven_cycle"
+    visit "/ebike-rules/US/CA?non_e_bike_rules=1&non_e_bike_type=motor-driven-cycle"
     expect(page).to have_css("#{state_rules} h3", exact_text: "Motor-Driven Cycle")
   end
 
   it "filters the states, opens the one an old link's anchor names, and checks a bike in each from its rules" do
+    # held until the filter that opens it has connected, the order lazy loading can land them in
+    collapse_module = hold_requests(%r{ui/collapse_controller})
     visit "#{ebike_rules_path}#state-pa"
+    wait_for do
+      page.evaluate_script("!!window.Stimulus?.getControllerForElementAndIdentifier(document.getElementById('state-laws'), 'ebike-rules--state-filter')")
+    end
+    collapse_module.release
     expect(page).to have_css("#state-panel-pa", text: "Its own definition: Pedalcycle With Electric Assist")
 
     fill_in "Filter states", with: "new"

@@ -11,8 +11,7 @@ module Pages
         UNCOMMENTED = ["bikebook-hosted copy of the manufacturer's photo of this colorway"].freeze
         LINE = /\A( *)("(?:[^"\\]|\\.)*": )?(.*?)(,?)\z/
 
-        def initialize(id:, record:, fields:)
-          @id = id
+        def initialize(record:, fields:)
           @record = record
           @fields = fields
         end
