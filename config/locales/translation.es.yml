@@ -4070,6 +4070,8 @@ es:
     landing_pages_for_bike_shops: Bike Index se conecta a tu sistema de punto de venta
       y registra automáticamente cada bicicleta que vendes. Es gratis para tiendas
       y clientes, y nunca vendemos ni compartimos datos de clientes.
+    shop_index: Gorra y pegatinas de registro de Bike Index. Cada compra ayuda a mantener
+      el registro gratuito.
   meta_titles:
     bikes_index: Resultados de la búsqueda
     bikes_new: "¡Inscribe una bicicleta!"
@@ -4129,6 +4131,7 @@ es:
     organization_signup_show: Añade tu organización al Índice de Bicicletas
     organization_signup_update: Añade tu organización al Índice de Bicicletas
     organization_signup_welcome: "%{organization} está activo"
+    shop_index: Tienda - Índice de bicicletas
   money:
     currencies:
       en: Dólar estadounidense
@@ -8875,6 +8878,47 @@ es:
             out_of_links_html: Hemos enviado todos los enlaces de activación posibles
               para %{name}, pero ninguno llegó a %{email}. Ponte en contacto con support@bikeindex.org
               y lo solucionaremos.
+      shop:
+        index:
+          bulk_order_email_subject: Pedido de pegatinas al por mayor
+          bulk_orders_html: "%{contact_link} para pedidos al por mayor."
+          caped_cap_alt: La gorra del Registrante Enmascarado, estampado de cómic
+            azul claro con visera morada.
+          caped_cap_description: Nuestro cómic ilustrado en una gorra de ciclista.
+            Suenan las campanillas, se abren los candados y el escudo con capa vigila.
+            Visera morada.
+          caped_cap_name: La gorra del Registrante con Capa
+          contact_us: Contacta
+          cycling_cap: gorra de ciclismo
+          for_riders_and_shops: Para ciclistas y tiendas
+          for_shops: Para tiendas
+          gear_that_helps_get_bikes_home: Equipo que ayuda a llevar las bicicletas
+            a casa.
+          lede: Bike Index es un registro gratuito y sin ánimo de lucro. Cada gorra
+            y pegatina que compres contribuye a que siga siendo gratuito para ciclistas
+            de todo el mundo.
+          mission: Somos una organización sin fines de lucro 501(c)(3). Las ventas
+            financian el registro, las alertas de bicicletas robadas y la red de socios
+            que ayuda a los ciclistas a recuperar sus bicicletas.
+          shop_the_gear: Compra el equipo
+          sticker_alt: 'Cómo evitar que te roben la bicicleta: cartel que muestra
+            la pegatina de matriculación.'
+          sticker_description: Pégala en el cuadro, escanea el código QR y tu bicicleta
+            quedará registrada en unos dos minutos. Si alguna vez pierdes o te roban
+            la bicicleta, quien la encuentre podrá escanear la pegatina y comprobar
+            que te pertenece. Las tiendas de bicicletas también pueden tenerlas disponibles
+            para bicicletas nuevas, de segunda mano y para bicicletas que necesiten
+            mantenimiento.
+          sticker_name: Pegatinas de registro del Índice de Bicicletas
+          suggested_retail: Precio minorista sugerido
+          the_bike_index_shop: La tienda Bike Index
+          wholesale_pricing_available: Precios al por mayor disponibles
+          your_purchase_keeps_bike_index_free: Tu compra permite que Bike Index siga
+            siendo gratuito.
+        product:
+          view: Vista
+          view_on_the_shop: Ver %{name} en la tienda Bike Index (se abre en una pestaña
+            nueva)
     shared_blocks:
       footer:
         about: Acerca
