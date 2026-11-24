@@ -9,7 +9,7 @@ RSpec.describe ShopController, type: :request do
       expect(response).to be_ok
       expect(response.body).to include("Gear that helps get bikes home.")
       expect(Capybara.string(response.body)).to have_title("Shop - Bike Index")
-        .and have_css("meta[name='description'][content^='Bike Index caps and registration stickers']", visible: :all)
+        .and have_css("meta[name='description'][content^='Bike Index cap and registration stickers']", visible: :all)
     end
 
     it "answers a Turbo submission redirected here as HTML" do
