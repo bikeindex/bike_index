@@ -1,7 +1,7 @@
 // Searches the published catalog off the main thread, by the rules the catalog's own search follows
 /* global self */
 
-const FORMAT = 5
+const FORMAT = 6
 
 let models = []
 let byId = new Map()
@@ -62,7 +62,7 @@ const classified = ({ e_vehicle_classifications: records }, jurisdictions) => Ob
   return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
 }))
 
-// What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in, the kit and the vocabulary
+// What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in and the vocabulary, which holds the kit
 function start ({ manifestUrl, ids, jurisdictions, riders, comparing }) {
   opened = fetchJson(manifestUrl).then((published) => {
     if (published.format !== FORMAT) throw new Error(`catalog format ${published.format} isn't ${FORMAT}`)
@@ -71,8 +71,8 @@ function start ({ manifestUrl, ids, jurisdictions, riders, comparing }) {
     base = new URL(manifestUrl, self.location)
     ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
   })
-  started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchJson(new URL(file, base)))))
-    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, names: { ...vocabulary.names, target_riders: { ...riders, ...vocabulary.names.target_riders } }, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
+  started = opened.then(() => fetchJson(new URL(manifest.vocabulary, base)))
+    .then(({ kit, ...vocabulary }) => ({ vocabulary: { ...vocabulary, names: { ...vocabulary.names, target_riders: { ...riders, ...vocabulary.names.target_riders } }, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
   if (comparing) fetchComparison()
   return started
 }

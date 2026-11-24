@@ -10,7 +10,7 @@ module Integrations
       LOCAL_PATH = "/bikebook_catalog"
       URL = "https://bikebook-catalog.bikeindex.org/catalog/"
       # the published format bikebook/catalog_worker.js and similarity.js read
-      FORMAT = 5
+      FORMAT = 6
       MANIFEST = "manifest.#{FORMAT}.json"
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/#{MANIFEST}" : "#{URL}#{MANIFEST}"
       GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
