@@ -12,8 +12,8 @@ import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_ind
 // State model: two independent flags, OR'd together.
 //   hoverActive       set by mouseenter / cleared by mouseleave, unless the pointer
 //                     is crossing the gap onto the tooltip - then once it strays
-//   persistentActive  set by focus or a click / cleared by a press outside or
-//                     focus moving to another element in the page
+//   persistentActive  set by focus, a click or a press in the tooltip / cleared
+//                     by a press outside or focus moving to another element in the page
 // The tooltip is visible whenever either flag is true.
 
 // Keyed by placement side: the tooltip edge the arrow sits on, and the
