@@ -228,7 +228,7 @@ export class VehiclePresenter {
 
       const label = labels[key] ?? this.humanize(key)
       if (meta.fields && !collapse.includes(key) && [value, ...otherValues].some(isHash)) {
-        return this.rowsFor(meta.fields, value, { others: otherValues, display }).map(([rowLabel, ...row]) => [`${label} ${String(rowLabel).toLowerCase()}`, ...row])
+        return this.rowsFor(meta.fields, value, { others: otherValues, display, prefix: prefix && `${prefix}${key}.` }).map(([rowLabel, ...row]) => [`${label} ${String(rowLabel).toLowerCase()}`, ...row])
       }
       return [[label, display(value, key), meta.unit, otherValues.some((other) => !equal(other, value)), `${prefix}${key}`, otherValues.map((other) => display(other, key))]]
     })

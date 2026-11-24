@@ -115,7 +115,7 @@ function start ({ manifestUrl, ids, jurisdictions, riders, comparing }) {
     ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
   })
   started = opened.then(() => Promise.all([manifest.vocabulary, manifest.kit].map((file) => fetchCatalog(new URL(file, base)))))
-    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, names: withCurrentNames({ target_riders: riders, ...vocabulary.names }), e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
+    .then(([vocabulary, { kit }]) => ({ vocabulary: { ...vocabulary, names: withCurrentNames({ ...vocabulary.names, target_riders: { ...riders, ...vocabulary.names.target_riders } }), e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
   if (comparing) fetchComparison()
   return started
 }

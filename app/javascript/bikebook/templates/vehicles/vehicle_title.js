@@ -15,8 +15,8 @@ export const manufacturerLine = (manufacturer) => present(manufacturer)
   : nothing
 
 // A compared vehicle's model, after an e-vehicle's badge, its configuration where it isn't complete by the kit's
-// `configurations` names, the markets selling it where `market` doesn't and the copy button for its id, `value`, whose tooltip links its JSON, inline
-// after its last line. As an 'h1' or 'h3' `heading`, set large
+// `configurations` names, the markets selling it where `market` doesn't and the copy button for its id, `value`, its
+// tooltip linking the JSON, inline after its last line. As an 'h1' or 'h3' `heading`, set large
 export const modelLine = ({ model, data, value, market, configurations, heading }) => {
   const size = heading ? 'md' : 'sm'
   const name = html`${model}${configurationNote({ configuration: data.model_configuration, names: configurations, size })}${

@@ -178,7 +178,7 @@ class ModelViewer {
       this.suspension(),
       this.frame()
     ], [this.electricSummary(), ...this.motorSections()], [
-      section({ heading: 'Cargo', content: presenter.measurementRows(presenter.rowsFor(this.kit.schemas.vehicle.cargo.fields, vehicle.cargo, { others: this.others.map((other) => other.cargo), prefix: 'cargo.' })) }),
+      section({ heading: 'Cargo', content: presenter.measurementRows(this.specRows('cargo', undefined, {}, 'cargo.')) }),
       this.weightLimits(),
       this.wheels(),
       this.positioned('Brakes', 'brakes', 'Brake', (brake) => this.brakeSummary(brake)),
@@ -532,9 +532,9 @@ class ModelViewer {
     return join([first, ' – ', presence(final) ?? inlineBadge({ text: 'current', size: 'sm' })])
   }
 
-  specRows (key, fields = key === 'frame' ? this.kit.viewer.frame_fields : this.kit.schemas.vehicle[key].fields, labels = {}) {
+  specRows (key, fields = key === 'frame' ? this.kit.viewer.frame_fields : this.kit.schemas.vehicle[key].fields, labels = {}, prefix = '') {
     return this.presenter.rowsFor(fields, this.vehicle[key], {
-      labels, others: this.others.map((other) => other[key]), collapse: ['bottom_bracket'], display: (value, field) => this.specValue(value, field)
+      labels, others: this.others.map((other) => other[key]), collapse: ['bottom_bracket'], display: (value, field) => this.specValue(value, field), prefix
     })
   }
 
