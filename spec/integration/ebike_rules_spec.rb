@@ -141,7 +141,7 @@ RSpec.describe "E-bike rules", :js, type: :system do
     end
 
     # as a link to them does, on the classification it names
-    visit "/ebike-rules/US/CA?non_e_bike_rules=1&non_e_bike_type=motor_driven_cycle"
+    visit "/ebike-rules/US/CA?non_e_bike_rules=1&non_e_bike_type=motor-driven-cycle"
     expect(page).to have_css("#{state_rules} h3", exact_text: "Motor-Driven Cycle")
   end
 

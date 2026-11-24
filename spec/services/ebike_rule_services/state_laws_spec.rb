@@ -60,7 +60,7 @@ RSpec.describe EbikeRuleServices::StateLaws do
         .to include({rule: "Class 3 riders must be 16 or older; a younger passenger may ride on one designed to carry passengers",
           citation: "Colorado Revised Statutes §42-4-1412", categories: ["rider_rule", "top_rule_1"], sources: ["https://olls.info/crs/crs2026-title-42.pdf#page=981"],
           starts_on: nil, ends_on: nil})
-      expect(described_class.find("CO")[:sources]).to include("https://leg.colorado.gov/bills/hb25-1197")
+      expect(described_class.find("CO")[:sources]).to include("https://leg.colorado.gov/bills/hb17-1151")
     end
 
     it "reads the parsed laws once a request" do
@@ -157,8 +157,8 @@ RSpec.describe EbikeRuleServices::StateLaws do
     it "has each place outside the US's e-bike laws in km/h, or its country's without its own, and its other classes" do
       places = described_class.places
       expect(places.keys).to match_array %w[CA EU CA-NB CA-ON]
-      expect(places["EU"][:laws]).to match [include(id: "evc/eu/epac", kmh: 25, mph: 16, watt_cap: 250, throttle: false, metric: true,
-        restrictions: [include(rule: "No licence, registration or insurance is needed")])]
+      expect(places["EU"][:laws]).to match [include(id: "evc/eu/epac", kmh: 25, mph: 16, watt_cap: 250, throttle: true, metric: true,
+        restrictions: include(include(rule: a_string_starting_with("No EU driving licence category covers it"))))]
       expect(places["EU"][:classes]).to eq []
       expect(places["CA-NB"][:laws]).to match [include(id: "evc/ca/power-assisted-bicycle", kmh: 32)]
       expect(places["CA-NB"][:classes]).to match [include(id: "evc/ca/nb/motor-driven-cycle", kmh: 50),
@@ -180,8 +180,9 @@ RSpec.describe EbikeRuleServices::StateLaws do
 
   describe "e_bike_top_rules" do
     it "is the top rules of the state's e-bike law for the class, without those only about others" do
-      expect(described_class.e_bike_top_rules("CA", e_bike_class: 3).pluck(:rule)).to match [a_string_starting_with("Ridden wherever bicycles may go"), a_string_starting_with("Riders must be 16 or older")]
-      expect(described_class.e_bike_top_rules("CA", e_bike_class: 1).pluck(:rule)).to match [a_string_starting_with("Ridden wherever bicycles may go")]
+      expect(described_class.e_bike_top_rules("CO", e_bike_class: 3).pluck(:rule)).to match [a_string_starting_with("Class 3 is kept off bike and pedestrian paths"),
+        a_string_starting_with("Class 3 riders must be 16 or older"), a_string_starting_with("In state wildlife areas")]
+      expect(described_class.e_bike_top_rules("CO", e_bike_class: 1).pluck(:rule)).to match [a_string_starting_with("In state wildlife areas")]
       expect(described_class.e_bike_top_rules("WY", e_bike_class: 1)).to eq []
     end
 
@@ -202,14 +203,15 @@ RSpec.describe EbikeRuleServices::StateLaws do
     it "is lowest speed cap first, then power cap, and off-highway last" do
       expect(described_class.non_e_bike_classifications("CA").pluck(:name)).to eq ["Moped", "Motor-Driven Cycle", "Motorcycle",
         "Off-Highway Motor Vehicle", "Off-Highway Electric Motorcycle"]
-      expect(described_class.non_e_bike_classifications("NJ").pluck(:name)).to eq ["Motorized Bicycle", "Dirt Bike"]
+      expect(described_class.non_e_bike_classifications("NJ").pluck(:name)).to eq ["Motorized Bicycle", "Motorcycle", "Dirt Bike"]
     end
   end
 
   describe "emoto_rules" do
     it "is the top rules for the state's motorcycle" do
-      expect(described_class.emoto_rules("CA").pluck(:rule)).to eq ["Riders need a driver's license with an M1 motorcycle endorsement",
-        "Riders must wear a motorcycle helmet", "Registered and plated with the DMV, and must carry liability insurance"]
+      expect(described_class.emoto_rules("NJ").pluck(:rule)).to match [a_string_starting_with("Riders need a motorcycle endorsement"),
+        "Titled, registered and insured with the Motor Vehicle Commission"]
+      expect(described_class.emoto_rules("CA")).to eq []
       expect(described_class.emoto_rules("WY")).to eq []
     end
   end
