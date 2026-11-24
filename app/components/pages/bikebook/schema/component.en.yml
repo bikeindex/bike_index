@@ -5,4 +5,3 @@ en:
       bikebook:
         schema:
           unreachable: The Bike Book repository isn't answering. Try again in a minute.
-          view_on_github: View this file on GitHub

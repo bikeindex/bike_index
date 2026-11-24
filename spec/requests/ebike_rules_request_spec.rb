@@ -259,7 +259,7 @@ RSpec.describe EbikeRulesController, type: :request do
 
       expect(page).to have_css("[role='status']", text: "The Aventón Level 4 ADV is not classified as an e-bike in California.")
       top_line = page.all("[role='status'] > div > ul > li").map { it.text.strip }
-      expect(top_line.first).to eq "It is a Class 2 and Class 3 e-bike, which is not permitted. In California, it may fall under Moped."
+      expect(top_line.first).to eq "It is a Class 2 and Class 3 e-bike, which is not permitted in California. In California, it may fall under Moped."
       expect(top_line.second).to start_with "Kept off bike paths and trails"
       # its speed and throttle fail too, which the classes' note already gives as the reason
       speed = page.find("li", text: /28\W*mph top assisted speed\s*Assists to 28\W*mph, not allowed with a throttle/)
@@ -271,7 +271,7 @@ RSpec.describe EbikeRulesController, type: :request do
 
       # as is one entered by hand, which is both classes as such a model is
       get "/ebike-rules/US/CA", params: {manual: "1", top_speed: "28", throttle: "1"}
-      expect(page).to have_css("[role='status'] li", text: "It is a Class 2 and Class 3 e-bike, which is not permitted.")
+      expect(page).to have_css("[role='status'] li", text: "It is a Class 2 and Class 3 e-bike, which is not permitted in California.")
       # under the e-moto's tile rather than its classes', with California's out of class ID
       expect(page.all("section[aria-live] [data-controller~='ui--tooltip'] > button[aria-label$='e-bike']").map { it[:"aria-label"] }).to eq ["E-moto, not an e-bike"]
       expect(page.find("section[aria-live] [role='tooltip'] code", visible: :all).text(:all).strip).to eq "evc/out-of-class/us/ca"
