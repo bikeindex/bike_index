@@ -66,6 +66,18 @@ RSpec.describe CustomerMailer, type: :mailer do
     end
   end
 
+  describe "pos_registration_match_email" do
+    let(:match) { FactoryBot.create(:pos_registration_match) }
+
+    it "renders email" do
+      mail = CustomerMailer.pos_registration_match_email(match, match.bike.user)
+      expect(mail.subject).to eq "Is this the same bike?"
+      expect(mail.to).to eq [match.bike.user.email]
+      expect(mail.tag).to eq "pos_registration_match_email"
+      expect(mail.body.encoded).to include("/my_account/pos_registration_matches/#{match.id}")
+    end
+  end
+
   describe "donation ask" do
     let(:html) { CustomerMailer.welcome_email(user).deliver_now.html_part.body.to_s }
     let(:organization) { FactoryBot.create(:invoice_with_payment).organization }
