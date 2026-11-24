@@ -94,9 +94,9 @@ RSpec.describe Integrations::Bikebook::Catalog do
 
   describe "vocabulary_dig" do
     it "caches what is at the keys alone" do
-      expect(described_class.vocabulary_dig("names", "components.type")).to include("saddle" => "Saddle")
-      cached = Rails.cache.read(["bikebook_catalog/vocabulary_dig", "vocabulary.json", "names", "components.type"])
-      expect(cached).to eq described_class.vocabulary_dig("names", "components.type")
+      names = described_class.vocabulary_dig("names", "components.type")
+      expect(names).to include("saddle" => "Saddle")
+      expect(Rails.cache.read(["bikebook_catalog/file", 2, "vocabulary.json", "names", "components.type"])).to eq names
     end
 
     context "while the catalog doesn't answer" do
