@@ -26,7 +26,8 @@ class MyAccountsController < ApplicationController
 
   def update
     @user = current_user
-    if params.dig(:user, :password).present?
+    # A passwordless user's digest is random, so there's no current password to give
+    if params.dig(:user, :password).present? && !@user.passwordless_user?
       unless @user.authenticate(params.dig(:user, :current_password))
         @user.errors.add(:base, translation(:current_password_doesnt_match))
       end
@@ -178,6 +179,7 @@ class MyAccountsController < ApplicationController
         user_registration_organization_attributes: [:all_bikes, :can_edit_claimed],
         # include address_record id so we don't create new address records
         address_record_attributes: (AddressRecord.permitted_params + [:id]))
+    pparams[:passwordless_user] = false if pparams[:password].present?
     if pparams.key?("username")
       pparams.delete("username") unless pparams["username"].present?
     end
