@@ -366,6 +366,32 @@ RSpec.describe MyAccountsController, type: :request do
       expect(current_user.name).not_to eq("Mr. Slick")
     end
 
+    context "passwordless user" do
+      let!(:current_user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+      let(:password_params) { {password: "new_password", password_confirmation: "new_password"} }
+
+      it "sets a first password without a current one" do
+        get "#{base_url}/edit/password"
+        expect(Capybara.string(response.body)).to have_no_field("user_current_password")
+
+        patch base_url, params: {user: password_params, edit_template: "password"}
+        expect(response).to redirect_to edit_my_account_url(edit_template: "password")
+        current_user.reload
+        expect(current_user.passwordless_user?).to be_falsey
+        expect(current_user.authenticate("new_password")).to be_truthy
+
+        get "#{base_url}/edit/password"
+        expect(Capybara.string(response.body)).to have_field("user_current_password")
+      end
+
+      it "stays passwordless when the confirmation doesn't match" do
+        patch base_url, params: {user: password_params.merge(password_confirmation: "new_passwordd"), edit_template: "password"}
+        expect(response).to render_template(:edit)
+        expect(Capybara.string(response.body)).to have_no_field("user_current_password")
+        expect(current_user.reload.passwordless_user?).to be_truthy
+      end
+    end
+
     context "setting address" do
       let(:country) { Country.united_states }
       let!(:state) { FactoryBot.create(:state_new_york) }
