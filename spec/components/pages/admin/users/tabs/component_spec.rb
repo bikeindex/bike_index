@@ -12,12 +12,13 @@ RSpec.describe Pages::Admin::Users::Tabs::Component, type: :component do
     FactoryBot.create(:user_email, user:)
     FactoryBot.create(:feedback, user:)
     FactoryBot.create(:user_alert, user:)
+    FactoryBot.create(:bug_report, user:, status: :ignored)
     expect(component).to have_content("Test User")
-    expect(tab_labels).to eq ["Edit", "Bikes 0", "Payments 0", "Organizations 0", "Messages 2", "Emails 2"]
+    expect(tab_labels).to eq ["Edit", "Bikes 0", "Payments 0", "Organizations 0", "Messages 3", "Emails 2"]
     expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Edit"]
     expect(component).to have_link("Edit", href: "/admin/users/#{user.id}/edit")
     expect(component).to have_link("Bikes 0", href: "/admin/users/#{user.id}?active_tab=bikes")
-    expect(component).to have_link("Messages 2", href: "/admin/users/#{user.id}?active_tab=messages")
+    expect(component).to have_link("Messages 3", href: "/admin/users/#{user.id}?active_tab=messages")
     expect(component).to have_link("Payments 0", href: "/admin/users/#{user.id}?active_tab=payments")
     expect(component).to have_link("Emails 2", href: "/admin/users/#{user.id}?active_tab=emails")
     expect(component.css("[role='alert']")).to be_empty

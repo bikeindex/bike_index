@@ -16,9 +16,10 @@ RSpec.describe BugReportAutoPrioritizeJob, type: :job do
     end
 
     context "with an internal notification subject" do
-      ["Bike Recovery", "Bike recovered", "Recovered Bike", "Stolen notification blocked!",
+      ["Stolen notification blocked!",
         "Marketplace message blocked!", "Cool Bike Shop doesn't have any admins!",
-        "Organization wants to be shown", "Organization deleted themselves"].each do |subject|
+        "Organization wants to be shown", "Organization deleted themselves", "Join MVMS on Bike Index",
+        "API Bike Creation error!", "[Bike Index Forum] update available"].each do |subject|
         context "subject '#{subject}'" do
           let(:bug_report) { FactoryBot.create(:bug_report, subject:) }
 
@@ -32,7 +33,9 @@ RSpec.describe BugReportAutoPrioritizeJob, type: :job do
     end
 
     context "with an automatic reply subject" do
-      ["Automatic reply: Stolen Bike Hot Sheet", "Out of Office", "auto-reply"].each do |subject|
+      ["Automatic reply: Stolen Bike Hot Sheet", "Out of Office", "auto-reply",
+        "Automatische Antwort: Please confirm your Bike Index email!", "Automatisch antwoord: Instructies",
+        "Réponse automatique : Please confirm your Bike Index email!"].each do |subject|
         context "subject '#{subject}'" do
           let(:bug_report) { FactoryBot.create(:bug_report, subject:) }
 
@@ -47,7 +50,7 @@ RSpec.describe BugReportAutoPrioritizeJob, type: :job do
 
     context "with a look-alike subject that isn't automated" do
       ["Recovered Bike investigation", "bike co-op, bike recovery?", "Cannot create an account",
-        "Cannot leave organization"].each do |subject|
+        "Cannot leave organization", "How do I join my school on Bike Index?"].each do |subject|
         context "subject '#{subject}'" do
           let(:bug_report) { FactoryBot.create(:bug_report, subject:) }
 
@@ -78,14 +81,14 @@ RSpec.describe BugReportAutoPrioritizeJob, type: :job do
 
         it "tags a configured email and ignores it" do
           instance.perform(bug_report.id)
-          expect(bug_report.reload.tags).to eq(["auto_replies_organization"])
+          expect(bug_report.reload.tags).to eq(["auto_replies"])
           expect(bug_report.status).to eq("ignored")
         end
 
         it "tags a configured domain but not other senders" do
           bug_report.update_column(:email, "noreply@tickets.example.org")
           instance.perform(bug_report.id)
-          expect(bug_report.reload.tags).to eq(["auto_replies_organization"])
+          expect(bug_report.reload.tags).to eq(["auto_replies"])
 
           other = FactoryBot.create(:bug_report, email: "someone@unlisted.example")
           instance.perform(other.id)
@@ -95,7 +98,7 @@ RSpec.describe BugReportAutoPrioritizeJob, type: :job do
         it "tags a subdomain of a configured domain" do
           bug_report.update_column(:email, "noreply@mail.tickets.example.org")
           instance.perform(bug_report.id)
-          expect(bug_report.reload.tags).to eq(["auto_replies_organization"])
+          expect(bug_report.reload.tags).to eq(["auto_replies"])
         end
 
         it "does not match a domain that merely ends with the configured one" do
@@ -137,12 +140,45 @@ RSpec.describe BugReportAutoPrioritizeJob, type: :job do
       end
     end
 
+    context "with a feedback notification" do
+      let(:body) { %(<p>Help me</p><a href="https://bikeindex.org/admin/feedbacks/12">read full message</a>) }
+      let(:bug_report) { FactoryBot.create(:bug_report, subject: "Found Bike", body:, tags: %w[feedback]) }
+
+      it "keeps it out of spam and prioritizes it low" do
+        instance.perform(bug_report.id)
+        expect(bug_report.reload.tags).to eq(["feedback"])
+        expect(bug_report.status).to eq("investigate_priority_low")
+      end
+
+      ["Bike Recovery", "Bike recovered", "Stolen Bike Recovered!", "Recovered Bike"].each do |subject|
+        context "subject #{subject}" do
+          let(:bug_report) { FactoryBot.create(:bug_report, subject:, body:, tags: %w[feedback]) }
+
+          it "tags it bike_index_notification and ignores it" do
+            instance.perform(bug_report.id)
+            expect(bug_report.reload.tags).to eq(%w[bike_index_notification feedback])
+            expect(bug_report.status).to eq("ignored")
+          end
+        end
+      end
+    end
+
+    context "with a recovery subject someone wrote themselves" do
+      let(:bug_report) { FactoryBot.create(:bug_report, subject: "Stolen bike recovery") }
+
+      it "does not tag it" do
+        instance.perform(bug_report.id)
+        expect(bug_report.reload.tags).to eq([])
+        expect(bug_report.status).to eq("investigate_priority_low")
+      end
+    end
+
     context "when already prioritized" do
-      let(:bug_report) { FactoryBot.create(:bug_report, subject: "Bike Recovery", status: :resolved) }
+      let(:bug_report) { FactoryBot.create(:bug_report, subject: "Bike Recovery", tags: %w[feedback], status: :resolved) }
 
       it "still tags it but does not override the status" do
         instance.perform(bug_report.id)
-        expect(bug_report.reload.tags).to eq(["bike_index_notification"])
+        expect(bug_report.reload.tags).to eq(%w[bike_index_notification feedback])
         expect(bug_report.status).to eq("resolved")
       end
     end

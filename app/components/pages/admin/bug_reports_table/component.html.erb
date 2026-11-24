@@ -1,7 +1,7 @@
 <%= render(UI::Table::InCard::Component.new(records: @collection, cache_key: self.class.cache_digest, render_sortable: @render_sortable, sort_state: @sort_state,
   column_settings: {storage_key: "adminBugReportsColumns", columns: COLUMNS, defaults: COLUMNS.keys, narrow_hidden: %i[receiver_cell member_cell invoiced_cell pull_request_cell]},
   form: {url: assign_tags_admin_bug_reports_path, method: :post},
-  data: {controller: "update-cached-sortable-links", "update-cached-sortable-links-base-url-value": url_for(@sort_state.search_params)})) do |table| %>
+  data: sortable_links_data)) do |table| %>
   <% table.with_actions do %>
     <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign", wrapper_class: "tw:mb-0 tw:min-w-64")) do %>
       <%= render UI::Forms::Combobox::Component.new(name: :tags, options: @searchable_tags, free_text: true, html_options: {placeholder: "Select or create a tag"}) %>
@@ -41,7 +41,7 @@
 
     <%= render(UI::Tooltip::Component.new) do |tooltip| %>
       <% tooltip.with_body do %>
-        <div class="tw:w-96 tw:text-left">
+        <div>
           <%= content_tag(:strong, bug_report.display_subject) %>
 
           <%# truncated because the tooltip has no scroll container %>
@@ -56,9 +56,11 @@
   <% end %>
 
   <% table.column(hideable: :tags_cell) do |bug_report| %>
-    <% bug_report.tags.each do |tag| %>
-      <%= render(UI::Code::Inline::Component.new(text: tag, small: true)) %>
-    <% end %>
+    <div class="tw:flex tw:flex-wrap tw:gap-1">
+      <% bug_report.tags.each do |tag_name| %>
+        <%= render(Atoms::Admin::Badges::BugReportTag::Component.new(tag: tag_name)) %>
+      <% end %>
+    </div>
   <% end %>
 
   <% table.column(hideable: :member_cell, classes: "tw:text-center") do |bug_report| %>

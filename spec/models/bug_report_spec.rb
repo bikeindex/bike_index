@@ -189,6 +189,14 @@ RSpec.describe BugReport, type: :model do
     end
   end
 
+  describe "feedback_id" do
+    it "reads the feedback link" do
+      bug_report = FactoryBot.build(:bug_report, body: %(<a href="https://bikeindex.org/admin/feedbacks/126340">read full message</a>))
+      expect(bug_report.feedback_id).to eq 126340
+      expect(FactoryBot.build(:bug_report).feedback_id).to be_nil
+    end
+  end
+
   describe "display_subject" do
     let(:bug_report) { FactoryBot.build(:bug_report, subject: " ") }
 
