@@ -3641,6 +3641,8 @@ nl:
     landing_pages_for_bike_shops: Bike Index koppelt zich aan uw kassasysteem en registreert
       automatisch elke fiets die u verkoopt. Gratis voor winkels en klanten, en we
       verkopen of delen nooit klantgegevens.
+    shop_index: Bike Index pet en registratiestickers. Elke aankoop helpt het registratiesysteem
+      gratis te houden.
   meta_titles:
     bikes_index: Zoekresultaten
     bikes_new: Registreer een fiets!
@@ -3700,6 +3702,7 @@ nl:
     organization_signup_show: Voeg uw organisatie toe aan Bike Index
     organization_signup_update: Voeg uw organisatie toe aan Bike Index
     organization_signup_welcome: "%{organization} is actief"
+    shop_index: Winkel - Fietsindex
   organized:
     ambassador_dashboards:
       getting_started:
@@ -8761,6 +8764,46 @@ nl:
             out_of_links_html: We hebben alle mogelijke activeringslinks voor %{name}
               verstuurd, maar geen enkele is bij %{email} aangekomen. Neem contact
               op met support@bikeindex.org, dan lossen we het op.
+      shop:
+        index:
+          bulk_order_email_subject: Grote bestelling stickers
+          bulk_orders_html: "%{contact_link} voor bulkbestellingen."
+          caped_cap_alt: De Caped Registrant-pet, lichtblauwe stripfiguurprint met
+            paarse rand.
+          caped_cap_description: Onze striptekening, allemaal op een wielerpet. Bellen
+            rinkelen, sloten klikken en het schild met cape houdt de wacht. Paarse
+            rand.
+          caped_cap_name: De Caped Registrant-cap
+          contact_us: Contacteer ons
+          cycling_cap: Fietsmuts
+          for_riders_and_shops: Voor motorrijders en winkels
+          for_shops: Voor winkels
+          gear_that_helps_get_bikes_home: Uitrusting die helpt om fietsen thuis te
+            krijgen.
+          lede: Bike Index is een gratis, non-profit register. Elke pet en sticker
+            die je koopt, zorgt ervoor dat het gratis blijft voor fietsers overal
+            ter wereld.
+          mission: Wij zijn een 501(c)(3) non-profitorganisatie. De opbrengst van
+            de verkoop financiert het register, de meldingen van gestolen fietsen
+            en het partnernetwerk dat fietsers helpt hun fiets terug te vinden.
+          shop_the_gear: Koop de uitrusting
+          sticker_alt: Poster met de titel "Hoe voorkom je dat je fiets gestolen wordt?",
+            waarop de kentekensticker te zien is.
+          sticker_description: Plak de sticker op je frame, scan de QR-code en je
+            fiets is binnen ongeveer twee minuten geregistreerd. Mocht je fiets ooit
+            kwijt raken of gestolen worden, dan kan de vinder de sticker scannen en
+            zien dat hij van jou is. Fietsenwinkels kunnen ze ook op voorraad hebben,
+            voor nieuwe fietsen, tweedehands fietsen en fietsen die voor onderhoud
+            binnenkomen.
+          sticker_name: Bike Index registratiestickers
+          suggested_retail: Adviesprijs
+          the_bike_index_shop: De Bike Index-winkel
+          wholesale_pricing_available: Groothandelsprijzen beschikbaar
+          your_purchase_keeps_bike_index_free: Met uw aankoop blijft Bike Index gratis.
+        product:
+          view: Weergave
+          view_on_the_shop: Bekijk %{name} in de Bike Index-winkel (opent in een nieuw
+            tabblad)
     shared_blocks:
       footer:
         about: Over

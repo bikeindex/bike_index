@@ -4082,6 +4082,8 @@ it:
     landing_pages_for_bike_shops: Bike Index si collega al tuo sistema POS e registra
       automaticamente ogni bicicletta che vendi. È gratuito sia per i negozi che per
       i clienti e non vendiamo né condividiamo mai i dati dei clienti.
+    shop_index: Cappellino e adesivi per la registrazione di Bike Index. Ogni acquisto
+      contribuisce a mantenere il registro gratuito.
   meta_titles:
     bikes_index: Risultati della ricerca
     bikes_new: Registra una bicicletta!
@@ -4141,6 +4143,7 @@ it:
     organization_signup_show: Aggiungi la tua organizzazione a Bike Index
     organization_signup_update: Aggiungi la tua organizzazione a Bike Index
     organization_signup_welcome: "%{organization} è attivo"
+    shop_index: Negozio - Indice biciclette
   money:
     currencies:
       en: USD
@@ -8897,6 +8900,46 @@ it:
             out_of_links_html: Abbiamo inviato tutti i link di attivazione possibili
               per %{name}, ma nessuno di essi è arrivato a %{email}. Contatta support@bikeindex.org
               e risolveremo il problema.
+      shop:
+        index:
+          bulk_order_email_subject: Ordine di adesivi all'ingrosso
+          bulk_orders_html: "%{contact_link} per ordini all'ingrosso."
+          caped_cap_alt: Il berretto "The Caped Registrant", con stampa a fumetti
+            azzurra e visiera viola.
+          caped_cap_description: La nostra grafica a fumetti, stampata su un berretto
+            da ciclista. I campanelli suonano, le serrature scattano e lo scudo con
+            il mantello fa la guardia. Visiera viola.
+          caped_cap_name: Il cappello del Registrante con cappuccio
+          contact_us: Contattaci
+          cycling_cap: berretto da ciclista
+          for_riders_and_shops: Per i ciclisti e i negozi
+          for_shops: Per i negozi
+          gear_that_helps_get_bikes_home: Attrezzatura che aiuta a riportare le biciclette
+            a casa.
+          lede: Bike Index è un registro gratuito e senza scopo di lucro. Ogni cappellino
+            e adesivo che acquisti contribuisce a mantenerlo gratuito per tutti i
+            ciclisti.
+          mission: Siamo un'organizzazione no-profit 501(c)(3). I proventi delle vendite
+            finanziano il registro, gli avvisi di furto delle biciclette e la rete
+            di partner che aiuta i ciclisti a recuperare le proprie biciclette.
+          shop_the_gear: Acquista l'attrezzatura
+          sticker_alt: 'Come evitare che ti rubino la bicicletta: poster che mostra
+            l''adesivo di immatricolazione.'
+          sticker_description: Applica l'adesivo sul telaio, scansiona il codice QR
+            e la tua bici sarà registrata in circa due minuti. Se la tua bici viene
+            smarrita o rubata, chiunque la trovi potrà scansionare l'adesivo e verificare
+            che ti appartiene. Anche i negozi di biciclette possono tenerli in magazzino,
+            sia per le bici nuove che per quelle usate e per quelle in riparazione.
+          sticker_name: Adesivi di registrazione Bike Index
+          suggested_retail: Prezzo al dettaglio consigliato
+          the_bike_index_shop: Il negozio Bike Index
+          wholesale_pricing_available: Prezzi all'ingrosso disponibili
+          your_purchase_keeps_bike_index_free: Il tuo acquisto contribuisce a mantenere
+            Bike Index gratuito.
+        product:
+          view: Visualizzazione
+          view_on_the_shop: Visualizza %{name} sul negozio Bike Index (si apre in
+            una nuova scheda)
     shared_blocks:
       footer:
         about: Di
