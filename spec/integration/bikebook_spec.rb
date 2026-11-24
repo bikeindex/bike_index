@@ -201,7 +201,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(certifications).to have_text(/UL 2849 Certified\s*E-bike electrical system\s*UL 2271 Certified\s*Battery pack\z/)
     certifications.find("button", text: "UL 2271 Certified").hover
     expect(page).to have_css("[role='tooltip']", text: "The battery pack passed UL safety testing", visible: true)
-    # under its class's name, the class's tile, a tooltip of its US class card, in place of the name's own
+    # under its class's name, each class's tile, a tooltip of its US class card, in place of the name's own
+    expect(all("[aria-label='Overview'] td button[aria-label$=' e-bike']").map { it[:"aria-label"] }).to eq ["Class 2 e-bike", "Class 3 e-bike"]
     badge = find("[aria-label='Overview'] td button[aria-label$=' e-bike']", match: :first)
     expect(badge.ancestor("td")).to have_no_button("?")
     badge.click
@@ -1451,6 +1452,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     type_into(vehicle_field, "soltera")
     retry_on_detach { find(vehicle_option, text: "Aventón Soltera 3 ADV").click }
     expect(page).to have_css("[data-comparison] article", count: 2)
+    # no groupset listed, so its gear count alone, one chainring by one cog a singlespeed, the rest of its drivetrain in the tooltip
+    click_link "Overview"
+    groupsets = find("[aria-label='Overview comparison'] tr", text: /\AGroupset/).all("td").map { it.text(:all).squish }
+    expect(groupsets).to include(a_string_matching(/\Asinglespeed \? Drivetrain: /))
     click_link "Sizes & geometry"
     expect_size.call("Soltera 3 ADV", "Small")
     expect_size.call("Current EXP", "Small")
@@ -1756,6 +1761,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(find("[aria-label='Sizes & geometry comparison'] tr", text: "Weight")).to have_text(/56\W*lb.*61\.1\W*lb\W*\+5\.1\W*lb/m)
     expect(page).to have_css("dd", text: /\A[\d.,]+\W*lb\z/, minimum: 2)
     expect(page).to have_no_text(/\d\W*kg\b/)
+    # the size's weight, then its limits, close the comparison
+    expect(all("[aria-label='Sizes & geometry comparison'] th[scope='row']").map(&:text).last(2)).to eq ["Weight", "Max payload (rider + cargo)"]
     # 650 B wheels smaller than the first's 700 C, and a tire's difference in mm all the same
     front_wheels = find("[aria-label='Sizes & geometry comparison'] tr", text: "Front wheel")
     expect(front_wheels).to have_css("td > span > span", text: /\A650 B,\s*− \?\z/)
@@ -2061,7 +2068,8 @@ RSpec.describe "Bike Book", :js, type: :system do
           tooltip(cargo('basics', rated)), ...((each) => [text(each), tooltip(each)])(cargo('basics', { ...data, weight_limits: [...riders, { load: 'gross', weight: 200 }] })),
           text(cargo('basics', { ...data, weight_limits: [...riders, { load: 'cargo', weight: 80 }] })),
           ...((row) => [text(row), tooltip(row)])(cargo('basics', { model: 'Long', type: 'cargo', cargo: { length: 787 }, sizes: [{ name: 'L', geometry: { wheelbase: 1356 } }],
-            wheels: [{ bsd: 406, tire_width: 89, position: ['front'] }, { bsd: 406, tire_width: 89, position: ['rear'] }] })), ...limits(rated)]
+            wheels: [{ bsd: 406, tire_width: 89, position: ['front'] }, { bsd: 406, tire_width: 89, position: ['rear'] }] })), ...limits(rated),
+          tooltip(cargo('basics', { ...data, weight_limits: [{ load: 'rider', weight: 190 }, { load: 'payload', weight: 190 }] }))]
         container.remove()
         return shown
       })()
@@ -2075,7 +2083,24 @@ RSpec.describe "Bike Book", :js, type: :system do
       # its wheelbase and wheels' total length beside its cargo area's, each spelled out in their tooltip
       /\ACargo Total length 194\W*cm, Cargo 78\.7\W*cm \?\z/,
       /\ATotal length: 194\W*cm \(6 feet, 4\.4 inches\) \(total length is the wheelbase plus each wheel’s radius, calculating the tire height from its width\) Cargo length: 78\.7\W*cm \(2 feet, 7 inches\)\z/,
-      /\ARider 150\W*kg, 180\W*kg \(sizes L\)\z/, /\APayload \(rider \+ cargo\) 160\W*kg\z/, /\AGross vehicle weight 200\W*kg\z/])
+      /\ARider 150\W*kg, 180\W*kg \(sizes L\)\z/, /\APayload \(rider \+ cargo\) 160\W*kg\z/, /\AGross vehicle weight 200\W*kg\z/,
+      # a rider limit the same as the max load, which leaves it out
+      /\AMax load \(rider \+ cargo\)\z/])
+    # a mount's type spelled out
+    frame = page.evaluate_script(<<~JS)
+      (async () => {
+        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
+        const [{ VehicleViewer }, { renderInto }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const container = document.body.appendChild(document.createElement('div'))
+        const data = { model: 'Tourer', type: 'bike', frame: { mounts: [{ type: 'top-tube-bag' }] } }
+        renderInto(container, new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/tourer', data }], new URL('/bikebook?view=all&vehicle_models=m/x/2026/tourer', window.location.href), null))
+        const shown = [...container.querySelectorAll('section')].find((section) => /^frame$/i.test(section.querySelector('h2')?.innerText)).innerText
+        container.remove()
+        return shown
+      })()
+    JS
+    expect(frame).to include("Top tube bag")
     click_link "All"
     expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
     expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)

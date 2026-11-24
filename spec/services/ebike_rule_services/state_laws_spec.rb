@@ -158,7 +158,7 @@ RSpec.describe EbikeRuleServices::StateLaws do
       places = described_class.places
       expect(places.keys).to match_array %w[CA EU CA-NB CA-ON]
       expect(places["EU"][:laws]).to match [include(id: "evc/eu/epac", kmh: 25, mph: 16, watt_cap: 250, throttle: true, metric: true,
-        restrictions: include(include(rule: a_string_starting_with("No EU driving licence category covers it"))))]
+        restrictions: have_attributes(size: 11) & include(include(rule: a_string_starting_with("No EU driving licence category covers it"))))]
       expect(places["EU"][:classes]).to eq []
       expect(places["CA-NB"][:laws]).to match [include(id: "evc/ca/power-assisted-bicycle", kmh: 32)]
       expect(places["CA-NB"][:classes]).to match [include(id: "evc/ca/nb/motor-driven-cycle", kmh: 50),

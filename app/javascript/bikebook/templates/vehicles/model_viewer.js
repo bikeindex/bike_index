@@ -265,7 +265,7 @@ class ModelViewer {
     const where = place == null ? null : place.startsWith('under') ? place : `on ${place}`
     const notes = compact([mount.interface && this.presenter.interfaceName(mount.interface), mount.description])
     return upcaseFirst(compact([this.presenter.positionLabel(mount.position), mount.holes != null ? `${mount.holes}-hole` : null,
-      mount.type.replaceAll('_', ' '), where, notes.length ? `(${notes.join(', ')})` : null]).join(' '))
+      mount.type.replaceAll('-', ' '), where, notes.length ? `(${notes.join(', ')})` : null]).join(' '))
   }
 
   #bottleMountLabel (mount) {

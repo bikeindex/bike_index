@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 # The fixture catalog in place of the published one: its blocks' models' published records, and an index of their
-# published rows beside cases of its own: the Specialized 2025 models only the index lists, Kris Holm's unicycles sold in
-# Canada but for kh24-us, and the Segway GT3 Pro sold in the UAE and China
+# published rows beside cases of its own, which regenerating it from the published catalog would drop: the Specialized
+# 2025 models and the Reactive Adaptations Nuke only the index lists, Kris Holm's unicycles sold in Canada but for
+# kh24-us, and the Segway GT3 Pro sold in the UAE and China
 module BikebookCatalogHelpers
   FIXTURES = Rails.root.join("spec/fixtures/bikebook_catalog")
 

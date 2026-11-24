@@ -33,9 +33,9 @@ module Integrations
         model(id)&.then { {title: "#{it["manufacturer"]} #{it["model"]}", description: it["description"], image_url: it["stock_photo"]} }
       end
 
-      # The model's record, nil for one the catalog hasn't. Raises Unreachable while the catalog
-      # doesn't answer. Cached apart from its far larger block, under the manifest's digest: a cached one needs no
-      # manifest read, and an updated catalog re-keys them all
+      # The model's record, nil for one the catalog hasn't. Raises Unreachable while the catalog doesn't answer. Cached
+      # apart from its far larger block, under the manifest's digest: a cached one needs no manifest read, and an updated
+      # catalog re-keys them all
       def model(id)
         return unless id.to_s.match?(MODEL_ID)
         raise Unreachable unless head

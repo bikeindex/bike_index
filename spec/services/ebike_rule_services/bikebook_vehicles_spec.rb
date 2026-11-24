@@ -30,7 +30,7 @@ RSpec.describe EbikeRuleServices::BikebookVehicles do
       expect(described_class.find("m/aventon/2026/level-4-rec-step-through")).to have_attributes(ul2849: :certified, ul2271: :certified)
     end
 
-    it "reads a market's model from its home market's record" do
+    it "reads a market's model by its citation key" do
       expect(described_class.find("m/specialized/2025/haul-st@CA")).to have_attributes(bikebook_id: "m/specialized/2025/haul-st@CA",
         model: "Haul ST", e_bike_class: 2, e_vehicle_classifications: ["evc/ca/power-assisted-bicycle"], watts: 500, top_assist_kmh: nil, throttle_kmh: 32,
         photo_url: "https://bikebook.bikeindex.org/specialized/2025/haul-st.png")

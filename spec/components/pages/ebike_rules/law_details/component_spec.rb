@@ -24,6 +24,15 @@ RSpec.describe Pages::EbikeRules::LawDetails::Component, type: :component do
     end
   end
 
+  context "with sources of its own" do
+    let(:abbreviation) { "CO" }
+
+    it "lists them under their own heading, last" do
+      expect(component.css("h3").map { it.text.strip }.last).to eq "Sources"
+      expect(component).to have_link(href: "https://leg.colorado.gov/bills/hb17-1151")
+    end
+  end
+
   context "with limits not yet in force" do
     let(:abbreviation) { "NC" }
 
