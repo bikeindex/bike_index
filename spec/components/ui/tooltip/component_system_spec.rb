@@ -39,10 +39,6 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     JS
   end
 
-  def hovered?(id)
-    page.evaluate_script("document.getElementById(#{id.to_json}).matches(':hover')")
-  end
-
   # Capybara's hover jumps there in one move, never crossing the gap between trigger and tooltip
   def glide_onto(element)
     box = element.native.bounding_box
@@ -156,7 +152,7 @@ RSpec.describe UI::Tooltip::Component, :js, type: :system do
     trigger.hover
     glide_onto(tooltip)
     expect(tooltip).to be_visible
-    expect(hovered?(tooltip_ids.first)).to be true
+    expect(tooltip).to match_css(":hover")
     find("body").hover
     expect(tooltip).not_to be_visible
 

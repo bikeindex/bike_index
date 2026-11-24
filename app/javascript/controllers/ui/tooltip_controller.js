@@ -142,7 +142,6 @@ export default class extends Controller {
     this.sync()
   }
 
-  // Within the box spanning the trigger and the tooltip
   #between ({ clientX, clientY }) {
     const [trigger, tooltip] = [this.triggerTarget, this.tooltipTarget].map((element) => element.getBoundingClientRect())
     return clientX >= Math.min(trigger.left, tooltip.left) && clientX <= Math.max(trigger.right, tooltip.right) &&
