@@ -72,7 +72,7 @@ module Pages
             translation(".millions_registered_no_owner_paid", millions: Counts.in_millions(Counts.total_bikes))
           end
 
-          def band = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800/60"
+          def band = SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES
 
           def section_inner = "tw:py-10 tw:sm:py-12 tw:lg:py-18 #{SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES}"
         end

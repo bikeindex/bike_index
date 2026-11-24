@@ -8,5 +8,5 @@ class SitemapPages
 
   ADDITIONAL = %w[organizations/new documentation/api_v3 recovery_stories
     strava_search manufacturers search/registrations search/marketplace stolen
-    marketplace/how-it-works theft-rings bikebook_schemas].freeze
+    marketplace/how-it-works theft-rings bikebook_schemas shop].freeze
 end

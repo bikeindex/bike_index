@@ -65,7 +65,7 @@
             html_class: "tw:whitespace-nowrap", commandfor: MODAL_ID, command: "show-modal")) %>
       </div>
 
-      <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: translation(".hero_image_alt"), width: 300, height: 224,
+      <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.webp", alt: translation(".hero_image_alt"), width: 300, height: 224,
           class: "tw:h-auto tw:w-full tw:max-w-28 tw:justify-self-end tw:min-[640px]:max-w-40 tw:min-[900px]:col-start-2 tw:min-[900px]:row-span-2 tw:min-[900px]:row-start-1 tw:min-[900px]:max-w-none" %>
     </div>
 
@@ -236,10 +236,7 @@
 
 <section
   id="recovery"
-  class="
-    tw:scroll-mt-16 tw:border-t tw:border-gray-200 tw:bg-gray-50
-    tw:dark:border-gray-700 tw:dark:bg-gray-900
-  "
+  class="tw:scroll-mt-16 tw:border-t <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>"
 >
   <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))] tw:items-start tw:gap-12 tw:py-20 <%= SECTION_CLASSES %>">
     <div>
@@ -311,7 +308,7 @@
       <% end %>
 
       <%= render(UI::Card::Component.new(shadow: :black, additional_classes: Pages::LandingPages::ForCitiesEducation::Component::STICKER_CLASSES)) do %>
-        <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", loading: "lazy", width: 96, height: 72, class: "tw:h-18 tw:w-auto tw:flex-none" %>
+        <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.webp", alt: "", loading: "lazy", width: 96, height: 72, class: "tw:h-18 tw:w-auto tw:flex-none" %>
 
         <p class="tw:text-[15px]">
           <strong><%= translation(".community_watch_lead") %></strong>
@@ -401,10 +398,7 @@
 
 <section
   id="education"
-  class="
-    tw:scroll-mt-16 tw:border-y tw:border-gray-200 tw:bg-gray-50
-    tw:dark:border-gray-700 tw:dark:bg-gray-900
-  "
+  class="tw:scroll-mt-16 tw:border-y <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>"
 >
   <div class="tw:py-20 <%= SECTION_CLASSES %>">
     <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".education_eyebrow"), heading: translation(".education_heading"), intro: translation(".education_intro"), html_class: "tw:mb-8 tw:max-w-[720px]")) %>
@@ -481,12 +475,7 @@
   </div>
 </section>
 
-<section
-  class="
-    tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
-    tw:dark:bg-gray-900
-  "
->
+<section class="tw:border-y <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>">
   <div class="tw:py-20 <%= SECTION_CLASSES %>">
     <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(eyebrow: translation(".field_eyebrow"), heading: translation(".field_heading"), intro: translation(".field_intro"), html_class: "tw:mb-10 tw:max-w-[720px]")) %>
 
@@ -559,10 +548,7 @@
 
 <section
   id="contact"
-  class="
-    tw:scroll-mt-16 tw:border-t tw:border-gray-200 tw:bg-gray-50
-    tw:dark:border-gray-700 tw:dark:bg-gray-900
-  "
+  class="tw:scroll-mt-16 tw:border-t <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>"
 >
   <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,360px),1fr))] tw:items-center tw:gap-12 tw:py-20 <%= SECTION_CLASSES %>">
     <div>

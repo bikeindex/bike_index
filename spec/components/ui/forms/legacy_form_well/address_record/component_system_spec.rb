@@ -11,6 +11,8 @@ RSpec.describe UI::Forms::LegacyFormWell::AddressRecord::Component, :js, type: :
     FactoryBot.create(:state_new_york)
     Country.canada
     visit(preview_path)
+    # The country select toggles the region fields only once this lazily loaded controller connects
+    wait_for_stimulus("ui--forms--legacy-form-well--address-record")
 
     expect(page).to have_content "Street address"
     expect_axe_clean("select-name")
@@ -42,6 +44,7 @@ RSpec.describe UI::Forms::LegacyFormWell::AddressRecord::Component, :js, type: :
       FactoryBot.create(:state_new_york)
       Country.canada
       visit(preview_path)
+      wait_for_stimulus("ui--forms--legacy-form-well--address-record")
 
       expect_axe_clean("select-name")
       expect(page).to have_select(

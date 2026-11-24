@@ -39,16 +39,11 @@
     </div>
 
     <div class="tw:flex tw:justify-center">
-      <%= image_tag("kelsey/illustrations/comic-assets_bike-hero.png", alt: "", width: 420, height: 314, class: "tw:h-auto tw:w-full tw:max-w-105") %>
+      <%= image_tag("kelsey/illustrations/comic-assets_bike-hero.webp", alt: "", width: 420, height: 314, class: "tw:h-auto tw:w-full tw:max-w-105") %>
     </div>
   </div>
 
-  <div
-    class="
-      tw:border-t tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
-      tw:dark:bg-gray-800
-    "
-  >
+  <div class="tw:border-t <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>">
     <ul class="tw:m-0 tw:grid tw:list-none tw:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] tw:gap-4 tw:py-5 <%= SECTION_CLASSES %>">
       <% trust_items.each do |icon, text| %>
         <li class="tw:flex tw:items-center tw:gap-2.5 tw:text-[15px] tw:font-semibold">
@@ -107,10 +102,7 @@
 
 <section
   id="ebikes"
-  class="
-    tw:scroll-mt-6 tw:border-y tw:border-gray-200 tw:bg-gray-50
-    tw:dark:border-gray-700 tw:dark:bg-gray-800
-  "
+  class="tw:scroll-mt-6 tw:border-y <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>"
 >
   <div class="tw:grid tw:grid-cols-[repeat(auto-fit,minmax(min(100%,380px),1fr))] tw:items-center tw:gap-12 tw:py-18 <%= SECTION_CLASSES %>">
     <div>

@@ -9,7 +9,6 @@ module Pages
         SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
         MUTED = "tw:text-gray-500 tw:dark:text-gray-400"
         HEADING_CLASSES = "tw:m-0 tw:font-header tw:font-extrabold"
-        BAND = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800"
         BIKE_BOOK_MODELS = %w[m/trek/2026/domane-sl-6-gen-4 m/specialized/2026/tarmac-sl8-pro-shimano-ultegra-di2
           m/cannondale/2025/synapse-carbon-1].freeze
         # Bike Book's banner is taller below 1024px, which its frame reaches at 410px
