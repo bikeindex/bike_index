@@ -30,9 +30,9 @@ class BikebookModel < ApplicationRecord
   scope :sold_in_year, ->(year) { where(first_year: ..year, final_year: [nil, year..]) }
 
   # The catalog id of the manufacturer's model of that name sold in that year, nil for one the catalog lacks. Of
-  # several, the one sold in `market`, a country's ISO code, then the latest
+  # several, the one sold in `market`, a country's ISO code (the US when it's unknown), then the latest
   def self.catalog_id_for(manufacturer_id:, name:, year:, market: nil)
-    market = Integrations::Bikebook::Catalog.market(market)
+    market = Integrations::Bikebook::Catalog.market(market.presence || "US")
     models = where(manufacturer_id:, model_slug: Slugifyer.book_slug(name)).sold_in_year(year).order(first_year: :desc, catalog_id: :asc).to_a
     (models.find { it.sold_in?(market) } || models.first)&.catalog_id_in(market)
   end
