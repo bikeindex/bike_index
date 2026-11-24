@@ -32,11 +32,8 @@ module Spreadsheets
       # A family exports as a flavor-less row; import upserts the family and creates no flavor
       shared = ->(record) { [record.priority, record.short_name, record.slug] }
       family_rows = families.map { [nil, it.name, *shared.call(it)] }
-      # A flavor in several families exports once, with its first (highest priority) record's attributes
-      family_rows + flavors.group_by(&:name).map do |name, records|
-        family_names = records.reject(&:top_level?).map(&:family_name).join(" & ").presence
-        [name, family_names, *shared.call(records.first)]
-      end
+      # A row per family, since a flavor's priority can differ between its families
+      family_rows + flavors.map { [it.name, (it.family_name unless it.top_level?), *shared.call(it)] }
     end
 
     def update_or_create_for!(row)

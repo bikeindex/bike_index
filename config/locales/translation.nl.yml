@@ -7052,6 +7052,8 @@ nl:
             daar vandaan in plaats van op deze pagina.'
           load_failed: De catalogus kon niet worden geladen.
           try_again: Probeer het opnieuw
+          any_target_riders: Alle doelrijders
+          target_riders: Doelrijders
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
@@ -7082,10 +7084,10 @@ nl:
           loading_catalog: De catalogus wordt geladen…
           lookup_label: Bekijk het bestand met de classificatie van een model of e-voertuig.
           search_placeholder: Zoeken op fabrikant of model…
+          view_on_github: Bekijk dit bestand op GitHub
         schema:
           unreachable: De Bike Book-database reageert niet. Probeer het over een minuut
             opnieuw.
-          view_on_github: Bekijk dit bestand op GitHub
       ebike_rules:
         class_tile:
           class: Klas
@@ -7523,7 +7525,6 @@ nl:
           class_n: Klasse %{n}
           class_unknown_in_bike_book_label: Bike Book vermeldt de klasse of topsnelheid
             niet, dus controleer de klasse op het label.
-          classes_not_permitted: Het is een %{classes} e-bike, wat niet is toegestaan.
           classes_not_recognized_in:
             one: Klasse %{n} wordt niet herkend in %{state}
             other: Klassen %{n} worden niet herkend in %{state}
@@ -7589,6 +7590,8 @@ nl:
           watts_to_check_html: Controleer of de motor een vermogen heeft van %{cap}W
             of minder.
           watts_within_cap_html: "%{watts}W-motor bevindt zich in de kap"
+          classes_not_permitted_in: Het is een %{classes} e-bike, die niet is toegestaan
+            in %{state}
       memberships:
         new:
           become_a_member: Word lid

@@ -234,8 +234,11 @@ RSpec.describe BikeServices::Creator do
           }
         end
         let(:not_matched_attrs) { %i[user_name propulsion_type_slug manufacturer_id manufacturer_other street address_record_attributes] }
+        let(:target_internal_address_attrs) do
+          default_location_address_record_attrs.except(:region).merge(street: "Somewhere Ville", region_string: "NY")
+        end
         let(:target_address_record) do
-          {street: "Somewhere Ville", kind: "ownership", publicly_visible_attribute: "postal_code"}
+          target_internal_address_attrs.merge(neighborhood: "Tribeca", kind: "ownership", publicly_visible_attribute: "postal_code")
         end
 
         def expect_bike_created_with_extra_attrs
@@ -247,7 +250,7 @@ RSpec.describe BikeServices::Creator do
           expect(bike.creation_organization_id).to eq organization.id
           expect(bike.bike_organizations.count).to eq 1
           expect(bike.bike_organizations.first.can_edit_claimed).to be_truthy
-          expect(bike.registration_address_record.internal_address_attrs.compact).to eq({"street" => "Somewhere Ville"})
+          expect(bike.registration_address_record.internal_address_attrs.compact).to eq target_internal_address_attrs.as_json
           expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
           expect(bike.address_record.attributes.compact.symbolize_keys.except(:id, :updated_at, :created_at)).to eq target_address_record.merge(bike_id: bike.id)
 
@@ -267,7 +270,7 @@ RSpec.describe BikeServices::Creator do
           expect(ownership.organization_id).to eq organization.id
           expect(ownership.owner_email).to eq "stuff@stuff.com"
           expect(ownership.owner_name).to eq "Sally"
-          expect(ownership.address_record.internal_address_attrs.compact).to eq({"street" => "Somewhere Ville"})
+          expect(ownership.address_record.internal_address_attrs.compact).to eq target_internal_address_attrs.as_json
         end
 
         it "creates", :flaky do
@@ -843,30 +846,28 @@ RSpec.describe BikeServices::Creator do
     it "returns the bike if stuff isn't present" do
       expect(instance.send(:add_bike_book_data)).to be_nil
     end
-    context "se data" do
-      let(:manufacturer_name) { "SE Bikes" }
+    context "a model in Bike Book" do
+      before { sync_bikebook_models }
+      let(:manufacturer) { Manufacturer.friendly_find("Specialized") }
       let(:bike_params) do
         {
           serial_number: "Some serial",
           description: "Input description",
           manufacturer_id: manufacturer.id,
-          year: 2014,
-          frame_model: "Draft",
+          year: 2025,
+          frame_model: "Haul ST",
           primary_frame_color_id: color.id
         }
       end
-      it "adds se bike data if it exists" do
-        VCR.use_cassette("bike_creator-include_bike_book", re_record_interval: 6.months) do
-          instance.send(:add_bike_book_data, b_param)
+      it "adds the model's data" do
+        instance.send(:add_bike_book_data, b_param)
 
-          b_param.reload
-          expect(b_param.params["components"].count).to be > 5
-          expect(b_param.params["components"].count { |c| c["is_stock"] }).to be > 5
-          expect(b_param.params["components"].count { |c| !c["is_stock"] }).to eq(0)
-          expect(b_param.bike["description"]).not_to eq("Input description")
-          expect(b_param.bike["serial_number"]).to eq("Some serial")
-          expect(b_param.bike["primary_frame_color_id"]).to eq(color.id)
-        end
+        b_param.reload
+        expect(b_param.params["components"].count).to be > 5
+        expect(b_param.params["components"]).to all(include("is_stock" => true))
+        expect(b_param.bike["description"]).to start_with("Input description Whatever you’re into")
+        expect(b_param.bike).to include("serial_number" => "Some serial", "primary_frame_color_id" => color.id,
+          "cycle_type" => "cargo-rear", "stock_photo_url" => "https://bikebook.bikeindex.org/specialized/2025/haul-st.png")
       end
     end
   end

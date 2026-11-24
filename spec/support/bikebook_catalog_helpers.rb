@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
-# The fixture catalog in place of the published one, its models at 1.0.0 but the Haul ST, at 1.1.0, whose CA is in
-# its market_variants; every other market variant is a record of its own. Its ids and its vocabulary's names are
-# 2.0.0's, but Aventon's 2022 models' ids and every model's values are 1.x's
+# The fixture catalog in place of the published one: the published catalog sliced to a few dozen of its models
 module BikebookCatalogHelpers
   FIXTURES = Rails.root.join("spec/fixtures/bikebook_catalog")
 
@@ -15,6 +13,15 @@ module BikebookCatalogHelpers
       file = FIXTURES.join(request.uri.path.delete_prefix(URI(Integrations::Bikebook::Catalog::URL).path))
       file.file? ? {status:, body: file.read} : {status: 404}
     end
+  end
+
+  # The fixture catalog, its index synced to BikebookModel, creating the manufacturers it lists
+  def sync_bikebook_models
+    stub_bikebook_catalog
+    JSON.parse(FIXTURES.join("index.json").read)["manufacturers"].each_value do
+      Manufacturer.friendly_find(it) || FactoryBot.create(:manufacturer, name: it)
+    end
+    BikebookModelsSyncJob.new.perform
   end
 
   # The catalog as it is once it publishes again: a new vocabulary, Segway's 2025 block with a new description, and a

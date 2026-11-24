@@ -36,7 +36,8 @@ RSpec.describe Spreadsheets::PrimaryActivities do
           ["flavor,families,priority,short_name,slug",
             ",ATB (All Terrain Biking),10,ATB,atb",
             ",Road Biking,9,Road,road-biking",
-            "All Road,ATB (All Terrain Biking) & Road Biking,4,All Road,atb-all-road",
+            "All Road,ATB (All Terrain Biking),4,All Road,atb-all-road",
+            "All Road,Road Biking,3,All Road,road-all-road",
             "Bike Polo,,1,Bike Polo,bike-polo"]
         end
 
@@ -56,6 +57,9 @@ RSpec.describe Spreadsheets::PrimaryActivities do
     # A top-level "Bike Polo" flavor comes from the enclosing let!
     let!(:family) { FactoryBot.create(:primary_activity_family, name: "Road Biking") }
     let!(:flavor) { FactoryBot.create(:primary_activity, name: "Triathalon", primary_activity_family: family) }
+    let!(:family_2) { FactoryBot.create(:primary_activity_family, name: "Track Racing") }
+    let!(:time_trial) { FactoryBot.create(:primary_activity, name: "Time Trial", primary_activity_family: family, priority: 237) }
+    let!(:time_trial_2) { FactoryBot.create(:primary_activity, name: "Time Trial", primary_activity_family: family_2, priority: 77) }
 
     it "re-imports the exported CSV without creating a flavor for a family row" do
       Tempfile.create(["primary_activities", ".csv"], Rails.root.join("tmp")) do |file|
@@ -65,7 +69,7 @@ RSpec.describe Spreadsheets::PrimaryActivities do
         expect { described_class.import(file.path) }.not_to change(PrimaryActivity, :count)
       end
 
-      expect(PrimaryActivity.all.map(&:display_name)).to match_array ["Road Biking", "Road: Triathalon", "Bike Polo"]
+      expect(PrimaryActivity.all.map(&:display_name)).to match_array ["Road Biking", "Road: Triathalon", "Road: Time Trial", "Track Racing", "Track: Time Trial", "Bike Polo"]
     end
 
     it "restores priorities" do
@@ -75,6 +79,7 @@ RSpec.describe Spreadsheets::PrimaryActivities do
       described_class.import(StringIO.new(csv))
 
       expect(described_class.to_csv).to eq csv
+      expect([time_trial.reload.priority, time_trial_2.reload.priority]).to eq [237, 77]
     end
   end
 

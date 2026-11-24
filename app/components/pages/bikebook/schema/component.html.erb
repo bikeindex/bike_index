@@ -1,8 +1,4 @@
 <% if @record %>
-  <p class="tw:mb-4">
-    <%= link_to(translation(".view_on_github"), Integrations::Bikebook::RepositoryRecord.github_url(@id), class: "twlink tw:underline") %>
-  </p>
-
   <%= code %>
 <% else %>
   <p><%= translation(".unreachable") %></p>
