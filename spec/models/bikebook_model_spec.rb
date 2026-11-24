@@ -11,6 +11,10 @@ RSpec.describe BikebookModel, type: :model do
     end
 
     it "is the model sold that year, its market's variant or the model sold there" do
+      kh24 = BikebookModel.find_by!(catalog_id: "m/kris-holm/2023/kh24")
+      kh24.dup.update!(catalog_id: "m/kris-holm/2023/kh24-us")
+      kh24.update!(markets: ["CA"])
+
       expect(catalog_id("Haul ST", 2026)).to eq "m/specialized/2025/haul-st"
       expect(catalog_id("haul-st", 2025, "US")).to eq "m/specialized/2025/haul-st"
       expect(catalog_id("Haul ST", 2025, "CA")).to eq "m/specialized/2025/haul-st@CA"
