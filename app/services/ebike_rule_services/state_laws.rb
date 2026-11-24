@@ -144,7 +144,7 @@ module EbikeRuleServices
     def vocabulary(name)
       path = Integrations::Bikebook::Catalog.vocabulary
       path && Integrations::Bikebook::Catalog.cached(["bikebook_catalog/#{name}", 3, path], expires_in: 1.week) do
-        Integrations::Bikebook::Catalog.file(path)&.dig("e_vehicle_classifications")&.then { yield it } ||
+        Integrations::Bikebook::Catalog.e_vehicle_classifications&.then { yield it } ||
           Integrations::Bikebook::Catalog.forget(laws_in_key(path))
       end
     end

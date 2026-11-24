@@ -72,7 +72,7 @@ function start ({ manifestUrl, ids, jurisdictions, riders, comparing }) {
     ids.map(blockKey).filter((key) => manifest.blocks[key]).forEach((key) => block(key).catch(() => {}))
   })
   started = opened.then(() => fetchJson(new URL(manifest.vocabulary, base)))
-    .then(({ kit, ...vocabulary }) => ({ vocabulary: { ...vocabulary, names: { ...vocabulary.names, target_riders: { ...riders, ...vocabulary.names.target_riders } }, e_vehicle_classifications: classified(vocabulary, jurisdictions) }, kit }))
+    .then((vocabulary) => ({ vocabulary: { ...vocabulary, names: { ...vocabulary.names, target_riders: { ...riders, ...vocabulary.names.target_riders } }, e_vehicle_classifications: classified(vocabulary, jurisdictions) } }))
   if (comparing) fetchComparison()
   return started
 }
@@ -80,7 +80,7 @@ function start ({ manifestUrl, ids, jurisdictions, riders, comparing }) {
 // After `start`, whose manifest and files it waits on
 async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   similarityUrl = similarityModule
-  const [index, { vocabulary, kit }, featuredRules] = await Promise.all([opened.then(() => fetchJson(new URL(manifest.index, base))), started, import(rulesUrl)])
+  const [index, { vocabulary }, featuredRules] = await Promise.all([opened.then(() => fetchJson(new URL(manifest.index, base))), started, import(rulesUrl)])
   rules = featuredRules
   const currentYear = new Date().getFullYear()
   const activityNames = vocabulary.names.primary_activity ?? {}
@@ -109,7 +109,7 @@ async function load ({ rulesUrl, similarityUrl: similarityModule }) {
   // the index labels the out of class markers, which the vocabulary has no record of: "Out of class in California"
   const labels = Object.entries(index.filter_options.e_vehicle_classification).map(([id, label]) => [id, { label, title: label, marker: true }])
   classifications = { ...Object.fromEntries(labels), ...vocabulary.e_vehicle_classifications }
-  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, kit, options: options(index, vocabulary.names) }
+  return { vocabulary: { ...vocabulary, e_vehicle_classifications: classifications }, options: options(index, vocabulary.names) }
 }
 
 const fetchComparison = () => (comparisonFetch ??= opened.then(() => manifest.comparison && fetchJson(new URL(manifest.comparison, base))).catch(() => null))

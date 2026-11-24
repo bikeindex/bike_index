@@ -36,7 +36,7 @@ export default class extends Controller {
     const catalog = await catalogAt(this.manifestUrlValue)
     // a model in the size Bike Book first shows it in
     const [found] = this.modelValue ? await catalog.vehicles([this.modelValue]) : [{ data: {} }]
-    this.kit = catalog.kit
+    this.kit = catalog.vocabulary.kit
     this.vehicle = found && { id: found.value, data: found.data, size: found.value && chosenSizes([found])[0] }
     this.vehicle
       ? this.draw()

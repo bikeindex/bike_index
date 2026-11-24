@@ -63,12 +63,13 @@ module Integrations
       # The file the catalog's laws and classifications are in, whose name is a digest of them
       def vocabulary = head&.dig("vocabulary")
 
+      # The vocabulary's classifications, cached without the rest of the file. nil while the catalog doesn't answer
+      def e_vehicle_classifications
+        vocabulary&.then { |path| cached(["bikebook_catalog/e_vehicle_classifications", path], expires_in: 1.week) { read(path)["e_vehicle_classifications"] } }
+      end
+
       # Whether the catalog answers in the format /bikebook reads
       def readable? = head&.dig("format") == FORMAT
-
-      # A published file, nil while the catalog doesn't answer. Its name is a digest of its contents,
-      # so it keeps while it's published
-      def file(path) = cached(["bikebook_catalog/file", 2, path], expires_in: 1.week) { read(path) }
 
       # Each schema document's fields, with the count of models holding each value and a few of them, and the file's
       # name, which carries a digest of its contents. nil while the catalog doesn't answer or names none
@@ -96,6 +97,10 @@ module Integrations
       #
       # private below here
       #
+
+      # A published file, nil while the catalog doesn't answer. Its name is a digest of its contents,
+      # so it keeps while it's published
+      def file(path) = cached(["bikebook_catalog/file", 2, path], expires_in: 1.week) { read(path) }
 
       # The head and the manifest are cached apart but always written together, so neither lags the catalog by more
       # than the 5 minutes each keeps
@@ -133,7 +138,7 @@ module Integrations
       # vocabulary and a model's block - which give up inside rack-timeout's 30s unless a body trickles in
       def connection = Faraday.new(url: URL, request: {open_timeout: 2, timeout: 7}) { it.response :raise_error }
 
-      conceal :manifest_part, :manifest_key, :fetched_manifest, :once, :read, :body, :connection
+      conceal :file, :manifest_part, :manifest_key, :fetched_manifest, :once, :read, :body, :connection
     end
   end
 end
