@@ -4,6 +4,8 @@ import { inlineBadge } from 'bikebook/templates/ui/badge'
 import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { fragmentOf, renderInto } from 'bikebook/render'
+import { localSources } from 'utils/hw_combobox_patch'
+import { TARGET_RIDERS } from 'bikebook/vehicle_presenter'
 
 /* global IntersectionObserver, Worker */
 
@@ -34,7 +36,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
 
   try {
     // a failure is load's to report, as it waits on the same files
-    call('start', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions, comparing }).then((picks) => ids.length && onPicks(painted(picks)), () => {})
+    call('start', { manifestUrl: new URL(manifestUrl, window.location.href).href, ids, jurisdictions, riders: TARGET_RIDERS, comparing }).then((picks) => ids.length && onPicks(painted(picks)), () => {})
     const loaded = await call('load', {
       rulesUrl: import.meta.resolve('bikebook/featured_rules'),
       similarityUrl: import.meta.resolve('bikebook/similarity')
@@ -50,6 +52,7 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
       }),
       search: (params, page, perPage) => call('search', { params, page, perPage }),
       featured: (params, legalClasses) => call('featured', { params, legalClasses }),
+      rotate: () => call('rotate'),
       group: (id, { market, market_scope: scope }) => call('group', { model: id, market, scope }),
       displays: (ids) => call('displays', { ids })
     }
@@ -58,6 +61,39 @@ export async function loadCatalog (manifestUrl, ids = [], jurisdictions = {}, pa
     if (!ids.length) worker.terminate()
     throw error
   }
+}
+
+const catalogs = new Map()
+// One catalog, and its worker, for everything on the page that reads it at `manifestUrl`, which a Turbo visit keeps
+export const catalogAt = (manifestUrl) => catalogs.get(manifestUrl) ?? catalogs.set(manifestUrl, loadCatalog(manifestUrl)).get(manifestUrl)
+
+// Stamps a template's catalog combobox into `slot`, in place of its stand-in field, once `loading` resolves, since the
+// combobox must have its source before it connects. Returns its hidden field, nothing when the catalog fails
+// `richPick` names a prefilled model as its chip would, for UI::Forms::Combobox's rich_display
+export async function mountCatalogCombobox (loading, template, slot, { display, failedText, richPick = false }) {
+  let catalog
+  try {
+    catalog = await loading
+  } catch (error) {
+    console.error(error)
+    slot.querySelector('input').placeholder = failedText
+    return
+  }
+  const fragment = template.content.cloneNode(true)
+  const combobox = fragment.querySelector('.hw-combobox')
+  const value = combobox.querySelector('input[type=hidden]').value
+  const [named] = richPick && value ? await catalog.displays([value]) : []
+  // with an async source the server can only prefill the id, which the gem would display
+  const shown = named?.replace(CURRENT_MARK, '') ?? display
+  if (shown) combobox.dataset.hwComboboxPrefilledDisplayValue = shown
+  // the option rich_display shows, ahead of the listbox's for the pick, which has its photo and price. Outside the
+  // listbox, the gem never lists it
+  if (named) {
+    combobox.before(fragmentOf(html`<span hidden role="option" data-value=${value} data-autocompletable-as=${shown}>${pickName(named)}</span>`))
+  }
+  localSources.set(combobox, new CatalogComboboxSource(catalog))
+  slot.replaceChildren(fragment)
+  return slot.querySelector('input[type=hidden]')
 }
 
 // Answers a hotwire_combobox async filter with the markup the gem's own turbo-stream response would
@@ -150,6 +186,11 @@ export class CatalogComboboxSource {
 // the catalog's mark on a current model's display, which a chip shows as a badge
 export const CURRENT_MARK = / \(current\)$/
 
+const pickName = (display) => {
+  const name = display.replace(CURRENT_MARK, '')
+  return html`${name}${name === display ? nothing : html` ${inlineBadge({ text: 'current', size: 'sm' })}`}`
+}
+
 // The gem's selection chip partial, ahead of the field, gripped where bikebook--chip-reorder drags them by the
 // template[data-chip-grip] beside it. Each grip's id is its model's and its count among that model's repeats, so a
 // render that recreates the chips keeps a grip's focus
@@ -159,9 +200,8 @@ export const renderChips = (combobox, chips) => {
   const values = [...chipped, ...chips.map(({ value }) => value)]
   const handleId = (value, index) => `move-${value}-${values.slice(0, chipped.length + index).filter((each) => each === value).length}`
   combobox.querySelector('[data-hw-combobox-target~="combobox"]').before(fragmentOf(chips.map(({ value, display }, index) => {
-    const name = display.replace(CURRENT_MARK, '')
-    return html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${grip ? gripFor(grip, display, handleId(value, index)) : nothing}<span>${name}${
-      name === display ? nothing : html` ${inlineBadge({ text: 'current', size: 'sm' })}`}</span><span tabindex="0" class="hw-combobox__chip__remover tw:inert:invisible"
+    return html`<div data-hw-combobox-chip=""><div class="hw-combobox__chip">${grip ? gripFor(grip, display, handleId(value, index)) : nothing}<span>${
+      pickName(display)}</span><span tabindex="0" class="hw-combobox__chip__remover tw:inert:invisible"
       aria-label=${`Remove ${display}`} data-action="click->hw-combobox#removeChip:stop keydown->hw-combobox#navigateChip"
       data-hw-combobox-target="chipDismisser" data-hw-combobox-value-param=${value}></span></div></div>`
   })))

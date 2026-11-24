@@ -24,7 +24,8 @@ LINT_AND_SCAN = {
   "js lint" => "npm run js:lint_check",
   "html lint" => "npm run html:lint_check",
   "html format" => "npm run html:format_check",
-  "brakeman" => "bin/brakeman"
+  "brakeman" => "bin/brakeman",
+  "bundler-audit" => "bundle exec bundler-audit --update"
 }.freeze
 
 # A second progress formatter writes the summary here, so the counts reach the

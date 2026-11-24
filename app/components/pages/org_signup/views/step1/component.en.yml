@@ -1,0 +1,39 @@
+---
+en:
+  components:
+    pages:
+      org_signup:
+        views:
+          step1:
+            activation_link: >-
+              We'll email you a link to activate the organization — no need to wait
+              for it, keep going.
+            add_your_organization: Add your organization
+            already_on_bike_index_html: Is your organization already on Bike Index?
+              %{sign_in_link} to manage it.
+            already_part_of_organization_html: >-
+              You're already part of the %{organization_link} - this will create a
+              separate organization.
+            email: Your email
+            email_placeholder: you@example.com
+            free_to_start_few_minutes: Free to start, it only takes a few minutes.
+            kind_bike_advocacy: Advocacy group
+            kind_bike_manufacturer: Manufacturer
+            kind_bike_shop: Bike shop
+            kind_law_enforcement: Law enforcement
+            kind_municipality: City or municipality
+            kind_other: Other
+            kind_property_management: Property management
+            kind_school: School or university
+            kind_software: Software
+            next: Next
+            organization_kind: What kind of organization?
+            organization_link: "%{name} organization"
+            organization_name: Organization name
+            sign_in: Sign in
+            signed_in_as_new_admin_html: >-
+              You're signed in as %{email}, which will be the new organization's administrator.
+            signup_name: signup
+            start_a_different_one: Start a different organization instead
+            your_info: Your info
+            your_organization: Your organization

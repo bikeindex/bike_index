@@ -9,7 +9,7 @@ pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 # preload: application.js imports this at the top level, so fetching it gates every
 # Stimulus controller connecting.
-pin "@bikeindex/time-localizer", to: "https://cdn.jsdelivr.net/npm/@bikeindex/time-localizer@0.4.0/dist/index.bundle.js", preload: true
+pin "@bikeindex/time-localizer", to: "@bikeindex--time-localizer.js", preload: true
 pin "@floating-ui/dom", to: "@floating-ui--dom.js", preload: false
 # preload: false so a component rendered on a handful of admin pages doesn't fetch 10KB
 # on every page -- the controller import()s them for the same reason.

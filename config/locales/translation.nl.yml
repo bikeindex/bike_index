@@ -869,6 +869,7 @@ nl:
         traditional_bike: Traditionele fiets (2 wielen, 1 zadel, pedaal)
         elliptical: Elliptische fiets
         balance_bike: Loopfiets
+        e_atv: e-ATV (e-Quad, elektrisch terreinvoertuig)
       frame_material:
         aluminum: Aluminium
         composite: Koolstof of composiet
@@ -1541,6 +1542,8 @@ nl:
           request_not_authorized: Verzoek moet worden geautoriseerd. Vereiste parameter
             voor het autoriseren van de aanvraag ontbreekt of is ongeldig.
           invalid_code_challenge: Er is een code-uitdaging vereist.
+          multiple_client_auth_methods: Het verzoek maakt gebruik van meerdere mechanismen
+            voor de authenticatie van de client.
         invalid_code_challenge_method:
           zero: De autorisatieserver ondersteunt PKCE niet omdat er geen geaccepteerde
             code_challenge_method-waarden zijn.
@@ -1950,18 +1953,15 @@ nl:
       find_lock:
         not_your_lock: Oeps, dat is niet jouw slot!
     organizations:
-      create:
-        organization_created: Organisatie met succes gemaakt!
-        must_create_an_account_first: Je moet eerst een account aanmaken op Bike Index
-          voordat je een organisatie kunt creëren.
       find_organization:
         not_found: Het spijt ons, die organisatie staat nog niet op Bike Index. E-mail
           contact@bikeindex.org als dit op een fout lijkt.
       lightspeed_interface:
-        must_create_an_account_first: Je moet je aanmelden voor een account op Bike
-          Index voordat je verbinding kunt maken met Lightspeed
         must_create_an_organization_first: U moet een organisatie op Bike Index maken
           voordat u verbinding kunt maken met Lightspeed
+        sign_in_or_add_organization: Meld u aan om uw organisatie te koppelen aan
+          Lightspeed - of, als uw organisatie nog niet op Bike Index staat, voeg deze
+          dan hier toe.
       set_bparam:
         no_user: Het spijt ons, die organisatie heeft geen gebruiker ingesteld om
           fietsen te registreren via. E-mail contact@bikeindex.org als dit op een
@@ -2108,6 +2108,9 @@ nl:
           already_signed_in: Je bent al ingelogd!
         turnstile_verified:
           verify_not_a_robot: Bevestig alstublieft dat u geen robot bent.
+        sign_in_confirmed_user:
+          unable_to_sign_in: We hebben je e-mailadres bevestigd, maar konden je niet
+            inloggen op dat account.
     oauth:
       applications:
         ensure_app_owner!:
@@ -2193,13 +2196,9 @@ nl:
             %{org_name} te verwijderen.
           deleted_org: "%{org_name} verwijderd."
         update:
-          could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
-            van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
       manage_impoundings:
         update:
-          could_not_update: Het spijt ons, we hebben problemen gehad met het bijwerken
-            van %{org_name}.
           updated_successfully: "%{org_name} is succesvol bijgewerkt."
       impound_records:
         available_impound_records:
@@ -2277,14 +2276,10 @@ nl:
         signed_in_as_other: Je bent ingelogd als %{email}, dus we hebben je in dat
           account behouden. De registratiegegevens zijn nog steeds opgeslagen op het
           e-mailadres waarnaar we je hebben gemaild.
-        sign_out_to_agree: Je bent ingelogd als %{email}. Log uit en open de link
-          opnieuw om akkoord te gaan met de veiligheidsregels.
+        accept_terms: Ga akkoord met de gebruiksvoorwaarden om verder te gaan.
       find_b_param:
         registration_not_found: We konden die registratie niet vinden. Start hieronder
           een nieuwe registratie.
-      sign_in_confirmed_user:
-        unable_to_sign_in: We hebben je e-mailadres bevestigd, maar konden je niet
-          inloggen op dat account.
       redirect_to_single_page:
         registered_for_owner: De %{bike_display} is geregistreerd - we hebben %{email}
           een e-mail gestuurd zodat zij het kunnen claimen.
@@ -2303,6 +2298,36 @@ nl:
     memberships:
       create:
         already_a_member: Je hebt al een lidmaatschap.
+    organization_signup:
+      complete_signup:
+        name_taken_meanwhile: Een andere organisatie heeft de naam %{name} al in gebruik
+          genomen tijdens uw registratie. Kies een andere naam om af te ronden - alle
+          andere gegevens worden bewaard.
+        unable_to_complete: Het is ons niet gelukt om uw organisatie (%{errors}) in
+          te stellen. Neem contact op met support@bikeindex.org en we lossen het op.
+      confirm_email:
+        link_invalid: Die link werkt niet meer. Gebruik de meest recente e-mail die
+          we naar %{email} hebben gestuurd, of stuur hieronder een nieuwe e-mail.
+        link_invalid_resent: Die link werkt niet meer, dus we hebben een nieuwe link
+          naar %{email} gemaild.
+        switched_signup: Je bent nu bezig met het afronden van %{name}. Om ook %{replaced_name}
+          af te ronden, open je de link in de bijbehorende e-mail.
+        accept_terms: Ga akkoord met de Servicevoorwaarden en de Servicevoorwaarden
+          voor Organisaties om de organisatie te activeren.
+      find_signup_for_confirmation:
+        signup_not_found: We konden die aanmelding niet vinden — start hieronder een
+          nieuwe aanmelding.
+      redirect_to_organization:
+        already_activated: "%{name} is al actief"
+      redirect_to_sign_in_for:
+        sign_in_to_manage: "%{name} is actief! Meld u aan als %{email} om het te beheren."
+      resend:
+        link_recently_sent: We hebben zojuist een link naar %{email} verzonden. Het
+          kan even duren voordat deze aankomt, dus controleer ook je spammap.
+        link_resent: We hebben een nieuwe link naar %{email} verzonden.
+        no_more_links: We hebben al meerdere links naar %{email} verzonden, dus we
+          kunnen er geen nieuwe meer sturen. Controleer uw spammap of neem contact
+          op met support@bikeindex.org.
   customer_mailer:
     additional_email_confirmation:
       html:
@@ -3240,6 +3265,7 @@ nl:
         register en QR-stickers uitdelen? <strong>Voeg gewoon "Sticker: <em>fietsstickernummer</em>
         " toe aan het einde van de verkoopnota in Lightspeed</strong> en de sticker
         zal naar de fiets linken en de fiets toevoegen aan je lokale register.'
+      add_your_shop: Voeg je winkel toe aan Bike Index
     protect_your_bike:
       211547_bikes_were_reported_stolen: 211.547 fietsen werden als gestolen gemeld
       9_in_10_incidents_of_bike_theft: 9 op 10 incidenten van fietsdiefstal
@@ -3483,38 +3509,6 @@ nl:
       you_bring_the_ideas_make_the_connections_: Jij brengt de ideeën, maakt verbindingen
         en wij zorgen ervoor dat je over de middelen beschikt om dingen voor elkaar
         te krijgen.
-    ascend:
-      ascend_knowledge_base_article: 'Ascend basis kennisartikel '
-      automatic_bicycle_registration: Automatische fietsregistratie voor fietsenwinkels
-        met behulp van Ascend POS
-      email_us_the_password_to_finish_setting_u: E-mail ons het wachtwoord om het
-        instellen af te ronden!
-      follow_the_setup_instructions_html: Volg de installatie-instructies <strong>%{ascend_link}</strong>
-        op Bike Index
-      if_your_shop_uses_lightspeed_html: Wanneer uw winkel gebruik maakt van Lightspeed,
-        bekijk dan onze Lightspeed POS-intergratie <a target="none" href="%{lightspeed_path}">hier</a>.
-      link_your_ascend_retail_and_bike_index: Koppel uw Ascend Retail- en Bike Index-accounts
-        gratis
-      new_bike_shop_org: 'Nieuwe fietsenwinkel organisatie '
-      once_youve_set_up_the_trek_ascenwd: Als u eenmaal de Trek Ascend POS-fietsregistratie
-        ingesteld hebt, bent u klaar! Bike Index haalt elke dag nieuwe informatie
-        over verkochte fietsen van Ascend, om Bike Index-accounts voor uw klanten
-        aan te maken. Hun nieuwe fietsen wachten op hen bij het inloggen. Ze hoeven
-        enkel hun e-mail te checken en de nieuwe fiets staat op hen te wachten.
-      sign_up_as_a_new_org_html: Login als %{new_org_link} bij Bike Index
-      then_if_a_customers_bike_goes_missing_html: 'Als de fiets van een klant vermist
-        raakt, wordt de informatie over de fiets en het framenummer van de fiets opgeslagen,
-        zodat de klant te allen tijde toegang heeft tot deze informatie. Maakt u zich
-        geen zorgen:  <a target="none" href="%{privacy_path}">we zullen deze informatie
-        nooit vrijgeven</a>.'
-      we_have_a_new_free_bicycle_registration: We hebben een nieuwe, gratis fietsregistratie
-        voor fietsenwinkels. Als u een winkel bent die Ascend als POS-intergratie
-        gebruikt, kunt u met onze nieuwe Ascend 'point of sale integration' elke fiets
-        die u verkoopt automatisch registreren. Installatie duurt ongeveer 10 minuten.
-      email_shops_security_html: E-mail %{shops_email_link} als je vragen hebt, of
-        bekijk de %{security_link}. Bedankt voor het registreren van fietsen in Bike
-        Index!
-      security_link_text: POS-integratie FAQ
     bike_shop_packages:
       bike_index_for_bike_shops: 'Bike Index voor fietsenwinkels '
       choose_a_package_size: 'Kies een pakketgrootte '
@@ -3596,8 +3590,6 @@ nl:
       dingen.
     feedbacks_new: Neem contact op met Bike Index. Uw woorden zijn onze muze, fluister
       ze in ons oor.
-    feedbacks_vendor_signup: Meld u aan bij Bike Index om de fietsen van uw klanten
-      snel, gemakkelijk en gratis te registreren.
     info_about: Waarom we Bike Index hebben gemaakt en wie we zijn
     info_protect_your_bike: Voorkom fietsdiefstal. Aanbevelingen en best practices
       voor het beschermen van uw fiets tegen dieven.
@@ -3656,7 +3648,6 @@ nl:
     documentation_api_v1: Bike Index API-documentatie
     feedbacks_index: Hulp bij Bike Index
     feedbacks_new: Neem contact op met Bike Index
-    feedbacks_vendor_signup: Winkel aanmelden - Bike Index
     info_about: Bike Index - de fietsregistratie die werkt
     info_serials: Framenummers van de fiets
     info_spokecard: Gesproken kaarten - Bike Index
@@ -3703,6 +3694,12 @@ nl:
     registration_form_settings: Instellingen voor het registratieformulier
     marketplace_how_it_works: Hoe de Bike Index Marketplace werkt
     register_landing: Registreer je fiets gratis
+    organization_signup_confirm: Activeer uw organisatie
+    organization_signup_create: Voeg uw organisatie toe aan Bike Index
+    organization_signup_new: Voeg uw organisatie toe aan Bike Index
+    organization_signup_show: Voeg uw organisatie toe aan Bike Index
+    organization_signup_update: Voeg uw organisatie toe aan Bike Index
+    organization_signup_welcome: "%{organization} is actief"
   organized:
     ambassador_dashboards:
       getting_started:
@@ -4103,14 +4100,14 @@ nl:
         why_no_direct_by_default: Standaard worden e-mails naar niet-geclaimde fietsen
           naar uw organisatie verzonden om te bekijken en door te sturen naar de eindgebruiker,
           omdat die gebruikers zich niet hebben aangemeld voor Bike Index-meldingen.
-        send_self_registration_email_html: Stuur een e-mail voor aanmeldingen naar
-          <code>%{email}</code>
         send_self_registration_email_includes_unregistered: Dit omvat ook niet-geregistreerde
           meldingen.
         send_self_registration_email_note: Standaard stuurt Bike Index geen e-mails
           meer naar het e-mailadres van uw organisatie wanneer een voertuig wordt
           geregistreerd. Vink dit vakje aan als u e-mails wilt ontvangen voor registraties
           met een eigenaars-e-mailadres van %{email}.
+        send_self_registration_email_to_html: Stuur een e-mail voor aanmeldingen naar
+          %{email}
     manage_impoundings:
       edit:
         impound_settings_html: Beheer <em>%{org_name}</em> inbeslagname-instellingen
@@ -4150,6 +4147,10 @@ nl:
       subject: Voltooi de melding van uw gestolen %{cycle_type}
     organization_message:
       subject: Bericht van %{organization_name} over uw %{bike_type}
+    organization_signup_confirmation:
+      subject: Bevestig je e-mailadres om %{name} te activeren op Bike Index
+    shop_welcome:
+      subject: Uw Bike Index-winkeldashboard is klaar voor gebruik.
   plan_features:
     automatic_registration_through_pos: Automatische registratie via uw POS
     create_organization_account: Maak een organisatieaccount en neem contact op met
@@ -4428,6 +4429,20 @@ nl:
       add_a_registration: Voeg een registratie toe
       registration_form_settings: Instellingen voor het registratieformulier
       education_courses: Onderwijscursussen
+      org_information: "%{org_name} Informatie"
+    organization_signup:
+      address_required: Voer het volledige adres van de organisatie in.
+      email_required: Een geldig e-mailadres is vereist.
+      kind_required: Kies het type organisatie dat dit is.
+      name_required: De naam van de organisatie is verplicht.
+      name_reserved: Die naam is gereserveerd op Bike Index - kies een andere naam.
+      name_taken: Er bestaat al een organisatie met de naam %{name} op Bike Index.
+        Kies een andere naam, of neem contact op met support@bikeindex.org als het
+        uw naam is.
+      name_taken_shortened: Dat lijkt te veel op %{name}, dat al op Bike Index staat
+        - namen moeten binnen de eerste 30 tekens verschillen. Kies een andere naam,
+        of neem contact op met support@bikeindex.org als het uw naam is.
+      name_too_short: De organisatienaam moet minimaal twee letters of cijfers bevatten.
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -4632,29 +4647,6 @@ nl:
       handlebar_type: Type stuur
       optional: optioneel
       phone_number_owner: Telefoon van de eigenaar
-    new:
-      bike_index_for_organizations: Bike Index voor organisaties
-    new_form:
-      add_organization: Organisatie toevoegen
-      add_your_organization_to_bike_index: 'Voeg uw organisatie gratis toe aan Bike
-        Index in drie eenvoudige stappen:'
-      bike_index_account: Bike Index-account
-      confirm_your_email: bevestig je email
-      fill_out_the_form_that_will_appear: Vul het formulier in dat op deze pagina
-        verschijnt zodra u bent ingelogd.
-      filling_out_this_form_will_create_a_new_org: Als u dit formulier invult, wordt
-        een nieuwe, andere organisatie gecreëerd
-      if_you_dont_want_that_to_be_the_case_html: Als u niet wilt dat dat het geval
-        is, %{logout_link} en meld u aan met de e-mail die u in plaats daarvan wilt
-        gebruiken.
-      log_out: Uitloggen
-      new_organization: Nieuwe organisatie
-      organization_kind: Soort organisatie
-      organization_name: Organisatie naam
-      sign_up_for_a_new_account_html: Meld u aan voor een %{new_account_link}
-      you_are_already_a_member_of_org_html: Je bent al lid van %{org_link}.
-      your_current_account_will_be_a_member_html: Uw huidige account ( <strong>%{user_email}</strong>
-        ) wordt lid van de organisatie die u maakt.
     embed_fields:
       add_a_color: Voeg een kleur toe
       additional_serial: Extra framenummer / stickernummer
@@ -4971,9 +4963,6 @@ nl:
         marketplace_messages: Marktplaatsberichten
     color_scheme:
       appearance: Verschijning
-      dark: Donker
-      light: Licht
-      system: Systeem
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe
@@ -5412,6 +5401,87 @@ nl:
           je een bericht gestuurd over jouw %{bike_type}:"
         sender_sent_you_a_message_html: "%{sender_email} van %{organization_name}
           heeft je een bericht gestuurd over jouw %{link}:"
+      organization_signup_confirmation:
+        activate_your_organization: Activeer uw organisatie
+        confirm_and_activate: Bevestig mijn e-mailadres en activeer
+        confirm_to_activate_html: Bevestig dit e-mailadres om <strong>%{name}</strong>
+          te activeren op Bike Index. Je wordt de beheerder en kunt de rest van je
+          team uitnodigen zodra je bent ingelogd.
+        link_signs_you_in: Deze link geeft je een account bij Bike Index, dus stuur
+          hem niet door. Hij is %{days} dagen geldig.
+      shop_welcome:
+        bike_book_body: Vergelijk specificaties, geometrie en tal van andere kenmerken
+          van duizenden fietsmodellen.
+        bookmark_it: Voeg dit toe aan je bladwijzers. Je logt in met dit e-mailadres.
+        browse_bike_book: Bekijk het fietsboek →
+        check_serials: Raadpleeg het register om de inruil van gebruikte fietsen veilig
+          te stellen.
+        check_serials_lead: Controleer de serienummers voordat u koopt.
+        check_your_state: Controleer uw staat →
+        connect_pos_body: Zonder een koppeling met een kassasysteem is het registreren
+          van fietsen afhankelijk van iemand die eraan denkt om het te doen tijdens
+          een drukke dag. Zodra je de koppeling maakt, wordt elke fietsverkoop automatisch
+          een Bike Index-registratie op de achtergrond. Geen extra formulieren aan
+          de kassa en geen personeelstraining nodig. Je klant ontvangt een e-mail
+          om zijn of haar fiets op te halen, met het serienummer en de gegevens al
+          ingevuld.
+        connect_pos_footnote: Hulp nodig? Beantwoord deze e-mail en we helpen je verder.
+          Geen ondersteund kassasysteem? Je kunt fietsen nog steeds registreren via
+          je dashboard.
+        connect_pos_heading: Sluit je kassasysteem aan, zodat geen enkele fiets over
+          het hoofd wordt gezien.
+        connect_pos_impact: Hoe meer fietsen er geregistreerd worden, hoe meer gestolen
+          fietsen herkend en teruggevonden worden, en hoe moeilijker het wordt om
+          gestolen fietsen in je buurt te verkopen.
+        connect_your_pos_now: Sluit uw kassasysteem nu aan.
+        create_your_shop_account: Maak uw winkelaccount aan
+        dashboard_intro: Je winkelaccount is meer dan alleen een aanmelding. Het is
+          je thuisbasis op Bike Index.
+        dashboard_items_heading: Wat je kunt doen vanaf je dashboard
+        ebike_checker: E-bike controleur
+        ebike_checker_body: De regels voor e-bikes verschillen per staat, met betrekking
+          tot de toegestane categorieën, de rijomstandigheden en de vereiste leeftijd
+          en uitrusting. Handig wanneer een klant vraagt wat legaal is voordat hij
+          of zij een e-bike koopt.
+        email_preferences: E-mailvoorkeuren
+        free_tools: Er komen nieuwe exemplaren aan, en winkelaccounts ontvangen ze
+          als eerste.
+        free_tools_heading: Hulpmiddelen om klanten te helpen bij hun keuze.
+        free_tools_intro: Gebruik ze in de winkel of stuur de link naar de klanten.
+        free_tools_lead: Gebruik onze gratis tools.
+        hero_body: "%{name} is ingesteld op Bike Index. Op je dashboard vind je alle
+          fietsen die in je winkel geregistreerd staan."
+        hero_body_connect_pos: "%{name} is ingesteld op Bike Index. Op je dashboard
+          vind je alle fietsen die je winkel registreert. Nog één stap: koppel je
+          kassasysteem zodat elke fiets die je verkoopt automatisch wordt geregistreerd."
+        hero_heading: Je bent binnen. Je winkel heeft een dashboard.
+        included_free: Inbegrepen gratis
+        most_important_next_step: Uw belangrijkste volgende stap
+        nonprofit: Bike Index, een 501(c)(3) non-profitorganisatie
+        open_your_dashboard: Open je dashboard
+        preheader: Je winkeldashboard is live. Elke fiets die je winkel registreert,
+          staat daar.
+        preheader_connect_pos: 'Je winkeldashboard is live. Nog één stap: koppel je
+          kassasysteem zodat elke fiets die je verkoopt geregistreerd wordt.'
+        privacy_policy: Privacybeleid
+        questions: Heeft u vragen over de installatie of uw dashboard? Beantwoord
+          deze e-mail en een medewerker van onze klantenservice helpt u graag verder.
+        receiving_because: Je ontvangt dit bericht omdat je een winkelaccount hebt
+          aangemaakt voor %{name} op Bike Index.
+        see_every_bike: Elke verkoop wordt in één lijst weergegeven, met serienummer
+          en details.
+        see_every_bike_lead: Bekijk alle fietsen die je hebt geregistreerd.
+        shopify_soon: Shopify binnenkort
+        stat_bikes: geregistreerde fietsen
+        stat_partners: partnerwinkels, politie en steden
+        stat_recoveries: Gestolen fietsen teruggevonden
+        sticker_pos_step: Uw kassasysteem aansluiten · duurt ongeveer 10 minuten
+        track_pos: 'Zie hoe het werkt: elke verkoop wordt geregistreerd.'
+        track_pos_lead: Houd uw POS-verbinding in de gaten.
+        why_shops_body: Uw klanten krijgen gratis diefstalbescherming en u wordt een
+          winkel die ze vertrouwen. Het is gratis voor u en voor hen, en we verkopen
+          of delen nooit klantgegevens.
+        why_shops_heading: Waarom winkels Bike Index gebruiken
     ui:
       definition_list:
         row:
@@ -5528,6 +5598,9 @@ nl:
           none: geen
           return_to_default_column_order: Terug naar de standaard kolomvolgorde
           visible_columns: Zichtbare kolommen
+        in_card:
+          select_record: Selecteer %{record} %{id}
+          toggle_all_checked: Alles aangevinkt weergeven/verbergen
     atoms:
       serial:
         hidden: verborgen
@@ -5561,6 +5634,9 @@ nl:
         report: Rapport
         step_1: Stap 1
         step_2: Stap 2
+      org:
+        impound_current_location:
+          same_as_impounded_from: hetzelfde als in beslag genomen van
     pages:
       messages:
         thread_show:
@@ -5722,7 +5798,6 @@ nl:
             show_location_search: toon locatie zoeken
             all_bikes: Alle fietsen
             all_statuses: Alle statussen
-            impound_location_cell: Plaats
             impound_status_cell: Inbeslagname status
             impound_updated_at_cell: Inbeslagname bijgewerkt
             impound_updated_at_cell_panel: Tijd - Registratie van inbeslagname bijgewerkt
@@ -5747,6 +5822,11 @@ nl:
               uit de zoekopdracht naar registraties.
             impound_search_columns: Inbeslagname zoekkolommen
             course_acknowledgment_cell_panel: Tijd - Erkende onderwijscursus
+            current_location_without_locations: Je hebt geen locaties van inbeslaggenomen
+              voertuigen, dus dit is grotendeels een herhaling van 'Inbeslaggenomen
+              vanuit'.
+            impound_current_location_cell: Huidige locatie
+            impound_notes_cell: Inbeslagname-aantekeningen
           column_settings_toggle:
             column_settings: Kolominstellingen
           settings_and_filters:
@@ -5766,9 +5846,9 @@ nl:
             hidden: verborgen
             not_registered_with: Verborgen omdat het niet is geregistreerd bij %{org_name}
             view: Weergave
-            toggle_all_checked: Alles aangevinkt weergeven/verbergen
             course_acknowledgment_title: Erkenning van deelname aan de onderwijscursus
               bij
+            more_notes: "+%{count} meer"
           multi_result_chip:
             no_results: geen overeenkomsten
           multi_results:
@@ -5842,6 +5922,26 @@ nl:
         education_course:
           page_edit_bullet:
             bullet: kogel
+        info:
+          show:
+            add_a_registration: Voeg een registratie toe
+            associated_with_org_html: Registraties via deze link zijn gekoppeld aan
+              <strong>%{org_name}</strong> .
+            continue_where_you_were: Ga verder waar je gebleven was.
+            copy_registration_link: Kopieer de registratielink
+            get_qr_code_html: Ontvang een %{qr_code_link} die de link opent wanneer
+              deze wordt gescand.
+            has_paid_functionality: Uw organisatie beschikt over betaalde functionaliteit.
+            invite_your_team: Nodig je team uit
+            next_invoice_due_html: Volgende factuur verschuldigd %{time}.
+            no_invoices_upcoming: Er komen geen facturen aan.
+            no_password_yet: Je kunt je voorlopig aanmelden via links die je per e-mail
+              ontvangt.
+            org_is_active: "%{name} is actief"
+            organization_set_up_next_steps: Organisatie zet volgende stappen op
+            qr_code: QR-code
+            set_a_password: Stel een wachtwoord in
+            your_public_registration_link: Uw openbare registratielink
       registrations:
         show:
           bike_details:
@@ -5976,6 +6076,8 @@ nl:
             impounded_from: In beslag genomen van
             last_update_by: Laatst bijgewerkt door
             status: Toestand
+            current_location: Huidige locatie
+            notes: Notes
           legacy_view_link:
             switch_to_classic: Schakel terug naar de oude viewer.
             view_in_legacy: bekijk %{bike_type} in de oude viewer
@@ -6711,10 +6813,19 @@ nl:
             continue: Doorgaan
             continue_where_you_left_off: Ga gerust verder, dan pakken we de draad
               weer op.
+            continuing_keeps_you_signed_in: Door verder te gaan, blijft u ingelogd
+              en wordt uw registratie opgeslagen op het adres waarnaar deze link verwijst.
+            i_agree_to_terms: Ik ga akkoord met de servicevoorwaarden van Bike Index.
+            link_is_for: Deze link is voor
+            read_terms: Lees de gebruiksvoorwaarden.
+            sign_out_to_agree: Voor wie deze link ook bedoeld is, deze moet akkoord
+              gaan met de veiligheidsregels. Log uit en open de link vervolgens opnieuw.
+            signed_in_as: Je bent ingelogd als
           step1:
             just_the_essentials: Om te beginnen alleen de essentiële zaken.
             register_your_vehicle: Registreer uw voertuig!
-            register_your_vehicle_with_org: Registreer uw voertuig met %{org_name}!
+            register_your_vehicle_with_org_html: Registreer uw voertuig met <strong>%{org_name}</strong>
+              !
           step2:
             add_your_bikes_details: Voeg de gegevens van uw %{cycle_type} toe
             confirmation_link_sent: We hebben een bevestigingslink naar je e-mailadres
@@ -6893,7 +7004,6 @@ nl:
           year: jaar
           filter_combobox:
             any: Elk
-          byline: Een gratis naslagwerk van Bike Index, het non-profit fietsregister.
           tagline: 'De wereldwijde fietsenbibliotheek: zoek, vergelijk en vind je
             volgende fiets.'
           activities: Activiteiten
@@ -6942,11 +7052,42 @@ nl:
             daar vandaan in plaats van op deze pagina.'
           load_failed: De catalogus kon niet worden geladen.
           try_again: Probeer het opnieuw
+          any_target_riders: Alle doelrijders
+          target_riders: Doelrijders
         donate_strip:
           donate: Schenken
           pitch: Dit fantastische product wordt u aangeboden door de non-profitorganisatie
             Bike Index. Help ons de serverkosten te dekken.
           region: Doneer aan Bike Index
+        schema_fields:
+          by_count: op aantal
+          by_count_label: "%{path} op basis van telling"
+          explain: uitleggen
+          less: minder
+          models: "%{number} modellen"
+          more: "+%{count} meer"
+          schema_order: schema volgorde
+          file: bestand
+          representative_initial: R
+          representative_vehicle_lowercase: representatief voertuig
+          view_list: lijst bekijken
+        schema_viewer:
+          documents: Schema-documenten
+          subtitle_html: De structuur van een %{document}-bestand op schema %{version},
+            gepubliceerd als %{url}
+          schemas_title: Fietsboek schema's
+          unavailable: De catalogus van Bike Book reageert niet, daarom kunnen de
+            schema's momenteel niet worden weergegeven. Probeer het over een minuut
+            opnieuw.
+          catalog_failed: De catalogus van Bike Book kon niet worden geladen, waardoor
+            er niet in gezocht kan worden.
+          loading_catalog: De catalogus wordt geladen…
+          lookup_label: Bekijk het bestand met de classificatie van een model of e-voertuig.
+          search_placeholder: Zoeken op fabrikant of model…
+          view_on_github: Bekijk dit bestand op GitHub
+        schema:
+          unreachable: De Bike Book-database reageert niet. Probeer het over een minuut
+            opnieuw.
       ebike_rules:
         class_tile:
           class: Klas
@@ -6973,17 +7114,11 @@ nl:
           answer_yes: Ja
           being_compiled: De regels voor deze staat worden samengesteld op basis van
             primaire bronnen.
-          class_1_throttle: Motorfietsen van klasse 1 mogen geen gashendel hebben.
-          class_3_throttle: Het gaspedaal moet bij 32 km/u (20 mph) worden uitgeschakeld.
-          classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
-            regels van de staat raadplegen.
           fails_rule: Voldoet niet aan deze regel.
           for_your_information: Ter informatie
           gray_headline: We hebben de e-bike-regels van %{state} nog niet in ons bestand.
-          has_throttle: Heeft een gasklep
           is_registered: Is deze fiets geregistreerd?
           legal_to_ride: Legaal om te rijden
-          limits_start_on: Deze limieten treden in werking %{date}
           manual_bike_name: e-bike
           may_be_moped: Het kan ook zijn dat het voertuig wordt gereguleerd als een
             bromfiets of motorvoertuig, waarvoor registratie en een rijbewijs vereist
@@ -6991,13 +7126,7 @@ nl:
           meets_rule: Voldoet aan deze regel
           motor: Motor
           mph_html: "%{mph} mph"
-          no_speed_cap: Geen snelheidslimiet in de staatswetgeving.
-          no_throttle: Geen gaspedaal
-          no_watt_cap: Geen maximumvermogen in de staatswet
-          not_classified: Het is geen e-bike van klasse 1, 2 of 3.
           not_permitted: Niet toegestaan
-          own_classes: De staat stelt zijn eigen grenzen vast in plaats van de drie
-            standaardklassen.
           recovered_more_often: Gestolen fietsen worden twee keer zo vaak teruggevonden
             als ze geregistreerd zijn.
           register_free: Registreer je gratis op Bike Index
@@ -7005,9 +7134,6 @@ nl:
           rules_not_on_file: Regels niet aanwezig
           source_html: 'Bron: %{link}''s catalogus van staatsrecht. Samenvattingen
             dienen ter referentie en zijn geen juridisch advies.'
-          speed_not_provided: Maximale snelheid niet vermeld
-          speed_over_cap_html: Assisteert tot %{mph} mph, boven de %{cap} mph-limiet
-          speed_within_cap_html: Assistentie tot %{mph} mph, binnen de limiet
           still_reviewing: We zijn de regels van %{state} nog aan het bekijken.
           still_reviewing_body: Raadpleeg de website van de RDW of de wetgevende macht
             van uw staat voor de actuele regelgeving met betrekking tot e-bikes. De
@@ -7015,81 +7141,30 @@ nl:
             en een maximumsnelheid van 20 mph (klasse 1-2) of 28 mph (klasse 3) voor
             trapondersteuning.
           throttle: Elektrisch gaspedaal
-          throttle_allowed: Gashendel toegestaan voor klasse 2
-          throttle_not_allowed: De staat staat geen gashendel toe.
-          throttle_not_stated: De wetgeving van de staat zegt niet of een gasklep
-            is toegestaan.
           top_speed: Topsnelheid
           watts_html: "%{watts}W"
-          watts_not_provided: Motorvermogen niet opgegeven
-          watts_over_cap_html: "%{watts}W motor overschrijdt de %{cap}W capaciteit"
-          watts_within_cap_html: "%{watts}W-motor bevindt zich in de kap"
           yes_to_html: Ja, naar %{mph}
           your_state: Uw staat
-          class_3_throttle_over_html: Het gaspedaal gaat tot %{mph} mph, voorbij de
-            20 mph die het gaspedaal van een klasse 3-voertuig is toegestaan.
-          class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
           over_mph_html: Meer dan %{mph} mph
           red_headline_manual: Dit is geen e-bike volgens de huidige %{state} regels.
-          speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
-            de %{cap} mph-limiet
-          speed_past_html: Ondersteunt voorbij %{past} mph; controleer of het stopt
-            bij %{cap} mph
-          classes_recognized:
-            one: Klasse %{n} wordt herkend
-            other: De klassen %{n} worden erkend.
           answer_optional: Optioneel
-          class_3_optional_throttle_within_html: Optionele gashendel stopt bij %{mph}
-            mph
-          class_3_speed_with_throttle_html: Assistentie tot %{mph} mph, niet toegestaan
-            met gashendel
-          class_n: Klasse %{n}
-          classes_not_permitted: Het is een %{classes} e-bike, wat niet is toegestaan.
           model_year: "%{year} model"
-          optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
-            gasklep.
           optional_to_html: Optioneel, naar %{mph}
-          throttle_with_class_3_assist: Niet toegestaan met assistentie van klasse
-            3
           kmh_html: "%{kmh} km/u"
           law_source_html: 'Bron: %{link}''s catalogus van wetgeving betreffende e-bikes.
             Samenvattingen dienen ter referentie en zijn geen juridisch advies.'
           may_be_moped_canada: Het kan ook zijn dat het voertuig als bromfiets of
             motorvoertuig wordt gereguleerd, waarvoor registratie en een rijbewijs
             vereist kunnen zijn.
-          no_e_bike_category: Er is hier geen aparte categorie voor e-bikes, dus controleer
-            de regels voor rijbewijs, registratie en helmplicht.
-          no_speed_cap_in_law: Er is geen snelheidslimiet in de wetgeving.
-          no_watt_cap_in_law: Er is geen maximumvermogen vastgelegd in de wet.
           optional_to_kmh_html: Optioneel, naar %{kmh} km/u
           over_kmh_html: Meer dan %{kmh} km/u
-          speed_over_cap_kmh_html: Assistentie tot %{kmh} km/u, boven de %{cap} km/u
-            limiet
-          speed_past_cap_kmh_html: Assistentie bij snelheden boven %{past} km/u, boven
-            de %{cap} km/u-limiet
-          speed_past_kmh_html: Assisteert voorbij %{past} km/u; controleer of het
-            stopt bij %{cap} km/u.
-          speed_within_cap_kmh_html: Assistentie tot %{kmh} km/u, binnen de limiet
           still_reviewing_province_body: Raadpleeg het ministerie van Transport van
             uw provincie of territorium voor de actuele regelgeving met betrekking
             tot e-bikes. De meeste ministeries stellen een maximumvermogen van e-bikemotoren
             van 500W en een maximumsnelheid met trapondersteuning van 32 km/u.
-          throttle_allowed_in_law: Gashendel toegestaan
-          throttle_not_allowed_in_law: De wet staat geen gashendel toe.
-          throttle_not_stated_in_law: De wet zegt niet of een gasklep is toegestaan.
-          watts_to_check_html: Controleer of de motor een vermogen heeft van %{cap}W
-            of minder.
           yes_to_kmh_html: Ja, tot %{kmh} km/u
           your_province: Uw provincie of territorium
-          classes_not_recognized_in:
-            one: Klasse %{n} wordt niet herkend in %{state}
-            other: Klassen %{n} worden niet herkend in %{state}
           falls_under_name: In %{state} valt het onder %{name}.
-          optional_classes_not_recognized_in:
-            one: Klasse %{n} wordt niet herkend in %{state}, dus het is alleen legaal
-              zoals het verkocht wordt.
-            other: De klassen %{n} worden niet herkend in %{state}, dus het is alleen
-              legaal zoals het verkocht wordt.
           other_classification_rules: "%{name} regels"
           also_class_with_optional_throttle: is ook een e-bike van klasse %{n} met
             optionele gashendel
@@ -7104,10 +7179,6 @@ nl:
           heading_throttle_not_allowed: Gas geven is niet toegestaan
           heading_vehicle_html: Gereguleerd als %{name}
           may_fall_under_name: In %{state} kan het onder %{name} vallen.
-          throttle_speed_over_cap_html: Het gaspedaal loopt door tot %{mph} mph, boven
-            de %{cap} mph-limiet.
-          throttle_speed_within_cap_html: Gashendel loopt tot %{mph} mph, binnen de
-            limiet
           class_summary: De %{name} is een e-bike van klasse %{n} in %{state}.
           class_summary_optional: De %{name} is een e-bike van klasse %{n} in %{state}
             en %{optional}.
@@ -7158,13 +7229,6 @@ nl:
               regels die gecontroleerd moeten worden.
           yellow_summary_no_classes_without_throttle: De %{name} wordt in %{state}
             als e-bike geclassificeerd, zonder de optionele gashendel.
-          class_3_throttle_past: Het gaspedaal wordt ingedrukt als de snelheid van
-            20 mph (32 km/u) wordt overschreden, de snelheid die is toegestaan voor
-            een voertuig van klasse 3.
-          throttle_past_cap_kmh_html: Het gaspedaal slaat door tot voorbij %{past}
-            km/u, boven de %{cap} km/u limiet.
-          throttle_past_kmh_html: Het gaspedaal slaat door tot voorbij %{past} km/u;
-            controleer of het stopt bij %{cap} km/u.
           yes_over_mph_html: Ja, meer dan %{mph} mph
           class_summary_manual: Deze e-bike is een e-bike van klasse %{n} in %{state}.
           class_summary_with_rules_manual:
@@ -7180,13 +7244,9 @@ nl:
             other: Dit wordt geclassificeerd als een e-bike in %{state}, met %{count}
               regels om te controleren.
           bike_book_name: Fietsboek
-          class_unknown_in_bike_book_label: Bike Book vermeldt de klasse of topsnelheid
-            niet, dus controleer de klasse op het label.
           entered_unverified_by_bike_book: Invoer door u, niet geverifieerd door Bike
             Book.
           full_bike_book_entry: Bekijk het volledige Bike Book-artikel
-          speed_to_check_bike_book_kmh_html: Bike Book vermeldt de topsnelheid niet,
-            dus controleer of de motor stopt bij %{cap} km/u.
         rule_label:
           classes: Erkende klassen
           power: Motorvermogenscapaciteit
@@ -7439,6 +7499,8 @@ nl:
           watts_min: "%{watts}W+"
           copy_id: Kopieer ID
           id: ID
+          class_3_throttle_barred: In %{state} mag een e-bike van klasse 3 geen gashendel
+            hebben, dus een e-bike van klasse 3 met een gashendel is daar geen e-bike.
         bike_summary:
           classification: E-%{vehicle_type} classificatie
           electric_certification: Elektrische certificering
@@ -7447,6 +7509,89 @@ nl:
           outside_checked_countries: De fietscontroles gelden voorlopig alleen in
             Amerikaanse staten en Canadese provincies. De wetgeving voor e-bikes in
             %{place} staat hieronder.
+        rule_note:
+          class_1_throttle: Motorfietsen van klasse 1 mogen geen gashendel hebben.
+          class_3_optional_throttle_within_html: Optionele gashendel stopt bij %{mph}
+            mph
+          class_3_speed_with_throttle_html: Assistentie tot %{mph} mph, niet toegestaan
+            met gashendel
+          class_3_throttle: Het gaspedaal moet bij 32 km/u (20 mph) worden uitgeschakeld.
+          class_3_throttle_over_html: Het gaspedaal gaat tot %{mph} mph, voorbij de
+            20 mph die het gaspedaal van een klasse 3-voertuig is toegestaan.
+          class_3_throttle_past: Het gaspedaal wordt ingedrukt als de snelheid van
+            20 mph (32 km/u) wordt overschreden, de snelheid die is toegestaan voor
+            een voertuig van klasse 3.
+          class_3_throttle_within_html: Gashendel stopt bij %{mph} mph
+          class_n: Klasse %{n}
+          class_unknown_in_bike_book_label: Bike Book vermeldt de klasse of topsnelheid
+            niet, dus controleer de klasse op het label.
+          classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}
+            other: Klassen %{n} worden niet herkend in %{state}
+          classes_recognized:
+            one: Klasse %{n} wordt herkend
+            other: De klassen %{n} worden erkend.
+          classes_start_on: De lessen gaan in %{date}. Tot die tijd kunt u de actuele
+            regels van de staat raadplegen.
+          has_throttle: Heeft een gasklep
+          limits_start_on: Deze limieten treden in werking %{date}
+          no_e_bike_category: Er is hier geen aparte categorie voor e-bikes, dus controleer
+            de regels voor rijbewijs, registratie en helmplicht.
+          no_speed_cap: Geen snelheidslimiet in de staatswetgeving.
+          no_speed_cap_in_law: Er is geen snelheidslimiet in de wetgeving.
+          no_throttle: Geen gaspedaal
+          no_watt_cap: Geen maximumvermogen in de staatswet
+          no_watt_cap_in_law: Er is geen maximumvermogen vastgelegd in de wet.
+          not_classified: Het is geen e-bike van klasse 1, 2 of 3.
+          optional_classes_not_recognized_in:
+            one: Klasse %{n} wordt niet herkend in %{state}, dus het is alleen legaal
+              zoals het verkocht wordt.
+            other: De klassen %{n} worden niet herkend in %{state}, dus het is alleen
+              legaal zoals het verkocht wordt.
+          optional_throttle_not_allowed: Het is alleen legaal zonder de optionele
+            gasklep.
+          own_classes: De staat stelt zijn eigen grenzen vast in plaats van de drie
+            standaardklassen.
+          speed_not_provided: Maximale snelheid niet vermeld
+          speed_over_cap_html: Assisteert tot %{mph} mph, boven de %{cap} mph-limiet
+          speed_over_cap_kmh_html: Assistentie tot %{kmh} km/u, boven de %{cap} km/u
+            limiet
+          speed_past_cap_html: Assistentie bij snelheden boven %{past} mph, boven
+            de %{cap} mph-limiet
+          speed_past_cap_kmh_html: Assistentie bij snelheden boven %{past} km/u, boven
+            de %{cap} km/u-limiet
+          speed_past_html: Ondersteunt voorbij %{past} mph; controleer of het stopt
+            bij %{cap} mph
+          speed_past_kmh_html: Assisteert voorbij %{past} km/u; controleer of het
+            stopt bij %{cap} km/u.
+          speed_to_check_bike_book_kmh_html: Bike Book vermeldt de topsnelheid niet,
+            dus controleer of de motor stopt bij %{cap} km/u.
+          speed_within_cap_html: Assistentie tot %{mph} mph, binnen de limiet
+          speed_within_cap_kmh_html: Assistentie tot %{kmh} km/u, binnen de limiet
+          throttle_allowed: Gashendel toegestaan voor klasse 2
+          throttle_allowed_in_law: Gashendel toegestaan
+          throttle_not_allowed: De staat staat geen gashendel toe.
+          throttle_not_allowed_in_law: De wet staat geen gashendel toe.
+          throttle_not_stated: De wetgeving van de staat zegt niet of een gasklep
+            is toegestaan.
+          throttle_not_stated_in_law: De wet zegt niet of een gasklep is toegestaan.
+          throttle_past_cap_kmh_html: Het gaspedaal slaat door tot voorbij %{past}
+            km/u, boven de %{cap} km/u limiet.
+          throttle_past_kmh_html: Het gaspedaal slaat door tot voorbij %{past} km/u;
+            controleer of het stopt bij %{cap} km/u.
+          throttle_speed_over_cap_html: Het gaspedaal loopt door tot %{mph} mph, boven
+            de %{cap} mph-limiet.
+          throttle_speed_within_cap_html: Gashendel loopt tot %{mph} mph, binnen de
+            limiet
+          throttle_with_class_3_assist: Niet toegestaan met assistentie van klasse
+            3
+          watts_not_provided: Motorvermogen niet opgegeven
+          watts_over_cap_html: "%{watts}W motor overschrijdt de %{cap}W capaciteit"
+          watts_to_check_html: Controleer of de motor een vermogen heeft van %{cap}W
+            of minder.
+          watts_within_cap_html: "%{watts}W-motor bevindt zich in de kap"
+          classes_not_permitted_in: Het is een %{classes} e-bike, die niet is toegestaan
+            in %{state}
       memberships:
         new:
           become_a_member: Word lid
@@ -8202,7 +8347,6 @@ nl:
           customer_records_sold_or_shared: klantgegevens verkocht of gedeeld
           data_stays_private: Hun gegevens blijven privé.
           data_stays_private_body: Nooit verkocht, nooit gedeeld.
-          ding: DING!
           ebike_legality_checker: Controle op de legaliteit van e-bikes
           ebike_legality_checker_body: Per staat is er een overzicht van de toegestane
             categorieën e-bikes, waar ze mogen worden gebruikt en de leeftijds- en
@@ -8285,7 +8429,6 @@ nl:
           shop_name_placeholder: Spaak- en kettingfietsen
           sign_up_free: Meld je gratis aan
           sign_up_your_shop: Meld je winkel aan
-          signup_name: aanmelden
           something_else_html: Nog iets anders? %{email_link}.
           step_connect_body: Koppel Lightspeed of Ascend aan je gratis winkelaccount.
             Dit duurt ongeveer 10 minuten.
@@ -8307,11 +8450,102 @@ nl:
           to_set_up: om op te zetten
           used_only_for_bikes: Uitsluitend te gebruiken voor fietsen.
           we_never_sell_or_share: Wij verkopen of delen nooit klantgegevens.
-          well_email_you: We sturen u een e-mail over het koppelen van uw kassasysteem.
           what_your_customers_get: Wat uw klanten krijgen. Wat uw winkel krijgt.
           wholesale: Groothandel
           your_pos: Uw kassasysteem
-          youre_in: Je bent binnen.
+          signed_in_as_admin_html: Je bent ingelogd als %{email}, dit is de beheerder
+            van de winkel.
+        ascend:
+          a_dashboard_for_your_shop: Een dashboard voor uw winkel
+          a_dashboard_for_your_shop_body: Zoek op elk gewenst moment in de fietsen
+            die je hebt verkocht. Als een fiets van een klant vermist raakt, worden
+            de gegevens en het serienummer opgeslagen en zijn ze direct beschikbaar
+            voor aangifte bij de politie of een melding van diefstal.
+          a_free_benefit_for_every_customer: Een gratis extraatje voor elke klant,
+            voor die dag waarvan je hoopt dat hij nooit komt.
+          a_full_suite_of_recovery_tools: Een complete reeks hersteltools
+          a_full_suite_of_recovery_tools_body: Bike Index is de enige organisatie
+            die consumenten een complete reeks hulpmiddelen biedt voor het terugvinden
+            van gestolen fietsen.
+          a_network_on_their_side: Een netwerk aan hun kant
+          a_network_on_their_side_body: Ons grote netwerk van non-profitorganisaties
+            helpt bij het ondersteunen en assisteren bij het bergen van fietsen.
+          about_10_minutes: Ongeveer 10 minuten
+          ascend_pos_integration: Ascend POS-integratie
+          bikes_waiting_for_customers: Fietsen staan klaar voor klanten.
+          bikes_waiting_for_customers_body: We maken voor elke klant een Bike Index-account
+            aan. Ze controleren hun e-mail, loggen in en hun nieuwe fiets staat er
+            al. Liever geen e-mails ontvangen? We kunnen de meldingen voor klanten
+            volledig uitschakelen.
+          caped_hero_bike_alt: gemaskerde heldenfiets
+          create_shop_account: Maak een winkelaccount aan
+          create_your_shop_account: Maak een winkelaccount aan op Bike Index.
+          create_your_shop_account_body: Meld je aan als nieuwe fietsenwinkelorganisatie.
+            Als je winkel al een organisatie heeft, log dan in en ga verder met deze
+            stap.
+          customers_stay_in_control: Klanten behouden de controle.
+          customers_stay_in_control_body: Eigenaren kunnen hun registratie op elk
+            moment bijwerken, overdragen of verwijderen.
+          email_notifications_off_body: We kunnen e-mailmeldingen volledig uitschakelen.
+            De fiets blijft dan geregistreerd op het e-mailadres van uw winkel, zodat
+            de politie contact opneemt met uw winkel als de fiets wordt teruggevonden.
+            U kunt dan vervolgens contact opnemen met de klant. We denken graag met
+            u mee over de privacyinstellingen die het beste bij uw winkel passen.
+          email_subject: Ascend-configuratie
+          email_us: Stuur ons een e-mail
+          lightspeed_body_html: Wij hebben ook een %{lightspeed_link}.
+          lightspeed_pos_integration: Lightspeed POS-integratie
+          link_your_accounts_once: Koppel je Ascend Retail- en Bike Index-accounts
+            eenmalig. Gratis, en de installatie duurt ongeveer 10 minuten.
+          never_sold_or_shared: Nooit verkocht of gedeeld
+          never_sold_or_shared_body: Klantnamen en e-mailadressen worden niet verkocht,
+            verhuurd of aan derden doorgegeven.
+          new_bike_sales_get_a_bike_index_account: Bij de verkoop van nieuwe fietsen
+            profiteert u automatisch van een Bike Index-account.
+          no_marketing_lists: Geen marketinglijsten
+          no_marketing_lists_body: Wij voegen uw klanten niet toe aan nieuwsbrieven
+            en sturen hen geen promoties.
+          nothing_to_do_at_checkout: Niets te doen bij de kassa
+          nothing_to_do_at_checkout_body: Elke dag haalt Bike Index de nieuw verkochte
+            fietsen uit Ascend. Uw personeel blijft de verkopen op de gebruikelijke
+            manier afrekenen.
+          one_email_to_claim_their_bike: Eén e-mail om hun fiets op te halen
+          one_email_to_claim_their_bike_body: Klanten ontvangen één e-mailbericht
+            waarin staat dat de fiets die ze in uw winkel hebben gekocht, is geregistreerd
+            en klaarstaat.
+          open_ascend_guide: Open Ascend-gids
+          peace_of_mind: gemoedsrust
+          peace_of_mind_body: De gegevens van hun fiets zijn al opgeslagen, dus ze
+            hoeven nooit meer naar een serienummer te zoeken.
+          pos_integration_faq: POS-integratie FAQ
+          pos_integration_security_faq: Veelgestelde vragen over de beveiliging van
+            POS-integratie
+          privacy_intro: Bike Index is een non-profitorganisatie. Klantgegevens worden
+            gebruikt om fietsen te registreren en terug te vinden, en voor niets anders.
+          privacy_policy: Privacybeleid
+          questions: Vragen?
+          questions_body_html: Stuur een e-mail naar %{email_link} of lees %{faq_link}.
+          rather_they_didnt_get_an_email: Hebben ze liever geen e-mail ontvangen?
+          register_every_bike_you_sell: Registreer elke fiets die je verkoopt, automatisch.
+          send_us_the_password: Stuur ons het wachtwoord
+          send_us_the_password_body: Stuur het per e-mail naar %{shops_email} en wij
+            zorgen ervoor dat uw accounts gekoppeld worden. Daarna bent u klaar.
+          set_up_in_three_steps: Installatie in drie stappen
+          start_setup: Start de installatie
+          turn_on_bike_index_in_ascend: Schakel de fietsindex in Ascend in.
+          turn_on_bike_index_in_ascend_body: Volg de installatie-instructies in het
+            kennisbankartikel van Ascend. Daar kunt u het wachtwoord voor de verbinding
+            aanmaken.
+          using_lightspeed_instead: Gebruik je in plaats daarvan Lightspeed?
+          we_hope_their_bike_is_never_stolen: We hopen dat hun fiets nooit gestolen
+            wordt. Mocht dat wel gebeuren, dan zijn ze gedekt.
+          we_will_never_give_out_customer_data: Wij zullen uw klantgegevens nooit
+            doorgeven.
+          what_your_customers_get: Wat uw klanten krijgen
+          your_customers_privacy: De privacy van uw klanten
+          your_shop_is_on_bike_index: Uw winkel staat op Bike Index.
+          your_shop_is_on_bike_index_body: Je bent ingelogd op het account van je
+            winkelorganisatie, dus deze stap is voltooid.
       marketplace:
         how_it_works:
           across_town_heading: Aan de andere kant van de stad of aan de andere kant
@@ -8439,6 +8673,94 @@ nl:
         stories:
           load_more_stories: Meer verhalen laden
           newer_stories: Nieuwere verhalen
+      org_signup:
+        views:
+          confirm:
+            activate: Activeren
+            activate_org: Activeer %{name}
+            confirm_email_to_activate_html: Bevestig dat %{email} uw e-mailadres is,
+              dan richten we de organisatie in met u als beheerder.
+            sign_out_and_activate: Uitloggen en activeren
+            activating_signs_you_out: Door te activeren wordt u afgemeld en ingelogd
+              als beheerder van de organisatie.
+            i_agree_to_terms: Ik ga akkoord met de Servicevoorwaarden van Bike Index
+              en de Servicevoorwaarden voor Organisaties.
+            link_is_for: Deze link is voor
+            read_terms_html: Lees de %{terms_link} en %{vendor_terms_link}
+            signed_in_as: Je bent ingelogd als
+            terms_of_service: Servicevoorwaarden
+            vendor_terms: Gebruiksvoorwaarden voor organisaties
+          step1:
+            activation_link: We sturen je een link per e-mail om de organisatie te
+              activeren. Je hoeft daar niet op te wachten, je kunt meteen aan de slag.
+            add_your_organization: Voeg uw organisatie toe
+            already_on_bike_index_html: Is uw organisatie al aangesloten bij Bike
+              Index? %{sign_in_link} om het te beheren.
+            email: Uw e-mailadres
+            email_placeholder: jij@example.com
+            kind_bike_advocacy: Belangengroep
+            kind_bike_manufacturer: Fabrikant
+            kind_bike_shop: Fietsenwinkel
+            kind_law_enforcement: Rechtshandhaving
+            kind_municipality: Stad of gemeente
+            kind_other: Ander
+            kind_property_management: Vastgoedbeheer
+            kind_school: School of universiteit
+            kind_software: Software
+            next: Volgende
+            organization_kind: Wat voor soort organisatie?
+            organization_name: Organisatie naam
+            sign_in: Log in
+            start_a_different_one: Begin in plaats daarvan een andere organisatie.
+            your_info: Uw gegevens
+            your_organization: Uw organisatie
+            already_part_of_organization_html: Je maakt al deel uit van %{organization_link}
+              - hiermee creëer je een aparte organisatie.
+            free_to_start_few_minutes: Het is gratis om te beginnen en duurt slechts
+              een paar minuten.
+            organization_link: "%{name} organisatie"
+            signed_in_as_new_admin_html: Je bent ingelogd als %{email}, wat de beheerder
+              van de nieuwe organisatie zal zijn.
+            signup_name: aanmelden
+          step2:
+            activation_link_sent: We hebben %{email} een link gemaild om de organisatie
+              te activeren — rond dit eerst af.
+            contact: contact
+            email_confirmed: Je e-mailadres is bevestigd. Voeg %{name} toe en het
+              wordt actief zodra je klaar bent.
+            finish: Finish
+            location: Plaats
+            phone: Telefoon
+            publicly_visible: Toon deze locatie op de Bike Index-kaart.
+            shown_to_people: Zo kunnen mensen die zich bij jou registreren je vinden.
+            website: Website
+            website_placeholder: voorbeeld.com
+            where_is_org: Waar is %{name}?
+            out_of_links: We hebben alle mogelijke activeringslinks verstuurd, maar
+              geen enkele is bij %{email} aangekomen. Neem contact op met support@bikeindex.org,
+              dan lossen we het op.
+            signup_name: aanmelden
+          step_finished:
+            activate_html: We hebben een link naar %{email} verzonden — klik erop
+              om %{name} te activeren.
+            activating_lets_you: 'Zodra het geactiveerd is, kunt u:'
+            change_it: Verander het
+            check_your_email: Controleer je e-mail.
+            invite_your_team: Nodig de rest van je team uit.
+            no_email_yet: Geen e-mail ontvangen? Het kan een paar minuten duren. Controleer
+              uw spammap of laat ons de e-mail opnieuw versturen.
+            register_for_community: Registreer voertuigen voor uw gemeente.
+            register_for_residents: Registreer voertuigen voor uw inwoners.
+            register_for_students: Registreer voertuigen voor uw leerlingen en personeel.
+            register_for_tenants: Registreer de voertuigen van uw huurders.
+            register_for_your_customers: Registreer voertuigen voor uw klanten
+            send_it_again: Stuur het opnieuw
+            share_your_link: Deel je registratielink en QR-code.
+            wrong_address: Verkeerd adres?
+            cant_send_another: We kunnen geen andere link versturen.
+            out_of_links_html: We hebben alle mogelijke activeringslinks voor %{name}
+              verstuurd, maar geen enkele is bij %{email} aangekomen. Neem contact
+              op met support@bikeindex.org, dan lossen we het op.
     shared_blocks:
       footer:
         about: Over
@@ -8642,6 +8964,11 @@ nl:
           stat_partners: partnerwinkels, politiekorpsen en steden
           stat_recoveries: Gestolen fietsen teruggevonden
           stat_value: waarde teruggegeven aan eigenaren
+      color_scheme_picker:
+        appearance: Verschijning
+        dark: Donker
+        light: Licht
+        system: Systeem
   user_emails:
     confirm:
       confirm_email: E-mail bevestigen

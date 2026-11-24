@@ -2,7 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 import { collapseField } from 'utils/collapse_utils'
 
 // Connects to data-controller="table-multi-checkbox"
-// whenChecked targets show only while a row is checked
+// whenChecked targets show only while a row is checked. Dispatches table-multi-checkbox:change as the selection does
 export default class extends Controller {
   static targets = ['checkbox', 'whenChecked']
 
@@ -51,6 +51,7 @@ export default class extends Controller {
   syncWhenChecked (duration) {
     const checked = this.checkboxTargets.some(cb => cb.checked)
     this.whenCheckedTargets.forEach(field => collapseField(field, checked, duration, 'horizontal'))
+    this.dispatch('change', { detail: { checked } })
   }
 
   // Editing a row checks it, so a submit button with data-discards-edits asks before acting on edited rows

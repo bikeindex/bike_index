@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    pages:
+      bikebook:
+        schema:
+          unreachable: The Bike Book repository isn't answering. Try again in a minute.

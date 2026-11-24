@@ -3,7 +3,7 @@
     <% if @organization.is_invoiced? %>
       <strong>True</strong>
     <% else %>
-      <% if LandingPageOrganizations::SLUGS.include?(@organization.slug) %>
+      <% if @organization.landing_page_slug.present? %>
         <p class="tw:mb-4 <%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
           IS NOT MARKED INVOICED BUT HAS A LANDING PAGE
         </p>
@@ -30,8 +30,8 @@
     <% end %>
     <% list.with_row(label: "Landing Page") do %>
       <% if @organization.organization_landing_page&.body? %>
-        <% if LandingPageOrganizations::SLUGS.include?(@organization.slug) %>
-          <%= link_to 'public landing page', "#{ENV['BASE_URL']}/#{@organization.slug}", class: "twlink" %>
+        <% if @organization.landing_page_slug.present? %>
+          <%= link_to 'public landing page', "#{ENV['BASE_URL']}/#{@organization.landing_page_slug}", class: "twlink" %>
         <% else %>
           landing page is not public -
           <%= link_to 'landing page', organization_landing_path(organization_id: @organization.to_param), class: "twlink" %>

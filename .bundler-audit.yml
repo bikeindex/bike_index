@@ -1,0 +1,8 @@
+---
+ignore:
+  # excon: headers leak only through RedirectFollower, which nothing here enables. The fix is in
+  # 1.5.0, and MailchimpMarketing (through 3.0.80) requires excon < 1
+  - CVE-2026-54171
+  # faraday: deferred; 1.10.6 fixes both
+  - CVE-2026-25765
+  - CVE-2026-54297

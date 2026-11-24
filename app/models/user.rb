@@ -89,6 +89,7 @@ class User < ApplicationRecord
 
   has_many :ambassador_task_assignments
   has_many :b_params, foreign_key: :creator_id
+  has_many :bug_reports
   has_many :bike_sticker_updates
   has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
   has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
@@ -601,7 +602,7 @@ class User < ApplicationRecord
     self.alert_slugs = (alert_slugs || [])
     # Rather than waiting for twilio to send, immediately update alert_slugs
     self.alert_slugs += ["phone_waiting_confirmation"] if phone_changed?
-    self.username = Slugifyer.slugify(username) if username
+    self.username = Slugifyer.slugify(username) if username && username_changed?
     self.email = EmailNormalizer.normalize(email)
     self.title = Binxtils::InputNormalizer.sanitize(title) if title.present?
     if no_non_theft_notification

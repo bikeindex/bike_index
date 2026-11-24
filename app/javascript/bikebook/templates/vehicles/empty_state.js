@@ -14,9 +14,9 @@ const steps = [
 ]
 
 const EXAMPLES = [
-  ['Gravel bikes under $1,500', 'primary_activity=atb_gravel&price_max=1500'],
-  ['Trek Marlin 5 vs Specialized Rockhopper Sport', 'vehicle_models=m/trek/2026/marlin_5_gen_3,m/specialized/2026/rockhopper_sport'],
-  ['RadWagon 4 vs 5 vs 2026', 'vehicle_models=m/rad_power/2020/radwagon_4,m/rad_power/2024/radwagon_5,m/rad_power/2026/radwagon']
+  ['Gravel bikes under $1,500', 'primary_activity=atb-gravel&price_max=1500'],
+  ['Trek Marlin 5 vs Specialized Rockhopper Sport', 'vehicle_models=m/trek/2026/marlin-5-gen-3,m/specialized/2026/rockhopper-sport'],
+  ['RadWagon 4 vs 5 vs 2026', 'vehicle_models=m/rad-power-bikes/2020/radwagon-4,m/rad-power-bikes/2024/radwagon-5,m/rad-power-bikes/2026/radwagon']
 ]
 
 // active while `url` has every param its query sets, as UI::ButtonLink's `active:` renders it
@@ -24,12 +24,15 @@ const exampleLink = (url, [label, query]) => html`<a href=${`${url.pathname}?${q
   data-active=${[...new URLSearchParams(query)].every(([name, value]) => url.searchParams.get(name) === value) || nothing}>${label}</a>`
 
 // What the search leaves, and the way on: into the search's list, or back to the filters when it's empty
-const searchNote = ({ count, filtered }) => html`<p class="tw:mt-3 tw:rounded-md tw:bg-blue-50 tw:px-4 tw:py-3 tw:text-sm tw:dark:bg-blue-950">${count
-  ? html`${numberDisplay(count)} ${filtered
+const searchNote = ({ count, filtered, rotatable }) => html`<p class="tw:mt-3 tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:rounded-md tw:bg-blue-50 tw:px-4
+  tw:py-3 tw:text-sm tw:dark:bg-blue-950">${count
+  ? html`<span>${numberDisplay(count)} ${filtered
     ? (count === 1 ? 'model matches your filters' : 'models match your filters')
     : (count === 1 ? 'model to compare' : 'models to compare')}. <button type="button" class="twlink"
-    data-action="bikebook--tips#browse">Search them</button>`
-  : html`No models match your filters. ${filtersButton('Change filters')}`}</p>`
+    data-action="bikebook--tips#browse">Search them</button></span>${rotatable
+    ? html`<button type="button" class=${buttonClasses({ size: 'sm', htmlClass: 'tw:ml-auto' })} data-action="bikebook--page#rotate">rotate samples</button>`
+    : nothing}`
+  : html`<span>No models match your filters. ${filtersButton('Change filters')}</span>`}</p>`
 
 // each scrolling to the views it opens, which an open filter panel would leave below the window
 const featuredCards = ({ featured, vehiclePath, ...card }) => html`<ul aria-label="Models to compare" class="tw:mt-3 ${MODEL_CARDS_CLASSES}"
@@ -37,10 +40,10 @@ const featuredCards = ({ featured, vehiclePath, ...card }) => html`<ul aria-labe
 
 // With nothing picked, how the page works and comparisons to start from, or once they're dismissed, a prompt, and under
 // either what the search leaves and some of it. A classification's card, shown alone, leaves out the first two
-export const emptyState = ({ url, filtered, count, featured, ...cards }) => html`<div class="tw:mt-3" data-controller="bikebook--tips">${url.searchParams.get('classifications')
+export const emptyState = ({ url, filtered, count, featured, rotatable, ...cards }) => html`<div class="tw:mt-3" data-controller="bikebook--tips">${url.searchParams.get('classifications')
   ? nothing
   : tips(url)}${filtered || featured.length
-  ? searchNote({ count, filtered })
+  ? searchNote({ count, filtered, rotatable })
   : nothing}${featured.length ? featuredCards({ featured, ...cards }) : nothing}</div>`
 
 const tips = (url) => html`<div data-bikebook--tips-target="tips"><section aria-label="How to use Bike Book" tabindex="-1"

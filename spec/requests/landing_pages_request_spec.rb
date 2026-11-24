@@ -14,6 +14,26 @@ RSpec.describe LandingPagesController, type: :request do
   end
 
   describe "#for_bike_shops" do
+    it "starts the organization signup as a bike shop" do
+      get "/for_bike_shops"
+      expect(response.body).to match("<title>Bike Index for Bike Shops</title>")
+      form = Capybara.string(response.body).find("form[action='/organizations/signup']")
+      fields = form.all("[name^='organization_signup']", visible: :all).to_h { [it[:name], it[:value]] }
+      expect(fields).to eq("organization_signup[name]" => nil, "organization_signup[email]" => nil,
+        "organization_signup[pos_kind]" => "", "organization_signup[kind]" => "bike_shop")
+
+      fields["organization_signup[pos_kind]"] = form.find("option", text: "Ascend")[:value]
+      post "/organizations/signup", params: fields
+      expect(response.status).to eq 422
+      expect(Capybara.string(response.body)).to have_field("organization_signup[pos_kind]", type: :hidden, with: "ascend_pos")
+
+      post "/organizations/signup", params: fields.merge("organization_signup[name]" => "Spoke Shop",
+        "organization_signup[email]" => "shop@example.com")
+      expect(response).to redirect_to "/organizations/signup?step=2"
+      expect(OrganizationSignup.last).to have_attributes(name: "Spoke Shop", kind: "bike_shop", email: "shop@example.com",
+        pos_kind: "ascend_pos")
+    end
+
     it "frames the checker on the visitor's place, and California without a location" do
       get "/for_bike_shops", headers: {"HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
       expect(Capybara.string(response.body)).to have_css("iframe[src^='/ebike-rules/US/IN?']", visible: :all)
@@ -65,11 +85,9 @@ RSpec.describe LandingPagesController, type: :request do
   end
 
   {
-    for_bike_shops: "Bike Index for Bike Shops",
     for_cities: "Bike Index for Cities",
     for_law_enforcement: "Bike Index for Law Enforcement",
     for_schools: "Bike Index for Schools",
-    ascend: "Ascend POS on Bike Index",
     ambassadors_current: "Bike Index Ambassadors",
     ambassadors_how_to: "Become a Bike Index Ambassador",
     bike_shop_packages: "Bike Index for Bike Shops - Features and Pricing"
@@ -86,6 +104,42 @@ RSpec.describe LandingPagesController, type: :request do
     end
   end
 
+  describe "#ascend" do
+    it "renders the setup steps with the title" do
+      get "/ascend"
+
+      expect(response.status).to eq(200)
+      expect(response.body).to match("<title>Ascend POS on Bike Index</title>")
+      expect(response.body).to include("Create your shop account on Bike Index")
+      expect(response.body).to_not include("Your shop is on Bike Index")
+    end
+
+    context "with a user in a shop" do
+      include_context :request_spec_logged_in_as_organization_admin
+      let(:current_organization) { FactoryBot.create(:organization, kind: "bike_shop") }
+
+      it "marks the account step done" do
+        get "/ascend"
+
+        expect(response.status).to eq(200)
+        expect(response.body).to include("Your shop is on Bike Index")
+        expect(response.body).to_not include("Create shop account")
+      end
+
+      context "when the organization isn't a shop" do
+        let(:current_organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
+
+        it "keeps the account step" do
+          get "/ascend"
+
+          expect(response.status).to eq(200)
+          expect(response.body).to include("Create shop account")
+          expect(response.body).to_not include("Your shop is on Bike Index")
+        end
+      end
+    end
+  end
+
   describe "#for_community_groups" do
     let!(:recovery_display) { FactoryBot.create(:recovery_display_with_photo, quote: "Recovered in under four hours") }
 
@@ -95,18 +149,7 @@ RSpec.describe LandingPagesController, type: :request do
       expect(response.status).to eq(200)
       expect(response.body).to match("<title>Bike Index for Community Groups</title>")
       expect(response.body).to include("Recovered in under four hours")
-      expect(response.body).to include("/users/new?return_to=%2Forganizations%2Fnew%3Fkind%3Dbike_advocacy")
-    end
-
-    context "with a user" do
-      include_context :request_spec_logged_in_as_user
-
-      it "links straight to the organization form" do
-        get "/for_community_groups"
-
-        expect(response.body).to include('href="/organizations/new?kind=bike_advocacy"')
-        expect(response.body).to_not include("/users/new?return_to")
-      end
+      expect(response.body).to include('href="/organizations/signup/new?kind=bike_advocacy"')
     end
   end
 
@@ -146,6 +189,16 @@ RSpec.describe LandingPagesController, type: :request do
       expect(title).to eq "Brakebills Bike Registration"
       expect(assigns(:page_id)).to eq "landing_pages_show"
       expect(response.body).to include "<p>Brakebills welcomes you</p>"
+    end
+
+    context "routed by the previous slug" do
+      let!(:organization) { FactoryBot.create(:organization, short_name: "Brakebills University", previous_slug: "brakebills") }
+
+      it "renders" do
+        get "/brakebills"
+        expect(response.status).to eq(200)
+        expect(response.body).to include "<p>Brakebills welcomes you</p>"
+      end
     end
 
     context "without a landing page" do

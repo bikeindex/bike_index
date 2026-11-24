@@ -152,6 +152,19 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(response).to render_template(:show)
       expect(assigns(:impound_record)).to eq impound_record
       expect(response.body).not_to include("created from a parking notification")
+      expect(response.body).not_to include("Current location")
+    end
+    context "held at a location" do
+      let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: current_organization, name: "Back lot") }
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, organization: current_organization, user: current_user, bike:, location:) }
+
+      it "renders its current location apart from where it was impounded from" do
+        get "#{base_url}/pkey-#{impound_record.id}"
+        expect(response.status).to eq(200)
+        current_location = Nokogiri::HTML(response.body).css("tr").find { it.text.include?("Current location") }
+        expect(current_location.text.squish).to match(/Back lot 278 Broadway/)
+        expect(response.body).to include("1300 W 14th Pl")
+      end
     end
     context "unregistered parking notification bike" do
       let(:parking_notification) do

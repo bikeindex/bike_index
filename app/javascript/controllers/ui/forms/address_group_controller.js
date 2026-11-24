@@ -7,6 +7,10 @@ export default class extends Controller {
   static targets = ['country', 'state', 'region']
   static values = { usId: Number, required: Boolean }
 
+  // A country restored before this connected (form-persist, the browser's own reload
+  // restore) fired its change with nothing listening
+  connect () { this.toggleCountry() }
+
   toggleCountry () {
     const isUs = this.isUs
     // Whichever of the pair is showing carries the required attribute - the browser

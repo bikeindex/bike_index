@@ -10,7 +10,7 @@
   <% end %>
 
   <% table.column(sortable: "slug") do |ctype| %>
-    <%= ctype.slug %>
+    <%= render(UI::Code::Inline::Component.new(text: ctype.slug)) %>
   <% end %>
 
   <% table.column(sortable: "cgroup", label: "Component group") do |ctype| %>

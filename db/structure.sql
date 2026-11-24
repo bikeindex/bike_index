@@ -729,6 +729,44 @@ ALTER SEQUENCE public.bike_versions_id_seq OWNED BY public.bike_versions.id;
 
 
 --
+-- Name: bikebook_models; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bikebook_models (
+    id bigint NOT NULL,
+    catalog_id character varying NOT NULL,
+    manufacturer_id bigint NOT NULL,
+    name character varying NOT NULL,
+    model_slug character varying NOT NULL,
+    first_year integer NOT NULL,
+    final_year integer,
+    markets character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    variants jsonb DEFAULT '[]'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: bikebook_models_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bikebook_models_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bikebook_models_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bikebook_models_id_seq OWNED BY public.bikebook_models.id;
+
+
+--
 -- Name: bikes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2378,7 +2416,8 @@ CREATE TABLE public.manufacturers (
     twitter_name character varying,
     priority integer,
     motorized_only boolean DEFAULT false,
-    secondary_slug character varying
+    secondary_slug character varying,
+    previous_slugs character varying[] DEFAULT '{}'::character varying[] NOT NULL
 );
 
 
@@ -3045,6 +3084,52 @@ ALTER SEQUENCE public.organization_saml_configurations_id_seq OWNED BY public.or
 
 
 --
+-- Name: organization_signups; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_signups (
+    id bigint NOT NULL,
+    id_token character varying NOT NULL,
+    email character varying,
+    name character varying,
+    kind integer,
+    website character varying,
+    phone character varying,
+    publicly_visible boolean DEFAULT true NOT NULL,
+    address jsonb DEFAULT '{}'::jsonb NOT NULL,
+    likely_spam boolean DEFAULT false NOT NULL,
+    email_confirmation_token character varying,
+    email_confirmation_sent_at timestamp(6) without time zone,
+    email_confirmations_sent integer DEFAULT 0 NOT NULL,
+    email_confirmed_at timestamp(6) without time zone,
+    return_to character varying,
+    organization_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    pos_kind integer
+);
+
+
+--
+-- Name: organization_signups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_signups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_signups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_signups_id_seq OWNED BY public.organization_signups.id;
+
+
+--
 -- Name: organization_stolen_messages; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3420,7 +3505,9 @@ CREATE TABLE public.pos_registration_matches (
     status integer DEFAULT 0 NOT NULL,
     review_reasons text[] DEFAULT '{}'::text[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    merger_id bigint,
+    merged_at timestamp(6) without time zone
 );
 
 
@@ -4744,6 +4831,13 @@ ALTER TABLE ONLY public.bike_versions ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: bikebook_models id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bikebook_models ALTER COLUMN id SET DEFAULT nextval('public.bikebook_models_id_seq'::regclass);
+
+
+--
 -- Name: bikes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5164,6 +5258,13 @@ ALTER TABLE ONLY public.organization_saml_configurations ALTER COLUMN id SET DEF
 
 
 --
+-- Name: organization_signups id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_signups ALTER COLUMN id SET DEFAULT nextval('public.organization_signups_id_seq'::regclass);
+
+
+--
 -- Name: organization_stolen_messages id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5564,6 +5665,14 @@ ALTER TABLE ONLY public.bike_stickers
 
 ALTER TABLE ONLY public.bike_versions
     ADD CONSTRAINT bike_versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bikebook_models bikebook_models_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bikebook_models
+    ADD CONSTRAINT bikebook_models_pkey PRIMARY KEY (id);
 
 
 --
@@ -6044,6 +6153,14 @@ ALTER TABLE ONLY public.organization_roles
 
 ALTER TABLE ONLY public.organization_saml_configurations
     ADD CONSTRAINT organization_saml_configurations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_signups organization_signups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_signups
+    ADD CONSTRAINT organization_signups_pkey PRIMARY KEY (id);
 
 
 --
@@ -6592,6 +6709,20 @@ CREATE INDEX index_bike_versions_on_owner_id ON public.bike_versions USING btree
 --
 
 CREATE INDEX index_bike_versions_on_primary_activity_id ON public.bike_versions USING btree (primary_activity_id);
+
+
+--
+-- Name: index_bikebook_models_on_catalog_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_bikebook_models_on_catalog_id ON public.bikebook_models USING btree (catalog_id);
+
+
+--
+-- Name: index_bikebook_models_on_manufacturer_id_and_model_slug; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikebook_models_on_manufacturer_id_and_model_slug ON public.bikebook_models USING btree (manufacturer_id, model_slug);
 
 
 --
@@ -7484,6 +7615,20 @@ CREATE UNIQUE INDEX index_organization_saml_configurations_on_organization_id ON
 
 
 --
+-- Name: index_organization_signups_on_id_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_organization_signups_on_id_token ON public.organization_signups USING btree (id_token);
+
+
+--
+-- Name: index_organization_signups_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_signups_on_organization_id ON public.organization_signups USING btree (organization_id);
+
+
+--
 -- Name: index_organization_stolen_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7670,6 +7815,13 @@ CREATE UNIQUE INDEX index_pos_registration_matches_on_bike_id_and_pos_bike_id ON
 --
 
 CREATE INDEX index_pos_registration_matches_on_duplicate_bike_group_id ON public.pos_registration_matches USING btree (duplicate_bike_group_id);
+
+
+--
+-- Name: index_pos_registration_matches_on_merger_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pos_registration_matches_on_merger_id ON public.pos_registration_matches USING btree (merger_id);
 
 
 --
@@ -8088,6 +8240,11 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261123074039'),
+('20261121050440'),
+('20261119180000'),
+('20261119102802'),
+('20261118155803'),
 ('20261117051637'),
 ('20261116222651'),
 ('20261111155046'),

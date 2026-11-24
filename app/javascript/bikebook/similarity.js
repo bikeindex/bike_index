@@ -2,7 +2,7 @@
 // presets are ours; the values are worked out by bikebook's Catalog::Comparison, so none is derived again here.
 // Imported by the catalog's worker too, which has no importmap, so it imports nothing
 
-const FORMAT = 3
+const FORMAT = 5
 const COUNT = 12
 export const MAX_WEIGHT = 5
 

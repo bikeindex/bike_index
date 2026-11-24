@@ -13,7 +13,7 @@ export default class extends Controller {
   static values = {
     sort: { type: String, default: 'year' },
     yearDir: { type: String, default: 'desc' },
-    priceDir: { type: String, default: 'desc' },
+    priceDir: { type: String, default: 'asc' },
     defaultMarket: String,
     defaultJurisdiction: String,
     cycle: { type: Boolean, default: true }
@@ -149,7 +149,7 @@ export default class extends Controller {
       ...filters,
       sort: this.sortValue === 'price' ? 'price' : '',
       year_dir: this.yearDirValue === 'asc' ? 'asc' : '',
-      price_dir: this.priceDirValue === 'asc' ? 'asc' : ''
+      price_dir: this.priceDirValue === 'desc' ? 'desc' : ''
     }
     for (const [key, value] of Object.entries(params)) value ? url.searchParams.set(key, value) : url.searchParams.delete(key)
   }
@@ -181,7 +181,8 @@ export default class extends Controller {
     const inputs = [...field.querySelectorAll('input[name]')]
     // what the catalog names, which leaves out a value while it loads
     if (field.matches('.hw-combobox')) {
-      return inputs[0].value.split(',').filter(Boolean)
+      // a single choice's value can hold a comma, as target riders' "kid,woman" does
+      return (field.matches('.hw-combobox--multiple') ? inputs[0].value.split(',') : [inputs[0].value]).filter(Boolean)
         .flatMap((value) => field.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)?.dataset.autocompletableAs ?? [])
         .join(', ')
     }

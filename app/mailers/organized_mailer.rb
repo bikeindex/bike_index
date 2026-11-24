@@ -33,6 +33,23 @@ class OrganizedMailer < ApplicationMailer
       subject_key: confirmation_subject_key(b_param))
   end
 
+  def organization_signup_confirmation(organization_signup)
+    mail(reply_to:, to: organization_signup.email,
+      subject: I18n.t("organized_mailer.organization_signup_confirmation.subject", name: organization_signup.name),
+      tag: __callee__) do |format|
+      format.html { render Emails::OrganizationSignupConfirmation::Component.new(organization_signup:) }
+    end
+  end
+
+  def shop_welcome(organization, user)
+    component = Emails::ShopWelcome::Component.new(organization:)
+
+    I18n.with_locale(user.preferred_language) do
+      mail(reply_to:, to: user.email, subject: I18n.t("organized_mailer.shop_welcome.subject"),
+        tag: __callee__) { |format| format.html { render component } }
+    end
+  end
+
   def finished_registration(ownership)
     bike = Bike.unscoped.find_id(ownership.bike_id)
     @organization = ownership.organization

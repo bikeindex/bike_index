@@ -50,6 +50,9 @@ module UI
         empty: "tw:bg-gray-500 tw:text-white tw:border-transparent"
       }.freeze
 
+      # Shown in place of the title, for a tooltip that needs markup - a link, a list. The title stays the trigger's name
+      renders_one :tooltip_body
+
       def self.badge_classes(color:, size:, cursor: "tw:cursor-default", solid: false)
         palette = solid ? SOLID_COLORS : COLORS
         [BASE_CLASSES, cursor, palette[color], SIZES[size]].join(" ")
@@ -70,8 +73,12 @@ module UI
         label = content.presence || @text
         label = safe_join([leading, label]) if leading
         badge = content_tag(:span, label, class: badge_class)
-        return badge unless custom_title?
-        render(UI::Tooltip::Component.new(text: @title)) { badge }
+        return badge unless tooltip?
+
+        render(UI::Tooltip::Component.new(text: @title)) do |tooltip|
+          tooltip.with_body_content(tooltip_body.to_s) if tooltip_body?
+          badge
+        end
       end
 
       private
@@ -93,8 +100,10 @@ module UI
         @title.present? && @title != @text
       end
 
+      def tooltip? = custom_title? || tooltip_body?
+
       def badge_class
-        self.class.badge_classes(color: @color, size: @size, solid: @solid, cursor: custom_title? ? "tw:cursor-help" : "tw:cursor-default")
+        self.class.badge_classes(color: @color, size: @size, solid: @solid, cursor: tooltip? ? "tw:cursor-help" : "tw:cursor-default")
       end
     end
   end

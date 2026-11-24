@@ -21,13 +21,12 @@ module Pages
           MULTI_UPDATE_FORM_ID = "impoundRecordsMultiUpdateForm"
 
           # impound_records: an impound search's rows, in place of bikes - which adds the impound
-          # columns and the multi-update checkboxes, shown with multiselect_visible
-          def initialize(organization:, bikes: [], impound_records: nil, multiselect_visible: false,
+          # columns and the multi-update checkboxes, shown inside a data-table-selecting element
+          def initialize(organization:, bikes: [], impound_records: nil,
             render_sortable: false, sort_state: ComponentStructs::SortState.new, bike_sticker: nil, settings: nil)
             @organization = organization
             @bikes = bikes
             @impound_records = impound_records
-            @multiselect_visible = multiselect_visible
             @render_sortable = render_sortable
             @sort_state = sort_state
             @bike_sticker = bike_sticker
@@ -44,16 +43,12 @@ module Pages
 
           def impound? = !@impound_records.nil?
 
-          def cache_key = [@organization, self.class.cache_digest, (@multiselect_visible if impound?)]
+          def cache_key = [@organization, self.class.cache_digest]
 
           # Everything an impound row renders besides its record. The claims decide its checkbox's
           # update kinds, and a claim's writes don't touch the record
           def cache_records
-            ->(impound_record) { [impound_record.bike, impound_record.user, impound_record.location, impound_record.impounded_from_address_record, *impound_record.impound_claims] } if impound?
-          end
-
-          def multiselect_cell_classes
-            ["multi-update-cell table_cell_check", ("tw:hidden" unless @multiselect_visible)].compact.join(" ")
+            ->(impound_record) { [impound_record.bike, impound_record.user, impound_record.location, impound_record.address_record, impound_record.impounded_from_address_record, *impound_record.impound_claims] } if impound?
           end
 
           # The organization's fields placed after column, or with :rest the ones placed nowhere

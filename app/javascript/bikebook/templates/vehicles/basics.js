@@ -114,10 +114,10 @@ const viewGroup = (groupPath, value, shownGroup) => html`<a href=${groupPath(val
 // The models' names, photos and headline fields side by side in a table, one model's as two's, each photo with an ×
 // to the page without it at `removePath`, each column topped and footed in its color among the overlay's `frames`, the
 // table's section with its `sectionClasses` and its corner with `corner`
-export const basics = ({ presenter, vehicles, market, outOfClassId, removePath, colorways: pickedColorways = {}, groupPath, shownGroup, frames = [], sectionClasses = '', corner = nothing }) => {
+export const basics = ({ presenter, vehicles, market, outOfClassId, state, removePath, colorways: pickedColorways = {}, groupPath, shownGroup, frames = [], sectionClasses = '', corner = nothing }) => {
   const shown = vehicles.map(({ data, value, key, outsideMarket }, index) => {
     const price = priced(data)
-    const fields = basicsOf({ presenter, data, outOfClassId })
+    const fields = basicsOf({ presenter, data, outOfClassId, state })
     return {
       ...fields,
       value,

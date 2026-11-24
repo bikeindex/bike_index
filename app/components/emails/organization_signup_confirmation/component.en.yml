@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    emails:
+      organization_signup_confirmation:
+        activate_your_organization: Activate your organization
+        confirm_and_activate: Confirm my email and activate
+        confirm_to_activate_html: >-
+          Confirm this email address to activate <strong>%{name}</strong> on Bike
+          Index. You'll be its administrator, and you can invite the rest of your
+          team once you're in.
+        link_signs_you_in: >-
+          This link signs you in to Bike Index, so don't forward it. It works for
+          %{days} days.

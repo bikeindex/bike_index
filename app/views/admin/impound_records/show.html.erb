@@ -38,20 +38,20 @@
 
   <%= render(UI::Table::List::Component.new) do |list| %>
     <% list.with_row(label: "Impounded from") do %>
-      <% if @impound_record.impounded_from_address_record.blank? %>
+      <% if @impound_record.impounded_from_address.blank? %>
         <em class="less-strong">No impounded from address</em>
       <% else %>
-        <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.impounded_from_address_record, visible_attribute: :street)) %>
+        <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.impounded_from_address, visible_attribute: :street)) %>
       <% end %>
     <% end %>
 
-    <% list.with_row(label: "Current address") do %>
-      <% if @impound_record.address_record_id.blank? %>
-        <em class="less-strong">No current address</em>
-      <% elsif @impound_record.address_record_id == @impound_record.impounded_from_address_record_id %>
-        <em class="less-strong">same as impounded from</em>
+    <% list.with_row(label: "Current location") do %>
+      <% current_location = Atoms::Org::ImpoundCurrentLocation::Component.new(impound_record: @impound_record) %>
+
+      <% if current_location.render? %>
+        <%= render(current_location) %>
       <% else %>
-        <%= render(UI::AddressDisplay::Component.new(address_record: @impound_record.address_record, visible_attribute: :street)) %>
+        <em class="less-strong">No current location</em>
       <% end %>
     <% end %>
   <% end %>

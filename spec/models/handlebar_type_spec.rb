@@ -20,11 +20,11 @@ RSpec.describe HandlebarType, type: :model do
     end
 
     it "returns drop_bar for its slug" do
-      ["drop_bar", "drop-bar", :drop_bar].each { expect(HandlebarType.friendly_find(it).slug).to eq :drop_bar }
+      ["drop_bar", "drop-bar", :drop_bar, "drop-bars"].each { expect(HandlebarType.friendly_find(it).slug).to eq :drop_bar }
     end
 
     it "returns horizontal for its names and former slugs" do
-      ["horizontal", "Riser", " FLAT ", :flat, " BMX ", :bmx, "BMX style"].each do
+      ["horizontal", "Riser", " FLAT ", :flat, " BMX ", :bmx, "BMX style", "bmx-style"].each do
         expect(HandlebarType.friendly_find(it).slug).to eq :horizontal
       end
     end

@@ -18,7 +18,7 @@ const combobox = (root, name) => root.getElementById(`${name}-hw-hidden-field`).
 const panelOf = (root) => root.querySelector('[data-controller~="bikebook--catalog-filters"]')
 const MARKET_ATTRIBUTE = 'data-bikebook--catalog-filters-default-market-value'
 // CycleType::NOT_CYCLE_TYPE, by the catalog's slugs
-const NOT_CYCLE_TYPE = ['e_scooter', 'skateboard', 'epamd', 'stroller', 'wheelchair', 'e_motorcycle']
+const NOT_CYCLE_TYPE = ['e-scooter', 'non-e-skateboard', 'personal-mobility', 'stroller', 'wheelchair', 'e-motorcycle', 'e-atv']
 const JURISDICTION_ATTRIBUTE = 'data-bikebook--catalog-filters-default-jurisdiction-value'
 
 // "Select an e-scooter, choose multiple to compare them" once the first of `vehicles` is one that isn't a bike, both
@@ -35,7 +35,8 @@ const labelSearch = (root, { vehicle_type: types }, [first]) => {
 // The fields as `filters` set them, none of which needs the catalog
 const fillFields = (root, filters) => {
   panelOf(root).setAttribute('data-bikebook--catalog-filters-sort-value', filters.sort === 'price' ? 'price' : 'year')
-  for (const field of ['year', 'price']) panelOf(root).setAttribute(`data-bikebook--catalog-filters-${field}-dir-value`, filters[`${field}_dir`] === 'asc' ? 'asc' : 'desc')
+  panelOf(root).setAttribute('data-bikebook--catalog-filters-year-dir-value', filters.year_dir === 'asc' ? 'asc' : 'desc')
+  panelOf(root).setAttribute('data-bikebook--catalog-filters-price-dir-value', filters.price_dir === 'desc' ? 'desc' : 'asc')
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-hidden-field`).setAttribute('value', filters[name])
   for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
   const scope = root.querySelector(`input[name="market_scope"][value="${CSS.escape(filters.market_scope)}"]`) ?? root.querySelector('input[name="market_scope"][value=""]')
@@ -46,7 +47,7 @@ const fillFields = (root, filters) => {
     root.getElementById('jurisdiction-hw-hidden-field').setAttribute('value', jurisdiction)
     combobox(root, 'jurisdiction').dataset.hwComboboxPrefilledDisplayValue = state.dataset.autocompletableAs
   }
-  // evc/out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
+  // evc/out-of-class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
   for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
 }
 
@@ -58,7 +59,7 @@ const legalClasses = (root, filters, { e_vehicle_classifications: classification
     return Object.keys(classifications).filter((id) => classifications[id].e_bike_law && classifications[id].jurisdiction === filters.market)
   }
   const classes = root.querySelector(`[data-jurisdiction="${CSS.escape(filters.jurisdiction)}"]`) ?? root.querySelector('[data-jurisdiction="US"]')
-  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'evc/out_of_class')
+  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'evc/out-of-class')
 }
 
 // `url`'s filters, its ranges in order and an older link's "all" markets as any, without which the market and the
@@ -253,7 +254,7 @@ export async function hydrate (catalog, source, shell, url) {
 
   const viewer = new VehicleViewer(kit, catalog.vocabulary, filters)
   for (const input of root.querySelectorAll('input[name="electric"]')) {
-    const id = input.value.replace(/^class_/, 'evc/us/class_')
+    const id = input.value.replace(/^class-/, 'evc/us/class-')
     const classification = catalog.vocabulary.e_vehicle_classifications[id]
     // a marker's checkbox has the page's own tooltip
     if (classification && !classification.marker) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))

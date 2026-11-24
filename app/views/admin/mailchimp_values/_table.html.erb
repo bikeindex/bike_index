@@ -8,8 +8,8 @@
     <%= mailchimp_value.name %>
   <% end %>
 
-  <% table.column(sortable: "slug", classes: "tw:text-sm") do |mailchimp_value| %>
-    <%= mailchimp_value.slug %>
+  <% table.column(sortable: "slug") do |mailchimp_value| %>
+    <%= render(UI::Code::Inline::Component.new(text: mailchimp_value.slug)) %>
   <% end %>
 
   <% table.column(sortable: "list") do |mailchimp_value| %>

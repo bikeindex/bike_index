@@ -14,9 +14,9 @@ en:
           any_manufacturer: Any manufacturer
           any_market: Any market
           any_suspension: Any suspension
+          any_target_riders: Any target riders
           any_vehicle_type: Any vehicle type
           applied_filters: Applied filters
-          byline: A free reference from Bike Index, the non-profit bike registry.
           clear_filters: Clear filters
           configuration: Configuration
           configuration_examples: "(complete/frameset)"
@@ -60,6 +60,7 @@ en:
           suspension: Suspension
           tagline: The world’s bicycle library — search, compare, and find your next
             ride.
+          target_riders: Target riders
           try_again: Try again
           united_states: United States
           us_class_1: US Class 1

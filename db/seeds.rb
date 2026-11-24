@@ -32,8 +32,10 @@ SeedHelpers.with_clock do
   require File.expand_path("db/seeds/seed_organization_bikes_and_associations", Rails.root)
   require File.expand_path("db/seeds/seed_organized_emails", Rails.root)
   require File.expand_path("db/seeds/seed_education_course_default", Rails.root)
+  require File.expand_path("db/seeds/seed_ios_review_bikes", Rails.root)
   require File.expand_path("db/seeds/seed_transfer_bike", Rails.root)
   require File.expand_path("db/seeds/seed_oauth_app", Rails.root)
+  require File.expand_path("db/seeds/seed_bug_reports", Rails.root)
   require File.expand_path("db/seeds/seed_stripe_prices", Rails.root)
 end
 require File.expand_path("db/seeds/seed_counts", Rails.root)
