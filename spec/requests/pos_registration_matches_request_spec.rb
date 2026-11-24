@@ -34,6 +34,14 @@ RSpec.describe PosRegistrationMatchesController, type: :request do
     expect(flash[:notice]).to include("already combined")
   end
 
+  it "keeps another match's link from replacing its token" do
+    follow_link
+    other_match = FactoryBot.create(:pos_registration_match, :different_email, serial_number: "XYZ987654")
+    get "/pos_registration_matches/#{other_match.id}?token=#{other_match.token}"
+    patch url, params: {answer: "decline"}
+    expect(pos_registration_match.reload.status).to eq "declined"
+  end
+
   it "keeps them separate" do
     follow_link
     patch url, params: {answer: "decline"}
