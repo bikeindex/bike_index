@@ -1,8 +1,6 @@
 # frozen_string_literal: true
 
 class BikebookController < ApplicationController
-  before_action :redirect_to_dashed_ids, only: :show
-
   def show
     entries = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
     model = Integrations::Bikebook::Catalog.vehicle_id(entries.first) if entries.one?

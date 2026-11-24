@@ -111,7 +111,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
       return {
         label: row.label,
         // lit as the drawings' `highlight` figure is
-        className: row.key && row.key === highlight ? 'tw:bg-[#3397dc]/10' : undefined,
+        className: row.key && row.key === highlight ? 'tw:bg-[#3397dc]/10' : row.className,
         cell: (index) => {
           if (!present(values[index])) return missing
           return row.parts
@@ -124,7 +124,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
   const sizeRows = sizes.some(Boolean) ? [size] : []
   const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
   const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
-  const typeRows = new Set(named.map(typeLabel)).size > 1 ? records([{ label: 'Vehicle type', read: typeLabel }]) : []
+  const typeRows = new Set(named.map(typeLabel)).size > 1 ? records([{ label: 'Vehicle type', read: typeLabel, className: 'tw:whitespace-normal!' }]) : []
   const rows = [...typeRows, ...records(wheelRows), ...cargoRows, ...sizeRows, ...records([...geometry, length, WEIGHT, ...LIMITS])]
   if (rows.length === 0) return nothing
 
@@ -143,7 +143,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
           }),
           classes: 'tw:min-w-48 tw:align-top',
           headerClasses: border.top,
-          // a model's name can wrap in its header, but not a value
+          // a model's name can wrap in its header, and its types, but not a value
           cellClass: (record) => `tw:whitespace-nowrap ${record.className ?? ''} ${record === rows.at(-1) ? border.bottom : ''}`,
           cell: (record) => record.cell(index)
         }
