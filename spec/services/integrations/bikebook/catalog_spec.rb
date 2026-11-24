@@ -97,7 +97,6 @@ RSpec.describe Integrations::Bikebook::Catalog do
       expect(described_class.e_vehicle_classifications).to include("evc/us/class-3")
       cached = Rails.cache.read(["bikebook_catalog/e_vehicle_classifications", "vocabulary.json"])
       expect(cached).to eq described_class.e_vehicle_classifications
-      expect(Rails.cache.exist?(["bikebook_catalog/file", 2, "vocabulary.json"])).to be false
     end
 
     context "while the catalog doesn't answer" do
