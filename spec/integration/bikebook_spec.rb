@@ -1597,6 +1597,21 @@ RSpec.describe "Bike Book", :js, type: :system do
       })
     JS
     expect(flat_bars).to eq([0, 1, 0, 2, 1])
+    # a BMX's and a dirt jumper's saddle tipped along the top tube, any other's level
+    saddle_tilts = page.evaluate_script(<<~JS)
+      import('bikebook/cycle_drawings').then(({ drawingViews }) => {
+        const size = { geometry: { stack: 600, reach: 390, head_angle: 70, seat_angle: 73, chainstay: 420, wheelbase: 1080, bb_drop: 10, seat_tube_ct: 380 } }
+        const tilt = (primary_activity) => {
+          const [back, nose] = drawingViews({ type: 'bike', data: { wheels: [{ bsd: 559, tire_width: 60, position: ['front', 'rear'] }], primary_activity }, size })
+            .views[0].shapes.flat(Infinity).filter(({ seat }) => seat).at(-1).points.slice(-2)
+          return Math.round(Math.atan2(nose[1] - back[1], nose[0] - back[0]) * 180 / Math.PI)
+        }
+        return [tilt('bmx-freestyle'), tilt('dj'), tilt('dj-slopestyle'), tilt('mtb-trail-all-mountain')]
+      })
+    JS
+    # level, but for its back raised square to it
+    expect(saddle_tilts.last).to eq(-4)
+    expect(saddle_tilts.first(3)).to all(be > 10)
     # a step-through frame drawn as one, but where its type detail is drawn its own way, as a bench seat is
     details = page.evaluate_script(<<~JS)
       import('bikebook/cycle_drawings').then(({ drawingViews }) => [{ frame: { top_tube: 'step_through' } }, { frame: { top_tube: 'sloping' } },

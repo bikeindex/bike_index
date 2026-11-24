@@ -71,6 +71,8 @@ const tires = (rearAxle, rearWheel, frontAxle, frontWheel) => [['tire_width_rear
 
 const ROAD = /^(road|track|atb-)/
 const BMX = /^bmx/
+// whose saddle tips along its top tube
+const ALONG_TOP_TUBE = /^(bmx|dj)/
 
 // its handlebar type's bar, a road bike's drop bar where it lists none
 const bar = (data, clamp) => (data.handlebar_type ? data.handlebar_type === 'drop_bar' : ROAD.test(data.primary_activity)) ? dropBar(clamp) : handlebar(clamp)
@@ -167,9 +169,10 @@ const bikeShapes = (frame, context, detail) => {
   const { bb, rearAxle, frontAxle, headTop, headBottom, seatTop, seatBottom } = frame
   const { steering, seat } = axes(frame)
   const { bmx, stem, clamp } = cockpit(frame, context)
-  // a BMX's saddle down on and along its top tube
+  // a BMX's saddle down on its top tube
   const top = plus(seatTop, scale(seat, bmx ? 30 : 170))
-  const saddled = [tube(seatTop, seatBottom), post(seatTop, top), saddle(top, 150, bmx ? unit(minus(headTop, seatTop)) : [1, 0])]
+  const along = ALONG_TOP_TUBE.test(data.primary_activity) ? unit(minus(headTop, seatTop)) : [1, 0]
+  const saddled = [tube(seatTop, seatBottom), post(seatTop, top), saddle(top, 150, along)]
   const { front, back, under, tail } = bench(frame, { fig })
   const riser = atHeight(headTop, steering, fig('handlebar_height'))
   const body = {
