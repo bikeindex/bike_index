@@ -184,7 +184,7 @@ module Geocodeable
     end
 
     geocoded_attrs = GeocodeHelper.assignable_address_hash_for(
-      formatted_address_string(render_country: :always), new_attrs: true
+      formatted_address_string(visible_attribute: :street, render_country: :always), new_attrs: true
     )
     self.attributes = geocoded_attrs.slice(:latitude, :longitude)
     assign_blank_geocoded_attrs(geocoded_attrs)
