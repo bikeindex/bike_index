@@ -2316,6 +2316,20 @@ it:
           left_organization: Hai lasciato %{org_name}
           unable_to_leave: 'Impossibile uscire da %{org_name}: contattare support@bikeindex.org
             per assistenza.'
+      pos_registration_matches:
+        redirect_by_status:
+          already_combined: Queste sono già riunite in un'unica registrazione.
+          already_kept_separate: Ci hai detto che sono diverse, quindi rimarranno
+            separate.
+          cant_combine_here: Queste registrazioni non possono essere combinate qui.
+            Invia un'e-mail a support@bikeindex.org se hai bisogno di aiuto.
+          combining: Stiamo unificando queste registrazioni in un'unica procedura.
+            Ci vuole solo un minuto.
+          combining_thanks: Grazie! Stiamo unendo le tue registrazioni %{bike_type}
+            in una sola. Ci vorrà un minuto.
+          couldnt_combine: Non è stato possibile unirli, quindi rimangono separati.
+            Invia un'e-mail a support@bikeindex.org se hai bisogno di aiuto.
+          kept_separate: Grazie, le manterremo come registrazioni separate.
     oauth:
       applications:
         ensure_app_owner!:
@@ -2813,6 +2827,8 @@ it:
           unito a noi.
         welcome_to_bike_index: Benvenuti su Bike Index
       subject: Benvenuti su Bike Index!
+    pos_registration_match_email:
+      subject: Si tratta dello stesso %{bike_type}?
   feedbacks:
     form:
       email_address: Indirizzo e-mail
@@ -5576,6 +5592,17 @@ it:
           e tu diventi un negozio di cui si fidano. È gratuito sia per te che per
           loro, e non vendiamo né condividiamo mai i dati dei clienti.
         why_shops_heading: Perché i negozi utilizzano Bike Index
+      pos_registration_match:
+        combine_them: Unendoli, si ottiene un'unica registrazione per il proprio %{bike_type},
+          con le foto e i dati inseriti.
+        if_theyre_different: Se sono diversi, puoi comunicarcelo sulla stessa pagina.
+        is_this_the_same: Si tratta dello stesso %{bike_type}?
+        pos_registered_it: Hai registrato un %{bike_type} che il negozio da cui l'hai
+          acquistato aveva già registrato a tuo nome, con lo stesso numero di serie.
+        review_and_combine: Rivedi e combina
+        shop_registered_it_html: Hai registrato un %{bike_type} che <strong>%{shop_name}</strong>
+          aveva già registrato a tuo nome al momento dell'acquisto, con lo stesso
+          numero di serie.
     ui:
       definition_list:
         row:
@@ -6626,6 +6653,20 @@ it:
             you_pay_the_current_price: Paghi il prezzo corrente per %{level}.
             your_membership: La tua iscrizione
             your_price: Il tuo prezzo
+        pos_registration_matches:
+          show:
+            combining_keeps: Unendole, viene mantenuta la registrazione del tuo %{bike_type}
+              presso il negozio, con le tue foto e i dettagli che hai inserito. La
+              tua registrazione separata viene eliminata.
+            is_this_the_same: Si tratta dello stesso %{bike_type}?
+            no_theyre_different: No, sono diversi
+            pos_registered_it: Il negozio dove hai acquistato il tuo %{bike_type}
+              lo aveva già registrato a tuo nome con lo stesso numero di serie.
+            registered_when_you_bought_it: Registrato al momento dell'acquisto
+            shop_registered_it: "%{shop_name} aveva già registrato un %{bike_type}
+              a tuo nome con lo stesso numero di serie quando lo hai acquistato."
+            yes_combine_them: Sì, combinali
+            your_registration: La tua registrazione
       sales:
         new_form:
           record_sale: Vendita record
