@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
-# The owner confirmed their own registration is the bike their shop's POS registered. The POS registration
-# stays, since it carries the shop and the sale, and takes what the owner added; their registration is deleted.
+# The owner, or the other email the shop registered it to, confirmed the owner's registration is the bike the
+# shop's POS registered. The POS registration stays, since it carries the shop and the sale, and takes what the
+# owner added and their account; their registration is deleted.
 # Like UserJobs::MergeAdditionalEmailJob, everything pointing at the deleted registration is moved or listed here
 module BikeJobs
   class MergePosRegistrationJob < ApplicationJob
@@ -73,6 +74,7 @@ module BikeJobs
       return unless merged
 
       [match.bike_id, match.pos_bike_id].each { CallbackJobs::AfterBikeSaveJob.perform_async(it) }
+      EmailJobs::PosRegistrationMergedJob.perform_async(match.id) if match.different_email?
     end
 
     private
@@ -89,7 +91,7 @@ module BikeJobs
       Sale.where(item: bike).update_all(item_id: pos_bike.id)
       # Gear is its Strava athlete's
       unless StravaGear.where(item: pos_bike).exists?
-        StravaGear.where(item: bike, strava_integration: StravaIntegration.where(user_id: pos_bike.user_id))
+        StravaGear.where(item: bike, strava_integration: StravaIntegration.where(user_id: bike.user_id))
           .update_all(item_id: pos_bike.id)
       end
       # Moved rather than claimed, which would make the owner its claimer and add organizations. The update has
@@ -138,11 +140,12 @@ module BikeJobs
         pos_bike.assign_attributes(address_record_id: bike.address_record_id, address_set_manually: true)
       end
 
-      # The registration address is the initial ownership's, so the owner's goes with their registration info
+      # The registration address is the initial ownership's, so the owner's goes with their registration info. One
+      # the shop registered to another email keeps it, and is claimed for the owner's account
       owner_ownership = bike.current_ownership
       pos_ownership = pos_bike.current_ownership
       owner_ownership&.address_record&.update!(bike_id: pos_bike.id)
-      pos_ownership.update!(claimed: true, token: nil,
+      pos_ownership.update!(claimed: true, token: nil, user_id: bike.user_id,
         registration_info: pos_ownership.registration_info.to_h.merge(owner_ownership&.registration_info.to_h.compact_blank),
         address_record_id: owner_ownership&.address_record_id || pos_ownership.address_record_id)
 

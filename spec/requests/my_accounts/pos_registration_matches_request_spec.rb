@@ -89,7 +89,8 @@ RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
     context "POS registration transferred after they said yes" do
       it "doesn't say it's combining" do
         patch url, params: {answer: "merge"}
-        pos_registration_match.pos_bike.current_ownership.update_column(:user_id, FactoryBot.create(:user).id)
+        BikeServices::OwnershipTransferer.find_or_create(pos_registration_match.pos_bike, updator: current_user,
+          new_owner_email: "new-owner@example.com")
 
         get url
         expect(response).to redirect_to(my_account_path)
@@ -100,7 +101,8 @@ RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
     context "POS registration transferred after the merge" do
       before do
         pos_registration_match.update!(status: :merged, merged_at: Time.current)
-        pos_registration_match.pos_bike.current_ownership.update_column(:user_id, FactoryBot.create(:user).id)
+        BikeServices::OwnershipTransferer.find_or_create(pos_registration_match.pos_bike, updator: current_user,
+          new_owner_email: "new-owner@example.com")
       end
 
       it "says they're combined" do
@@ -128,6 +130,19 @@ RSpec.describe MyAccounts::PosRegistrationMatchesController, type: :request do
         expect(response).to redirect_to(my_account_path)
         expect(flash[:notice]).to include("can't be combined here")
       end
+    end
+  end
+
+  context "signed in as the owner of one the shop registered to another email" do
+    include_context :request_spec_logged_in_as_user
+    let(:pos_registration_match) { FactoryBot.create(:pos_registration_match, :different_email, user: current_user) }
+
+    it "404s, since that email answers" do
+      get "#{base_url}/#{pos_registration_match.id}"
+      expect(response.status).to eq 404
+      patch "#{base_url}/#{pos_registration_match.id}", params: {answer: "merge"}
+      expect(response.status).to eq 404
+      expect(pos_registration_match.reload.status).to eq "pending"
     end
   end
 

@@ -29,6 +29,35 @@ RSpec.describe EmailJobs::PosRegistrationMatchJob, type: :job do
     end
   end
 
+  context "the shop registered it to another email" do
+    let(:match) { FactoryBot.create(:pos_registration_match, :different_email) }
+
+    it "emails that address once, with the token's link" do
+      expect {
+        instance.perform(match.id)
+        instance.perform(match.id)
+      }.to change(Notification, :count).by 1
+      mail = ActionMailer::Base.deliveries.sole
+      expect(mail.to).to eq(["shop-customer@example.com"])
+      expect(mail.html_part.body.to_s).to include("/pos_registration_matches/#{match.token}")
+      expect(mail.html_part.body.to_s).not_to include(user.email)
+      expect(Notification.last).to have_attributes(kind: "pos_registration_match", user_id: nil,
+        message_channel_target: "shop-customer@example.com", delivery_status: "delivery_success")
+    end
+
+    context "whose account asked for no email but theft alerts" do
+      before do
+        FactoryBot.create(:user_confirmed, email: "shop-customer@example.com", no_non_theft_notification: true)
+      end
+
+      it "doesn't send" do
+        expect(match.asked_user).to be_present
+        instance.perform(match.id)
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+      end
+    end
+  end
+
   context "with a POS registration the owner hid" do
     before { match.pos_bike.update_column(:user_hidden, true) }
 

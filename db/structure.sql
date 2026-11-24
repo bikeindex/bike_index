@@ -3507,7 +3507,8 @@ CREATE TABLE public.pos_registration_matches (
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
     merger_id bigint,
-    merged_at timestamp(6) without time zone
+    merged_at timestamp(6) without time zone,
+    token character varying
 );
 
 
@@ -7832,6 +7833,13 @@ CREATE INDEX index_pos_registration_matches_on_pos_bike_id ON public.pos_registr
 
 
 --
+-- Name: index_pos_registration_matches_on_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_pos_registration_matches_on_token ON public.pos_registration_matches USING btree (token);
+
+
+--
 -- Name: index_primary_activities_on_primary_activity_family_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8240,6 +8248,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261124120000'),
 ('20261123074039'),
 ('20261121050440'),
 ('20261119180000'),

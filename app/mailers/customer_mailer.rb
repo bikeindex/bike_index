@@ -191,11 +191,25 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
-  def pos_registration_match_email(pos_registration_match, user)
+  # To the owner, or the other email the shop registered it to, which may have no account
+  def pos_registration_match_email(pos_registration_match, email, user = nil)
     @user = user
     pos_bike = pos_registration_match.pos_bike
     component = Emails::PosRegistrationMatch::Component.new(bike: pos_registration_match.bike, pos_bike:,
       pos_registration_match:)
+
+    I18n.with_locale(@user&.preferred_language) do
+      mail(to: email, subject: default_i18n_subject(bike_type: pos_bike.type), tag: __callee__) do |format|
+        format.html { render component }
+      end
+    end
+  end
+
+  # After another email the shop registered it to said to merge, so the owner can tell us if it's wrong
+  def pos_registration_merged_email(pos_registration_match, user)
+    @user = user
+    pos_bike = pos_registration_match.pos_bike
+    component = Emails::PosRegistrationMerged::Component.new(pos_bike:, pos_registration_match:)
 
     I18n.with_locale(@user.preferred_language) do
       mail(to: @user.email, subject: default_i18n_subject(bike_type: pos_bike.type), tag: __callee__) do |format|

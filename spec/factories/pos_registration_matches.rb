@@ -6,13 +6,20 @@ FactoryBot.define do
       user { FactoryBot.create(:user_confirmed) }
       manufacturer { FactoryBot.create(:manufacturer) }
       serial_number { "WTU123C4567" }
+      pos_owner_email { user.email }
     end
     pos_bike do
-      FactoryBot.create(:bike_lightspeed_pos, owner_email: user.email, manufacturer:, serial_number:, created_at: Time.current - 30.days)
+      FactoryBot.create(:bike_lightspeed_pos, owner_email: pos_owner_email, manufacturer:, serial_number:, created_at: Time.current - 30.days)
     end
     bike do
       FactoryBot.create(:bike, :with_ownership_claimed, user:, manufacturer:, serial_number:, creation_state_origin: "web",
         claimed_at: Time.current)
+    end
+
+    # The shop registered it to an email that isn't the owner's, as the finder records it
+    trait :different_email do
+      pos_owner_email { "shop-customer@example.com" }
+      token { SecurityTokenizer.new_token }
     end
 
     after(:build) do |pos_registration_match|

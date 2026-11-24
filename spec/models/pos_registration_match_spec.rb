@@ -35,6 +35,51 @@ RSpec.describe PosRegistrationMatch, type: :model do
     end
   end
 
+  context "the shop registered it to another email" do
+    let(:match) { FactoryBot.create(:pos_registration_match, :different_email) }
+    let(:user) { match.bike.user }
+
+    it "is asked there, and only its token answers" do
+      expect(match).to have_attributes(different_email?: true, asked_email: "shop-customer@example.com", asked_user: nil)
+      expect(match.answer!(user:, merge: true)).to be_falsey
+      expect(match.answer!(token: "wrong", merge: true)).to be_falsey
+      expect(match.reload.status).to eq "pending"
+
+      expect(match.answer!(token: match.token, merge: true)).to be_truthy
+      expect(match.reload).to have_attributes(status: "confirmed", merger_id: nil)
+      expect(BikeJobs::MergePosRegistrationJob.jobs.map { it["args"] }).to eq([[match.id]])
+    end
+
+    it "isn't mergeable once another account claims the POS registration" do
+      expect(match.mergeable?).to be_truthy
+      match.pos_bike.current_ownership.update!(user: FactoryBot.create(:user_confirmed), claimed: true)
+      expect(match.reload.mergeable?).to be_falsey
+    end
+  end
+
+  describe "owners_pos_registration?" do
+    let(:user) { FactoryBot.create(:user_confirmed, email: "john.smith@gmail.com") }
+    let(:match) { FactoryBot.create(:pos_registration_match, user:, pos_owner_email:) }
+    let(:pos_owner_email) { "JohnSmith+bikeshop@googlemail.com" }
+
+    it "counts an address that delivers to one of the owner's emails, until another account claims it" do
+      expect(match.pos_bike.user_id).to be_nil
+      expect(described_class.owners_pos_registration?(match.bike, match.pos_bike)).to be_truthy
+      expect(match.mergeable?).to be_truthy
+      match.pos_bike.current_ownership.update!(user: FactoryBot.create(:user_confirmed), claimed: true)
+      expect(described_class.owners_pos_registration?(match.bike, match.reload.pos_bike)).to be_falsey
+    end
+
+    context "another address" do
+      let(:pos_owner_email) { "john.smith@example.com" }
+
+      it "is false" do
+        expect(described_class.owners_pos_registration?(match.bike, match.pos_bike)).to be_falsey
+        expect(match.mergeable?).to be_falsey
+      end
+    end
+  end
+
   describe "review_reasons_for" do
     let(:match) { FactoryBot.create(:pos_registration_match) }
     let(:reasons) { described_class.review_reasons_for(match.bike, match.pos_bike) }

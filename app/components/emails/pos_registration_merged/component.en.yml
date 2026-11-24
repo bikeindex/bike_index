@@ -1,0 +1,17 @@
+---
+en:
+  components:
+    emails:
+      pos_registration_merged:
+        combined: We combined your %{bike_type}'s registrations
+        if_this_is_a_mistake: If this is a mistake, or a problem, reply to this email
+          and we'll sort it out.
+        one_registration: >-
+          It's now one registration on your account, with your photos and the details
+          you entered.
+        pos_registered_it: >-
+          The shop it was bought from registered a %{bike_type} with the same serial
+          to %{shop_email}, which told us they're the same %{bike_type}.
+        shop_registered_it_html: >-
+          <strong>%{shop_name}</strong> registered a %{bike_type} with the same serial
+          to %{shop_email} when it was bought, which told us they're the same %{bike_type}.

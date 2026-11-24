@@ -9,8 +9,6 @@ module MyAccounts
     before_action :authenticate_user_for_my_accounts_controller
     before_action :find_pos_registration_match
 
-    ANSWERS = {"merge" => true, "decline" => false}.freeze
-
     def show
       return redirect_by_status unless @pos_registration_match.confirmable?
 
@@ -19,7 +17,8 @@ module MyAccounts
     end
 
     def update
-      redirect_by_status(@pos_registration_match.answer!(user: current_user, merge: ANSWERS[params[:answer]]))
+      redirect_by_status(@pos_registration_match.answer!(user: current_user,
+        merge: PosRegistrationMatch::ANSWERS[params[:answer]]))
     end
 
     private
@@ -28,7 +27,8 @@ module MyAccounts
       @pos_registration_match = PosRegistrationMatch.find(params[:id])
       @bike = @pos_registration_match.bike
       @pos_bike = @pos_registration_match.pos_bike
-      raise ActiveRecord::RecordNotFound unless @bike.present? && @bike.user_id == current_user.id
+      # One the shop registered to another email is answered from there
+      raise ActiveRecord::RecordNotFound unless @pos_registration_match.answerable_by?(user: current_user)
     end
 
     # The emailed link stays the same as the match changes. answered is whether the owner's answer was just recorded
@@ -38,7 +38,8 @@ module MyAccounts
       return redirect_to(my_account_pos_registration_match_path(match)) if match.confirmable?
 
       # A really deleted POS registration (BikeDeleterJob) leaves no @pos_bike
-      combined = (match.merging? || match.merged?) && @pos_bike&.user_id == current_user.id
+      combined = (match.merging? || match.merged?) && @pos_bike.present? &&
+        PosRegistrationMatch.owners_pos_registration?(@bike, @pos_bike)
       flash[answered ? :success : :notice] = if answered
         match.declined? ? translation(:kept_separate) : translation(:combining_thanks, bike_type: @pos_bike&.type)
       elsif match.merged?

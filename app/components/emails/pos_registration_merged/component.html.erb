@@ -1,0 +1,15 @@
+<h1><%= translation("combined", bike_type:) %></h1>
+
+<p>
+  <% if shop_name.present? %>
+    <%= translation("shop_registered_it_html", shop_name:, bike_type:, shop_email:) %>
+  <% else %>
+    <%= translation("pos_registered_it", bike_type:, shop_email:) %>
+  <% end %>
+</p>
+
+<p><%= translation("one_registration", bike_type:) %></p>
+
+<%= render(Emails::Partials::BikeBox::Component.new(bike: @pos_bike, ownership: @pos_bike.current_ownership, bike_url_path: bike_url(@pos_bike))) %>
+
+<p><%= translation("if_this_is_a_mistake") %></p>

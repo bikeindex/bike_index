@@ -7,6 +7,7 @@
 #  merged_at               :datetime
 #  review_reasons          :text             default([]), not null, is an Array
 #  status                  :integer          default("pending"), not null
+#  token                   :string
 #  created_at              :datetime         not null
 #  updated_at              :datetime         not null
 #  bike_id                 :bigint           not null
@@ -20,12 +21,16 @@
 #  index_pos_registration_matches_on_duplicate_bike_group_id  (duplicate_bike_group_id)
 #  index_pos_registration_matches_on_merger_id                (merger_id)
 #  index_pos_registration_matches_on_pos_bike_id              (pos_bike_id)
+#  index_pos_registration_matches_on_token                    (token) UNIQUE
 #
-# A new self-registration of a bike a shop's POS registered to the same owner: a pair within the
-# whole-serial DuplicateBikeGroup, recorded by BikeJobs::PosRegistrationMatchFinderJob
+# A new self-registration of a bike a shop's POS registered to the same owner, or to an email that isn't
+# theirs: a pair within the whole-serial DuplicateBikeGroup, recorded by BikeJobs::PosRegistrationMatchFinderJob.
+# For another email, the token emailed to it says whether to merge, not the owner
 class PosRegistrationMatch < ApplicationRecord
   STATUS_ENUM = {pending: 0, confirmed: 1, declined: 2, merged: 3}.freeze
   BUCKETS = %w[merge_candidate review_candidate].freeze
+  # The answer page's buttons
+  ANSWERS = {"merge" => true, "decline" => false}.freeze
   REVIEW_REASONS = {
     "stolen_history" => "Stolen history on the serial",
     "multiple_pos_bikes" => "More than one POS registration matches",
@@ -77,10 +82,22 @@ class PosRegistrationMatch < ApplicationRecord
     where(pos_bike_id:).where.not(bike_id:).and(where(bike_id: Bike.current_with_user_hidden.select(:id)).or(merged))
   end
 
+  # The shop registered it to the owner's account, or to an address that delivers to one of its emails
+  def self.owners_pos_registration?(bike, pos_bike)
+    return true if bike.user_id.present? && bike.user_id == pos_bike.user_id
+
+    mailbox = EmailNormalizer.mailbox(pos_bike.current_ownership&.owner_email)
+    mailbox.present? && !pos_bike.claimed? && bike.user.present? &&
+      bike.user.own_emails.any? { EmailNormalizer.mailbox(it) == mailbox }
+  end
+
   # The registration a deleted one was merged into, so its links still go somewhere
   def self.merged_into(bike) = bike.deleted? ? merged.find_by(bike_id: bike.id)&.pos_bike : nil
 
   def merge_candidate? = review_reasons.none?
+
+  # The shop registered it to an email that isn't the owner's, so that email is asked, with the token
+  def different_email? = token.present?
 
   # The owner said yes and BikeJobs::MergePosRegistrationJob hasn't run yet
   def merging? = confirmed? && merge_candidate?
@@ -89,18 +106,30 @@ class PosRegistrationMatch < ApplicationRecord
   def confirmable? = pending? && mergeable?
 
   # Still the same bike (an edited serial or manufacturer could otherwise slip past the stolen veto), both live,
-  # and both theirs
+  # and both theirs - or for another email, the shop's still unclaimed by any account
   def mergeable?
-    merge_candidate? && [bike, pos_bike].all? { it&.current_with_user_hidden? } &&
-      bike.user_id.present? && bike.user_id == pos_bike.user_id &&
+    merge_candidate? && [bike, pos_bike].all? { it&.current_with_user_hidden? } && bike.user_id.present? &&
+      (different_email? ? !pos_bike.claimed? : self.class.owners_pos_registration?(bike, pos_bike)) &&
       bike.serial_normalized_no_space == pos_bike.serial_normalized_no_space && bike.manufacturer_id == pos_bike.manufacturer_id
   end
 
-  # The owner's answer (merge is true or false), while they can still give one. Returns whether it was recorded.
+  # Who's asked: the owner, or for another email, that email (and its account, if it has one)
+  def asked_user = different_email? ? pos_bike&.user : bike&.user
+
+  def asked_email = different_email? ? pos_bike&.current_ownership&.owner_email : bike&.user&.email
+
+  # The owner, or for another email, whoever has the token emailed to it
+  def answerable_by?(user: nil, token: nil)
+    return token.present? && ActiveSupport::SecurityUtils.secure_compare(token, self.token) if different_email?
+
+    bike&.user_id.present? && bike.user_id == user&.id
+  end
+
+  # The answer (merge is true or false), while one can still be given. Returns whether it was recorded.
   # A yes is rechecked and merged by BikeJobs::MergePosRegistrationJob
-  def answer!(user:, merge:)
+  def answer!(merge:, user: nil, token: nil)
     recorded = with_lock do
-      next false unless merge.in?([true, false]) && confirmable? && bike.user_id == user&.id
+      next false unless merge.in?([true, false]) && confirmable? && answerable_by?(user:, token:)
 
       merge ? update!(status: :confirmed, merger: user) : update!(status: :declined)
     end
