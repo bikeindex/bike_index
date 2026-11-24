@@ -19,6 +19,6 @@ RSpec.describe Pages::Shop::Index::Component, type: :component do
     expect(component).to have_link("Shop the gear", href: "#caped-registrant-cap")
     expect(component).to have_css("section#caped-registrant-cap")
     expect(component).to have_css("section#registration-stickers")
-    expect(component).to have_link("Contact us", href: "mailto:support@bikeindex.org")
+    expect(component).to have_link("Contact us", href: "mailto:gavin@bikeindex.org?subject=Bulk%20sticker%20order")
   end
 end

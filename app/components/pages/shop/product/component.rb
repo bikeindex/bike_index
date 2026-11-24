@@ -7,8 +7,6 @@ module Pages
       # flip puts the media on the right once the row is two columns
       class Component < ApplicationComponent
         # Template Dependency: SharedBlocks::Marketing::Wrapper::Component
-        BAND_CLASSES = "tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700 tw:dark:bg-gray-800/60"
-
         renders_one :media
         renders_one :pricing
         renders_one :note

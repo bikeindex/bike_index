@@ -20,6 +20,7 @@ RSpec.describe "shop", :js, type: :system do
     click_link "Shop the gear"
     wait_for { first_product_top.between?(0, 40) }
     expect(page.evaluate_script("window.location.hash")).to eq ""
+    expect(page.evaluate_script("document.activeElement.id")).to eq "caped-registrant-cap"
 
     # The pink cap's image is on the right wherever the row has two columns, down to where it wraps
     image = find("img[alt^='Illustration of the pink ripstop']")

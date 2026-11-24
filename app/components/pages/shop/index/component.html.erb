@@ -1,4 +1,4 @@
-<section class="tw:border-b <%= Pages::Shop::Product::Component::BAND_CLASSES %>">
+<section class="tw:border-b <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>">
   <div class="twwiderow tw:items-center tw:gap-10 tw:pt-12 tw:pb-10 tw:sm:pt-16 tw:sm:pb-14 <%= SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES %>">
     <div class="tw:flex tw:flex-col tw:items-start tw:gap-4.5">
       <%= render(UI::Badge::Component.new(text: translation(".the_bike_index_shop"), color: :yellow, size: :lg)) %>
@@ -26,7 +26,7 @@
         color: :yellow, size: :callout, data: {controller: "scroll-to-hash", action: "scroll-to-hash#scroll"})) %>
     </div>
 
-    <%= image_tag("kelsey/illustrations/comic-assets_bike-hero.png", alt: "", width: 1768, height: 1320, class: "tw:mx-auto tw:w-full tw:max-w-105") %>
+    <%= image_tag("kelsey/illustrations/comic-assets_bike-hero.webp", alt: "", width: 840, height: 628, class: "tw:mx-auto tw:w-full tw:max-w-105") %>
   </div>
 </section>
 
@@ -78,7 +78,7 @@
           >
             <%= image_tag("shop/pink-cap-brim.webp", alt: translation(".pink_cap_brim_alt"), width: 400, height: 231, loading: "lazy", class: "tw:w-full") %>
 
-            <span class="tw:font-[Patrick_Hand,_cursive] tw:text-base tw:text-slate-900">
+            <span class="tw:text-base tw:text-slate-900">
               <%= translation(".under_the_brim") %>
             </span>
           </div>
@@ -116,7 +116,8 @@
 
   <% product.with_note do %>
     <p class="tw:mt-4 tw:mb-0 tw:text-sm tw:text-gray-600 tw:dark:text-gray-400">
-      <%= translation(".bulk_orders_html", contact_link: mail_to("support@bikeindex.org", translation(".contact_us"), class: "twlink tw:font-bold")) %>
+      <%= translation(".bulk_orders_html", contact_link: mail_to("gavin@bikeindex.org", translation(".contact_us"),
+        subject: translation(".bulk_order_email_subject"), class: "twlink tw:font-bold")) %>
     </p>
   <% end %>
 <% end %>

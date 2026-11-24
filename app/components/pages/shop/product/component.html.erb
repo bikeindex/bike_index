@@ -1,4 +1,4 @@
-<%= tag.section(id: @id, class: ["tw:scroll-mt-4", ("tw:border-y #{BAND_CLASSES}" if @band)]) do %>
+<%= tag.section(id: @id, tabindex: (-1 if @id), class: ["tw:scroll-mt-4 tw:outline-none", ("tw:border-y #{SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES}" if @band)]) do %>
   <div
     class="
       twwiderow tw:items-center tw:gap-x-14 tw:gap-y-12 tw:py-12 tw:sm:py-18
@@ -13,8 +13,8 @@
 
         <span
           class="
-            tw:font-[Bangers,_cursive] tw:text-[28px] tw:text-purple-500
-            tw:dark:text-purple-300
+            tw:font-header tw:text-[28px] tw:font-extrabold
+            tw:text-purple-500 tw:dark:text-purple-300
           "
           aria-hidden="true"
         >

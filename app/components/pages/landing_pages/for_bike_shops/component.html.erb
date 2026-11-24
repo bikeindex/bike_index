@@ -133,7 +133,7 @@
   </div>
 </section>
 
-<section class="tw:border-y <%= BAND %>">
+<section class="tw:border-y <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>">
   <div class="tw:py-12 tw:md:py-18 <%= SECTION_CLASSES %>">
     <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".what_your_customers_get"),
       html_class: "tw:mb-8 tw:max-w-170")) %>
@@ -246,7 +246,7 @@
   </div>
 </section>
 
-<section class="tw:border-t <%= BAND %>">
+<section class="tw:border-t <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>">
   <div class="tw:grid tw:gap-8 tw:py-12 tw:md:py-16 tw:lg:grid-cols-[0.7fr_1.3fr] tw:lg:gap-12 <%= SECTION_CLASSES %>">
     <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".faq"),
       intro: translation(".something_else_html",

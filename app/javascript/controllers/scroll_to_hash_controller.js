@@ -8,6 +8,7 @@ export default class extends Controller {
     if (!target || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return
 
     event.preventDefault()
+    target.focus({ preventScroll: true })
     const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
     target.scrollIntoView({ behavior: reduceMotion ? 'auto' : 'smooth' })
   }

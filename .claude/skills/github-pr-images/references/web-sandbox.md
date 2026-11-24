@@ -99,9 +99,9 @@ Find it by `get_me`'s login and a body starting `## Screenshots`, paging through
 
 `add_issue_comment` appends a Claude Code attribution footer the `pr` skill forbids —
 the tell is the session id in its link — and can backtick the URL inside an `<img src>`
-too (#4474), leaving an image with no `src`. `update_issue_comment` does neither, so
-create the comment with `## Screenshots` alone and put the body in with an update, then
-read it back.
+too (#4474), leaving an image with no `src`. `update_issue_comment` adds no footer but
+can rewrite URLs too (#4821) — so create the comment with `## Screenshots` alone, put
+the body in with an update once the probe has passed, then read it back.
 
 ## Verifying
 

@@ -13,14 +13,8 @@ module Pages
         STICKERS_ID = "registration-stickers"
         PRICES = {caped_cap: "$20.00", cycling_cap: "$15.00", sticker: "$7.99"}.freeze
 
-        BURST_CLASSES = "tw:absolute tw:font-[Bangers,_cursive] tw:text-[44px] tw:tracking-[.02em] " \
+        BURST_CLASSES = "tw:absolute tw:font-header tw:font-extrabold tw:text-[44px] tw:tracking-[.02em] " \
           "tw:[-webkit-text-stroke:2px_#000]"
-
-        def before_render
-          helpers.content_for(:header) do
-            tag.link(href: "https://fonts.googleapis.com/css2?family=Bangers&family=Patrick+Hand&display=swap", rel: "stylesheet")
-          end
-        end
 
         private
 

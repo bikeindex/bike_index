@@ -4,6 +4,7 @@ en:
     pages:
       shop:
         index:
+          bulk_order_email_subject: Bulk sticker order
           bulk_orders_html: "%{contact_link} for bulk orders."
           caped_cap_alt: The Caped Registrant cap, light blue comic print with purple
             brim
