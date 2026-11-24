@@ -62,7 +62,7 @@ const classified = ({ e_vehicle_classifications: records }, jurisdictions) => Ob
   return [id, { ...record, label, jurisdiction_name: jurisdictionName, title: /^Class \d+$/.test(record.name) ? `${label} e-bike` : label }]
 }))
 
-// What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in and the vocabulary, which holds the kit
+// What picked vehicles render from, which needs nothing of the index: the blocks `ids` are in and the vocabulary
 function start ({ manifestUrl, ids, jurisdictions, riders, comparing }) {
   opened = fetchJson(manifestUrl).then((published) => {
     if (published.format !== FORMAT) throw new Error(`catalog format ${published.format} isn't ${FORMAT}`)
