@@ -44,10 +44,11 @@ class BugReport < ApplicationRecord
   SIGNIFICANT_TAG_SHARE = 0.1
   INTERNAL_NOTIFICATION_TAG = "bike_index_notification"
   AUTO_REPLY_TAG = "auto_replies"
-  ORGANIZATION_AUTO_REPLY_TAG = "auto_replies_organization"
   SPAM_TAG = "spam"
+  FEEDBACK_TAG = "feedback"
+  FEEDBACK_LINK_REGEX = %r{/admin/feedbacks/(\d+)}
   # Tags marking reports that aren't real bug reports and can be auto-ignored
-  IGNORED_TAGS = [INTERNAL_NOTIFICATION_TAG, AUTO_REPLY_TAG, ORGANIZATION_AUTO_REPLY_TAG, SPAM_TAG].freeze
+  IGNORED_TAGS = [INTERNAL_NOTIFICATION_TAG, AUTO_REPLY_TAG, SPAM_TAG].freeze
 
   enum :status, STATUS_ENUM
 
@@ -102,6 +103,12 @@ class BugReport < ApplicationRecord
       [EmailNormalizer.normalize(field&.addresses&.first), field&.display_names&.first]
     end
 
+    # A feedback panel notification we sent - not a reply quoting one, which carries the same link
+    def tags_from_mail(mail, body)
+      feedback = our_address?(mail.from&.first) && mail.in_reply_to.blank? && body.to_s.match?(FEEDBACK_LINK_REGEX)
+      feedback ? [FEEDBACK_TAG] : []
+    end
+
     # Which of our addresses the email was sent to (contact@, support@, bugs@, ...) - nil when none of
     # the recipients is ours. X-Original-To is the envelope recipient Postmark's ingress prepends,
     # which for anything forwarded is Postmark's own inbound address rather than one of ours
@@ -142,6 +149,11 @@ class BugReport < ApplicationRecord
 
   def display_subject
     subject.presence || "(no subject)"
+  end
+
+  # Feedback notifications link to the full message, which the email only previews
+  def feedback_id
+    body.to_s[FEEDBACK_LINK_REGEX, 1]&.to_i
   end
 
   def body_stripped

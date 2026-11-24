@@ -2270,6 +2270,19 @@ nb:
           left_organization: Du har forlatt %{org_name}
           unable_to_leave: 'Kan ikke forlate %{org_name}: kontakt support@bikeindex.org
             for hjelp'
+      pos_registration_matches:
+        redirect_by_status:
+          already_combined: Disse er allerede samlet i én registrering.
+          already_kept_separate: Du fortalte oss at disse er forskjellige, så de forblir
+            separate.
+          cant_combine_here: Disse registreringene kan ikke kombineres her. Send en
+            e-post til support@bikeindex.org hvis du trenger hjelp.
+          combining: Vi slår disse sammen til én registrering. Det tar et minutt.
+          combining_thanks: Takk! Vi slår sammen registreringene til %{bike_type}-en
+            din til én. Det tar et minutt.
+          couldnt_combine: Vi kunne ikke kombinere disse, så de er fortsatt separate.
+            Send en e-post til support@bikeindex.org hvis du trenger hjelp.
+          kept_separate: Takk, vi beholder dem som separate registreringer.
     oauth:
       applications:
         ensure_app_owner!:
@@ -2742,6 +2755,8 @@ nb:
           blitt med.
         welcome_to_bike_index: Velkommen til Bike Index
       subject: Velkommen til Bike Index!
+    pos_registration_match_email:
+      subject: Er dette den samme %{bike_type}?
   feedbacks:
     form:
       email_address: Epostadresse
@@ -3888,6 +3903,8 @@ nb:
     landing_pages_for_bike_shops: Bike Index kobler seg til kasseapparatet ditt og
       registrerer automatisk alle sykler du selger. Gratis for butikker og kunder,
       og vi selger eller deler aldri kundedata.
+    shop_index: Sykkelregisterlokk og registreringsklistremerker. Hvert kjøp bidrar
+      til å holde registeret fritt.
   meta_titles:
     bikes_index: Søkeresultater
     bikes_new: Registrer en sykkel!
@@ -3947,6 +3964,7 @@ nb:
     organization_signup_show: Legg til organisasjonen din i Bike Index
     organization_signup_update: Legg til organisasjonen din i Bike Index
     organization_signup_welcome: "%{organization} er aktiv"
+    shop_index: Butikk - Sykkelindeks
   money:
     currencies:
       en: USD
@@ -5317,6 +5335,17 @@ nb:
           de stoler på. Det er gratis for deg og for dem, og vi selger eller deler
           aldri kundedata.
         why_shops_heading: Hvorfor butikker bruker Bike Index
+      pos_registration_match:
+        combine_them: Ved å kombinere dem beholdes én registrering for din %{bike_type},
+          med bildene dine og detaljene du skrev inn.
+        if_theyre_different: Hvis de er forskjellige, kan du fortelle oss det på samme
+          side.
+        is_this_the_same: Er dette den samme %{bike_type}?
+        pos_registered_it: Du registrerte en %{bike_type} som butikken du kjøpte den
+          fra allerede hadde registrert på deg, med samme serienummer.
+        review_and_combine: Gjennomgå og kombiner
+        shop_registered_it_html: Du registrerte en %{bike_type} som <strong>%{shop_name}</strong>
+          allerede hadde registrert på deg da du kjøpte den, med samme serienummer.
     ui:
       definition_list:
         row:
@@ -6337,6 +6366,20 @@ nb:
             you_pay_the_current_price: Du betaler gjeldende pris for %{level}.
             your_membership: Ditt medlemskap
             your_price: Din pris
+        pos_registration_matches:
+          show:
+            combining_keeps: Ved å kombinere dem beholdes butikkens registrering av
+              din %{bike_type}, med bildene dine og detaljene du skrev inn. Din separate
+              registrering fjernes.
+            is_this_the_same: Er dette den samme %{bike_type}?
+            no_theyre_different: Nei, de er forskjellige
+            pos_registered_it: Butikken du kjøpte din %{bike_type} fra hadde allerede
+              registrert den til deg med samme serienummer.
+            registered_when_you_bought_it: Registrert da du kjøpte den
+            shop_registered_it: "%{shop_name} hadde allerede registrert en %{bike_type}
+              til deg med samme serienummer da du kjøpte den."
+            yes_combine_them: Ja, kombiner dem
+            your_registration: Din registrering
       sales:
         new_form:
           record_sale: Rekordsalg
@@ -8433,6 +8476,43 @@ nb:
             out_of_links_html: Vi har sendt alle aktiveringslenkene vi kan for %{name},
               og ingen av dem gikk til %{email}. Kontakt support@bikeindex.org, så
               ordner vi det.
+      shop:
+        index:
+          bulk_order_email_subject: Storbestilling av klistremerker
+          bulk_orders_html: "%{contact_link} for bulkbestillinger."
+          caped_cap_alt: The Caped Registrant-capsen, lyseblå tegneserietrykk med
+            lilla brem
+          caped_cap_description: Vår tegneseriekunst, over hele en sykkellue. Klokker
+            ringer, låser klikker, og det kappekledde skjoldet holder vakt. Lilla
+            brem.
+          caped_cap_name: Capsen med registrant
+          contact_us: Kontakt oss
+          cycling_cap: Sykkelhette
+          for_riders_and_shops: For ryttere og butikker
+          for_shops: For butikker
+          gear_that_helps_get_bikes_home: Utstyr som hjelper med å få sykler hjem.
+          lede: Bike Index er et gratis, ideell register. Hver caps og klistremerke
+            du kjøper gjør det gratis for syklister overalt.
+          mission: Vi er en ideell organisasjon med 501(c)(3)-status. Salget finansierer
+            registeret, varslene om stjålne sykler og partnernettverket som hjelper
+            syklister med å finne syklene sine.
+          shop_the_gear: Handle utstyret
+          sticker_alt: Plakat med registreringsklistremerke om hvordan du unngår å
+            få sykkelen din stjålet
+          sticker_description: Fest den på rammen, skann QR-koden, så er sykkelen
+            din registrert på omtrent to minutter. Hvis sykkelen din noen gang blir
+            mistet eller stjålet, kan alle som finner den skanne klistremerket og
+            se at den tilhører deg. Sykkelbutikker kan også ha dem på lager, for nye
+            salg, brukte sykler og sykler inn til service.
+          sticker_name: Klistremerker for registrering av sykkelindeks
+          suggested_retail: Foreslått detaljhandel
+          the_bike_index_shop: Bike Index-butikken
+          wholesale_pricing_available: Engrospriser tilgjengelig
+          your_purchase_keeps_bike_index_free: Kjøpet ditt forblir gratis for Bike
+            Index.
+        product:
+          view: Utsikt
+          view_on_the_shop: Vis %{name} i Bike Index-butikken (åpnes i en ny fane)
     shared_blocks:
       footer:
         about: Om

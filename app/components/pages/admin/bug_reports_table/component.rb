@@ -21,6 +21,15 @@ module Pages
           @sort_state = sort_state
           @render_sortable = render_sortable
         end
+
+        private
+
+        # The controller rewrites the search links' path to the sort state's, which off the index is the page itself
+        def sortable_links_data
+          return {} unless @render_sortable
+
+          {controller: "update-cached-sortable-links", "update-cached-sortable-links-base-url-value": url_for(@sort_state.search_params)}
+        end
       end
     end
   end

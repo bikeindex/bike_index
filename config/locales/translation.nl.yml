@@ -2249,6 +2249,20 @@ nl:
           left_organization: Je hebt %{org_name} verlaten.
           unable_to_leave: 'Kan %{org_name} niet verlaten: neem contact op met support@bikeindex.org
             voor hulp.'
+      pos_registration_matches:
+        redirect_by_status:
+          already_combined: Deze zijn al samengevoegd in één registratie.
+          already_kept_separate: U vertelde ons dat dit verschillende zaken zijn,
+            dus blijven ze gescheiden.
+          cant_combine_here: Deze registraties kunnen hier niet worden gecombineerd.
+            Stuur een e-mail naar support@bikeindex.org als u hulp nodig heeft.
+          combining: We voegen deze samen tot één registratie. Dat duurt maar een
+            minuut.
+          combining_thanks: Bedankt! We voegen de registraties van %{bike_type} samen
+            tot één. Dat duurt even.
+          couldnt_combine: We konden deze niet samenvoegen, dus ze blijven gescheiden.
+            Stuur een e-mail naar support@bikeindex.org als je hulp nodig hebt.
+          kept_separate: Dank u, we zullen ze als aparte registraties bewaren.
     search:
       registrations:
         set_interpreted_params:
@@ -2520,6 +2534,8 @@ nl:
       html:
         this_email_is_about_the_bike_type_register: Deze e-mail gaat over de %{bike_type}
           geregistreerd op Bike Index op %{date}
+    pos_registration_match_email:
+      subject: Is dit dezelfde %{bike_type}?
   info:
     about:
       about_bike_index: Over Bike Index
@@ -3641,6 +3657,8 @@ nl:
     landing_pages_for_bike_shops: Bike Index koppelt zich aan uw kassasysteem en registreert
       automatisch elke fiets die u verkoopt. Gratis voor winkels en klanten, en we
       verkopen of delen nooit klantgegevens.
+    shop_index: Bike Index pet en registratiestickers. Elke aankoop helpt het registratiesysteem
+      gratis te houden.
   meta_titles:
     bikes_index: Zoekresultaten
     bikes_new: Registreer een fiets!
@@ -3700,6 +3718,7 @@ nl:
     organization_signup_show: Voeg uw organisatie toe aan Bike Index
     organization_signup_update: Voeg uw organisatie toe aan Bike Index
     organization_signup_welcome: "%{organization} is actief"
+    shop_index: Winkel - Fietsindex
   organized:
     ambassador_dashboards:
       getting_started:
@@ -5482,6 +5501,17 @@ nl:
           winkel die ze vertrouwen. Het is gratis voor u en voor hen, en we verkopen
           of delen nooit klantgegevens.
         why_shops_heading: Waarom winkels Bike Index gebruiken
+      pos_registration_match:
+        combine_them: Door ze te combineren, blijft er één registratie over voor uw
+          %{bike_type}, met uw foto's en de gegevens die u hebt ingevoerd.
+        if_theyre_different: Als ze verschillen, kunt u ons dat op dezelfde pagina
+          laten weten.
+        is_this_the_same: Is dit dezelfde %{bike_type}?
+        pos_registered_it: Je hebt een %{bike_type} geregistreerd die de winkel waar
+          je hem kocht al op jouw naam had geregistreerd, met hetzelfde serienummer.
+        review_and_combine: Bekijk en combineer
+        shop_registered_it_html: Je hebt een %{bike_type} geregistreerd die <strong>%{shop_name}</strong>
+          al op jouw naam had geregistreerd toen je hem kocht, met hetzelfde serienummer.
     ui:
       definition_list:
         row:
@@ -6529,6 +6559,20 @@ nl:
             you_pay_the_current_price: U betaalt de huidige prijs voor %{level}.
             your_membership: Uw lidmaatschap
             your_price: Uw prijs
+        pos_registration_matches:
+          show:
+            combining_keeps: Door ze te combineren blijft de winkelregistratie van
+              uw %{bike_type} behouden, inclusief uw foto's en de door u ingevoerde
+              gegevens. Uw aparte registratie wordt verwijderd.
+            is_this_the_same: Is dit dezelfde %{bike_type}?
+            no_theyre_different: Nee, ze zijn verschillend.
+            pos_registered_it: De winkel waar je je %{bike_type} hebt gekocht, had
+              deze al op jouw naam geregistreerd met hetzelfde serienummer.
+            registered_when_you_bought_it: Geregistreerd toen je het kocht.
+            shop_registered_it: "%{shop_name} had al een %{bike_type} met hetzelfde
+              serienummer op uw naam geregistreerd toen u deze kocht."
+            yes_combine_them: Ja, combineer ze.
+            your_registration: Uw registratie
       sales:
         new_form:
           record_sale: Recordverkoop
@@ -8761,6 +8805,46 @@ nl:
             out_of_links_html: We hebben alle mogelijke activeringslinks voor %{name}
               verstuurd, maar geen enkele is bij %{email} aangekomen. Neem contact
               op met support@bikeindex.org, dan lossen we het op.
+      shop:
+        index:
+          bulk_order_email_subject: Grote bestelling stickers
+          bulk_orders_html: "%{contact_link} voor bulkbestellingen."
+          caped_cap_alt: De Caped Registrant-pet, lichtblauwe stripfiguurprint met
+            paarse rand.
+          caped_cap_description: Onze striptekening, allemaal op een wielerpet. Bellen
+            rinkelen, sloten klikken en het schild met cape houdt de wacht. Paarse
+            rand.
+          caped_cap_name: De Caped Registrant-cap
+          contact_us: Contacteer ons
+          cycling_cap: Fietsmuts
+          for_riders_and_shops: Voor motorrijders en winkels
+          for_shops: Voor winkels
+          gear_that_helps_get_bikes_home: Uitrusting die helpt om fietsen thuis te
+            krijgen.
+          lede: Bike Index is een gratis, non-profit register. Elke pet en sticker
+            die je koopt, zorgt ervoor dat het gratis blijft voor fietsers overal
+            ter wereld.
+          mission: Wij zijn een 501(c)(3) non-profitorganisatie. De opbrengst van
+            de verkoop financiert het register, de meldingen van gestolen fietsen
+            en het partnernetwerk dat fietsers helpt hun fiets terug te vinden.
+          shop_the_gear: Koop de uitrusting
+          sticker_alt: Poster met de titel "Hoe voorkom je dat je fiets gestolen wordt?",
+            waarop de kentekensticker te zien is.
+          sticker_description: Plak de sticker op je frame, scan de QR-code en je
+            fiets is binnen ongeveer twee minuten geregistreerd. Mocht je fiets ooit
+            kwijt raken of gestolen worden, dan kan de vinder de sticker scannen en
+            zien dat hij van jou is. Fietsenwinkels kunnen ze ook op voorraad hebben,
+            voor nieuwe fietsen, tweedehands fietsen en fietsen die voor onderhoud
+            binnenkomen.
+          sticker_name: Bike Index registratiestickers
+          suggested_retail: Adviesprijs
+          the_bike_index_shop: De Bike Index-winkel
+          wholesale_pricing_available: Groothandelsprijzen beschikbaar
+          your_purchase_keeps_bike_index_free: Met uw aankoop blijft Bike Index gratis.
+        product:
+          view: Weergave
+          view_on_the_shop: Bekijk %{name} in de Bike Index-winkel (opent in een nieuw
+            tabblad)
     shared_blocks:
       footer:
         about: Over

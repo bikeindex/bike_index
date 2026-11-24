@@ -54,6 +54,8 @@ module AdminHelper
       admin_organization_statuses_path(organization_id: obj.organization_id)
     elsif obj.instance_of?(UserAlert)
       admin_user_alerts_path(user_id: obj.user_id)
+    elsif obj.instance_of?(PosRegistrationMatch)
+      admin_pos_registration_matches_path(user_id: obj.bike&.user_id, period: "all")
     elsif obj.instance_of?(OrganizationMessage)
       admin_organization_messages_path(search_bike_id: obj.bike_id)
     elsif obj.instance_of?(OrganizationSignup)

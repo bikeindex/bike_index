@@ -19,7 +19,14 @@ backticks, `<img` escaped to `&lt;img`, plain and reference-style links alike, a
 the footer appended. No retry or body form got past it, and nothing here deletes a
 comment — so find out first, before any capture or hosting commit.
 
-1. Create the `## Screenshots` comment — or update the existing one — with this body:
+**Probe with `update_issue_comment`, the call the real post ends in.** On #4821
+`add_issue_comment` left an `<img>` alone and `update_issue_comment` rewrote the same
+kind of tag, so a probe created with `add_issue_comment` passed and the real post
+failed after the whole capture round — leaving a comment that can never hold images.
+
+1. Make sure the `## Screenshots` comment exists — when it doesn't, create it with
+   `add_issue_comment` and a body of just `## Screenshots` — then **update** it with
+   `update_issue_comment` to this body:
 
    ```
    ## Screenshots
@@ -32,8 +39,8 @@ comment — so find out first, before any capture or hosting commit.
    or a backtick before `https://`.
 3. **Rewritten: stop.** Don't capture, host or retry — every retry stacks another
    rewrite. Update the comment to a body with no URLs: `## Screenshots` and a line
-   saying the screenshots couldn't be posted from this session (that goes through;
-   the footer still gets appended). Then tell the user the sandbox's comment tools
+   saying the screenshots couldn't be posted from this session (that goes through).
+   Then tell the user the sandbox's comment tools
    rewrite URLs, so the screenshots have to be captured and attached by hand — and
    skip the rest of this file.
 4. **Posted: carry on.** The probe is the comment you edit in place with the real body.
@@ -56,10 +63,8 @@ The blob stays reachable through the branch's history, so those URLs keep servin
 after the deletion while the PR's **Files changed** stays empty.
 
 **Post the tags verbatim — never rewrap them as `![](url)`.** Widths belong to the caller —
-the `pr` skill's table wants `width="500"` desktop, `"250"` mobile. Create the comment
-with `add_issue_comment`, then `update_issue_comment` it with the same body, and read
-it back: whether either tool leaves an `<img>` alone depends on the session, which is
-what the probe below is for.
+the `pr` skill's table wants `width="500"` desktop, `"250"` mobile. Post them with
+`update_issue_comment` onto the probe's comment, and read it back.
 
 **Call it once, after every capture including the base branch's.** Each call costs
 two commits and a push, and it refuses on a detached HEAD, so it can't run mid-checkout
@@ -94,9 +99,9 @@ Find it by `get_me`'s login and a body starting `## Screenshots`, paging through
 
 `add_issue_comment` appends a Claude Code attribution footer the `pr` skill forbids —
 the tell is the session id in its link — and can backtick the URL inside an `<img src>`
-too (#4474), leaving an image with no `src`. `update_issue_comment` does neither, so
-create the comment with `## Screenshots` alone and put the body in with an update, then
-read it back.
+too (#4474), leaving an image with no `src`. `update_issue_comment` adds no footer but
+can rewrite URLs too (#4821) — so create the comment with `## Screenshots` alone, put
+the body in with an update once the probe has passed, then read it back.
 
 ## Verifying
 
