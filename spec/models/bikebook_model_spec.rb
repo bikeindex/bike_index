@@ -15,10 +15,22 @@ RSpec.describe BikebookModel, type: :model do
       expect(catalog_id("haul-st", 2025, "US")).to eq "m/specialized/2025/haul-st"
       expect(catalog_id("Haul ST", 2025, "CA")).to eq "m/specialized/2025/haul-st@CA"
       expect(catalog_id("Haul ST", 2024)).to be_nil
-      expect(catalog_id("KH24", 2023, manufacturer: "Kris Holm")).to eq "m/kris-holm/2023/kh24-us"
       expect(catalog_id("KH24", 2023, "CA", manufacturer: "Kris Holm")).to eq "m/kris-holm/2023/kh24"
       expect(catalog_id("Nuke", 2024, manufacturer: "Reactive Adaptations")).to eq "m/reactive-adaptations/2013/nuke"
       expect(catalog_id("Nuke", 2025, manufacturer: "Reactive Adaptations")).to be_nil
+    end
+  end
+
+  describe "names_matching" do
+    def names(query, page: 1, per_page: 15)
+      described_class.where(manufacturer: Manufacturer.friendly_find("Kris Holm")).names_matching(query, page:, per_page:)
+    end
+
+    it "is the names with every word in them, each once, a page at a time" do
+      expect(names("kh2")).to eq ["KH20", "KH24", "KH27.5", "KH29"]
+      expect(names("27 KH")).to eq ["KH27.5"]
+      expect(names("kh", page: 2, per_page: 3)).to eq ["KH29", "KH36"]
+      expect(names("%")).to eq []
     end
   end
 end

@@ -40,8 +40,7 @@ module Search
     end
 
     def bikebook_models
-      names = BikebookModel.for_manufacturer(Manufacturer.find_by(id: params[:manufacturer_id])&.name)
-        .names_matching(params[:q], page: current_page, per_page: PER_PAGE)
+      names = BikebookModel.where(manufacturer_id: params[:manufacturer_id]).names_matching(params[:q], page: current_page, per_page: PER_PAGE)
 
       render turbo_stream: helpers.hw_async_combobox_options(names, next_page: next_page_for(names))
     end

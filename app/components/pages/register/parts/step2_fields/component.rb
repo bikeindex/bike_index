@@ -29,7 +29,7 @@ module Pages
             @b_param.type
           end
 
-          def bikebook_models? = BikebookModel.for_manufacturer(@b_param.manufacturer&.name).exists?
+          def bikebook_models? = @b_param.manufacturer_id.present? && BikebookModel.exists?(manufacturer_id: @b_param.manufacturer_id)
 
           # A theft report and an e-vehicle's safety pages both come after this form, so it
           # doesn't always finish the registration. Which statuses have one is rechecked

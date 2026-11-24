@@ -147,7 +147,7 @@ RSpec.describe Search::ComboboxController, type: :request do
   end
 
   describe "bikebook_models" do
-    let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Kris Holm") }
+    let(:manufacturer) { Manufacturer.friendly_find("Kris Holm") }
     before { sync_bikebook_models }
 
     it "renders the manufacturer's matching model names" do

@@ -74,7 +74,7 @@ RSpec.describe Pages::Register::Views::Step2::Component, type: :component do
     end
 
     context "for a manufacturer with Bike Book models" do
-      let(:manufacturer) { FactoryBot.create(:manufacturer, name: "Specialized") }
+      let(:manufacturer) { Manufacturer.friendly_find("Specialized") }
       let(:params) { {bike: {owner_email: "owner@bikeindex.org", manufacturer_id: manufacturer.id, frame_model: "Haul ST"}} }
       before { sync_bikebook_models }
 
