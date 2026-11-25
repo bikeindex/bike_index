@@ -46,14 +46,8 @@ module SharedBlocks
         end
 
         def status_badge(size:)
-          Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size:, time: status_time)
-        end
-
-        # occurred_at is the stolen or impounded date, and nil for a bike with its owner
-        # or for sale. How long a bike has been registered is what vouches for it, so that
-        # date is the credibility feature's
-        def status_time
-          @bike.occurred_at || for_sale_listing&.published_at || (@bike.created_at if credibility_badges?)
+          Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size:,
+            time: Atoms::RegistrationStatusBadge::Component.event_time(@bike, for_sale_listing:))
         end
 
         def credibility_badges? = @organization&.enabled?("credibility_badges")

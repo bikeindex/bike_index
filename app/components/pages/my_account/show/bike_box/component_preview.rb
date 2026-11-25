@@ -22,6 +22,14 @@ module Pages
             render_box(bike(id: 43))
           end
 
+          def stock_photo
+            render_box(bike(id: 48, stock_photo_url: "https://bikebook.bikeindex.org/aventon/2022/level-2.jpg"))
+          end
+
+          def hidden_with_strava_gear
+            render_box(bike(id: 49, user_hidden: true, strava_gear: ::StravaGear.new(strava_id: "b1", name: "My Road Bike", gear_type: "bike")))
+          end
+
           def with_owner_with_photo
             render_box(bike(id: 44, thumb_path: SharedBlocks::SearchResults::BikeBox::ComponentPreview.vehicles.first.thumb_path))
           end

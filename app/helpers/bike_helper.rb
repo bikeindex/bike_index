@@ -5,7 +5,7 @@ module BikeHelper
     if thumb_image_url.present?
       image_tag(thumb_image_url, alt: bike.title_string, skip_pipeline: true)
     else
-      image_tag(bike_placeholder_image_path, alt: bike.title_string, title: "No image", class: "no-image tw:bg-gray-100 tw:dark:bg-gray-800")
+      bike_placeholder_image_tag(alt: bike.title_string, title: "No image", class: "no-image tw:bg-gray-100 tw:dark:bg-gray-800")
     end
   end
 
@@ -23,6 +23,11 @@ module BikeHelper
 
   def bike_placeholder_image_path
     image_path("revised/bike_photo_placeholder.svg")
+  end
+
+  # The drawing is white, so on a dark background it stands out far more than on light
+  def bike_placeholder_image_tag(**options)
+    image_tag(bike_placeholder_image_path, **options, class: class_names(options[:class], "tw:dark:opacity-15"))
   end
 
   private

@@ -92,6 +92,22 @@ RSpec.describe Integrations::Bikebook::Catalog do
     end
   end
 
+  describe "vocabulary_dig" do
+    it "caches what is at the keys alone" do
+      names = described_class.vocabulary_dig("names", "components.type")
+      expect(names).to include("saddle" => "Saddle")
+      expect(Rails.cache.read(["bikebook_catalog/file", 2, "vocabulary.json", "names", "components.type"])).to eq names
+    end
+
+    context "while the catalog doesn't answer" do
+      before { stub_bikebook_catalog(status: 503) }
+
+      it "is nil" do
+        expect(described_class.vocabulary_dig("e_vehicle_classifications")).to be_nil
+      end
+    end
+  end
+
   describe "schema_viewer" do
     it "is the file the manifest names, with its name" do
       expect(described_class.schema_viewer).to include("file" => "schema_viewer.json", "documents" => include("vehicle_model", "component"))
