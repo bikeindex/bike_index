@@ -5,34 +5,29 @@ description: >-
   Trigger when a request pairs a local image (screenshot, .png/.jpg, CleanShot capture, before/after)
   with an existing PR (by #number, URL, branch name, or "the open PR"), regardless of verb —
   attach, embed, add, put, post, drop, show, document. Also covers visually documenting test runs,
-  bug repros, UI states, or CI failures on an existing PR. Uploads through GitHub's
-  `user-attachments` REST endpoint — the one `gh … --attach` uses — with `gh api`. It also owns
-  the PR's one `## Screenshots` comment — finding, creating, editing and verifying it — so other
-  workflows (the `pr` skill's screenshot phase) hand it a composed body that references local
-  image paths, and it posts it.
-allowed-tools: Bash(gh:*), Bash(rtk proxy gh:*), Bash(ruby .claude/skills/github-pr-images/assets/upload_attachments.rb:*), Bash(cp:*), Bash(bash .claude/skills/github-pr-images/assets/commit_images.sh:*), Bash(curl -sI https://raw.githubusercontent.com/:*), Read, Write, mcp__github__list_pull_requests, mcp__github__get_me, mcp__github__issue_read, mcp__github__add_issue_comment, mcp__github__update_issue_comment
+  bug repros, UI states, or CI failures on an existing PR. Uploads with `gh api` to GitHub's
+  `user-attachments` endpoint. It also owns the PR's one `## Screenshots` comment — finding,
+  creating, editing and verifying it — so other workflows (the `pr` skill's screenshot phase)
+  hand it a composed body that references local image paths, and it posts it.
+allowed-tools: Bash(gh:*), Bash(ruby .claude/skills/github-pr-images/assets/upload_attachments.rb:*), Bash(cp:*), Bash(bash .claude/skills/github-pr-images/assets/commit_images.sh:*), Bash(curl -sI https://raw.githubusercontent.com/:*), Read, Write, mcp__github__list_pull_requests, mcp__github__issue_read, mcp__github__add_issue_comment, mcp__github__update_issue_comment
 ---
 
 # Upload Image to PR
 
-GitHub's upload endpoint takes one file and hands back its permanent `https://github.com/user-attachments/assets/…` URL, with nothing posted:
-
-```bash
-gh api -X POST "https://uploads.github.com/user-attachments/assets?name=x.png&content_type=image/png&repository_id=$(gh api 'repos/{owner}/{repo}' --jq .id)" \
-  -H 'Content-Type: application/octet-stream' --input tmp/x.png --jq .url
-```
-
-It needs write access to the repo — a 404 means the token can't write — and takes images and video only. **The URLs come back before anything is posted**, so the post is a plain `gh api` POST or PATCH, and any comment, whoever posted it, edits in place.
-
-`assets/upload_attachments.rb <body-file>` does it for a whole body: every local path in an `<img src="…">` or `![alt](…)` uploads and is swapped for its URL in the file. So callers hand over a body referencing local paths.
+`assets/upload_attachments.rb <body-file>` uploads every local path in an `<img src="…">` or `![alt](…)` to GitHub's REST upload endpoint (`POST https://uploads.github.com/user-attachments/assets`, the one `gh … --attach` uses) and swaps each for its permanent `https://github.com/user-attachments/assets/…` URL in the file. Nothing is posted, so the post is a plain `gh api` POST or PATCH.
 
 ## Who runs this
 
 From a session with history, hand this skill to a subagent the way `AGENTS.md`'s **Who runs this** describes — `model: "haiku"` (the commands are all here) — briefed with the PR number and either a composed body file referencing local image paths or the images plus where they go. It replies with the comment (or PR) URL and Step 4's verification result.
 
-## Preflight: the web sandbox
+## Preflight: can this session upload?
 
-When `$CLAUDE_CODE_REMOTE` is `true`, follow [references/web-sandbox.md](references/web-sandbox.md) for the **whole flow**. Anywhere else with no `gh` → stop and say so, posting nothing.
+Callers run this before capturing anything. Anywhere but the web sandbox, `gh` is the answer: no `gh` → stop and say so, posting nothing.
+
+**In the web sandbox** (`$CLAUDE_CODE_REMOTE` is `true`) `gh` refuses GraphQL (`HTTP 403: GitHub GraphQL is not available from Claude Code sessions`), but the upload and every post here are REST. Run the script on a body file holding one existing image, `![probe](app/assets/images/logos/bikebook.png)`:
+
+- **It rewrites the path to a `user-attachments` URL**: follow this file as written, except step 1, which is `list_pull_requests` with `head: "bikeindex:<branch>"`, `state: "open"` — `gh pr view` is GraphQL.
+- **No `gh`, or the upload is refused**: follow [references/web-sandbox.md](references/web-sandbox.md) for the **whole flow**, starting with its probe.
 
 ## Step 1: Resolve PR context
 

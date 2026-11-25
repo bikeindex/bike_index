@@ -1,28 +1,13 @@
 # Hosting images from the Claude Code web sandbox
 
-**Try SKILL.md's upload endpoint first.** The sandbox refuses `gh`'s GraphQL
-(`HTTP 403: GitHub GraphQL is not available from Claude Code sessions`), not REST, and
-the upload and every post in SKILL.md are REST calls through `gh api`. Upload one image
-on its own (SKILL.md's single-file command) before any capture:
+SKILL.md's preflight sends you here when its upload is out of reach: no `gh`, or the
+endpoint refused. This route commits the images to the PR's branch instead, and posts
+through the GitHub MCP tools. It stands in for **all** of SKILL.md: step 1's PR lookup
+and step 3's posting are the MCP calls below, the upload is one script, step 4 is
+`curl`. The script hands back URLs before anything is posted, so the body is composed
+with them rather than with local paths.
 
-- **It prints a `user-attachments` URL**: follow SKILL.md for the whole flow, `gh api`
-  posting included — skip the rest of this file. Use `list_pull_requests` (table below)
-  for step 1's lookup, since `gh pr view` is GraphQL.
-- **No `gh`, or the upload is refused**: the fallback below.
-
-## Fallback: hosting in the branch's history
-
-This route commits the images to the PR's branch, and posts through the GitHub MCP
-tools. It stands in for **all** of SKILL.md: step 1's PR lookup and step 3's posting
-are the MCP calls below, the upload is one script, step 4 is `curl`. The script hands
-back URLs before anything is posted, so the body is composed with them rather than
-with local paths.
-
-Use it only when `$CLAUDE_CODE_REMOTE` is `true` and the endpoint is out of reach.
-Its URLs last only as long as the branch's objects; `user-attachments` URLs are
-permanent and leave no commits behind.
-
-### Probe the posting before capturing
+## Probe the posting before capturing
 
 Posting is the last step and the only one a capture round can't recover from. In some
 sessions (#4792) the comment tools rewrite every URL in a body: each wrapped in
@@ -56,7 +41,7 @@ failed after the whole capture round — leaving a comment that can never hold i
    skip the rest of this file.
 4. **Posted: carry on.** The probe is the comment you edit in place with the real body.
 
-### Hosting
+## Hosting
 
 ```bash
 bash .claude/skills/github-pr-images/assets/commit_images.sh tmp/pr_screenshots/*.png
@@ -86,26 +71,26 @@ commit would leave that deleted), and on a **dirty index** (staged changes ride 
 the screenshot commit and survive the cleanup). `git rm --cached` keeps the files on
 disk for a later recapture.
 
-### What it costs
+## What it costs
 
 The images live only in that branch's history. This repo squash-merges, so they
 never reach `main` and no clone pays for them — but a deleted branch leaves them
 unreachable and eventually collectable. **Good for review, not an archive**: for
 permanence use a release asset uploaded by a workflow — the GitHub MCP tools this
-session goes through can't upload one.
+session goes through can't upload one. Say in your summary that the screenshots
+aren't archival.
 
-### Posting, without `gh`
+## Posting, without `gh`
 
 Same rules as SKILL.md step 3 — one `## Screenshots` comment per PR, edited in place.
-Find it by `get_me`'s login and a body starting `## Screenshots`, paging through
-`get_comments` since on a busy PR it won't be on the first page.
+Find it the same way, by a body starting `## Screenshots` whoever posted it, paging
+through `get_comments` since on a busy PR it won't be on the first page.
 
 | SKILL.md | here |
 | --- | --- |
 | `gh pr view --json number` | `list_pull_requests`, `head: "bikeindex:<branch>"`, `state: "open"` |
-| `gh api user --jq .login` | `get_me` |
 | `gh api …/issues/N/comments` | `issue_read`, `method: "get_comments"` |
-| `gh pr comment` | `add_issue_comment` |
+| `gh api …/issues/N/comments -F body=@…` | `add_issue_comment` |
 | `gh api -X PATCH …/comments/ID` | `update_issue_comment` |
 
 `add_issue_comment` appends a Claude Code attribution footer the `pr` skill forbids —
@@ -114,7 +99,7 @@ too (#4474), leaving an image with no `src`. `update_issue_comment` adds no foot
 can rewrite URLs too (#4821) — so create the comment with `## Screenshots` alone, put
 the body in with an update once the probe has passed, then read it back.
 
-### Verifying
+## Verifying
 
 Unlike `user-attachments` URLs these are plain public files, so `curl` settles it:
 
