@@ -17,10 +17,10 @@ set -euo pipefail
 
 [ "$#" -gt 0 ] || { echo "usage: $0 <image>..." >&2; exit 2; }
 
-# Sandbox-only by design: anywhere else has gh --attach, whose
-# user-attachments URLs are permanent and leave no commits behind.
+# The sandbox's fallback only: GitHub's user-attachments upload (SKILL.md) gives
+# permanent URLs and leaves no commits behind.
 [ "${CLAUDE_CODE_REMOTE:-}" = "true" ] ||
-  { echo "not the web sandbox - use gh --attach (SKILL.md)" >&2; exit 1; }
+  { echo "not the web sandbox - upload with SKILL.md's endpoint" >&2; exit 1; }
 
 ROOT=$(git rev-parse --show-toplevel)
 BRANCH=$(git symbolic-ref --quiet --short HEAD) ||
