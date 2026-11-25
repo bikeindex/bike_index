@@ -2,7 +2,7 @@
 
 require "rails_helper"
 
-RSpec.describe Pages::Admin::BugReportsTable::Component, type: :component do
+RSpec.describe Pages::Admin::BugReports::Table::Component, type: :component do
   let(:bug_report) { FactoryBot.create(:bug_report, subject: "Broken search", body: "<p>It &amp; everything</p>") }
   let(:component) do
     with_controller_class(Admin::BugReportsController) do
