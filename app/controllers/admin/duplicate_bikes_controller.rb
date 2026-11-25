@@ -205,7 +205,7 @@ module Admin
       end
       if params[:search_serial].present?
         # Normalized as the whole-serial segment is
-        segment = SerialNormalizer.no_space(SerialNormalizer.new(serial: params[:search_serial]).normalized)
+        segment = SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(params[:search_serial]))
         groups = groups.where(id: NormalizedSerialSegment.where(segment:).select(:duplicate_bike_group_id))
       end
       groups

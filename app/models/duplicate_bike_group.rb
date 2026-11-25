@@ -27,6 +27,11 @@ class DuplicateBikeGroup < ApplicationRecord
       .where(normalized_serial_segments: {segment: segment}).first
   end
 
+  # Ignoring asks to confirm; un-ignoring doesn't
+  def ignore_toggle_confirm
+    IGNORE_CONFIRM unless ignore?
+  end
+
   def update_added_bike_at
     self.added_bike_at ||= Time.current
   end
