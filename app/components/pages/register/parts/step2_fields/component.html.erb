@@ -5,10 +5,10 @@
 
 <% model_options = {value: bike["frame_model"], placeholder: translation(".model_placeholder")} %>
 
-<%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :frame_model, label_text: translation(".model"), html_options: model_options)) do %>
-  <% if bikebook_models? %>
-    <%= tag.div(data: {controller: "register--model-lookup", action: "hw-combobox:preselection->register--model-lookup#pick hw-combobox:selection->register--model-lookup#pick form-persist:restored@window->register--model-lookup#pick",
-      "register--model-lookup-manifest-url-value": Integrations::Bikebook::Catalog::MANIFEST_URL}) do %>
+<%= tag.div(data: bikebook_models? ? {controller: "register--model-lookup", action: "hw-combobox:preselection->register--model-lookup#pick hw-combobox:selection->register--model-lookup#pick form-persist:restored@window->register--model-lookup#pick",
+  "register--model-lookup-manifest-url-value": Integrations::Bikebook::Catalog::MANIFEST_URL} : {}) do %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :frame_model, label_text: translation(".model"), html_options: model_options)) do %>
+    <% if bikebook_models? %>
       <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
       <template data-register--model-lookup-target="combobox">
         <%= render UI::Forms::Combobox::Component.new(name: :frame_model, src: bikebook_path(manufacturer: @b_param.manufacturer.slug),
@@ -22,12 +22,12 @@
       <div data-register--model-lookup-target="photo"></div>
     <% end %>
   <% end %>
-<% end %>
 
-<%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :year,
-    label_text: translation(".model_year"),
-    html_options: {value: bike["year"], inputmode: "numeric",
-      placeholder: translation(".model_year_placeholder"), class: "tw:font-mono"}) %>
+  <%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :year,
+      label_text: translation(".model_year"),
+      html_options: {value: bike["year"], inputmode: "numeric",
+        placeholder: translation(".model_year_placeholder"), class: "tw:font-mono", data: {"register--model-lookup-target": "year"}}) %>
+<% end %>
 
 <%= render Pages::Register::Parts::ColorFields::Component.new(form: @form,
     primary_frame_color_id: @b_param.primary_frame_color_id, secondary_frame_color_id: bike["secondary_frame_color_id"],

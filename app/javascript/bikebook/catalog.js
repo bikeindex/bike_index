@@ -107,11 +107,16 @@ export async function mountCatalogCombobox (loading, template, slot, { display, 
   return slot.querySelector('input[type=hidden]')
 }
 
+const showing = new WeakMap()
+
 // Shows the stock photo of the model `value` names in `target`, and nothing for a value naming none: typed text, or a
-// classification
+// classification. Resolves to the model, null for none, and undefined once a later call for `target` supersedes it
 export async function showPickedPhoto (catalog, value, target) {
+  showing.set(target, value)
   const [picked] = value ? await catalog.vehicles([value]).catch(() => []) : []
+  if (showing.get(target) !== value) return
   renderInto(target, picked ? pickedPhoto(picked.data.stock_photo, picked.display?.replace(CURRENT_MARK, '')) : nothing)
+  return picked ?? null
 }
 
 // Answers a hotwire_combobox async filter with the markup the gem's own turbo-stream response would

@@ -363,23 +363,29 @@ RSpec.describe "Register flow", :js, type: :system do
     overlay = "[data-controller~='register--model-lookup'] [data-ui--forms--combobox-display-target='overlay']"
     expect(page).to have_css(overlay, exact_text: "Specialized Haul ST current")
     expect(page).to have_no_css("#{overlay} img", visible: :all)
+    # Its years, through its newest record as it's current, the newest chosen
+    expect(page).to have_select("Model year", options: %w[2026 2025], selected: "2026")
 
-    # Typed over, it's the text that submits, so the pick's name and photo go
+    # Typed over, it's the text that submits, so the pick's name and photo go, and the year is typed again
     type_into(model, "Haul ST custom")
     find("h1", text: "Add your bike").click
     expect(page).to have_no_css(overlay)
     expect(page).to have_no_css(photo, visible: :all)
     expect(page).to have_field("bike_frame_model", with: "Haul ST custom")
+    expect(page).to have_no_select("Model year")
+    expect(page).to have_field("Model year", with: "2026")
 
     type_into(model, "haul")
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
     expect(page).to have_css(photo, visible: :all)
+    select "2025", from: "Model year"
 
-    # Restored from the draft, the pick shows its name and photo rather than the catalog id it submits
+    # Restored from the draft, the pick shows its name and photo rather than the catalog id it submits, and keeps its year
     visit page.current_url
     expect(page).to have_css("#bike_frame_model[role='combobox']", wait: 10)
     expect(page).to have_field("bike_frame_model", with: "Specialized Haul ST")
     expect(page).to have_css(photo, visible: :all)
+    expect(page).to have_select("Model year", selected: "2025")
 
     type_into("#bike_primary_frame_color_id", "Red")
     click_combobox_option("Red")
@@ -388,7 +394,7 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Complete Bike Registration"
 
     expect(page).to have_css("h1", text: "Progress saved", wait: 10)
-    expect(BParam.last.bike["frame_model"]).to eq "Haul ST"
+    expect(BParam.last.bike).to include("frame_model" => "Haul ST", "year" => "2025")
   end
 
   # form-persist announces its restore once, and controllers are lazily loaded - so a
