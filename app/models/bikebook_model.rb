@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # A model in the Bike Book catalog's index, which BikebookModelsSyncJob copies here so that registering doesn't wait on
-# the index, the catalog's biggest file
+# the index, the catalog's biggest file. `markets` are every market it's sold in, its market variants' too
 # == Schema Information
 #
 # Table name: bikebook_models

@@ -18,6 +18,10 @@ RSpec.describe BikebookModel, type: :model do
       expect(catalog_id("Haul ST", 2026)).to eq "m/specialized/2025/haul-st"
       expect(catalog_id("haul-st", 2025, "US")).to eq "m/specialized/2025/haul-st"
       expect(catalog_id("Haul ST", 2025, "CA")).to eq "m/specialized/2025/haul-st"
+      # sold in Canada as a variant, it's preferred there over one listed first
+      BikebookModel.find_by!(catalog_id: "m/specialized/2025/haul-st").dup.update!(catalog_id: "m/specialized/2025/haul-sa", markets: ["US"])
+      expect(catalog_id("Haul ST", 2025, "US")).to eq "m/specialized/2025/haul-sa"
+      expect(catalog_id("Haul ST", 2025, "CA")).to eq "m/specialized/2025/haul-st"
       expect(catalog_id("Haul ST", 2024)).to be_nil
       expect(catalog_id("KH24", 2023, manufacturer: "Kris Holm")).to eq "m/kris-holm/2023/kh24-us"
       expect(catalog_id("KH24", 2023, "CA", manufacturer: "Kris Holm")).to eq "m/kris-holm/2023/kh24"
