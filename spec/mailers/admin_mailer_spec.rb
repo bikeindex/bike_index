@@ -12,6 +12,13 @@ RSpec.describe AdminMailer, type: :mailer do
       expect(mail.body.encoded).to_not match "supported by"
       expect(mail.deliver_now.text_part.body.to_s).to include(feedback.body)
     end
+
+    context "with a long body" do
+      let(:feedback) { FactoryBot.create(:feedback, body: "word " * 300) }
+      it "includes the whole body" do
+        expect(mail.deliver_now.html_part.body.to_s).to include(feedback.body.strip)
+      end
+    end
   end
 
   describe "special_feedback_notification_email" do
