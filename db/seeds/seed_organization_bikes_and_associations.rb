@@ -44,18 +44,8 @@ owner_emails = %w[
 creator = BikeServices::Creator.new
 
 def org_bike_params(owner_email:, creation_organization_id: Organization.find_by_name("Brakebills").id, manufacturer_id: nil)
-  manufacturer_id ||= SeedHelpers.weighted_frame_maker_id
-  {
-    cycle_type: "bike",
-    propulsion_type: "foot-pedal",
-    serial_number: (0...10).map { rand(65..90).chr }.join,
-    manufacturer_id:,
-    primary_frame_color_id: Color.pluck(:id).sample,
-    rear_tire_narrow: "true",
-    handlebar_type: HandlebarType.slugs.first,
-    owner_email:,
-    creation_organization_id: creation_organization_id.to_s
-  }.merge(org_registration_info(owner_email:))
+  SeedHelpers.bike_params(owner_email:, manufacturer_id:)
+    .merge(creation_organization_id: creation_organization_id.to_s, **org_registration_info(owner_email:))
 end
 
 def org_registration_info(owner_email:)
@@ -86,7 +76,7 @@ def seed_unregistered_parking_notification(creator:, member:, owner_email:, loc:
   b_param = BParam.create!(
     creator: member,
     params: {
-      bike: org_bike_params(owner_email:, manufacturer_id:).merge(serial_number: "unknown", year:),
+      bike: org_bike_params(owner_email:, manufacturer_id:).merge({serial_number: "unknown", year:}.compact),
       parking_notification: {kind:, street: loc[:street], city: loc[:city], postal_code: loc[:postal_code], region_record_id:, country_id:, skip_geocoding: true}
     }
   )

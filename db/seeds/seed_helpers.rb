@@ -80,7 +80,7 @@ module SeedHelpers
       rear_tire_narrow: "true",
       handlebar_type: HandlebarType.slugs.first,
       owner_email:
-    }
+    }.merge(manufacturer_id ? {} : bikebook_model_params)
   end
 
   def seed_bike(creator:, user:, params:, origin: nil, label: "bike")
@@ -91,4 +91,21 @@ module SeedHelpers
     puts "\n #{label} error \n #{b_param.bike_errors}" if bike.errors.any?
     bike
   end
+
+  #
+  # private below here
+  #
+
+  # Every other bike is a Bike Book catalog model, which registration fills in the stock specs of. None when the catalog
+  # didn't sync. Never Jamis, as weighted_frame_maker_id
+  def bikebook_model_params
+    @bikebook_turn = !@bikebook_turn
+    model = BikebookModel.where.not(manufacturer: Manufacturer.where(name: "Jamis")).order("RANDOM()").first if @bikebook_turn
+    return {} if model.blank?
+
+    {manufacturer_id: model.manufacturer_id, frame_model: model.name,
+     year: rand(model.first_year..(model.final_year || [model.first_year, Time.current.year].max))}
+  end
+
+  conceal :bikebook_model_params
 end
