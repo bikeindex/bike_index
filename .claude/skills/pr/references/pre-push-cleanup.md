@@ -41,7 +41,7 @@ Scope specs the same way — the ones covering what the branch changed, never a 
 
 **`bin/rails tailwindcss:build` before the `:js` ones, after the last template edit.** Tailwind's content scan reads the templates, so adding or removing a class in an `.erb` changes the built CSS — and a system spec asserting a computed style (`spec/components/ui/dropdown/component_system_spec.rb` reads `getComputedStyle(...).color`) fails against the stale build until it's rebuilt. A merge that brings in `app/assets/tailwind/**` does it too. The failure names the assertion, not the build, so it reads as a real regression.
 
-Then run the `code-review-bike-index` skill: the `AGENTS.md` conformance pass and every audit — spec, documentation, churn, comment, model-comment, backfill, asset, controller, component, markup and marketing page — and the cycle-type translation and product-name checks. **Required every run**, not just when the diff looks messy. Its fixes come back uncommitted, and its reply goes into yours: the backfill verdict, and every markup conversion with the commit it landed in.
+Then run the `code-review-bike-index` skill: the `AGENTS.md` conformance pass and every audit — spec, documentation, churn, comment, model-comment, backfill, asset, controller, component, markup and marketing page — and the cycle-type translation and product-name checks. **Required every run**, not just when the diff looks messy. Its fixes come back uncommitted, and its reply goes into yours: the backfill verdict, every markup conversion with the commit it landed in, and every finding it left for the user — repeated marketing copy included.
 
 Commit everything from this before re-dating migrations.
 

@@ -68,7 +68,7 @@ A marketing page is a `for_*` landing page, or the donate, recovery stories, e-b
 | Any donation or membership form | `Pages::Donate::Form` in a `UI::Card`, the way `Pages::RecoveryStories::Index` embeds it, with its own `referral_source:` |
 | An FAQ | `UI::Accordion` |
 
-`Pages::Register::Views::Landing` is the worked example. Its hand-rolled $5/$15/$50 donation form and a stats strip that took four counts from the controller both became the components above.
+`Pages::Register::Views::Landing` is the worked example. Its hand-rolled 5, 15 and 50 dollar donation form and a stats strip that took four counts from the controller both became the components above.
 
 ## Everywhere else: `UI::*` and `Atoms::*`
 

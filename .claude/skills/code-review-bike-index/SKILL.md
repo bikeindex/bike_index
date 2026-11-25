@@ -94,8 +94,10 @@ Judge each against the **Comments** section of `AGENTS.md` and reach a verdict o
 **Required.** A model's class comment goes between the `# == Schema Information` block and `class`, never above the schema block — `app/models/organization_message.rb` is the pattern. List every comment above a schema block:
 
 ```bash
-awk 'FNR==1{buf="";s=0} s{next} /^# == Schema Information/{printf "%s",buf;s=1;next} /^#/ && !/frozen_string_literal/{buf=buf FILENAME": "$0"\n"}' app/models/*.rb app/models/*/*.rb
+awk 'FNR==1{buf="";s=0} s{next} /^# == Schema Information/{printf "%s",buf;s=1;next} /^#/ && !/frozen_string_literal/{buf=buf FILENAME": "$(0)"\n"}' app/models/*.rb app/models/*/*.rb
 ```
+
+`$(0)` is awk's whole line, spelled so the Skill tool doesn't swap in its first argument the way it does for the bare form.
 
 Silence is the pass. Every hit is a class comment in the wrong place: put it through the class-comment bar above, delete the lines that fail it, and move what's left down to sit directly above `class`.
 
