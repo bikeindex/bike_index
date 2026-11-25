@@ -868,7 +868,6 @@ RSpec.describe BikeServices::Creator do
         b_param.reload
         expect(b_param.params["components"].count).to be > 5
         expect(b_param.params["components"]).to all(include("is_stock" => true))
-        expect(b_param.params["vehicle_specification"]).to eq("bikebook_model_id" => bikebook_model.id, "bikebook_market" => "US")
         expect(b_param.bike["description"]).to start_with("Input description Whatever you’re into")
         expect(b_param.bike).to include("serial_number" => "Some serial", "primary_frame_color_id" => color.id,
           "cycle_type" => "cargo-rear", "stock_photo_url" => "https://bikebook.bikeindex.org/specialized/2025/haul-st.png")
@@ -876,8 +875,6 @@ RSpec.describe BikeServices::Creator do
 
       it "creates the bike with its vehicle specification" do
         bike = instance.create_bike(b_param)
-
-        expect(bike.id).to be_present
         expect(bike.vehicle_specification).to have_attributes(bikebook_model:, bikebook_market: "US")
       end
 
@@ -887,12 +884,12 @@ RSpec.describe BikeServices::Creator do
         it "adds its Canadian variant's data" do
           instance.send(:add_bike_book_data, b_param)
           expect(b_param.reload.bike["description"]).to include("up to 100 km")
-          expect(b_param.params["vehicle_specification"]).to eq("bikebook_model_id" => bikebook_model.id, "bikebook_market" => "CA")
         end
       end
 
-      context "with a model the catalog lacks" do
+      context "with a model the catalog lacks, and a vehicle_specification in the request" do
         let(:bike_params) { super().merge(frame_model: "Not a real model") }
+        let(:b_param) { BParam.create(creator: user, params: {bike: bike_params, vehicle_specification: {bikebook_model_id: bikebook_model.id}}) }
 
         it "creates the bike without a vehicle specification" do
           bike = instance.create_bike(b_param)

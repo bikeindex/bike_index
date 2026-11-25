@@ -185,6 +185,8 @@ module BikeServices
     end
 
     def add_bike_book_data(b_param = nil)
+      # Request params reach b_param unfiltered, so a vehicle_specification is only ever Bike Book's
+      b_param&.params&.delete("vehicle_specification")
       return nil unless b_param&.bike.present? && b_param.manufacturer_id.present?
       return nil unless b_param.bike["frame_model"].present? && b_param.bike["year"].present?
 

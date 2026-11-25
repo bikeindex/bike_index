@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# The Bike Book model a vehicle was registered as. bikebook_model_id has no foreign key: BikebookModelsSyncJob deletes a
-# model the catalog drops
+# The Bike Book model a vehicle was registered as. bikebook_model goes nil when BikebookModelsSyncJob deletes one the
+# catalog drops
 # == Schema Information
 #
 # Table name: vehicle_specifications
