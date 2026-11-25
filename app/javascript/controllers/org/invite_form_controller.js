@@ -5,8 +5,6 @@ import { collapse } from 'utils/collapse_utils'
 const EMAIL_PATTERN = /^[^@\s<>(),;]+@[^@\s<>(),;]+\.[^@\s.<>(),;]+$/
 
 // Connects to data-controller='org--invite-form'
-// Counts and validates the emails as they're typed, and keeps the form from submitting
-// until there is at least one, all of them look right, and the organization can invite them
 export default class extends Controller {
   static targets = ['emails', 'count', 'invalid', 'limit', 'submit']
   static values = {

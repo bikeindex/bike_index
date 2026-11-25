@@ -1,7 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='org--role-form'
-// Keeps the submit button disabled until the checked role differs from the saved one
 export default class extends Controller {
   static targets = ['submit']
 
