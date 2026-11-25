@@ -16,14 +16,16 @@
     primary_frame_color_id: @b_param.primary_frame_color_id, secondary_frame_color_id: bike["secondary_frame_color_id"],
     tertiary_frame_color_id: bike["tertiary_frame_color_id"]) %>
 
-<div class="tw:mb-4" data-controller="register--frame-size">
+<div class="tw:group/frame-size tw:mb-4" data-controller="register--frame-size">
   <span class="twlabel">
     <%= translation(".frame_size") %><%= optional_badge %>
   </span>
 
   <div
-    class="tw:mt-2 tw:mb-2 tw:transition-opacity"
-    data-register--frame-size-target="chips"
+    class="
+      tw:mt-2 tw:mb-2 tw:transition-opacity
+      tw:group-has-[[type=number]:not(:placeholder-shown)]/frame-size:opacity-60
+    "
   >
     <%= render UI::Forms::RadioButtonGroup::Component.new(name: "bike[frame_size]", full_width: true,
         selected: bike["frame_size"],
@@ -37,8 +39,10 @@
     </span>
 
     <div
-      class="tw:flex tw:flex-1 tw:items-center tw:transition-opacity"
-      data-register--frame-size-target="measure"
+      class="
+        tw:flex tw:flex-1 tw:items-center tw:transition-opacity
+        tw:group-has-[[type=radio]:checked]/frame-size:opacity-60
+      "
     >
       <%= render UI::Forms::Input::Component.new(form_builder: @form, attribute: :frame_size_number, kind: :number_field,
           html_options: {value: bike["frame_size_number"], step: 0.5, min: 0, placeholder: translation(".enter_size"),
@@ -52,7 +56,7 @@
             tw:text-sm tw:font-medium tw:text-gray-500
             tw:dark:border-gray-600 tw:dark:bg-gray-700
             tw:dark:text-gray-400",
-          data: {"register--frame-size-target": "unit", action: "register--frame-size#pickUnit"} %>
+          data: {"register--frame-size-target": "unit", action: "register--frame-size#hideWrongUnit"} %>
     </div>
   </div>
 

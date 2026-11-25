@@ -172,14 +172,13 @@ RSpec.describe "Register flow", :js, type: :system do
     find_field("bike[frame_size_number]").send_keys(:tab)
     expect(page).to have_select("bike[frame_size_unit]", selected: "inches")
     expect(page).to have_content("That looks like inches not cm, so we switched it.")
-    expect(page).to have_css("[data-register--frame-size-target='chips'].tw\\:opacity-60")
+    expect(find("label", text: "M", exact_text: true)).to have_ancestor("div", style: {opacity: "0.6"})
     click_button "Change back"
     expect(page).to have_select("bike[frame_size_unit]", selected: "cm")
     expect(page).to have_no_content("so we switched it")
     find("label", text: "M", exact_text: true).click
-    # Each way of giving a size dims the other
-    expect(page).to have_css("[data-register--frame-size-target='measure'].tw\\:opacity-60")
-    expect(page).to have_no_css("[data-register--frame-size-target='chips'].tw\\:opacity-60")
+    expect(find_field("bike[frame_size_number]")).to have_ancestor("div", style: {opacity: "0.6"})
+    expect(find("label", text: "M", exact_text: true)).to have_no_ancestor("div", style: {opacity: "0.6"})
     select "inches", from: "bike[frame_size_unit]"
     check "Missing serial"
     # Hidden rather than removed, so "unknown" still submits
@@ -210,7 +209,7 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_field("bike_tertiary_frame_color_id", with: "Green")
     expect(page).to have_no_button("+ Add another color")
     expect(find("input[name='bike[frame_size]'][value='m']", visible: :all)).to be_checked
-    expect(page).to have_css("[data-register--frame-size-target='measure'].tw\\:opacity-60")
+    expect(find_field("bike[frame_size_number]")).to have_ancestor("div", style: {opacity: "0.6"})
     # A select always has a value, so it restores from the draft rather than the server default
     expect(page).to have_select("bike[frame_size_unit]", selected: "inches")
     # The restored missing serial hides the input again and re-reveals the made-without link
