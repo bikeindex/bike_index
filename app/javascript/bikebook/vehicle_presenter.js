@@ -28,7 +28,7 @@ const SINGULAR = { feet: 'foot', inches: 'inch' }
 const FEET_AND_INCHES = ["'", '"']
 
 export class VehiclePresenter {
-  constructor (kit, vocabulary) {
+  constructor ({ kit, ...vocabulary }) {
     // an extra's bb as the catalog's own labels write "BB Drop", standover above it short, as its tooltip
     // explains it, and the actual seat angle without the catalog's note on it
     this.kit = {
