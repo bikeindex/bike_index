@@ -1,0 +1,41 @@
+---
+en:
+  components:
+    pages:
+      org:
+        impound_settings:
+          bulk_import: Bulk import
+          days: days
+          default_location_html: Bikes are impounded with locations. The default location
+            is %{name}.
+          expiration: Expiration
+          expiration_helper_html: >-
+            If your organization automatically removes or auctions bikes after a certain
+            time period, enter the period here. <em>Leave blank to never expire.</em>
+          id_prefix: ID prefix
+          id_prefix_helper_html: >-
+            Use this to make IDs in Bike Index match an external system, or rotate
+            every year. Changing it restarts numbering at %{example}.
+          import_impounded_bikes: Import impounded bikes
+          impound_email: Impound email
+          impound_email_helper_html: >-
+            Email address impound notifications (and claims, if enabled) will be sent
+            from. <em>If blank, uses the default organization email.</em>
+          impound_location: Impound location
+          impound_settings_html: "<em>%{org_name}</em> impound settings"
+          next_id: Next impound record ID
+          no_prefix: no prefix
+          previous_prefixes: 'Previous prefixes:'
+          public_page: Publicly accessible impound page
+          public_page_helper_html: >-
+            If checked, %{link} will be accessible by everyone. <em>Serials are never
+            displayed for impounded bikes, so they can be used for verification of
+            ownership.</em>
+          public_search: Public search
+          save: Save
+          set_locations: Set impound locations
+          subtitle: How impounded vehicles are found, numbered, contacted and expired.
+          unsaved: Unsaved
+          update_locations: Update locations
+          upload_csv: Upload a CSV of impounded bikes
+          use_this_prefix: Use this prefix
