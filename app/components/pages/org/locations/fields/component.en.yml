@@ -12,8 +12,8 @@ en:
             impound: Impound
             impound_location: Impound location
             impound_location_help: >-
-              If %{org_name} has multiple locations where impounded bikes go and wants
-              to track them
+              If %{org_name} has multiple locations where impounded vehicles go and
+              wants to track them
             location_name: Location name
             name: Name
             new: New
@@ -22,7 +22,7 @@ en:
             phone_number: Phone number
             publicly_visible: Publicly visible
             remove: Remove
-            required_for_impounded_bikes: Required for impounded bikes
+            required_for_impounded_vehicles: Required for impounded vehicles
             save: Save
             street: Street
             undo: Undo

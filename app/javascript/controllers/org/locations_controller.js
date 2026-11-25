@@ -82,8 +82,6 @@ export default class extends Controller {
     this.refreshAll()
   }
 
-  // private
-
   // The state combobox renders its option ids as UUIDs, which every clone of the template would share
   uniqueIds (html, index) {
     return html.replace(UUID, (id) => `${id}-${index}`)

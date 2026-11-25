@@ -39,7 +39,7 @@
 
         <% if @location.destroy_forbidden? %>
           <small class="tw:shrink-0 tw:text-gray-500 tw:italic tw:dark:text-gray-400">
-            <%= translation(".required_for_impounded_bikes") %>
+            <%= translation(".required_for_impounded_vehicles") %>
           </small>
         <% else %>
           <%= @form_builder.hidden_field :_destroy, data: {slot: "destroy"} %>

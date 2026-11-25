@@ -28,7 +28,7 @@ RSpec.describe Pages::Org::Locations::Fields::Component, type: :component do
     expect(component).to have_field("Street")
     expect(component).to have_field("Publicly visible", type: "checkbox")
     expect(component).to have_field("Impound location", type: "checkbox")
-    expect(component).to have_field("If Brakebills has multiple locations where impounded bikes go and wants to track them", type: "checkbox", visible: :all)
+    expect(component).to have_field("If Brakebills has multiple locations where impounded vehicles go and wants to track them", type: "checkbox", visible: :all)
     expect(component.at_css("[data-new-record]")["data-new-record"]).to eq "false"
     expect(component).to have_button("Remove")
     expect(component.css("[data-slot='destroy']").length).to eq 1
@@ -60,7 +60,7 @@ RSpec.describe Pages::Org::Locations::Fields::Component, type: :component do
       expect(slot("badge-default-impound")["class"].to_s).not_to include("tw:hidden")
       expect(slot("badge-impound")["class"]).to include("tw:hidden")
       expect(slot("default-row")["class"].to_s).not_to include("tw:hidden")
-      expect(component).to have_text("Required for impounded bikes")
+      expect(component).to have_text("Required for impounded vehicles")
       expect(component).to have_no_button("Remove")
       expect(component.css("[data-slot='destroy']")).to be_empty
     end
