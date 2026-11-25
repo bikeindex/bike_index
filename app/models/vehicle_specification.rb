@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-# The Bike Book model a Bike or BikeVersion was registered as. bikebook_model goes nil when BikebookModelsSyncJob
-# deletes one the catalog drops
+# The Bike Book model a Bike or BikeVersion was registered as
 # == Schema Information
 #
 # Table name: vehicle_specifications
@@ -22,5 +21,5 @@
 #
 class VehicleSpecification < ApplicationRecord
   belongs_to :bike_obj, polymorphic: true
-  belongs_to :bikebook_model
+  belongs_to :bikebook_model, -> { with_deleted }
 end

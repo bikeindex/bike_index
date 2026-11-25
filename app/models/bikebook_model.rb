@@ -8,6 +8,7 @@
 # Database name: primary
 #
 #  id              :bigint           not null, primary key
+#  deleted_at      :datetime
 #  final_year      :integer
 #  first_year      :integer          not null
 #  markets         :string           default([]), not null, is an Array
@@ -24,6 +25,8 @@
 #  index_bikebook_models_on_manufacturer_id_and_model_slug  (manufacturer_id,model_slug)
 #
 class BikebookModel < ApplicationRecord
+  acts_as_paranoid
+
   belongs_to :manufacturer
 
   scope :sold_in_year, ->(year) { where(first_year: ..year, final_year: [nil, year..]) }
