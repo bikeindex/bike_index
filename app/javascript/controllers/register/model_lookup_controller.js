@@ -1,19 +1,12 @@
 import { Controller } from '@hotwired/stimulus'
-import { html, nothing } from 'lit-html'
-import { catalogAt, mountCatalogCombobox, showPickedPhoto } from 'bikebook/catalog'
-import { renderInto } from 'bikebook/render'
-
-// Newest first, every year it was sold rather than only those the catalog has a record of: through its final year, or
-// for a current model its newest record
-const yearsOf = ({ first_year: first, final_year: final, years = [] }) => {
-  const last = final ?? Math.max(first, ...years.map(({ year }) => year))
-  return first ? Array.from({ length: last - first + 1 }, (_, index) => last - index) : []
-}
+import { catalogAt, mountCatalogCombobox, pickedVehicle, showPhoto } from 'bikebook/catalog'
+import { soldYears, yearPhoto } from 'bikebook/colorways'
 
 // Connects to data-controller='register--model-lookup'
 // The model field as /bikebook's search of the registration's manufacturer's models, once the catalog loads, in place of
 // the text field it starts as - what's typed there meanwhile carries over. A pick submits its catalog id, which saving
-// the step names it by, shows its stock photo, and makes the year a select of its years
+// the step names it by, fills in the newest year it was sold, and shows its stock photo for the year entered. The year
+// stays free to change, as the catalog may not have all of a model's years
 export default class extends Controller {
   static targets = ['combobox', 'slot', 'photo', 'year']
   static values = { manifestUrl: String }
@@ -28,8 +21,6 @@ export default class extends Controller {
     this.field = await mountCatalogCombobox(loading, this.comboboxTarget, this.slotTarget,
       { display: standIn.value, failedText: standIn.placeholder, richPick: true })
     if (typing) this.slotTarget.querySelector('[role=combobox]')?.focus()
-    this.yearSelect = document.createElement('span')
-    this.yearTarget.after(this.yearSelect)
     this.pick()
   }
 
@@ -39,24 +30,25 @@ export default class extends Controller {
     const { type, detail } = event ?? {}
     if (!this.field || (type === 'hw-combobox:preselection' && detail.value && !detail.isNewAndAllowed)) return
 
-    const picked = await showPickedPhoto(this.catalog, this.field.value, this.photoTarget)
-    if (picked !== undefined) this.offerYears(picked ? yearsOf(picked.data) : [], type === 'hw-combobox:selection')
+    const value = this.field.value
+    const picked = await pickedVehicle(this.catalog, value)
+    if (value !== this.field.value) return
+
+    this.picked = picked
+    const [newest] = picked ? soldYears(picked.data) : []
+    if (newest && type === 'hw-combobox:selection') {
+      this.yearTarget.value = newest
+      // for form-persist's draft
+      this.yearTarget.dispatchEvent(new Event('input', { bubbles: true }))
+    }
+    this.showPhoto()
   }
 
-  // In place of the year's text field, which keeps what's chosen for a pick replaced by typed text. A single year is the
-  // field itself, read only - unlike a disabled field, it submits
-  offerYears (years, fresh) {
-    const year = this.yearTarget
-    this.yearId ??= year.id
-    const chosen = years.includes(Number(year.value)) && !fresh ? Number(year.value) : years[0]
-    const choosing = years.length > 1
-    if (years.length) year.value = chosen
-    // the select takes the field's id while it's shown, which the label is for
-    Object.assign(year, { hidden: choosing, disabled: choosing, readOnly: years.length === 1, id: choosing ? '' : this.yearId })
-    renderInto(this.yearSelect, choosing
-      ? html`<select class="twinput tw:font-mono" id=${this.yearId} name=${year.name}
-          @change=${({ target }) => { year.value = target.value }}>${years.map((each) => html`<option value=${each}
-          ?selected=${each === chosen}>${each}</option>`)}</select>`
-      : nothing)
+  // A year typed partway keeps the photo it has
+  showPhoto () {
+    const year = this.yearTarget.value.trim()
+    if (this.field && (!year || /^\d{4}$/.test(year))) {
+      showPhoto(this.photoTarget, this.picked, (this.picked && yearPhoto(this.picked.data, Number(year))) ?? null)
+    }
   }
 }

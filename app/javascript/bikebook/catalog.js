@@ -6,6 +6,7 @@ import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
 import { pickedPhoto } from 'bikebook/templates/vehicles/picked_photo'
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { localSources } from 'utils/hw_combobox_patch'
+import { collapse } from 'utils/collapse_utils'
 import { TARGET_RIDERS } from 'bikebook/vehicle_presenter'
 
 /* global IntersectionObserver, Worker */
@@ -107,17 +108,18 @@ export async function mountCatalogCombobox (loading, template, slot, { display, 
   return slot.querySelector('input[type=hidden]')
 }
 
-const showing = new WeakMap()
+// The model `value` names, null for one naming none: typed text, or a classification
+export const pickedVehicle = async (catalog, value) => value ? (await catalog.vehicles([value]).catch(() => []))[0] ?? null : null
 
-// Shows the stock photo of the model `value` names in `target`, and nothing for a value naming none: typed text, or a
-// classification. Resolves to the model, null for none, and undefined once a later call for `target` supersedes it
-export async function showPickedPhoto (catalog, value, target) {
-  showing.set(target, value)
-  const [picked] = value ? await catalog.vehicles([value]).catch(() => []) : []
-  if (showing.get(target) !== value) return
-  renderInto(target, picked ? pickedPhoto(picked.data.stock_photo, picked.display?.replace(CURRENT_MARK, '')) : nothing)
-  return picked ?? null
+// Collapses open on `vehicle`'s `photo`, its stock photo by default, and shut for none or one that fails to load
+export const showPhoto = (target, vehicle, photo = vehicle?.data.stock_photo) => {
+  if (!photo) return collapse('hide', target)
+  renderInto(target, pickedPhoto({ photo, alt: vehicle.display?.replace(CURRENT_MARK, ''), failed: () => collapse('hide', target) }))
+  collapse('show', target)
 }
+
+// Shows the stock photo of the model `value` names in `target`
+export const showPickedPhoto = async (catalog, value, target) => showPhoto(target, await pickedVehicle(catalog, value))
 
 // Answers a hotwire_combobox async filter with the markup the gem's own turbo-stream response would
 // carry, so its selection and paging run unchanged

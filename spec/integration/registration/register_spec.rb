@@ -341,10 +341,10 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(bike.creator_id).to eq user.id
   end
 
-  it "picks the model from its manufacturer's Bike Book models, showing its stock photo" do
+  it "picks the model from its manufacturer's Bike Book models, filling in its year and showing its stock photo" do
     sync_bikebook_models
     Autocomplete::Loader.load_all(%w[Manufacturer])
-    serve_bikebook_catalog
+    serve_bikebook_catalog(photos: true)
     visit "/register/new"
     type_into("#b_param_manufacturer_id", "Specialized")
     click_combobox_option("Specialized")
@@ -353,44 +353,45 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_content("Add your bike", wait: 10)
 
     model = find("#bike_frame_model[role='combobox']", wait: 10)
-    type_into(model, "fuse")
-    retry_on_detach { find("[role='option']", text: "Specialized Fuse FOUR").click }
-    # Its one year, which can't be changed but submits
-    expect(page).to have_field("Model year", with: "2007", readonly: true)
-
     type_into(model, "haul")
     # Only the registration's manufacturer's
     expect(page).to have_no_css("[role='option']", text: "Segway")
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
-    photo = "img[src$='/specialized/2025/haul-st.png']"
-    expect(page).to have_css(photo, visible: :all)
+    photo = "[data-register--model-lookup-target='photo'] img"
+    expect(page).to have_css("#{photo}[src$='/specialized/2025/haul-st.png']")
     # The field names the pick on a line, rather than as the option's photo and price
     overlay = "[data-controller~='register--model-lookup'] [data-ui--forms--combobox-display-target='overlay']"
     expect(page).to have_css(overlay, exact_text: "Specialized Haul ST current")
     expect(page).to have_no_css("#{overlay} img", visible: :all)
-    # Its years, through its newest record as it's current, the newest chosen
-    expect(page).to have_select("Model year", options: %w[2026 2025], selected: "2026")
+    # The newest year it was sold, through its newest record as it's current
+    expect(page).to have_field("Model year", with: "2026")
 
-    # Typed over, it's the text that submits, so the pick's name and photo go, and the year is typed again
+    # A year the catalog has no record of has no photo, as the catalog may not have all its years
+    fill_in "Model year", with: "2020"
+    expect(page).to have_no_css(photo)
+    fill_in "Model year", with: "2025"
+    expect(page).to have_css(photo)
+
+    # Typed over, it's the text that submits, so the pick's name and photo go
     type_into(model, "Haul ST custom")
     find("h1", text: "Add your bike").click
     expect(page).to have_no_css(overlay)
-    expect(page).to have_no_css(photo, visible: :all)
+    expect(page).to have_no_css(photo)
     expect(page).to have_field("bike_frame_model", with: "Haul ST custom")
-    expect(page).to have_no_select("Model year")
-    expect(page).to have_field("Model year", with: "2026")
+    expect(page).to have_field("Model year", with: "2025")
 
-    type_into(model, "haul")
-    retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
-    expect(page).to have_css(photo, visible: :all)
-    select "2025", from: "Model year"
+    type_into(model, "fuse")
+    retry_on_detach { find("[role='option']", text: "Specialized Fuse FOUR").click }
+    expect(page).to have_css("#{photo}[src$='/specialized/2007/fuse-four.jpg']")
+    expect(page).to have_field("Model year", with: "2007")
+    fill_in "Model year", with: "2008"
 
-    # Restored from the draft, the pick shows its name and photo rather than the catalog id it submits, and keeps its year
+    # Restored from the draft, the pick shows its name, and its photo for its year, rather than the catalog id it submits
     visit page.current_url
     expect(page).to have_css("#bike_frame_model[role='combobox']", wait: 10)
-    expect(page).to have_field("bike_frame_model", with: "Specialized Haul ST")
-    expect(page).to have_css(photo, visible: :all)
-    expect(page).to have_select("Model year", selected: "2025")
+    expect(page).to have_field("bike_frame_model", with: "Specialized Fuse FOUR (2007)")
+    expect(page).to have_field("Model year", with: "2008")
+    expect(page).to have_no_css(photo)
 
     type_into("#bike_primary_frame_color_id", "Red")
     click_combobox_option("Red")
@@ -399,7 +400,7 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "Complete Bike Registration"
 
     expect(page).to have_css("h1", text: "Progress saved", wait: 10)
-    expect(BParam.last.bike).to include("frame_model" => "Haul ST", "year" => "2025")
+    expect(BParam.last.bike).to include("frame_model" => "Fuse FOUR", "year" => "2008")
   end
 
   # form-persist announces its restore once, and controllers are lazily loaded - so a

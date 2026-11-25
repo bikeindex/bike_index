@@ -19,16 +19,15 @@
         <%= @form.text_field(:frame_model, class: "twinput", autocomplete: "off", **model_options) %>
       </div>
 
-      <div data-register--model-lookup-target="photo"></div>
+      <div class="tw:mt-3 tw:hidden" data-register--model-lookup-target="photo"></div>
     <% end %>
   <% end %>
 
   <%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :year,
       label_text: translation(".model_year"),
       html_options: {value: bike["year"], inputmode: "numeric",
-        placeholder: translation(".model_year_placeholder"), data: {"register--model-lookup-target": "year"},
-        class: "tw:font-mono tw:read-only:cursor-default tw:read-only:border-gray-300 tw:read-only:bg-gray-50 tw:read-only:text-gray-600
-          tw:dark:read-only:border-gray-600 tw:dark:read-only:bg-gray-700 tw:dark:read-only:text-gray-300"}) %>
+        placeholder: translation(".model_year_placeholder"), class: "tw:font-mono",
+        data: {"register--model-lookup-target": "year", action: "input->register--model-lookup#showPhoto"}}) %>
 <% end %>
 
 <%= render Pages::Register::Parts::ColorFields::Component.new(form: @form,
