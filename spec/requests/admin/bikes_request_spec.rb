@@ -68,6 +68,7 @@ RSpec.describe Admin::BikesController, type: :request do
         get base_url, params: {user_id: user.id, search_previous_owner: true}
         expect(assigns(:bikes).pluck(:id)).to eq([bike_transferred.id])
         expect(response.body).to include("view currently owned bikes")
+        expect(response.body).to match(/name="search_previous_owner"[^>]*value="true"/)
       end
     end
   end

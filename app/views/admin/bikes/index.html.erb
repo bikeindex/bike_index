@@ -131,6 +131,7 @@
         <%= hidden_field_tag :search_pos, params[:search_pos] %>
         <%= hidden_field_tag :search_origin, params[:search_origin] %>
         <%= hidden_field_tag :search_only_creation_organization, params[:search_only_creation_organization] %>
+        <%= hidden_field_tag :search_previous_owner, params[:search_previous_owner] %>
 
         <% if show_search_statuses %>
           <%= render(Pages::Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state,
