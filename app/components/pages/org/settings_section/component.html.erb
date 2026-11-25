@@ -1,30 +1,26 @@
-<%# UI::Card's own p-4 plus the p-4 here make the 32px the design asks for %>
-<%= render(UI::Card::Component.new(shadow: :large)) do %>
-  <div class="tw:grid tw:gap-8 tw:p-4 tw:md:grid-cols-3">
-    <div class="tw:flex tw:max-w-65 tw:flex-col tw:gap-1.5">
-      <h2
-        class="
-          tw:m-0 tw:font-header tw:text-lg tw:font-bold tw:normal-case
-          tw:leading-normal tw:twtext-color
-        "
-      >
-        <%= @title %>
-      </h2>
+<%# The grid's p-8 outranks UI::Card's own p-4 %>
+<%= render(UI::Card::Component.new(shadow: :large, additional_classes: "tw:grid tw:gap-8 tw:p-8! tw:md:grid-cols-3")) do %>
+  <div class="tw:flex tw:max-w-65 tw:flex-col tw:gap-1.5">
+    <h2
+      class="
+        tw:m-0 tw:font-header tw:text-lg tw:font-bold tw:normal-case
+        tw:leading-normal tw:twtext-color
+      "
+    >
+      <%= @title %>
+    </h2>
 
-      <% if @description.present? %>
-        <p
-          class="
-            tw:m-0 tw:text-sm tw:leading-normal tw:text-gray-500
-            tw:dark:text-gray-400
-          "
-        >
-          <%= @description %>
-        </p>
-      <% end %>
-    </div>
+    <p
+      class="
+        tw:m-0 tw:text-sm tw:leading-normal tw:text-gray-500
+        tw:dark:text-gray-400
+      "
+    >
+      <%= @description %>
+    </p>
+  </div>
 
-    <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-5 tw:md:col-span-2">
-      <%= content %>
-    </div>
+  <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-5 tw:md:col-span-2">
+    <%= content %>
   </div>
 <% end %>
