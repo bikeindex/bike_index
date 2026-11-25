@@ -334,10 +334,7 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
     let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:, street: " ") }
     let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record:, user:) }
     let(:bike_registered) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
-    let(:b_param) do
-      FactoryBot.create(:b_param, creator: user, origin: "register_flow", created_bike_id: bike_registered.id,
-        params: {bike: {manufacturer_id: 1, owner_email: user.email}})
-    end
+    let(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: bike_registered.id) }
     let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment_pending, b_param:, bike: bike_registered) }
 
     it "resolves their alerts" do

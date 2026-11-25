@@ -8,8 +8,7 @@ module Backfills
     sidekiq_options queue: "low_priority", retry: false
 
     def perform
-      user_alerts = UserAlert.active.where.not(bike_id: nil).or(UserAlert.active.unfinished_registration)
-      User.where(id: user_alerts.select(:user_id)).find_each do |user|
+      User.where(id: UserAlert.active.distinct.pluck(:user_id)).find_each do |user|
         UserAlert.resolve_without_bike(user)
         UserAlert.resolve_finished_registrations(user)
         UserAlert.refresh_alert_slugs(user)

@@ -143,7 +143,8 @@ class UserAlert < ApplicationRecord
 
   # Deleted and transferred bikes leave user.bikes, which is all the other updates revisit
   def self.resolve_without_bike(user, bike_ids: user.bike_ids)
-    user.user_alerts.active.where.not(bike_id: nil).where.not(bike_id: bike_ids).each(&:resolve!)
+    user.user_alerts.active.where.not(bike_id: nil).where.not(bike_id: bike_ids)
+      .update_all(resolved_at: Time.current, updated_at: Time.current)
   end
 
   def self.update_unfinished_registration(user:, b_param:)

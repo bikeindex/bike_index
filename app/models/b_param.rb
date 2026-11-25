@@ -321,8 +321,8 @@ class BParam < ApplicationRecord
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
   # new creates, and the token still resumes it. A destroyed one is false so that the
   # after_commit a destroy fires resolves its alert rather than re-saving it. One with a
-  # bike here owes an education course, which doesn't expire - until the bike is deleted
-  # or transferred, which leaves the registrant nothing to finish.
+  # bike here owes an education course, which doesn't expire unless the bike is deleted
+  # or transferred.
   # self_made? last, taking the user callers already hold: one made for someone else
   # isn't the creator's bike to alert about
   def unfinished_registration?(user = creator)
@@ -810,7 +810,8 @@ class BParam < ApplicationRecord
   private
 
   def created_bike_initially_owned?
-    created_bike.present? && !created_bike.deleted? && created_bike.current_ownership&.initial?
+    Bike.unscoped.where(id: created_bike_id, deleted_at: nil).joins(:current_ownership)
+      .merge(Ownership.initial).exists?
   end
 
   def ensure_valid_params

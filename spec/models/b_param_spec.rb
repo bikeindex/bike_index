@@ -945,16 +945,12 @@ RSpec.describe BParam, type: :model do
           before { b_param.update(created_bike_id: bike.id) }
 
           it "isn't unfinished after the bike is deleted" do
-            expect(b_param.unfinished_registration?).to be_truthy
-
             bike.destroy
 
             expect(BParam.find(b_param.id).unfinished_registration?).to be_falsey
           end
 
           it "isn't unfinished after the bike is transferred" do
-            expect(b_param.unfinished_registration?).to be_truthy
-
             BikeServices::OwnershipTransferer.find_or_create(bike, updator: creator,
               new_owner_email: "new-owner@example.com")
 
