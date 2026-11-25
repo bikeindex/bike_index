@@ -40,7 +40,7 @@
             data: {"register--frame-size-target": "number", action: "input->register--frame-size#pickNumber change->register--frame-size#checkUnit"}}) %>
 
       <%= @form.select :frame_size_unit, [[translation(".inches"), "in"], [translation(".cm"), "cm"]],
-          {selected: bike["frame_size_unit"] || "in"},
+          {selected: bike["frame_size_unit"] || "cm"},
           class: "tw:self-stretch tw:rounded-r-sm tw:border tw:border-l-0
             tw:border-gray-300 tw:bg-gray-50 tw:px-3 tw:py-1.5
             tw:text-sm tw:font-medium tw:text-gray-500
