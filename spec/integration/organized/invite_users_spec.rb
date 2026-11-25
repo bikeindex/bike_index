@@ -20,6 +20,14 @@ RSpec.describe "Organized user invitations", :js, type: :system do
     expect(page).to have_content("1 email")
     expect(page).to have_button("Send invitation", disabled: true)
 
+    fill_in "multiple_emails_invited", with: "Name <first@example.com>"
+    expect(page).to have_content("Not a valid email: Name, <first@example.com>")
+    fill_in "multiple_emails_invited", with: "first@example.com."
+    expect(page).to have_content("Not a valid email: first@example.com.")
+    fill_in "multiple_emails_invited", with: "first@example.com FIRST@example.com"
+    expect(page).to have_content("1 email")
+    expect(page).to have_button("Send invitation", disabled: false)
+
     fill_in "multiple_emails_invited", with: "first@example.com\nsecond@example.com\nthird@example.com"
     expect(page).to have_content("You only have 2 invitations left.")
     expect(page).to have_button("Send 3 invitations", disabled: true)

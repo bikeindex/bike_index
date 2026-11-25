@@ -1979,11 +1979,12 @@ en:
             if you think you should be able to.
       users:
         create:
-          insufficient_invitations: >-
-            You tried to invite %{invite_count} users, but %{org_name} only can invite
-            *%{remaining_invite_count} more*. Invite fewer or contact support.
+          already_invited: Everyone you entered has already been invited to %{org_name}.
           no_remaining_user_invitations: "%{org_name} is out of user invitations.
             Contact support@bikeindex.org."
+          too_many_invitations: >-
+            You tried to invite %{invite_count} users, but %{org_name} only can invite
+            %{remaining_invite_count} more. Invite fewer or contact support.
           user_was_invited: "%{invited_email} was invited to %{org_name}!"
           users_invited: "%{invite_count} users invited to %{org_name}"
         destroy:
@@ -4484,9 +4485,9 @@ en:
     users:
       edit:
         back_to_users: Manage users
-        confirmation: >-
-          Are you sure you want to remove %{user_name} from %{org_name}? (They will
-          still be to use their personal account)
+        confirm_removal: >-
+          Are you sure you want to remove %{user_name} from %{org_name}? They will
+          still be able to use their personal account.
         details: Details
         has_not_signed_up_html: "%{name} <strong>has still not signed up</strong>"
         invited: Invited

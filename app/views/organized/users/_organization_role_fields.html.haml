@@ -1,6 +1,6 @@
--# locals: (f:)
+-# locals: (f:, disabled: false)
 - admin, member, member_no_bike_edit = OrganizationRole.role_types
 %div{class: "tw:flex tw:flex-col tw:gap-2.5"}
-  = render partial: "organization_role_option", locals: {f:, role: admin, label: t(".admin_of_organization"), description: t(".admin_access")}
-  = render partial: "organization_role_option", locals: {f:, role: member, label: t(".member_of_organization"), description: t(".member_access")}
-  = render partial: "organization_role_option", locals: {f:, role: member_no_bike_edit, label: t(".member_no_bikes"), description: t(".member_no_bikes_access")}
+  = render partial: "organization_role_option", locals: {f:, disabled:, role: admin, label: t(".admin_of_organization"), description: t(".admin_access")}
+  = render partial: "organization_role_option", locals: {f:, disabled:, role: member, label: t(".member_of_organization"), description: t(".member_access")}
+  = render partial: "organization_role_option", locals: {f:, disabled:, role: member_no_bike_edit, label: t(".member_no_bikes"), description: t(".member_no_bikes_access")}

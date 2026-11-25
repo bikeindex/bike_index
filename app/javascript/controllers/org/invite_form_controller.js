@@ -1,7 +1,8 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 
-const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+// No brackets, commas or a trailing dot, so a pasted "Name <a@b.co>" or "a@b.co." is flagged
+const EMAIL_PATTERN = /^[^@\s<>(),;]+@[^@\s<>(),;]+\.[^@\s.<>(),;]+$/
 
 // Connects to data-controller='org--invite-form'
 // Counts and validates the emails as they're typed, and keeps the form from submitting
@@ -22,7 +23,8 @@ export default class extends Controller {
   }
 
   check () {
-    const emails = [...new Set(this.emailsTarget.value.split(/[\s,;]+/).filter(Boolean))]
+    // Keyed by lowercase, since the server treats Dave@ and dave@ as one address
+    const emails = [...new Map(this.emailsTarget.value.split(/[\s,;]+/).filter(Boolean).map((email) => [email.toLowerCase(), email])).values()]
     const invalid = emails.filter((email) => !EMAIL_PATTERN.test(email))
     const count = emails.length - invalid.length
     const over = this.hasRemainingValue && count > this.remainingValue
