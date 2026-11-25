@@ -3,6 +3,7 @@ import { numberDisplay, uuid } from 'bikebook/templates/helpers'
 import { inlineBadge } from 'bikebook/templates/ui/badge'
 import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
+import { pickedPhoto } from 'bikebook/templates/vehicles/picked_photo'
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { localSources } from 'utils/hw_combobox_patch'
 import { TARGET_RIDERS } from 'bikebook/vehicle_presenter'
@@ -94,6 +95,13 @@ export async function mountCatalogCombobox (loading, template, slot, { display, 
   localSources.set(combobox, new CatalogComboboxSource(catalog))
   slot.replaceChildren(fragment)
   return slot.querySelector('input[type=hidden]')
+}
+
+// Shows the stock photo of the model `value` names in `target`, and nothing for a value naming none: typed text, or a
+// classification
+export async function showPickedPhoto (catalog, value, target) {
+  const [picked] = value ? await catalog.vehicles([value]).catch(() => []) : []
+  renderInto(target, picked ? pickedPhoto(picked.data.stock_photo, picked.display?.replace(CURRENT_MARK, '')) : nothing)
 }
 
 // Answers a hotwire_combobox async filter with the markup the gem's own turbo-stream response would

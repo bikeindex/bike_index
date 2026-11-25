@@ -18,6 +18,8 @@ RSpec.describe BikebookModel, type: :model do
       expect(catalog_id("Haul ST", 2026)).to eq "m/specialized/2025/haul-st"
       expect(catalog_id("haul-st", 2025, "US")).to eq "m/specialized/2025/haul-st"
       expect(catalog_id("Haul ST", 2025, "CA")).to eq "m/specialized/2025/haul-st@CA"
+      BikebookModel.find_by!(catalog_id: "m/specialized/2025/haul-st").update!(market_variants: %w[CA EU])
+      expect(catalog_id("Haul ST", 2025, "DE")).to eq "m/specialized/2025/haul-st@EU"
       expect(catalog_id("Haul ST", 2024)).to be_nil
       expect(catalog_id("KH24", 2023, manufacturer: "Kris Holm")).to eq "m/kris-holm/2023/kh24-us"
       expect(catalog_id("KH24", 2023, "CA", manufacturer: "Kris Holm")).to eq "m/kris-holm/2023/kh24"
@@ -26,16 +28,12 @@ RSpec.describe BikebookModel, type: :model do
     end
   end
 
-  describe "names_matching" do
-    def names(query, page: 1, per_page: 15)
-      described_class.where(manufacturer: Manufacturer.friendly_find("Kris Holm")).names_matching(query, page:, per_page:)
-    end
-
-    it "is the names with every word in them, each once, a page at a time" do
-      expect(names("kh2")).to eq ["KH20", "KH24", "KH27.5", "KH29"]
-      expect(names("27 KH")).to eq ["KH27.5"]
-      expect(names("kh", page: 2, per_page: 3)).to eq ["KH29", "KH36"]
-      expect(names("%")).to eq []
+  describe "frame_model" do
+    it "is a picked catalog id's or citation key's model name, and typed text as it is" do
+      expect(described_class.frame_model("m/specialized/2025/haul-st")).to eq "Haul ST"
+      expect(described_class.frame_model("m/specialized/2025/haul-st@CA")).to eq "Haul ST"
+      expect(described_class.frame_model("m/specialized/2020/not-synced")).to eq "m/specialized/2020/not-synced"
+      expect(described_class.frame_model("Haul ST custom")).to eq "Haul ST custom"
     end
   end
 end

@@ -341,6 +341,41 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(bike.creator_id).to eq user.id
   end
 
+  it "picks the model from its manufacturer's Bike Book models, showing its stock photo" do
+    sync_bikebook_models
+    Autocomplete::Loader.load_all(%w[Manufacturer])
+    serve_bikebook_catalog
+    visit "/register/new"
+    type_into("#b_param_manufacturer_id", "Specialized")
+    click_combobox_option("Specialized")
+    fill_in "b_param[owner_email]", with: owner_email
+    click_button "Next"
+    expect(page).to have_content("Add your bike", wait: 10)
+
+    model = find("#bike_frame_model[role='combobox']", wait: 10)
+    type_into(model, "haul")
+    # Only the registration's manufacturer's
+    expect(page).to have_no_css("[role='option']", text: "Segway")
+    retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
+    photo = "img[src$='/specialized/2025/haul-st.png']"
+    expect(page).to have_css(photo, visible: :all)
+
+    # Restored from the draft, the pick shows its name and photo rather than the catalog id it submits
+    visit page.current_url
+    expect(page).to have_css("#bike_frame_model[role='combobox']", wait: 10)
+    expect(page).to have_field("bike_frame_model", with: "Specialized Haul ST")
+    expect(page).to have_css(photo, visible: :all)
+
+    type_into("#bike_primary_frame_color_id", "Red")
+    click_combobox_option("Red")
+    fill_in_verified "bike[serial_number]", with: "SERIAL9"
+    fill_in_verified "bike[user_name]", with: user_name
+    click_button "Complete Bike Registration"
+
+    expect(page).to have_css("h1", text: "Progress saved", wait: 10)
+    expect(BParam.last.bike["frame_model"]).to eq "Haul ST"
+  end
+
   # form-persist announces its restore once, and controllers are lazily loaded - so a
   # module that lands after the announcement never hears it
   it "reconciles a restored draft into the controllers whose modules arrive after it" do

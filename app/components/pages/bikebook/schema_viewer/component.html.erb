@@ -35,6 +35,8 @@
           </div>
         <% end %>
 
+        <div data-bikebook--schema-lookup-target="photo"></div>
+
         <% if @record %>
           <p class="tw:mt-3">
             <%= link_to(translation(".view_on_github"), Integrations::Bikebook::RepositoryRecord.github_url(@record_id), class: "twlink tw:underline") %>

@@ -6,8 +6,8 @@ class BikebookModelsSyncJob < ScheduledJob
   sidekiq_options queue: "low_priority"
 
   # The index's file name is a digest of it, so a publish that changes it renames it. A manufacturer added since can
-  # match models the last sync skipped
-  SYNCED_KEY = "bikebook_catalog/synced"
+  # match models the last sync skipped. Versioned with what a row holds, so a new column fills without a publish
+  SYNCED_KEY = ["bikebook_catalog/synced", 2]
 
   def self.frequency = 62.minutes
 
@@ -36,6 +36,6 @@ class BikebookModelsSyncJob < ScheduledJob
   def row(model, manufacturer_id)
     {catalog_id: model["id"], manufacturer_id:, name: model["model"],
      model_slug: Slugifyer.book_slug(model["model"]), first_year: model["first_year"], final_year: model["final_year"],
-     markets: model["markets"], variants: model["variants"].map { it.slice("id", "markets") }}
+     markets: model["markets"], market_variants: model["variants"].flat_map { it["markets"] }.uniq}
   end
 end

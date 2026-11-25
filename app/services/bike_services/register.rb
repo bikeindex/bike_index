@@ -668,6 +668,7 @@ module BikeServices
       bike_params = bike_params.reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
       # The unit only means something alongside a numeric size
       bike_params = bike_params.except("frame_size_unit") if bike_params["frame_size_number"].blank?
+      bike_params = bike_params.merge("frame_model" => BikebookModel.frame_model(bike_params["frame_model"])) if bike_params["frame_model"]
       # The photo went browser -> bucket before submit, so only its signed id rides along.
       # Dropped when blank rather than merged, which would clobber an id already stored.
       {details_completed: completed, bike: bike_params, image_signed_id: image_signed_id.presence}.compact

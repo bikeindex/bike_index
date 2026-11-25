@@ -1061,6 +1061,15 @@ RSpec.describe RegisterController, type: :request do
         expect(response.body).to_not include "Finish reporting your stolen"
       end
 
+      context "with a model picked from Bike Book" do
+        before { sync_bikebook_models }
+
+        it "saves the model's name rather than the catalog id its combobox posts" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.merge(frame_model: "m/specialized/2025/haul-st@CA")}
+          expect(b_param.reload.bike["frame_model"]).to eq "Haul ST"
+        end
+      end
+
       context "with a photo" do
         let(:blob) do
           ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join("spec/fixtures/bike.jpg")),

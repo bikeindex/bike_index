@@ -65,12 +65,12 @@ RSpec.describe Pages::Register::Views::Step2::Component, type: :component do
   end
 
   describe "the model field" do
-    let(:combobox) { "[data-hw-combobox-async-src-value*='bikebook_models']" }
+    let(:lookup) { "[data-controller='register--model-lookup']" }
 
     it "is a text field" do
       render_step_2
       expect(page).to have_field("bike[frame_model]", type: "text")
-      expect(page).to_not have_css(combobox)
+      expect(page).to_not have_css(lookup)
     end
 
     context "for a manufacturer with Bike Book models" do
@@ -78,10 +78,11 @@ RSpec.describe Pages::Register::Views::Step2::Component, type: :component do
       let(:params) { super().deep_merge(bike: {manufacturer_id: manufacturer.id, frame_model: "Haul ST"}) }
       before { sync_bikebook_models }
 
-      it "autocompletes from them, keeping what was entered" do
+      it "starts as a text field keeping what was entered, for a catalog search of the manufacturer's models" do
         render_step_2
-        expect(page).to have_css("#{combobox}[data-hw-combobox-async-src-value*='manufacturer_id=#{manufacturer.id}']")
-        expect(page).to have_field("bike[frame_model]", type: :hidden, with: "Haul ST")
+        expect(page).to have_css(lookup)
+        expect(page.find(lookup)).to have_field("bike[frame_model]", type: "text", with: "Haul ST")
+        expect(rendered_content).to include('data-hw-combobox-async-src-value="/bikebook?manufacturer=specialized&amp;')
       end
     end
   end

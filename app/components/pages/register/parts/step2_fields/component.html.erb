@@ -7,9 +7,20 @@
 
 <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :frame_model, label_text: translation(".model"), html_options: model_options)) do %>
   <% if bikebook_models? %>
-    <%= render UI::Forms::Combobox::Component.new(name: :frame_model,
-        src: search_combobox_bikebook_models_path(manufacturer_id: @b_param.manufacturer_id), free_text: true,
-        no_js: true, dialog_label: translation(".model"), html_options: {form: @form, **model_options}) %>
+    <%= tag.div(data: {controller: "register--model-lookup", action: "hw-combobox:selection->register--model-lookup#pick form-persist:restored@window->register--model-lookup#pick",
+      "register--model-lookup-manifest-url-value": Integrations::Bikebook::Catalog::MANIFEST_URL}) do %>
+      <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
+      <template data-register--model-lookup-target="combobox">
+        <%= render UI::Forms::Combobox::Component.new(name: :frame_model, src: bikebook_path(manufacturer: @b_param.manufacturer.slug),
+            free_text: true, rich_display: :inline, dialog_label: translation(".model"), html_options: {form: @form, **model_options}) %>
+      </template>
+
+      <div data-register--model-lookup-target="slot">
+        <%= @form.text_field(:frame_model, class: "twinput", autocomplete: "off", **model_options) %>
+      </div>
+
+      <div data-register--model-lookup-target="photo"></div>
+    <% end %>
   <% end %>
 <% end %>
 

@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 # A model in the Bike Book catalog's index, which BikebookModelsSyncJob copies here so that registering doesn't wait on
-# the index, the catalog's biggest file. `variants` are its market variants' ids and markets, [{"id", "markets"}]
+# the index, the catalog's biggest file. `market_variants` are the markets with a version of their own, each at
+# catalog_id@market (…/haul-st@CA) - the index calls them variants, which Bike Book's schema uses for a colorway's SKUs
 # == Schema Information
 #
 # Table name: bikebook_models
@@ -10,10 +11,10 @@
 #  id              :bigint           not null, primary key
 #  final_year      :integer
 #  first_year      :integer          not null
+#  market_variants :string           default([]), not null, is an Array
 #  markets         :string           default([]), not null, is an Array
 #  model_slug      :string           not null
 #  name            :string           not null
-#  variants        :jsonb            not null
 #  created_at      :datetime         not null
 #  updated_at      :datetime         not null
 #  catalog_id      :string           not null
@@ -37,12 +38,14 @@ class BikebookModel < ApplicationRecord
     (models.find { it.sold_in?(market) } || models.first)&.catalog_id_in(market)
   end
 
-  def self.names_matching(query, page:, per_page:)
-    query.to_s.split.reduce(all) { |models, word| models.where("name ILIKE ?", "%#{sanitize_sql_like(word)}%") }
-      .distinct.order(:name).offset((page - 1) * per_page).limit(per_page).pluck(:name)
+  # The name of a catalog id or a market variant's citation key (…/haul-st@CA), which a pick in registration's model
+  # combobox submits. Anything else, typed rather than picked, as it is
+  def self.frame_model(value)
+    id = value.to_s.sub(/@[A-Z]+\z/, "")
+    (find_by(catalog_id: id)&.name if id.match?(Integrations::Bikebook::Catalog::MODEL_ID)) || value
   end
 
-  def sold_in?(market) = [*markets, *variants.flat_map { it["markets"] }].include?(market)
+  def sold_in?(market) = [*markets, *market_variants].include?(market)
 
-  def catalog_id_in(market) = variants.find { it["markets"].include?(market) }&.dig("id") || catalog_id
+  def catalog_id_in(market) = market_variants.include?(market) ? "#{catalog_id}@#{market}" : catalog_id
 end
