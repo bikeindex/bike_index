@@ -1,6 +1,7 @@
 module Organized
   class ManageImpoundingsController < Organized::AdminController
     before_action :assign_organization
+    before_action :force_html_response, only: :edit
 
     # IDK, may want to render something here sometime
     def show

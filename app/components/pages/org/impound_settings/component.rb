@@ -13,17 +13,12 @@ module Pages
 
         private
 
-        def form_url
-          organization_manage_impounding_path(organization_id: @organization.to_param)
+        def next_ids = @next_ids ||= @impound_configuration.next_display_id_integers
+
+        def next_id
+          prefix = @impound_configuration.display_id_prefix.to_s
+          "#{prefix}#{next_ids[prefix]}"
         end
-
-        def public_page_path = organization_impounded_bikes_path(organization_id: @organization.to_param)
-
-        def locations_path = locations_organization_manage_path(organization_id: @organization.to_param)
-
-        def bulk_import_path = new_organization_bulk_import_path(organization_id: @organization.to_param, kind: "impounded")
-
-        def default_location = @organization.default_impound_location
       end
     end
   end

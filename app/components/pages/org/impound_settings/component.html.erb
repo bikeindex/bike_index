@@ -1,9 +1,9 @@
 <%= render UI::Header::Component.new(text: translation(".impound_settings_html", org_name: @organization.name),
     subtitle: translation(".subtitle"), html_class: "uncap") %>
 
-<%= form_for @impound_configuration, url: form_url, html: {data: {controller: "org--impound-settings",
+<%= form_for @impound_configuration, url: organization_manage_impounding_path(organization_id: @organization.to_param), html: {data: {controller: "org--impound-settings",
       "org--impound-settings-saved-prefix-value": @impound_configuration.display_id_prefix_was.to_s,
-      "org--impound-settings-next-ids-value": @impound_configuration.next_display_id_integers.to_json}} do |f| %>
+      "org--impound-settings-next-ids-value": next_ids.to_json}} do |f| %>
   <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
     <span class="twlabel tw:sm:text-right"><%= translation(".public_search") %></span>
 
@@ -17,6 +17,7 @@
           tw:dark:text-gray-400
         "
       >
+        <% public_page_path = organization_impounded_bikes_path(organization_id: @organization.to_param) %>
         <%= translation(".public_page_helper_html", link: link_to(public_page_path, public_page_path, class: "twlink")) %>
       </p>
     </div>
@@ -27,6 +28,9 @@
       <span class="twlabel tw:sm:text-right"><%= translation(".impound_location") %></span>
 
       <div class="tw:text-sm tw:sm:col-span-2">
+        <% default_location = @organization.default_impound_location %>
+        <% locations_path = locations_organization_manage_path(organization_id: @organization.to_param) %>
+
         <% if default_location.present? %>
           <p class="tw:mb-0">
             <%= translation(".default_location_html", name: tag.strong(default_location.name)) %>
@@ -82,18 +86,14 @@
         <span><%= translation(".next_id") %></span>
 
         <strong data-org--impound-settings-target="nextId">
-          <%= render UI::Code::Inline::Component.new(text: @impound_configuration.calculated_display_id_next) %>
+          <%= render UI::Code::Inline::Component.new(text: next_id) %>
         </strong>
 
         <span
-          class="
-            tw:ml-auto tw:hidden tw:rounded-full tw:border
-            tw:border-yellow-300 tw:bg-yellow-100 tw:px-2 tw:text-[11px]
-            tw:font-bold tw:text-yellow-800 tw:uppercase
-          "
+          class="tw:ml-auto tw:hidden"
           data-org--impound-settings-target="unsaved"
         >
-          <%= translation(".unsaved") %>
+          <%= render UI::Badge::Component.new(text: translation(".unsaved"), color: :warning, size: :xs) %>
         </span>
       </div>
 
@@ -107,20 +107,9 @@
         <em><%= translation(".no_prefix") %></em>
 
         <% @impound_configuration.previous_prefixes.each do |prefix| %>
-          <button
-            type="button"
-            class="
-              tw:cursor-pointer tw:rounded-sm tw:border tw:border-gray-200
-              tw:bg-transparent tw:px-1.5 tw:font-mono tw:text-xs
-              tw:text-pink-600 tw:hover:border-pink-600
-              tw:dark:border-gray-700 tw:dark:text-pink-400
-            "
-            title="<%= translation(".use_this_prefix") %>"
-            data-action="org--impound-settings#use"
-            data-org--impound-settings-prefix-param="<%= prefix %>"
-          >
-            <%= prefix %>
-          </button>
+          <%= render UI::Button::Component.new(text: prefix, color: :secondary, size: :sm,
+              title: translation(".use_this_prefix"),
+              data: {action: "org--impound-settings#use", "org--impound-settings-prefix-param": prefix}) %>
         <% end %>
       </p>
     </div>
@@ -170,7 +159,7 @@
     <span class="twlabel tw:sm:text-right"><%= translation(".bulk_import") %></span>
 
     <div class="tw:sm:col-span-2">
-      <%= link_to translation(".import_impounded_bikes"), bulk_import_path, class: "twlink tw:text-sm tw:font-semibold" %>
+      <%= link_to translation(".import_impounded_bikes"), new_organization_bulk_import_path(organization_id: @organization.to_param, kind: "impounded"), class: "twlink tw:text-sm tw:font-semibold" %>
 
       <p class="tw:mt-1 tw:mb-0 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
         <%= translation(".upload_csv") %>

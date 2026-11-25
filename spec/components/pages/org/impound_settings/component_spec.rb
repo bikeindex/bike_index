@@ -15,7 +15,6 @@ RSpec.describe Pages::Org::ImpoundSettings::Component, type: :component do
     expect(form.at_css("[data-org--impound-settings-target=nextId]").text.strip).to eq "BB-1"
     expect(form.at_css("[data-org--impound-settings-target=unsaved]")["class"]).to include "tw:hidden"
     expect(form["data-controller"]).to eq "org--impound-settings"
-    # No locations or bulk import features
     expect(component).to_not have_text "Impound location"
     expect(component).to_not have_text "Bulk import"
   end
@@ -48,7 +47,6 @@ RSpec.describe Pages::Org::ImpoundSettings::Component, type: :component do
       let!(:location) { FactoryBot.create(:location, organization:, impound_location: true, default_impound_location: true) }
 
       it "names it" do
-        expect(organization.reload.default_impound_location).to eq location
         expect(component).to have_css("strong", text: location.name)
         expect(component).to have_link "Update locations"
       end
