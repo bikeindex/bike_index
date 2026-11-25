@@ -1,0 +1,6 @@
+<%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :edit, user: current_user, display_dev_info: display_dev_info?) %>
+
+<%= render(Pages::Admin::Bikes::Edit::Component.new(bike: @bike, organizations: @organizations,
+      display_dev_info: display_dev_info?)) %>
+
+<%= render(Pages::Admin::Bikes::CreationData::Component.new(bike: @bike, display_dev_info: display_dev_info?)) %>

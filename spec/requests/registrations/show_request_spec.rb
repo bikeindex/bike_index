@@ -11,7 +11,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
   end
 
   context "consumer view" do
-    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_primary_activity, year: 2020, frame_model: "Stumpjumper", name: "Morning commuter") }
     let(:current_user) { bike.reload.user }
 
     it "renders the redesigned consumer view with owner actions" do
@@ -25,6 +25,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       expect(body).to match("Mark stolen")
       expect(body).to match("Add photo")
       expect(body).to match("Edit this bike")
+      expect(body).to match("2020 #{bike.mnfg_name} Stumpjumper nickname: Morning commuter")
       expect(response.body).to match(edit_bike_path(bike, edit_template: bike.default_edit_template))
     end
 
@@ -42,12 +43,65 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
     end
 
-    context "current_user is a superuser" do
-      let(:current_user) { FactoryBot.create(:superuser) }
-      it "offers a View Super Admin link to the admin bike page" do
+    context "with a draft marketplace_listing" do
+      let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, :with_address_record, item: bike) }
+
+      it "offers the preview, which renders the listing publicly" do
         get "#{base_url}/#{bike.id}"
         body = whitespace_normalized_body_text
-        expect(body).to match("View Super Admin")
+        expect(body).to match("Your bike")
+        expect(body).to_not match("This bike is for sale")
+        expect(response.body).to include("view_as=marketplace_preview")
+
+        get "#{base_url}/#{bike.id}", params: {view_as: "marketplace_preview"}
+        body = whitespace_normalized_body_text
+        expect(body).to match("Listing preview")
+        expect(body).to match("This bike is for sale")
+        expect(body).to match("For Sale")
+        # It's the public view, down to the contact link the seller can't otherwise see
+        expect(body).to match("Contact the seller")
+        expect(body).to_not match("Mark stolen")
+      end
+
+      context "current_user not the seller" do
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+        it "flashes and falls back to the public view" do
+          get "#{base_url}/#{bike.id}", params: {view_as: "marketplace_preview"}
+          body = whitespace_normalized_body_text
+          expect(body).to match("not allowed to view this registration")
+          expect(body).to match("Public view")
+          expect(body).to_not match("This bike is for sale")
+        end
+      end
+    end
+
+    context "current_user has a general alert" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let!(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: current_user) }
+
+      def main_class
+        Nokogiri::HTML(response.body).at_css("main#main-content")[:class]
+      end
+
+      # The page pulls up by --nav-gap to sit flush under the navbar, so the alert
+      # standing in that gap has to zero it or the photos render underneath
+      it "zeroes the pull up, and restores it once the alert is gone" do
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("isn't registered yet!")
+        expect(main_class).to eq "tw:[--nav-gap:0px]"
+
+        b_param.destroy
+        get "#{base_url}/#{bike.id}"
+        expect(main_class).to be_blank
+      end
+    end
+
+    context "current_user is a superuser" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      it "offers a View in Super Admin link to the admin bike page" do
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("View in Super Admin")
         expect(response.body).to match(admin_bike_path(bike.id))
       end
     end
@@ -109,7 +163,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
         # Theft details always show a location row, even with no location on file
         expect(body).to match("No location given")
         # Owner phone shows when phone visibility permits
-        expect(body).to match("3025551234")
+        expect(body).to match("302-555-1234")
       end
     end
 
@@ -126,6 +180,17 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match(bike_sticker.pretty_code)
         expect(body).to match("Change the bike it links to")
         expect(response.body).to match(bike_sticker_path(id: bike_sticker.code))
+      end
+
+      context "viewer isn't the bike owner" do
+        # current_user is the claimant above, so the sticker has to name the owner itself
+        let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike:, user: bike.reload.user) }
+        let(:current_user) { FactoryBot.create(:user_confirmed) }
+        it "names the sticker, without offering to re-link it" do
+          get "#{base_url}/#{bike.id}", params: {scanned_id: bike_sticker.code}
+          expect(whitespace_normalized_body_text).to match("You scanned")
+          expect(response.body).to_not match(bike_sticker_path(id: bike_sticker.code))
+        end
       end
     end
   end
@@ -155,6 +220,59 @@ RSpec.describe "RegistrationsController#show", type: :request do
     end
   end
 
+  context "bike_id too large for the column" do
+    let(:current_user) { nil }
+    it "404s" do
+      get "#{base_url}/57549641769762268311552"
+      expect(response.status).to eq 404
+    end
+  end
+
+  context "organization_id & sign_in_if_not" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { nil }
+    let(:organization) { FactoryBot.create(:organization) }
+
+    it "redirects to sign in, with or without an organization that resolves" do
+      get "#{base_url}/#{bike.to_param}?organization_id=#{organization.to_param}&sign_in_if_not=true"
+      expect(response).to redirect_to new_session_path
+      expect(flash[:notice]).to be_present
+      expect(session[:return_to]).to eq registration_path(bike.to_param, sign_in_if_not: true, organization_id: organization.to_param)
+
+      get "#{base_url}/#{bike.to_param}?organization_id=not-an-actual-organization&sign_in_if_not=true"
+      expect(response).to redirect_to new_session_path
+      expect(flash[:notice]).to be_present
+    end
+
+    context "no organization" do
+      it "redirects to sign in" do
+        get "#{base_url}/#{bike.to_param}?sign_in_if_not=1"
+        expect(response).to redirect_to new_session_path
+        expect(flash[:notice]).to be_present
+        expect(session[:return_to]).to eq "#{base_url}/#{bike.to_param}?sign_in_if_not=1"
+      end
+    end
+
+    context "organization with passwordless_users" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
+      it "redirects to magic link" do
+        get "#{base_url}/#{bike.to_param}?organization_id=#{organization.to_param}&sign_in_if_not=1"
+        expect(response).to redirect_to(magic_link_session_path)
+        expect(flash[:notice]).to be_present
+        expect(session[:return_to]).to eq registration_path(bike.to_param, sign_in_if_not: 1, organization_id: organization.to_param)
+      end
+    end
+
+    context "signed in" do
+      let(:current_user) { bike.reload.user }
+      it "renders" do
+        get "#{base_url}/#{bike.to_param}?sign_in_if_not=1"
+        expect(response.status).to eq(200)
+        expect(whitespace_normalized_body_text).to match("Your bike")
+      end
+    end
+  end
+
   context "likely_spam bike" do
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
     let(:current_user) { bike.reload.user }
@@ -174,13 +292,13 @@ RSpec.describe "RegistrationsController#show", type: :request do
     let(:current_user) { owner }
     before { bike.update(marked_user_hidden: "true") }
 
-    it "renders for the owner, without the registered badge" do
+    it "renders for the owner" do
       expect(bike.reload.user_hidden).to be_truthy
       get "#{base_url}/#{bike.id}"
       expect(response.status).to eq(200)
       body = whitespace_normalized_body_text
       expect(body).to match("Your bike")
-      expect(body).to_not match("Registered & protected")
+      expect(body).to match("Registered & protected")
     end
 
     context "superuser viewing" do
@@ -188,7 +306,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       it "renders" do
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
-        expect(whitespace_normalized_body_text).to match("View Super Admin")
+        expect(whitespace_normalized_body_text).to match("View in Super Admin")
       end
     end
 
@@ -203,6 +321,50 @@ RSpec.describe "RegistrationsController#show", type: :request do
 
     context "logged out" do
       let(:current_user) { nil }
+      it "404s" do
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq 404
+      end
+    end
+  end
+
+  context "bike is soft deleted" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.reload.user }
+    before { bike.destroy }
+
+    it "404s, even for the owner" do
+      expect(bike.deleted?).to be_truthy
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq 404
+    end
+
+    context "superuser viewing" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      it "renders" do
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq(200)
+      end
+    end
+  end
+
+  context "merged into its shop's POS registration" do
+    let(:pos_registration_match) { FactoryBot.create(:pos_registration_match, status: :merged) }
+    let(:bike) { pos_registration_match.bike }
+    let(:current_user) { bike.user }
+    before { bike.destroy! }
+
+    it "redirects to the POS registration, keeping the query params as query params" do
+      params = {parking_notification_retrieved: "token", script_name: "//example.com"}
+      get "#{base_url}/#{bike.id}", params: params.merge(id: bike.id, bike_id: bike.id)
+      expect(response).to redirect_to(registration_path(pos_registration_match.pos_bike_id, params:))
+    end
+
+    # A hidden registration's id isn't revealed by a redirect
+    context "a hidden POS registration, viewed by someone else" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      before { pos_registration_match.pos_bike.update!(marked_user_hidden: true) }
+
       it "404s" do
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq 404
@@ -283,8 +445,8 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Owner & access")
         expect(body).to match(bike.owner_name)
         expect(body).to match(bike.owner_email)
-        expect(body).to match("E-Vehicle Audit")
-        # Gated by credibility_badges and additional_registrations_information
+        # Gated by e-vehicles, credibility_badges and additional_registrations_information
+        expect(body).to_not match("E-Vehicle Audit")
         expect(body).to_not match("Credibility")
         expect(body).to_not match("Other registrations")
       end
@@ -330,7 +492,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
           expect(body).to match("Impounded")
-          expect(body).to_not match("Not stolen")
+          expect(body).to_not match("Registered & protected")
         end
       end
 
@@ -373,6 +535,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
             # The View notifications action opens the parking-notification show panel
             expect(body).to match("View notification")
             expect(body).to match("Parked incorrectly")
+            expect(response.body).to include('data-registrations--show--map-latitude-value="40.7143528"')
             expect(response.body).to match(organization_parking_notification_path(ParkingNotification.last.id, organization_id: organization.to_param))
           end
         end
@@ -422,7 +585,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
           expect(body).to match("Found")
-          expect(body).to_not match("Not stolen")
+          expect(body).to_not match("Registered & protected")
         end
       end
 
@@ -433,7 +596,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
           expect(body).to match("Unregistered")
-          expect(body).to_not match("Not stolen")
+          expect(body).to_not match("Registered & protected")
           expect(body).to_not match("Claimed")
           # Owner & access shows the parking-notification explanation, no owner rows
           expect(body).to match("not registered to a user. It was added to track parking notifications")
@@ -493,7 +656,7 @@ RSpec.describe "RegistrationsController#show", type: :request do
       end
 
       context "more than the display limit" do
-        before { stub_const("Registrations::Show::WrapperOrgAdmin::Component::OTHER_REGISTRATIONS_LIMIT", 1) }
+        before { stub_const("Pages::Registrations::Show::WrapperOrgAdmin::Component::OTHER_REGISTRATIONS_LIMIT", 1) }
         it "caps the table and links to the org search for the full list" do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
@@ -532,10 +695,10 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to_not match("not allowed to view this registration")
       end
 
-      context "with parking notifications and impound enabled" do
-        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes]) }
+      context "with parking notifications, impound and bike_stickers enabled" do
+        let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications impound_bikes bike_stickers]) }
 
-        it "offers create parking notification, not the impound action" do
+        it "offers create parking notification and linking a sticker, not the impound action" do
           get "#{base_url}/#{bike.id}"
           body = whitespace_normalized_body_text
           # Limited members can create a parking notification
@@ -543,7 +706,41 @@ RSpec.describe "RegistrationsController#show", type: :request do
           # No impound action for limited (create is staff-only, request impound removed)
           expect(response.body).to_not match('data-panel-name="impound"')
           expect(body).to_not match("Request impound")
+          expect(body).to match("Link sticker")
+          expect(response.body).to include(organization_sticker_path(id: "code", organization_id: organization.to_param))
         end
+      end
+    end
+
+    context "passive_organization the user is no longer a member of" do
+      let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+
+      it "falls back to the public view, and drops the organization from the session" do
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("Staff")
+        expect(session[:passive_organization_id]).to eq organization.id
+        current_user.organization_roles.destroy_all
+        current_user.reload
+
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("Public view")
+        expect(body).to_not match("Staff")
+        expect(session[:passive_organization_id]).to eq "0"
+      end
+    end
+
+    context "scanned a sticker from an organization the user isn't in" do
+      let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+      let(:organization2) { FactoryBot.create(:organization) }
+      let(:bike_sticker) { FactoryBot.create(:bike_sticker_claimed, bike:, organization: organization2) }
+
+      it "renders their own organization's view" do
+        get "/bikes/scanned/#{bike_sticker.code}", params: {organization_id: organization2.slug}
+        expect(response).to redirect_to(registration_path(bike, scanned_id: bike_sticker.code, organization_id: organization2.slug))
+        follow_redirect!
+        expect(whitespace_normalized_body_text).to match("Staff")
+        expect(session[:passive_organization_id]).to eq organization.id
       end
     end
 
@@ -580,6 +777,20 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("Staff")
         expect(body).to match("not allowed to view this registration")
       end
+
+      it "drops the passive organization when switching to public" do
+        get "#{base_url}/#{bike.id}"
+        expect(response.body).to include("organization_id=false")
+
+        get "#{base_url}/#{bike.id}", params: {view_as: "public", organization_id: "false"}
+        expect(whitespace_normalized_body_text).to match("Public view")
+
+        # Without the org sticking in the session, the next visit stays public
+        get "#{base_url}/#{bike.id}"
+        body = whitespace_normalized_body_text
+        expect(body).to match("Public view")
+        expect(body).to_not match("Staff")
+      end
     end
 
     context "view_as another organization" do
@@ -588,8 +799,9 @@ RSpec.describe "RegistrationsController#show", type: :request do
       let!(:organization_role) { FactoryBot.create(:organization_role_claimed, organization: other_organization, user: current_user) }
 
       it "sets the passive_organization, so the organization sticks on the next request" do
-        # Which organization is default_organization isn't ordered, so put one in the session
-        get "#{base_url}/#{bike.id}", params: {organization_id: organization.to_param}
+        # Which organization is default_organization isn't ordered, so seed the session -
+        # by name, which organization_id takes as well as a slug
+        get "#{base_url}/#{bike.id}", params: {organization_id: organization.name}
         expect(session[:passive_organization_id]).to eq organization.id
 
         get "#{base_url}/#{bike.id}", params: {view_as: "#{other_organization.to_param}.staff"}
@@ -612,16 +824,18 @@ RSpec.describe "RegistrationsController#show", type: :request do
         expect(body).to match("View as owner of bike")
         expect(body).to match("View as #{brakebills.short_name} staff")
         expect(body).to match("View as #{brakebills.short_name} limited")
-        # ikes-bikes is the seeded unpaid default alongside the paid brakebills
+        # ikes-bikes is the seeded no-invoice default alongside the invoiced brakebills
         expect(body).to match("View as #{ikes.short_name} limited")
         # public is the superuser's default/current view
         expect(body).to match("Viewing as Public")
 
         # Renders the owner view even though they don't own the bike
-        get "#{base_url}/#{bike.id}", params: {view_as: "owner"}
+        expect(response.body).to include("organization_id=false&amp;view_as=owner")
+        get "#{base_url}/#{bike.id}", params: {view_as: "owner", organization_id: "false"}
         body = whitespace_normalized_body_text
         expect(body).to match("Your bike")
         expect(body).to match("Mark stolen")
+        expect(session[:passive_organization_id]).to eq "0"
 
         # Renders an org panel as limited
         get "#{base_url}/#{bike.id}", params: {view_as: "#{brakebills.to_param}.limited"}
@@ -641,6 +855,9 @@ RSpec.describe "RegistrationsController#show", type: :request do
         # other offered role)
         expect(body).to match("Viewing as #{other_organization.short_name} staff")
         expect(body).to match("View as #{other_organization.short_name} limited")
+
+        get "#{base_url}/#{bike.id}"
+        expect(whitespace_normalized_body_text).to match("Viewing as #{other_organization.short_name} staff")
       end
     end
   end

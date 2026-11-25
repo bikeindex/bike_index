@@ -7,5 +7,6 @@ class UpdateCountsJob < ScheduledJob
 
   def perform
     Counts.count_keys.each { |k| Counts.send(:"assign_#{k}") }
+    Counts.assign_logged_searches
   end
 end

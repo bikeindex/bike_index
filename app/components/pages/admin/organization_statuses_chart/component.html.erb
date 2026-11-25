@@ -1,0 +1,21 @@
+<%= render(UI::Table::Base::Component.new(records: [[start_count, end_count]], classes: "tw:mb-8")) do |table| %>
+  <% table.column(label: show_with_pos_counts? ? "Active POS at start" : "Matching statuses at start") do |(start, _end)| %>
+    <%= number_display(start) %>
+  <% end %>
+
+  <% table.column(label: show_with_pos_counts? ? "Active POS at end" : "Matching statuses at end") do |(_start, finish)| %>
+    <%= number_display(finish) %>
+  <% end %>
+<% end %>
+
+<% unless @ended %>
+  <%= render(UI::Header::Component.new(text: safe_join(["POS kinds ", render(UI::Code::Inline::Component.new(text: "start_at"))]), tag: :h3)) %>
+  <%= render(UI::Chart::Component.new(series: pos_kinds_start_counts, time_range: @time_range, stacked: true, colors: start_colors)) %>
+<% end %>
+
+<% unless @current %>
+  <%= render(UI::Header::Component.new(text: safe_join(["POS kinds ", render(UI::Code::Inline::Component.new(text: "end_at"))]), tag: :h3, html_class: "tw:mt-6")) %>
+  <%= render(UI::Chart::Component.new(series: pos_kinds_end_counts, time_range: @time_range, stacked: true, colors: end_colors)) %>
+<% end %>
+
+<div class="tw:mt-10"></div>

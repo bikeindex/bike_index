@@ -5,8 +5,8 @@ class SessionsController < ApplicationController
   before_action :skip_if_signed_in, only: [:new, :magic_link]
   # SSO orgs force SSO: every entry point that submits an email redirects an SSO-managed one
   # to the IdP before the action runs, so no password or new magic link gets issued for it.
-  # sign_in_with_magic_link is absent because it submits a token rather than an email — a link
-  # issued before the org moved to SSO still signs in until that token expires.
+  # sign_in_with_magic_link submits a token rather than an email, so it is caught downstream in
+  # sign_in_and_redirect instead, once the token has resolved a user.
   before_action :redirect_forced_saml, only: %i[identify create create_magic_link]
 
   def new
@@ -42,11 +42,12 @@ class SessionsController < ApplicationController
 
   def magic_link
     @token = params[:token]
+    @return_to = params[:return_to]
     @failure = magic_link_failure(params[:incorrect_token]) if params[:incorrect_token].present?
   end
 
   def sign_in_with_magic_link
-    user = User.find_by_magic_link_token(params[:token])
+    user = User.find_for_auth_token("magic_link_token", params[:token])
     if user.present? && !user.auth_token_expired?("magic_link_token")
       user.confirm(user.confirmation_token) unless user.confirmed?
       @user = user
@@ -94,13 +95,13 @@ class SessionsController < ApplicationController
     end
   end
 
-  # Rather than dumping a would-be sign in at user_root_url, hand back the form they
-  # submitted - losing the session that failed the check is exactly when they need it
+  # Hand back the form they submitted rather than dumping them at user_root_url
   def handle_unverified_request
     flash.now[:error] = invalid_authenticity_token_message
     case action_name
     when "sign_in_with_magic_link"
       @token = params[:token]
+      @return_to = params[:return_to]
       render_partner_or_default_signin_layout(render_action: :magic_link)
     when "identify", "create", "create_magic_link"
       @email = submitted_email
@@ -133,9 +134,7 @@ class SessionsController < ApplicationController
     Organization.passwordless_email_matching(email).present? ? "magic_link" : "password"
   end
 
-  # Whatever killed a magic link token, it matches no user afterward - so the timestamp baked
-  # into the token is the only thing left to read. Old enough and it timed out; recent and it
-  # was spent signing in, or replaced by the link in a newer email.
+  # A dead token matches no user whatever killed it, so its timestamp is all that's left to read
   def magic_link_failure(token)
     return :unrecognized unless SecurityTokenizer.recognized_token?(token)
 
@@ -147,7 +146,7 @@ class SessionsController < ApplicationController
     # Stash the remember-me choice so the emailed-link GET (which carries no form
     # params) can still honor it in sign_in_and_redirect.
     session[:magic_link_remember_me] = Binxtils::InputNormalizer.boolean(submitted_remember_me)
-    user.send_magic_link_email
+    user.send_magic_link_email(return_to: emailable_return_to)
     redirect_to magic_link_sent_session_path(partner: sign_in_partner)
   end
 

@@ -1,0 +1,4 @@
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
+  Bikes
+  <%= render(Pages::Admin::Headers::Count::Component.new(count: 250, href: "#", parenthetical: "first 100 shown")) %>
+<% end %>

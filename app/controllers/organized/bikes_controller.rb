@@ -43,7 +43,7 @@ module Organized
 
       @b_param = current_organization.incomplete_b_params.find_by_id(params[:id])
       if @b_param.present?
-        Email::PartialRegistrationJob.perform_async(@b_param.id)
+        EmailJobs::PartialRegistrationJob.perform_async(@b_param.id)
         flash[:success] = "Incomplete registration re-sent!"
       else
         flash[:error] = "Unable to find that incomplete bike"
@@ -73,22 +73,22 @@ module Organized
     def update
       bike = Bike.unscoped.find_id(params[:id])
 
-      unless bike.organized?(current_organization) && current_organization.enabled?("registration_notes")
+      unless bike.visible_by?(current_user) && current_organization.enabled?("registration_notes")
         flash[:error] = "Not authorized to update notes"
-        redirect_to(bike_path(bike)) && return
+        redirect_to(RegistrationView.path(bike, user: current_user, session:)) && return
       end
 
       BikeOrganizationNote.upsert(bike:, organization: current_organization, body: params[:notes], user: current_user)
 
       flash[:success] = "Note saved"
-      redirect_to bike_path(bike)
+      redirect_to RegistrationView.path(bike, user: current_user, session:)
     end
 
     def create
       @b_param = find_or_new_b_param
       iframe_redirect_params = {organization_id: current_organization.to_param}
       if @b_param.created_bike.present?
-        flash[:success] = "#{@bike.created_bike.type} Created"
+        flash[:success] = "#{@b_param.created_bike.type} Created"
       else
         if params.dig(:bike, :image).present? # Have to do in the controller, before assigning
           @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
@@ -144,7 +144,7 @@ module Organized
       else
         @sort_column = "id" unless %w[id email].include?(sort_column)
 
-        b_params.order("b_params.#{sort_column} #{sort_direction}")
+        b_params.order(sortable_order(BParam))
       end
     end
 

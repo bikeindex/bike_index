@@ -82,6 +82,7 @@ RSpec.describe Search::ComboboxController, type: :request do
       get "/search/combobox/manufacturers", params: {q: "tre", for_id: "test"}, as: :turbo_stream
 
       expect(response.code).to eq("200")
+      expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(response.body).to include("data-value=\"#{trek.id}\"")
       expect(response.body).to include("data-value=\"#{trek_components.id}\"")
       # AVANTREK isn't a match - the autocomplete index matches on word prefixes
@@ -154,6 +155,8 @@ RSpec.describe Search::ComboboxController, type: :request do
       post "/search/combobox/chips", params: {combobox_values: values, for_id: "test"}, as: :turbo_stream
 
       expect(response.code).to eq("200")
+      # Turbo drops any other content type, and the body looks the same either way
+      expect(response.media_type).to eq("text/vnd.turbo-stream.html")
       expect(response.body).to include("Burgundy")
       expect(response.body).to include("Cool Bikes")
       expect(response.body).to include("free text")

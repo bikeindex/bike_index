@@ -1,0 +1,124 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :component do
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["registration_notes"]) }
+  let(:current_user) { FactoryBot.create(:organization_admin, organization:) }
+  let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+
+  # The wrapper folds this into its cache key, so these still expire the cached panel
+  describe "#cache_version" do
+    def cache_version
+      described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff).cache_version
+    end
+
+    it "changes when the owner registers another bike" do
+      expect { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: bike.user) }
+        .to change { cache_version }
+    end
+  end
+
+  describe "title" do
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, year: 2020, frame_model: "Stumpjumper", name: "Morning commuter") }
+
+    it "titles by year, manufacturer and model, with the nickname beneath" do
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+      expect(page).to have_css("h1", text: "2020 #{bike.mnfg_name} Stumpjumper")
+      expect(page).to have_css("h1 + p", text: "nickname: Morning commuter")
+    end
+  end
+
+  describe "notes" do
+    include_context :with_paper_trail
+
+    let(:other_user) { FactoryBot.create(:organization_user, organization:) }
+
+    it "renders the current note to update, with the notes it replaced above" do
+      BikeOrganizationNote.upsert(bike:, organization:, body: "First note", user: other_user)
+      BikeOrganizationNote.upsert(bike:, organization:, body: "Second note", user: current_user)
+      BikeOrganizationNote.upsert(bike:, organization:, body: "Third note", user: current_user)
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+      expect(page).to have_text(/First note.*Note by #{other_user.display_name}.*Second note.*Updated by #{current_user.display_name}.*Current note.*most recent update by #{current_user.display_name}.*You'll post as #{current_user.display_name}/m)
+      expect(page).to have_field("Current note", with: "Third note")
+      expect(page).to have_button("Update note")
+    end
+
+    context "on a bike registered elsewhere" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+
+      it "renders the notes form" do
+        render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+        expect(page).to have_text("Internal notes")
+        expect(page).to have_button("Post note")
+      end
+    end
+  end
+
+  describe "owner & access, on a bike registered elsewhere" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[unstolen_notifications]) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+    let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: true, phone: "7183914410") }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: owner, cycle_type: "e-scooter") }
+    let(:owner_access) { page.find("h2", text: "Owner & access").find(:xpath, "..") }
+
+    it "shows the phone behind a toggle, and says the rest of the contact details aren't available" do
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+      phone_toggle = owner_access.find("[data-ui--collapse-param-value='phone_shown']")
+      expect(phone_toggle).to have_css("[role='button'][aria-expanded='false']", text: "Show phone")
+      expect(phone_toggle).to have_css("[data-ui--collapse-target='content'].tw\\:hidden a[href='tel:718-391-4410']", text: "718-391-4410", visible: :all)
+      expect(owner_access).to have_text("Not registered with #{organization.short_name}")
+      expect(owner_access).to have_text("Other owner contact details aren't available, since this e-scooter isn't registered with your organization")
+      expect(owner_access).to_not have_text(bike.owner_email)
+    end
+
+    context "when the owner turned off non-stolen notifications" do
+      let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: false, phone: "7183914410") }
+
+      it "doesn't show the phone" do
+        render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+        expect(page).to_not have_link("718-391-4410", visible: :all)
+        expect(owner_access).to have_text("Owner contact isn't available for bikes outside your organization")
+      end
+    end
+  end
+
+  describe "other registrations" do
+    let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[additional_registrations_information]) }
+
+    context "with another registration" do
+      let!(:other_bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: bike.user) }
+
+      it "renders the column settings inside the card" do
+        render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+        expect(page).to have_css("[data-controller~='ui--table-column-settings']")
+        expect(page).to have_text("Visible columns")
+        expect(page).to have_button("Column settings", visible: :all)
+      end
+
+      context "on a bike registered elsewhere, viewed by a limited member" do
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+
+        it "renders the card" do
+          render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :limited))
+
+          expect(page).to have_text("Other registrations by this user")
+          expect(page).to have_text("1 other registrations")
+        end
+      end
+    end
+
+    it "renders the card when the owner has no other registrations" do
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+      expect(page).to have_text("Other registrations by this user")
+      expect(page).to have_text("None found")
+    end
+  end
+end

@@ -60,6 +60,15 @@ RSpec.describe Organized::ModelAuditsController, type: :request do
         expect(assigns(:model_attestations).pluck(:id)).to eq([model_attestation.id])
         # It renders with a model attestation too
       end
+      context "without attestations" do
+        let!(:model_attestation) { nil }
+        it "renders the empty state" do
+          get "#{base_url}/#{model_audit.id}"
+          expect(response.code).to eq("200")
+          expect(assigns(:model_attestations)).to be_empty
+          expect(response.body).to include("No Attestations")
+        end
+      end
     end
 
     describe "update create" do

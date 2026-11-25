@@ -34,3 +34,9 @@
 :parking_notification: 35
 :additional_email_confirmation: 36
 :partial_register_confirmation: 37
+:welcome_email: 38
+:organization_message: 39
+:magic_login_link: 40
+:organization_signup_confirmation: 41
+:shop_welcome: 42
+:pos_registration_match: 43

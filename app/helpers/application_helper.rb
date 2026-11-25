@@ -1,6 +1,9 @@
 module ApplicationHelper
-  include Binxtils::NavHelper
   include Binxtils::SortableHelper
+
+  def body_tag(html_class: nil, **html_options, &block)
+    tag.body(id: page_id, class: html_class.presence || body_class, **html_options, &block)
+  end
 
   def notification_delivery_display(status)
     text = if status == "delivery_success"
@@ -22,85 +25,18 @@ module ApplicationHelper
     end
   end
 
-  def active_link(link_text, link_path, html_options = {})
-    match_controller = html_options.delete(:match_controller)
-    html_options[:class] ||= ""
-    html_options[:class] += " active" if current_page_active?(link_path, match_controller)
-    link_to(raw(link_text), link_path, html_options).html_safe
+  # Organized lays out its own general alert, and takes over the body background
+  def main_content_organized?
+    SharedBlocks::MainContent::Wrapper::Component.kind(
+      controller_namespace:,
+      controller_name:,
+      action_name:,
+      force_landing_page_render: @force_landing_page_render
+    ) == :organized
   end
 
-  # Used to render the page wrapper
-  # MUST be either:
-  #  - a valid partial file in views/shared
-  #  - nil - which just calls yield directly
-  def current_page_skeleton
-    return "organized_skeleton" if controller_namespace == "organized" && action_name != "landing"
-    return "oauth_applications_skeleton" if controller_namespace == "oauth" && controller_name == "applications"
-    return nil if controller_namespace == "search"
-    return nil if @force_landing_page_render
-
-    case controller_name
-    when "bikes"
-      "edit_bike_skeleton" if %w[update].include?(action_name)
-    when "edits", "theft_alerts", "recovery"
-      "edit_bike_skeleton"
-    when "info"
-      "content_skeleton" unless %w[terms security vendor_terms privacy support_the_index resources].include?(action_name)
-    when "welcome"
-      "content_skeleton" if %w[goodbye].include?(action_name)
-    when "organizations"
-      "content_skeleton" if %w[lightspeed_integration].include?(action_name)
-    when "news", "feedbacks", "manufacturers", "errors"
-      "content_skeleton"
-    when "registrations"
-      "content_skeleton" unless action_name == "show"
-    end
-  end
-
-  # For determining menu items to display on content skeleton
-  def content_page_type
-    if controller_name == "info"
-      action_name
-    elsif controller_name == "news"
-      "news"
-    end
-  end
-
-  def body_class
-    if controller_name == "landing_pages" || @force_landing_page_render
-      if %w[for_schools for_law_enforcement].include?(action_name)
-        "kelsey_landing-page-body"
-      else
-        "landing-page-body"
-      end
-    elsif controller_name == "info" && action_name == "resources"
-      "kelsey_landing-page-body"
-    elsif current_page_skeleton == "organized_skeleton"
-      "organized-body"
-    elsif controller_name == "registrations" && action_name == "show"
-      "tw:bg-[#f7f6fb]"
-    end
-  end
-
-  def admin_nav_link(link_text, link_path)
-    if controller_name == "dashboard"
-      if action_name == "invitations" && link_text == "Invitations"
-        class_name = "active"
-      elsif action_name == "show" && link_text == "Go hard"
-        class_name = "active"
-      end
-    elsif controller_name == "payments"
-      if action_name == "invoices" && link_text == "Invoices"
-        class_name = "active"
-      elsif link_text == "Payments"
-        class_name = "active"
-      end
-    else
-      class_name = (controller_name == link_text.downcase.tr(" ", "_")) ? "active" : ""
-    end
-    (link_to link_text, link_path, class: class_name).html_safe
-  end
-
+  # Deprecated - UI::Forms::NestedFields::Component replaces this. Every set this adds shares one
+  # child_index, so clicking twice submits a single record
   def link_to_add_fields(name, f, association, class_name: nil, obj_attrs: {}, filename: nil)
     new_object = f.object.send(association).klass.new(obj_attrs)
     id = new_object.object_id
@@ -171,18 +107,21 @@ module ApplicationHelper
     [twitterable(user), instagramable(user), websiteable(user)].compact.to_sentence.html_safe
   end
 
-  def pretty_print_json(data, no_blank = false)
-    require "coderay"
-    cleaned_data = if no_blank
-      # Show false values, just not empty or nil things
-      data.select do |k, v|
-        next unless Binxtils::InputNormalizer.present_or_false?(v)
+  private
 
-        [k, v]
-      end.compact.to_h
-    else
-      data
+  def body_class
+    if controller_name == "landing_pages" || @force_landing_page_render
+      if %w[for_schools for_law_enforcement].include?(action_name)
+        "kelsey_landing-page-body"
+      else
+        "landing-page-body"
+      end
+    elsif controller_name == "info" && action_name == "resources"
+      "kelsey_landing-page-body"
+    elsif main_content_organized?
+      "organized-body"
+    elsif controller_name == "registrations" && action_name == "show"
+      "tw:bg-[#f7f6fb]"
     end
-    CodeRay.scan(JSON.pretty_generate(cleaned_data), :json).div.html_safe
   end
 end

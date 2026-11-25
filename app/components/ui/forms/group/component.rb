@@ -7,18 +7,25 @@ module UI
         # Text under the field. The input points at it with aria-describedby -- a
         # content block renders its own field, so it passes helper_text_id itself.
         renders_one :helper_text
+        # Small text inside the label, after the required/optional marker
+        renders_one :label_note
 
         # Pass a block (a UI::Forms::Combobox, Select, TextEditor...) and it renders in
         # place of the input -- `kind` is then unused. Without a form_builder that block
         # is the only valid shape: the label falls back to label_tag, so it points at
         # whatever the block renders with the attribute's id.
+        # required_toggleable: the answer is decided in the browser, so the label renders
+        # both markers with the inactive one hidden - it can't be rebuilt from JS. They're
+        # [data-required-marker] and [data-optional-marker] for whichever controller flips them
         def initialize(attribute:, form_builder: nil, kind: :text_field, label_text: nil, required: false,
-          wrapper_class: "tw:mb-4", html_options: {})
+          required_toggleable: false, optional_badge: true, wrapper_class: "tw:mb-4", html_options: {})
           @form_builder = form_builder
           @attribute = attribute
           @kind = Input::Component.validate_kind!(kind)
           @label_text = label_text || attribute.to_s.humanize
           @required = required
+          @required_toggleable = required_toggleable
+          @optional_badge = optional_badge
           @wrapper_class = wrapper_class
           @html_options = html_options
         end
@@ -56,15 +63,22 @@ module UI
 
         # The label carries a required "*" or an "optional" badge, keyed off required?.
         def label_content
-          safe_join([@label_text, label_suffix_markup], " ")
+          safe_join([@label_text, label_suffix_markup, label_note_markup].compact, " ")
         end
 
+        def label_note_markup = label_note? ? tag.small(label_note, class: "less-strong") : nil
+
         def label_suffix_markup
-          if required?
-            tag.span("*", class: "tw:text-red-600")
-          else
-            render(UI::Badge::Component.new(text: translation(".optional"), size: :xs))
-          end
+          return required? ? required_marker : optional_marker unless @required_toggleable
+
+          safe_join([tag.span(required_marker, data: {required_marker: true}, hidden: !required?),
+            tag.span(optional_marker, data: {optional_marker: true}, hidden: required?)])
+        end
+
+        def required_marker = render(UI::Forms::RequiredMarker::Component.new)
+
+        def optional_marker
+          render(UI::Badge::Component.new(text: translation(".optional"), size: :xs)) if @optional_badge
         end
 
         def required?

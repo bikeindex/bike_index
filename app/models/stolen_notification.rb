@@ -44,7 +44,7 @@ class StolenNotification < ApplicationRecord
   after_create :notify_receiver
 
   def notify_receiver
-    Email::StolenNotificationJob.perform_async(id)
+    EmailJobs::StolenNotificationJob.perform_async(id)
   end
 
   def permitted_send?

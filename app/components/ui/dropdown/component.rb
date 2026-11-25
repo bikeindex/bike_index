@@ -3,16 +3,13 @@
 module UI
   module Dropdown
     class Component < ApplicationComponent
-      # Applied to the <li>; the `[&>a]` variant colors the item's link (the surface).
-      # The item flags itself aria-current rather than aria-pressed, which is invalid on
-      # role="menuitem" — the is-active variant (application.css) covers both.
-      # The fill is UI::Button's secondary active, minus the border and ring a menu item has no room for.
-      ACTIVE_COLORS = "tw:is-active:[&>a]:bg-purple-500 tw:is-active:[&>a]:text-white"
-
+      # Template Dependency: UI::Button::Component
       renders_one :button
+      # Which entry is current is UI::ActiveLink's, on the entry's own link -- .twdropdown
+      # styles whichever one it marks
       renders_many :entries, types: {
-        item: lambda { |active: false, &block|
-          content_tag(:li, capture(&block), role: "menuitem", class: ACTIVE_COLORS, aria: {current: active || nil})
+        item: lambda { |&block|
+          content_tag(:li, capture(&block), role: "menuitem")
         },
         divider: lambda {
           content_tag(:li, "", role: "separator")
@@ -48,11 +45,13 @@ module UI
         return @button_class if @button_class
 
         classes = UI::Button::Component.new(color: @button_color, size: @button_size).button_classes
-        if @button_color == :link
-          # button_content underlines the label span, so the trigger itself never does.
-          classes = classes.sub("tw:is-active:underline", "").squeeze(" ").strip + " tw:px-1"
-        end
-        classes
+        return classes unless @button_color == :link
+
+        # button_content underlines the label span, so the trigger itself never does — the
+        # chevron would be underlined with it. .twlink underlines on both hover and active
+        # from the components layer, which is why it takes a utility to hold it off.
+        # UI::Button gives every other color this same tw:no-underline.
+        "#{classes} tw:no-underline tw:px-1"
       end
 
       def button_id

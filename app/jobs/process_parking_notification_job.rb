@@ -7,40 +7,24 @@ class ProcessParkingNotificationJob < ApplicationJob
     "#{REDLOCK_PREFIX}-#{parking_notification_id}"
   end
 
-  def self.new_lock_manager
-    Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
-  end
-
-  def self.locked_for?(parking_notification_id)
-    new_lock_manager.locked?(redlock_key(parking_notification_id))
-  end
-
-  def lock_duration_ms
-    1.minute.in_milliseconds.to_i
-  end
-
-  def perform(parking_notification_id)
-    lock_manager = self.class.new_lock_manager
-    redlock = lock_manager.lock(self.class.redlock_key(parking_notification_id), lock_duration_ms)
-    return unless redlock
-
-    begin
-      run(parking_notification_id)
-    ensure
-      lock_manager.unlock(redlock)
-    end
+  def perform(parking_notification_id, skip_email = false)
+    with_redlock(parking_notification_id) { run(parking_notification_id, skip_email) }
   end
 
   private
 
-  def run(parking_notification_id)
+  def run(parking_notification_id, skip_email)
     parking_notification = ParkingNotification.find(parking_notification_id)
 
-    if parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
-      impound_record = ImpoundRecord.create!(bike_id: parking_notification.bike_id,
-        user_id: parking_notification.user_id,
-        organization_id: parking_notification.organization_id,
-        skip_update: true)
+    current_record = current_impound_record(parking_notification)
+    # Another organization's record isn't ours to link to, but it still blocks creating one
+    impound_record = if current_record.blank?
+      new_impound_record(parking_notification)
+    elsif current_record.organization_id == parking_notification.organization_id
+      current_record
+    end
+
+    if impound_record.present?
       parking_notification.resolved_at ||= Time.current
       parking_notification.update(impound_record_id: impound_record.id)
       ProcessImpoundUpdatesJob.new.perform(impound_record.id)
@@ -62,7 +46,36 @@ class ProcessParkingNotificationJob < ApplicationJob
       end
     end
 
-    send_notification_if_should(parking_notification)
+    # The owner was already emailed by the notification that impounded the bike
+    unless skip_email || current_record.present? || earlier_impound_notification?(parking_notification)
+      send_notification_if_should(parking_notification)
+    end
+  end
+
+  # ParkingNotification validates that its bike isn't already impounded, so a current record here
+  # means both notifications were created before either of them was processed
+  def current_impound_record(parking_notification)
+    return nil unless parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
+
+    ImpoundRecord.current.find_by(bike_id: parking_notification.bike_id)
+  end
+
+  # Once a duplicate has been linked to the record, this is what keeps a re-run from emailing
+  def earlier_impound_notification?(parking_notification)
+    return false if parking_notification.impound_record_id.blank?
+
+    ParkingNotification.impound_notification
+      .where(impound_record_id: parking_notification.impound_record_id)
+      .where("id < ?", parking_notification.id).exists?
+  end
+
+  def new_impound_record(parking_notification)
+    return nil unless parking_notification.impound_notification? && parking_notification.impound_record_id.blank?
+
+    ImpoundRecord.create!(bike_id: parking_notification.bike_id,
+      user_id: parking_notification.user_id,
+      organization_id: parking_notification.organization_id,
+      skip_update: true)
   end
 
   def send_notification_if_should(parking_notification)
@@ -72,7 +85,7 @@ class ProcessParkingNotificationJob < ApplicationJob
       Notification.create(kind: "parking_notification", notifiable: parking_notification,
         user_id: parking_notification.bike&.user_id, message_channel_target: parking_notification.email,
         bike_id: parking_notification.bike_id)
-    notification.track_email_delivery do
+    Notifications::Deliver.track_email(notification) do
       OrganizedMailer.parking_notification(parking_notification).deliver_now
     end
   end

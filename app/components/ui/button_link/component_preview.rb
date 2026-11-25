@@ -55,6 +55,18 @@ module UI
         render(UI::ButtonLink::Component.new(text: "Link Disabled", href: "#", color: :link, disabled: true))
       end
 
+      def link_gray
+        render(UI::ButtonLink::Component.new(text: "Link gray", href: "#", color: :link_gray))
+      end
+
+      def link_gray_active
+        render(UI::ButtonLink::Component.new(text: "Link Gray Active", href: "#", color: :link_gray, active: true))
+      end
+
+      def link_gray_disabled
+        render(UI::ButtonLink::Component.new(text: "Link Gray Disabled", href: "#", color: :link_gray, disabled: true))
+      end
+
       # Filled purple primary
       def purple
         render(UI::ButtonLink::Component.new(text: "Purple Link", href: "#", color: :purple))
@@ -66,6 +78,19 @@ module UI
 
       def purple_disabled
         render(UI::ButtonLink::Component.new(text: "Purple Disabled", href: "#", color: :purple, disabled: true))
+      end
+
+      # Blue on the brand yellow, the landing pages' call to action
+      def yellow
+        render(UI::ButtonLink::Component.new(text: "Yellow Link", href: "#", color: :yellow))
+      end
+
+      def yellow_active
+        render(UI::ButtonLink::Component.new(text: "Yellow Active", href: "#", color: :yellow, active: true))
+      end
+
+      def yellow_disabled
+        render(UI::ButtonLink::Component.new(text: "Yellow Disabled", href: "#", color: :yellow, disabled: true))
       end
       # @!endgroup
 
@@ -82,6 +107,16 @@ module UI
       # @label button_to DELETE
       def button_to_delete
         render(UI::ButtonLink::Component.new(text: "Delete", href: "#", color: :error, method: :delete))
+      end
+
+      # @label method with confirm
+      def method_confirm
+        render(UI::ButtonLink::Component.new(text: "Delete", href: "#", color: :error, method: :delete, confirm: "Are you sure? It can't be undone"))
+      end
+
+      # A confirm on a plain link guards the navigation, so the href has to go somewhere
+      def link_confirm
+        render(UI::ButtonLink::Component.new(text: "Read the terms", href: "/terms", confirm: "Leave this page?"))
       end
 
       # @label button_to disabled

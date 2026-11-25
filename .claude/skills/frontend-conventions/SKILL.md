@@ -3,75 +3,129 @@ name: frontend-conventions
 description: >-
   Bike Index's frontend conventions — Tailwind class prefixing (`tw:`),
   the standard `twinput`/`twlabel`/`twlink` form/link classes, the
-  `number_display` helper for numbers, the UI component library rule
+  `number_display` helper for numbers, `Counts` for site-wide figures
+  (bikes registered, recoveries, organizations), the UI component library rule
   (every button is `UI::Button`/`UI::ButtonLink`, every
-  typeahead/autocomplete is `UI::Forms::Combobox`, never hand-rolled
-  markup), ViewComponent rules (keyword arguments, instance variables,
+  typeahead/autocomplete is `UI::Forms::Combobox`, every FAQ is
+  `UI::Accordion`, never hand-rolled
+  markup; existing components before new ones — never a wrapper around one to
+  dodge asking for a new `UI::*` argument, which needs the user's permission), that **helpers are deprecated — render a view component
+  taking full keyword arguments instead of adding or extending one**,
+  ViewComponent rules (when to write a partial instead, keyword arguments, instance variables,
   `helpers.` prefix in templates), and `UI::Time::Component` for every
-  date/time. Trigger
+  date/time, and that a new marketing page's URL is spelled with dashes. Trigger
   when adding or modifying views (`.html.erb`), view components, Stimulus
-  controllers, Tailwind classes, or any frontend code that touches styling
-  or interactivity. **Also trigger before any
-  `mcp__playwright__browser_take_screenshot` call** — this skill defines
-  the required `tmp/` filename rule so screenshots don't land in the
-  project root. Stimulus.js is the JavaScript framework; SCSS and
-  CoffeeScript files exist but are deprecated.
+  controllers, Tailwind classes, image or icon files under `app/assets/images`
+  (which usually already exist), a page's route or a link's path, or any frontend
+  code that touches styling or interactivity. Stimulus.js is the
+  JavaScript framework; SCSS and CoffeeScript files exist but are deprecated.
 ---
 
 # Frontend conventions
 
-This project uses **Stimulus.js** for JavaScript interactivity and **Tailwind CSS** for styling. There are SCSS styles and CoffeeScript files, but they are deprecated — don't add to them.
-
-The `bin/dev` command handles building and updating Tailwind and JS.
+SCSS and CoffeeScript files are deprecated — don't add to them.
 
 **Format ERB before committing.** After editing any `.html.erb`, run `bin/lint` on the files or directories you changed — `bin/lint app/components/ui/table`. It runs `herb-lint` and `herb-format`, which sort `tw:` classes, reflow long `class` attributes onto multiple lines, and flag things like an `<input>` missing `autocomplete`. CI's `lint_and_scan` job runs both as steps separate from `standardrb`/`rubocop`, so hand-edited ERB that skips formatting fails CI even when the Ruby is clean.
 
-Scope it rather than running bare `bin/lint`: a whole-repo run reformats files outside your change, and every file it rewrites that you've already read gets re-injected into context in full.
+Scope it: every file a bare run rewrites that you've already read is re-injected into context in full.
 
 ## Tailwind classes and helpers
 
 - Tailwind classes have the prefix `tw:` (e.g. `tw:text-blue`, `tw:flex`, `tw:gap-4`).
   - The `tw:` prefix comes **before** variant modifiers, not after. Use `tw:dark:bg-gray-800`, `tw:hover:bg-blue-600`, `tw:sm:flex`, `tw:focus-visible:ring-2`. Never `dark:tw:bg-gray-800` — variant prefixes layer on top of `tw:`.
+  - **`dark` is a custom variant keyed to a `.dark` ancestor** (`app/assets/tailwind/application.css`), and the page layouts set that class on `<body>` from the `color_scheme` controller helper — `User#color_scheme`, or a signed-out visitor's `color_scheme` cookie, either set from the footer's picker. It defaults to `system`, which `SharedBlocks::SystemColorScheme` resolves in the browser, so a dark-mode check means picking Dark or adding `.dark` to `<body>` by hand (`combobox.css` keys on `body.dark`, so on `<html>` the comboboxes stay light). A preview takes it as `?lookbook%5Bdisplay%5D%5Btheme%5D=dark` on the bare `/rails/view_components/` route, which `/lookbook/preview/` ignores. Keep writing the variants; just don't read a light screenshot as a missing one. Legacy markup's dark colors are in `app/assets/tailwind/legacy_dark.css`, not the SCSS; `kelsey_styles.css` is unlayered, so its pages stay light unless their wrapper adds `kelsey_styles_dark`, which re-points its `--redesign-*` colors, and a section inside it adds `kelsey_styles_light` to keep the light ones (`Pages::LandingPages::ForSchools`); a color it doesn't cover takes a `!` utility. Black-ink art on a transparent background is `tw:dark:invert tw:dark:hue-rotate-180`.
+- **Yellow is the theme's `yellow-*`, Bike Index's own ramp** — `yellow-300` is the brand yellow, never its hex or `amber-*`. **A status surface in dark mode is a translucent tint, not a solid `-950`**: `tw:dark:bg-yellow-300/25 tw:dark:border-yellow-300/50`, and the `-500` of the other status colors. `UI::Alerts::Base` is the pattern.
 - Form fields should use the `twinput` class.
 - Labels should use the `twlabel` class.
 - Basic links should use the `twlink` class.
-- **Every number** should be rendered with `number_display(number)`. This applies even when a number is composed into a string with non-numeric values — wrap the number itself, not the surrounding string.
-  - Good: `[number_display(@bike.year), @bike.mnfg_name].join(" ")`
-  - Bad: `[@bike.year, @bike.mnfg_name].join(" ")`
-  - "Number" includes years, counts, prices, distances, IDs — anything numeric, even when it reads like a label.
+- A link that should take the color of the text around it — inside an alert, a colored `<small>`, the review-app banner — uses `twlink-underlined` instead. Never hand-roll `tw:text-inherit tw:underline`. Its color must come from an ancestor, not a `tw:text-*` on the link itself, which would outrank the class at every state.
+- **A row of two or three things side by side uses `twfieldrow` or `twwiderow`**, not `tw:md:grid-cols-2`. `twfieldrow` is for fields that read as one control (a city and its state); `twwiderow` is for cards and sections, and `twwiderow twwiderow-3` for three of them. Both break on the row's own width rather than a viewport breakpoint, so a row nested in a narrow card breaks where it should. `UI::Card`'s `full_bleed:` is keyed to `twwiderow` by a container query, so it only bleeds inside one, and only once that row is single-column. All three are in `app/assets/tailwind/bike_index_components.css`.
+- A small purple section label (the registration page's and Bike Book's) is `tw:tweyebrow`.
+- The default text color is `tw:twtext-color` (`tw:twtext-color!` to force it). It's an `@utility`, hence the `tw:` prefix — **any Bike Index class that something `@apply`s has to be an `@utility`**; v4's `@apply` rejects a `@layer components` class with "Cannot apply unknown utility class".
+- **A horizontal scroller runs out to its container's edges, the container's padding inside it** — `twgutter-bleed tw:overflow-x-auto`, with `--gutter` set to that padding wherever it isn't the page's (`tw:[--gutter:--spacing(2.5)]` in a `px-2.5` table cell). One out to the window's edges is `twpagebleed`, padded `tw:px-(--gutter)`. `UI::Table::Base`, `UI::Tabs` and `SharedBlocks::Marketing::RecoveryStories` are the pattern; a `tw:m-0` or `tw:p-0` beside `twgutter-bleed` undoes it. A scroller that is its own bordered box — a code block, `Atoms::CopyableCode` — scrolls inside its border instead.
+- **A custom `@utility` has no fixed rank against a core one it collides with** — Tailwind sorts custom and core utilities together, so `tw:twfullbleed` emits after `tw:border` while another pairing may go the other way. A hand-written `@layer utilities { }` block in `bike_index_components.css` *does* have a fixed rank: it emits after everything Tailwind generates, so it takes ties and needs no `@variant` or `!`. That's also how to define an unprefixed class name — `@utility` would force the `tw:` prefix. `.only-dev-visible` is the pattern for both. Grep `app/assets/builds/tailwind.css` for the two selectors when a collision matters.
+- **A `@layer components` rule loses to a utility class on the same element**, whatever the specificity — so a hand-written rule that sets `display` is inert against an element carrying `tw:grid` or `tw:flex`, silently. A variant utility has no such problem, and reaches further than it looks: `SharedBlocks::SearchResults::Frame` drives its whole loading swap off `tw:group`, `tw:peer` and an arbitrary `tw:peer-[[busy]:not(:has(>.search-results-card))]:block`, with no rule at all. `@custom-variant` when the state is worth naming for templates to use inline (`search-all-checked` is the pattern), and a long selector written out per utility in a component constant, since tailwind scans for whole class names.
+- **A Tailwind class a Stimulus controller toggles is a literal in that controller**, not a `static classes` value the template has to carry — `ui/table_controller.js` toggling `tw:overflow-x-scroll` is the pattern, and there are ~40 of those against one `static classes`. Tailwind scans `app/javascript`, so the utility is generated either way; reach for `static classes` only when call sites need different classes.
+- **Every number** renders with `number_display(number)` — including one composed into a string: `[number_display(bike_count), organization.short_name].join(" ")` wraps the number, not the string.
+  - "Number" includes counts, distances and quantities — anything whose magnitude is the point.
+  - **Not a year.** `number_display` is `number_with_delimiter`, so it renders 2015 as "2,015". Emit a year bare, the way `bike_title_html` and the search result cards do — nothing in `app/` wraps one. The same delimiter argument applies to any identifier that only looks numeric.
+- **A site-wide figure comes from `Counts`** (`app/services/counts.rb`) — bikes registered (`total_bikes`), stolen (`stolen_bikes`), recoveries, the recovered value, organizations. Read several in one round trip with `Counts.retrieve_many("total_bikes", "recoveries")`. Never a live `Bike.count` / `Organization.count` on a public page, which counts the whole table on every render, and never a number typed into copy, which goes stale. `UpdateCountsJob` refreshes them hourly, so a new figure is a new `COUNT_KEYS` entry with an `assign_*`, not a query in the view. Admin screens that want the exact live number are the exception. A dev server shows whatever its Redis holds, not this workspace's database — `bin/rails setup:load_counts` recomputes them.
 - **Currency amounts** use `amount_display(obj)` instead of `number_display` directly. It takes an object that responds to `amount_cents`, `amount`, `currency_symbol`, and `currency_name` (e.g. a `MarketplaceListing`), and renders the symbol + `number_display(amount)` together. Don't reach for `number_to_currency` or roll your own.
+- **Every phone number** renders through `Atoms::Phone::Component` — never a hand-rolled `tel:` link or `number_to_phone`. It links by default; pass `skip_link: true` for plain text. See `app/components/atoms/phone/`. Non-markup callers that need the formatted string (a form field value, a translation interpolation) use `Phonifyer.display`.
 - **Every date/time** renders through `UI::Time::Component` — `render(UI::Time::Component.new(time: some_time))`. It emits the client-localized `localizeTime` span the frontend JS converts to the viewer's timezone. This is the *only* way to show a time: never `l(time, ...)`, `strftime`, `time_ago_in_words`, or a hand-written `localizeTime` span. Pass `format: :localize_time_precise` when you need seconds precision (default is `:localize_time`). It self-hides when `time` is nil, so no surrounding `if` guard is needed.
   - Legacy `l(time, format: :convert_time)` inside a `localizeTime` span predates the component and is still all over the admin tables. Convert one to `UI::Time::Component` whenever you touch the line it's on — including when it's the body of a `link_to`.
 
+- **An image from a design handoff is already in the repo — use the original, never a renamed or resized copy.** `kelsey_redesign/` holds the drawn originals; a served one is a byte-identical copy under its original name in `app/assets/images/kelsey/illustrations/`, as `comic-assets_bike-love-*.png` are. Before adding any PNG/JPG, `git ls-files` the distinctive words of its name across the whole repo — a hash search misses a resized copy.
+
+- **Look for an existing icon before adding an SVG** — all of `app/assets/images/` (not just `icons/`), `app/javascript/bikebook/templates/icons.js`, and text glyphs in templates. A mark that's a plain character is text, not an icon: a link's trailing arrow is `<span aria-hidden="true">→</span>` (`SharedBlocks::MainContent::OrganizedShopIntegrationAlert`), and a `?`, `!` or `i` in a disc is the character (`UI::Tooltip`, `Pages::EbikeRules::StatusIcon`). A check or a cross stays an icon.
+
+- **A decorative icon is `inline_svg_tag(..., aria_hidden: true)`** — `aria: {hidden: true}` is a hash `inline_svg` drops, leaving an `svg[role=img]` with no accessible name, which only an axe audit in a `:js` spec catches.
+
+**Building markup to pass into a component argument uses `capture`** — a component keyword like `UI::Alerts::Base`'s `header:` or `UI::Header`'s `text:` takes a string, so a heading that wraps a link or an `<em>` has to be captured first.
+
+## A component dropped into legacy markup is styled on the component
+
+Every legacy stylesheet wraps itself in `@layer legacy` (see `app/assets/stylesheets/legacy_includes/_css_layers.scss`), which sorts below tailwind's `components` and `utilities`. So a `UI::*` component rendered inside legacy-styled markup **wins over the surrounding stylesheet's rules for every property its own classes set** — `UI::Button`'s `tw:inline-flex`, `tw:p-0` and `twlink` beat `.primary-header-nav`'s `display`, `padding` and `color` no matter how specific those selectors are.
+
+**`!important` reverses layer order**, so a legacy-layer `!important` beats a tailwind utility that isn't. A rule kept "just in case" in `revised.scss` is not inert — it is what paints. Delete the legacy rule rather than leaving it alongside; `revised.scss` is fully inside the layer, so the utility already wins without it.
+
+## Tailwind v4 traps
+
+- **A build that was right can go wrong under you.** Each workspace runs its own `tailwindcss:watch`, and one can overwrite `app/assets/builds/tailwind.css` with a scan from before your edit — so a rule you just wrote is served, then isn't. Before believing a CSS change doesn't work, count it in the build (`grep -o '<class>' app/assets/builds/tailwind.css | wc -l`, since the file is minified onto few lines) and check the built file's mtime against the source's. `bin/rails tailwindcss:build` restores it.
+- **An `_` inside an arbitrary value compiles to a space.** `tw:group-has-[#donate_cadence:checked]:flex` builds `#donate cadence:checked`, a descendant selector that never matches, so the class is emitted and inert. Give an id an arbitrary variant keys on dashes (`Pages::Donate::Form`'s `donate-cadence-one-time`), or escape it as `\_`.
+- **A grid item stretches to its row.** For a `<div>` that's invisible, but a bare `<table>` grid item spreads the extra height across its own rows, so two `UI::Table::List` panels side by side pull each other's rows tall. `tw:items-start` on the grid, or wrap the table in a `<div>`.
+
 ## Buttons: always `UI::Button` (and the UI component library generally)
 
-**Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (`:primary`/`:secondary`/`:error`/`:link`), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
+**Every button goes through `UI::Button::Component`** — never a hand-rolled `<button>`, `button_to`, or submit input with ad-hoc Tailwind classes. The component centralizes colors (its `COLORS` is the list of record), sizes (`:sm`/`:md`/`:lg`), and the focus/active/dark-mode states; a hand-styled button silently drifts from all of that the next time the design changes.
 
-- Plain button or form submit: `render UI::Button::Component.new(text: "Save", color: :primary, type: "submit")`. Pass a class as `html_class:` — the component builds its own, so a `class:` raises.
+**An in-page action trigger that doesn't navigate is a `UI::Button`, not `link_to "#"`** — `.herb.yml` runs `html-anchor-require-href` over `app/components` only, so a component is caught and an `app/views` template isn't. `UI::Forms::NestedFields::Component`'s add trigger is the worked example.
+
+- Plain button or form submit — **a form submits with `color: :primary`**: `render UI::Button::Component.new(text: "Save", color: :primary, type: "submit")`. Pass a class as `html_class:` — the component builds its own, so a `class:` raises.
 - A link styled as a button: `UI::ButtonLink::Component.new(href:, text:, color:, size:)` — same palette, renders an `<a>`.
-- A standalone action button (POST/DELETE/etc. to a URL) — a link that performs an action: pass `method:` to `ButtonLink` and it renders `button_to` for you (`render UI::ButtonLink::Component.new(text: "Delete", color: :error, href: bike_path(@bike), method: :delete)`), so don't hand-roll a `button_to` or wrap a submit button in a bare form. Extra `html_options` flow through: pass `params:` for a POST that carries params (they render as hidden fields — no manual `form_with`/`hidden_field_tag` needed), and `form: {onsubmit: …}` for a confirm on the wrapping form.
+- A standalone action button (POST/DELETE/etc. to a URL) — a link that performs an action: pass `method:` to `ButtonLink` and it renders `button_to` for you (`render UI::ButtonLink::Component.new(text: "Delete", color: :error, href: bike_path(@bike), method: :delete)`), so don't hand-roll a `button_to` or wrap a submit button in a bare form. Extra `html_options` flow through: pass `params:` for a POST that carries params (they render as hidden fields — no manual `form_with`/`hidden_field_tag` needed).
 
-The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atom/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, badges, modals, pagination, tables…). If a component exists for the pattern, use it; if it almost fits, extend it rather than forking its markup inline.
+  - **Not inside another form** — `button_to` renders a `<form>`, and the parser drops a nested one, hoisting its button into the outer form, which that button then submits. Nothing errors; it just does the wrong thing when clicked. Either pass `confirm:` (which switches the component to a Turbo link — see below), or, for an action with no prompt, carry the verb yourself with `data: {turbo: true, turbo_method: :put}` on a link.
 
-`Atom::*` (`app/components/atom/`) holds the small value-rendering components — `Atom::Serial`, `Atom::Sticker`, `Atom::ShortId`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atom::Serial::Component`, not `BikeHelper#render_serial_display`.
+- **An action that needs confirming passes `confirm:` alongside `method:`**, and the component renders a Turbo link rather than a `button_to` — an `<a>` carrying the method plus an `onclick` that Turbo's click handler honours. So a confirming action nests anywhere a link does, and no call site spells the mechanism out. `Pages::MyAccount::OrganizationRoles` is the worked example.
 
-## Tooltips: default `?` button trigger
+The same instinct applies beyond buttons: **check `app/components/ui/` and `app/components/atoms/` before hand-rolling any UI primitive** (dropdowns → `UI::Dropdown`, tooltips → `UI::Tooltip`, form fields → `UI::Forms::*`, label-beside-value tables → `UI::Table::List` — only email CSS still styles `.table-list`, so the legacy class renders bare on a page — inline code → `UI::Code::Inline`, a block of JSON → `UI::Code::Json`, badges, modals, pagination, tables…). If a component exists for the pattern, use it. **Never add an argument to a `UI::*` component without the user's explicit permission** — its arguments are the design system's surface, and one added for a single caller stays for every caller. If it almost fits, ask, and don't fork its markup inline meanwhile.
 
-**Every `UI::Tooltip` uses the default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the tooltip's trigger content. See `app/components/ui/tooltip/`.
+**A marketing page — a `for_*` landing page, donate, a how-it-works — builds on `SharedBlocks::Marketing`**; the `use-existing-markup` skill maps each hand-drawn block to its component.
 
-## Form fields: the label comes from `UI::Forms::Group`
+Four of those carry a rule beyond "use the component":
 
-**A `UI::Forms::*` field renders no label of its own** — render it inside a `UI::Forms::Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, and `TextEditor`. A visually hidden label is the exception — `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Search::Form` does. See `app/components/ui/forms/group/component_preview/` and `app/components/ui/forms/combobox/component_preview/`.
+- **`UI::Tooltip` keeps its default `?` button trigger** unless the user explicitly says otherwise — never pass a label as the trigger content.
+- **A `UI::Forms::*` field gets its label from `UI::Forms::Group`** — render it inside a `Group` block, passing `form_builder:` when there is one. Holds for `Combobox`, `Select`, `TextEditor`, and `Files::Upload`, whose own `Upload` button is a second label for the same input and audits clean beside `Group`'s (`spec/components/ui/forms/group/component_system_spec.rb`) — never drop `Group` for a bare `<label>` to avoid it. A visually hidden label is the exception: `Group`'s label always carries a required/optional suffix, so use a bare `label_tag` with `twlabel tw:sr-only`, the way `Pages::Search::Form` does.
+- **Every typeahead / autocomplete goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. `spec/components/ui/forms/combobox` shows how to invoke it.
+- **Every FAQ / list of questions is `UI::Accordion::Component`** — `items:` as `[question, answer]` pairs. Never hand-rolled `<details>` or per-item `UI::Collapse` markup.
+- **Every chart goes through `UI::Chart::Component`** — chartkick's `column_chart`/`line_chart`/`pie_chart` helpers are pinned `preload: false` and fetched by the component's `ui--chart` controller, so a bare helper call renders the placeholder and nothing else. Pass `kind:` for a line or pie. A page with no Stimulus (`layout: false`) loads them itself: `app/views/welcome/bike_creation_graph.html.erb`.
 
-## Typeaheads: always `UI::Forms::Combobox`
+`Atoms::*` (`app/components/atoms/`) holds the small value-rendering components — `Atoms::Serial`, `Atoms::Sticker`, `Atoms::ShortId`, `Atoms::Phone`. Everything else is `UI::*`; older value renderers like `UI::AddressDisplay` predate the split and stay put. Render a serial with `Atoms::Serial::Component`.
 
-**Every typeahead / autocomplete / combobox goes through `UI::Forms::Combobox::Component`** — never a new Stimulus controller that fetches matches and renders its own menu. See `app/components/ui/forms/combobox/` (component + `component_preview.rb`) and `spec/components/ui/forms/combobox` for how to invoke it.
+## URLs: dashes for a new marketing page
+
+**Spell a new marketing or landing page's path with dashes** — `/donate/year-end-2026`, `/ebike-rules`, `/marketplace/how-it-works` — since Google reads a hyphen as a word break and an underscore as joining two words. Give its route an underscored `as:` so the helper still reads like the rest (`get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules`). Everything else, and the marketing pages that are already underscored (`/for_bike_shops`), stays as it is.
+
+**Don't add a route for the other spelling.** `PathSpellingRedirect`, the `*path` route at the end of `config/routes.rb`, 301s an unmatched path to whichever spelling is routed, keeping the query. Link with the path helper; where a literal has to stand (a JS template, an emailed link, a spec's `have_current_path`), write the routed spelling, since the other costs a redirect.
+
+## Form drafts: always `form-persist`
+
+**A form worth not retyping mirrors itself to localStorage through the `form-persist` controller** — never one of your own. It takes a `data-form-persist-key-value` when the derived key — the pathname plus the form's action — isn't unique per form. See `app/components/pages/register/views/step1/component.rb` and `app/components/pages/register/views/step2/component.html.erb`.
+
+**A controller whose UI hangs off a restored field reconciles in two places** — a `form-persist:restored@window->…` entry in the element's `data-action`, and the same call in its own `connect`. A hand-rolled `window.addEventListener` is the older idiom; don't add more. See `app/components/pages/register/views/step1/component.html.erb` with `app/javascript/controllers/register/heading_controller.js`.
+
+## Current-page links: always `UI::ActiveLink`
+
+**Every link that goes `aria-current` on the page it points at goes through `UI::ActiveLink::Component`** — never `current_page?` in a template, and never a Stimulus controller of your own comparing `window.location`. It always derives the state in the browser (`app/javascript/controllers/ui/active_link_controller.js`), so there's no way to pass the answer in: `match_paths:` is the only control over what counts as the page it points at. Any layout rendering one opens its `<body>` with `body_tag`. See `app/components/ui/active_link/`.
+
+**`match_params:` is the params the entry stands for, not the ones its `path:` sets** — a filter entry that toggles links *away* from itself to clear the filter, so the two differ. Passing `path:`'s value to both fails silently, and only on the entry that is currently applied.
 
 ## Showing and hiding elements: always use the collapse helpers
 
 Any time you show, hide, or toggle an element in response to interaction, go through the shared collapse helpers. **Never** hand-roll it with the `hidden` attribute, `element.style.display`, `element.hidden = true`, or ad-hoc `classList.add('tw:hidden')` — those skip the shared show/hide animation and the `tw:hidden!`/`tw:hidden` class contract the rest of the app depends on.
 
-- **Markup-only toggle** (a trigger reveals/collapses a panel, no other logic): add `data-controller="ui--collapse"`, mark the collapsible element `data-ui--collapse-target="content"`, and wire the trigger's `data-action` to `ui--collapse#toggle` / `ui--collapse#show` / `ui--collapse#hide` (`app/javascript/controllers/ui/collapse_controller.js`; optional `data-ui--collapse-duration-value`).
+- **Markup-only toggle** (a trigger reveals/collapses a panel, no other logic): add `data-controller="ui--collapse"`, mark the collapsible element `data-ui--collapse-target="content"`, and render the trigger with `UI::Collapse::Component` (`chevron: true` for the rotating chevron) — never a hand-wired button (`app/javascript/controllers/ui/collapse_controller.js`).
 - **Inside your own Stimulus controller** (you have extra logic — a redirect branch, a query-param check, etc.): import `collapse_utils` and call it directly:
 
   ```js
@@ -80,31 +134,103 @@ Any time you show, hide, or toggle an element in response to interaction, go thr
   collapse('show', this.formTarget)   // 'show' | 'hide' | 'toggle'; optional duration (default 200)
   ```
 
-The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Use **`tw:hidden!`** when the element also carries a display utility that sorts after `hidden` — any `inline-*`, which every `UI::Button` has. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
+The collapsible element starts hidden with the **`tw:hidden` class** (not the `hidden` attribute) — `collapse` toggles `tw:hidden`/`tw:hidden!` and runs the height/scale transition for you. Use **`tw:hidden!`** when the element also carries a display utility that sorts after `hidden` — any `inline-*`, which every `UI::Button` has. A plain `tw:hidden` renders that panel open, and no component spec can see it: the class is in the attribute, it just loses the cascade. Because the initial hidden state is a class, component specs assert it by class (`have_css("[…].tw\\:hidden")`), not Capybara visibility — the rack_test driver doesn't evaluate CSS, so it can't tell a class-hidden element is hidden.
 
 ## No dead hooks in markup
 
-Only add an `id` or non-utility `class` when something concrete consumes it — a CSS rule, a JS/Stimulus selector, a test fixture, an accessibility attribute. Don't keep or invent "structural identifier" hooks "in case something needs them later," and don't replace a removed hook with a renamed one out of inertia.
+Only add an `id` or non-utility `class` when something concrete consumes it — a CSS rule, a JS/Stimulus selector, a test fixture, an accessibility attribute. Don't keep or invent "structural identifier" hooks "in case something needs them later."
 
 When deleting an `id`/`class`, grep the repo for the name before deciding what to do with it:
 
+**On a page that loads a vendored bundle, grep `public/vendored_assets/*.js` as well as `app/`.** The
+Doorkeeper layout loads `application_standalone.js` and the bike versions index `bikes_search1.js`; they bind
+behaviour by id and class, and their source left the repo with the webpack config, so they can't be rebuilt —
+a hook with no consumer in `app/` is routinely live. Each `.js.map` still carries the original source in
+`sourcesContent`, which reads far better than the minified bundle. Handlers are guarded on a hook being present, and the guard is often a *different* id than the one bound: `#blog-image-form` gates the module
+that binds `#infoCheck`. So removing an id silently disables behaviour, sometimes behaviour attached
+to another id entirely.
+Grep for what a module *assigns*, not only the hooks it binds — a guarded init publishes globals and
+its callers don't re-check the guard. No spec catches it; a converted page's `browser_console_messages` does.
+
 - Zero consumers: delete it, don't rename it.
 - Consumers exist: either update them, or leave the hook in place — the consumers are the *reason* it earns its spot in the markup.
+
+## Helpers are deprecated — render a view component instead
+
+**Never add a helper method, and don't extend an existing one.** Anything a helper would render belongs in a view component that takes what it needs as explicit keyword arguments. `app/helpers/` is legacy: leave what's there, but move a helper into a component when you touch the line that calls it.
+
+- A *view helper* that only gathers a component's arguments out of controller assigns is still a helper — pass those arguments from the view.
+- `ApplicationComponentHelper` is the exception (`number_display`, `amount_display`, `check_mark`, `search_emoji`) — value formatters `ApplicationComponent` already includes, so components call them bare.
+
+**What's banned is the component reaching out, not the number of arguments.** State the controller already owns can be named and passed as one value object — `ComponentStructs::IndexState` (built in `ControllerHelpers#admin_index_state`) and `ComponentStructs::SortState` (`ControllerHelpers#sort_state`) are the pattern — value objects live in `app/services/component_structs/`.
+
+Bundle only what's cohesive — one subject, assembled in one place. `IndexState` is "this admin index request"; `ComponentStructs::SortState` is "how this table is sorted and what its links carry". A grab-bag of unrelated request facts (`display_dev_info`, `current_user`, `current_country_id`) is not a value object, it's `helpers` renamed — those stay individual arguments. `Data.define` for one that only carries its arguments; a plain class when it memoizes derivations, since `Data` instances are frozen and `@x ||=` raises on one (`ComponentStructs::OrgSearchSettings`).
 
 ## ViewComponent rules
 
 This project uses the ViewComponent gem to render components.
 
-- Prefer view components to partials.
+- **Prefer an existing component to a new one, extended if needed.** Before creating one, look for a component that already renders the pattern or its core — in `ui/`, `atoms/` and the sibling `pages/` namespaces. A new component whose template is mostly one existing `UI::*` component plus chrome is that component with an argument: ask to extend it (the no-new-argument rule above) rather than wrapping it to avoid asking. `UI::BulkTableCard`, folded into `UI::Table::InCard`'s `column_settings:`, is the pattern.
+- **Before creating a component, check it earns its class.** If its `component.rb` would hold nothing but `initialize` assigning arguments to ivars, and fewer than 3 callers render it, write a partial instead, with `<%# locals: (…) %>` at the top. An admin index table on `UI::Table::Base` is the usual case: `admin/strava_gears/_table.html.erb` is the pattern, and `Pages::Admin::IndexSkeleton` renders the `_table` partial without a `table_view:`. A component earns its class with logic to name, a cache key to build, or a third caller; past that bar, prefer components to partials.
 - **If a view file only renders a single component, consider rendering it from the controller instead** (`render Foo::Component.new(...)`) and deleting the view file — the layout still wraps it.
 - Generate a new view component with `rails generate component ComponentName argument1 argument2`.
 - View components must initialize with keyword arguments. Everything the component needs must be passed in explicitly by the caller — never reach into controller state from inside a component (e.g. `controller.instance_variable_get(:@bike)`). If the component needs `@bike`, the caller renders `Component.new(bike: @bike)`.
 - In view components, use instance variables directly — don't add `attr_reader`/`attr_accessor`. Reference `@foo` everywhere, including in the template (`@current_user`, not `current_user`).
-- In ViewComponent templates, use the `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`).
+- In ViewComponent templates, use the `helpers.` prefix for view helpers (e.g. `helpers.time_ago_in_words`) — a legacy bridge, and a sign the helper wants to be a component.
   - Rule of thumb: try the bare call first. Only add `helpers.` if it fails with `NoMethodError` — route helpers (`new_bike_path`) and ActionView tag/url builders (`tag.span`, `content_tag`, `link_to`) are mixed into `ViewComponent::Base` directly, so they don't need it.
-- **Never nest a component inside a folder that already holds a `component.rb`.** Each component lives in `app/components/<path>/component.rb` (and `spec/components/<path>/component_spec.rb`); siblings go in sibling folders, not subfolders. If you have `search/everything_combobox/component.rb` and need a related component, place it at `search/everything_combobox_options/component.rb` (module `Search::EverythingComboboxOptions`), not `search/everything_combobox/options/component.rb`.
-- **Converting a partial to a component is a faithful move, not a cleanup.** Carry the markup over verbatim — including comments and commented-out code. Those lines are often a deliberate stash (a link that's temporarily disabled, a snippet someone expects to restore), so dropping them silently loses intent and surprises the reviewer, who expects the diff to read as "same content, new home." The only changes a conversion should introduce are the mechanical ones the move *requires*: `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it, and the like. If you spot something that genuinely looks like dead code worth removing, that's a separate judgment call — raise it with the user or do it in its own commit, don't fold it into the move.
+- **Never nest a component inside a folder that already holds a `component.rb`.** Each component lives in `app/components/<path>/component.rb` (and `spec/components/<path>/component_spec.rb`); siblings go in sibling folders, not subfolders. If you have `pages/search/everything_combobox/component.rb` and need a related component, place it at `pages/search/everything_combobox_options/component.rb` (module `Pages::Search::EverythingComboboxOptions`), not `pages/search/everything_combobox/options/component.rb`.
+- **Cached markup has no digest to maintain.** `ApplicationComponent` includes `ViewComponent::ExperimentallyCacheable`, so a `cache` block moves when anything it renders changes.
+- **A component that builds its own `cache_key` includes `self.class.cache_digest`** — `SharedBlocks::Footer` is the pattern.
+- **A component not rendered as a literal constant after `render` needs a `# Template Dependency: Full::Class::Component` line** in the component that uses it — `render(inner_component)`, a collection, or a constant read all count. `SharedBlocks::Navbar::Wrapper` is the pattern; `spec/components/application_component_spec.rb` fails on a missing or stale one.
+- **`skip_digest: true` and components outside `ApplicationComponent` bypass the digest.** A `skip_digest` key carries the component's `cache_digest` itself — `welcome/index.html.erb` is the pattern.
+- **Change a component's signature, then open its `component_preview.rb`** — nothing renders previews in the suite, so a stale one raises `ArgumentError: unknown keyword` on its Lookbook page with the whole suite green. `curl -s -o /dev/null -w "%{http_code}" "$BASE_URL/rails/view_components/<path>/component/<scenario>"` is the check.
+- **A `UI::Table::Base` cell block is `instance_exec`'d against the component.** Inside `table.column ... do`, bare calls and `@ivar`s resolve on `UI::Table::Base::Component`, not the view. A bare call raises, but **an `@ivar` fails silently** — it reads `nil`, or worse, an identically-named ivar the table happens to hold. Reach state through the readers the table exposes (`sort_state.search_params`, not `sortable_search_params`), and for anything else assign a local above the block, the way `Pages::Org::SearchResults::BikesTable` carries `organization`. Above the `UI::Table::Base::Component.new` block the view's own helpers work; rewriting those too is churn.
+- **Dev-only admin markup renders unconditionally, classed `only-dev-visible`** — `SharedBlocks::HeaderTags` hides that class in the page head per request, which is what lets one fragment-cached row serve dev and non-dev viewers both. Never put `display_dev_info?` in a cache key, and never inject a second, local `<style>` to hide it; `admin/notifications/_table.html.erb` is the pattern. The class hides, it does not omit, so three things keep a `display_dev_info?` gate: a payload a non-dev should not hold in page source at all (`Pages::Org::BulkImportError`'s raw `import_errors`), a form input, whose params would otherwise submit (`Pages::Admin::Users::Edit`'s `developer` checkbox), and a decision about whether something *exists* rather than whether it shows (`Organizations::Tabs#render_tab?` on `custom_layouts`).
+- **Cache rows, never cells.** A `cache(...)` inside a cell digests `UI::Table::Base`'s template rather than the calling partial's, so it needs a `cache_fragment_name` prefix to avoid sharing a fragment with every other table caching that record. Pass `cache_key:` and `cache_records:` to `UI::Table::Base` instead — `admin/payments/_table.html.erb` is the pattern. **A fragment cached per organization can hold nothing that varies by viewer** — the org search's rows and cards cache on the organization, so its serials render for the organization (`Atoms::Serial::Component`, and `Bike#serial_display` take one) rather than `current_user`, or one member's page is served to the next. A row key has three inputs and one exclusion: the record (automatic), every flag fixed for the render (`cache_key: cache_fragment_name([name, *flags])`), every *other* record the row renders (`cache_records:`, which mirrors the controller's `includes` — a cell reading an association the controller doesn't preload is an N+1 and a stale row at once; one that *can't* be preloaded, because a method re-queries over it like `TheftAlert#bike`, stays out of the key rather than costing a query per row on every hit), and **never** `sort_state.search_params`, which varies per request: wrap the table in `update-cached-sortable-links` and let it rewrite those hrefs client-side.
+- **A component that `include`s a helper is coupled to whatever ivars that helper reads.** `GraphingHelper#time_range_counts` falls back to `@time_range` off the object it's mixed into, so moving that ivar out of the component silently returns nil rather than failing. Pass the value as an argument when converting a component to explicit arguments.
+- **Moving a view into a component turns its locals into methods.** A `<% x = … %>` computed once per template becomes a method run once per *call site* — which is how a single pluck becomes one per table row. Memoize anything that queries as you move it.
+- **Converting a partial — to a component, or from haml to ERB — is a faithful move, not a cleanup.** Carry the markup over verbatim, including comments and commented-out code: those are often a deliberate stash (a link temporarily disabled, a snippet someone expects to restore). The only changes a conversion introduces are the ones the move requires — `t(".x")` → `translation(".x")`, adding `helpers.` where a helper now needs it. Dead code worth removing goes in its own commit.
 
-## Playwright screenshot filenames
+## Turbo is opt-in, and opting a form in has consequences
 
-**Every `mcp__playwright__browser_take_screenshot` call must pass a `filename:` that starts with `tmp/`** (e.g. `tmp/tooltip-hover.png`). The MCP tool's default root is the project root — a bare filename like `tooltip.png` lands in the working tree, shows up in `git status`, and has to be cleaned up by hand. `tmp/` is gitignored, so screenshots there stay out of commits and don't pollute the diff. This rule applies to ad-hoc visual verification, not just PR-screenshot capture.
+`application.js` sets `Turbo.session.drive = false`, so links and forms submit natively
+until something carries `data-turbo="true"`. These bite the first time a form opts
+in, none of which shows up as an error — the page just behaves oddly:
+
+- **A controller-rendered component takes its content type from the request.** A Turbo
+  submission sends `Accept: text/vnd.turbo-stream.html` first, and `render Foo::Component.new(...)`
+  has no template format to override it, so the response comes back as a *stream message* —
+  which Turbo appends to the current page instead of replacing it. Two steps of a wizard end
+  up on screen at once. Fix it at the controller with `before_action { request.format = :html }`
+  for actions that only ever render pages. (An `.html.erb` view doesn't have this problem: the
+  template's own format sets the content type.)
+- **`data-turbo="true"` on a form opts in every link inside it too** — navigability is
+  resolved with `closest("[data-turbo]")`, so it isn't scoped to the submission. A link that
+  leaves for a legacy jQuery page needs `data: {turbo: false}`, or it gets Turbo-rendered into
+  a body whose `loadPageScript` never runs. Links to pages the Stimulus redesign owns are fine.
+- **`data-turbo` is opt-*out* on any value but `"false"`** — an empty `data-turbo=""`, from
+  interpolating a false into the attribute, reads as opted in. Render the attribute
+  conditionally (`tag.attributes(data: {turbo: (true if @turbo)})`) rather than its value;
+  `UI::Tabs` is the example.
+- **Turbo restores its own snapshot on back/forward**, which `Cache-Control: no-store` can't
+  reach. If what a page renders depends on server state, opt out with
+  `helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") }`
+  — `Pages::Register::Parts::Shell` and `SharedBlocks::SearchResults::Frame` are the examples — and a restoration re-fetches
+  instead of showing a page the user has moved past.
+
+`RegisterController` and the `Pages::Register::` components are the worked example of both.
+
+## Admin screens
+
+A record with more than one super-admin page gets `Pages::Admin::Headers::Tabs::Component`, with the
+section's own tabs named in a component of their own — `Pages::Admin::Organizations::Tabs` is the
+pattern — rather than restated in each view.
+
+`sortable_search_params` (defined in the binxtils gem, `Binxtils::SortableHelper`) permits every
+param starting with `search_`, plus the sort and period keys — which is how a filter link keeps the
+rest of the table's state. Reach it through the reader, not the bare helper:
+`url_for(@index.sortable_search_params.merge(search_kind: "x"))`.
+
+## Screenshots
+
+Not this skill's — `frontend-screenshots` owns them, including where the files land.

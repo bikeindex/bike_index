@@ -68,6 +68,7 @@ class ParkingNotification < ActiveRecord::Base
   has_many :repeat_records, class_name: "ParkingNotification", foreign_key: :initial_record_id
   validates_presence_of :bike_id, :user_id
   validate :location_present, on: :create
+  validate :bike_not_impounded, on: :create
   attr_accessor :skip_geocoding, :is_repeat, :use_entered_address, :image_cache, :skip_update
 
   mount_uploader :image, ImageUploaderBackgrounded
@@ -75,10 +76,6 @@ class ParkingNotification < ActiveRecord::Base
 
   before_validation :set_calculated_attributes
   after_commit :process_notification
-
-  scope :with_location, -> { where.not(latitude: nil) }
-  scope :with_street, -> { with_location.where.not(street: nil) }
-  scope :without_street, -> { where(street: ["", nil]) }
 
   scope :active, -> { where(resolved_at: nil) }
   scope :resolved, -> { where.not(resolved_at: nil) }
@@ -90,7 +87,10 @@ class ParkingNotification < ActiveRecord::Base
   scope :not_unregistered_bike, -> { where(unregistered_bike: false) }
   scope :first_notification, -> { where(repeat_number: 0) }
   scope :not_replaced, -> { where.not(status: "replaced") }
-  scope :email_success, -> { joins(:notifications).merge(Notification.delivery_success).distinct }
+  scope :email_success, -> { joins(:notifications).merge(Notification.delivered).distinct }
+  scope :notes_matching, ->(query) {
+    where("message ILIKE :query OR internal_notes ILIKE :query", query: "%#{sanitize_sql_like(query.strip)}%")
+  }
 
   def self.kinds
     KIND_ENUM.keys.map(&:to_s)
@@ -109,6 +109,16 @@ class ParkingNotification < ActiveRecord::Base
     }
   end
 
+  # The org form panels only ever offer a new notification, so the repeat flag, location
+  # and kind are defaulted here rather than read off an existing record
+  def self.build_for(bike:, organization:)
+    new(bike_id: bike.id, organization:, use_entered_address: false).tap do |notification|
+      notification.is_repeat = notification.likely_repeat?
+      notification.set_location_from_organization
+      notification.kind ||= notification.potential_initial_record&.kind || kinds.first
+    end
+  end
+
   def self.associated_notifications_including_self(id, initial_record_id)
     potential_id_matches = [id, initial_record_id].compact
     where(initial_record_id: potential_id_matches).or(where(id: potential_id_matches))
@@ -123,6 +133,16 @@ class ParkingNotification < ActiveRecord::Base
   def self.bikes
     Bike.unscoped.includes(:parking_notifications)
       .where(parking_notifications: {id: pluck(:id)})
+  end
+
+  # #bike looks the bike up unscoped, so `includes(:bike)` loads a second copy that nothing reads -
+  # this fills the same memo in one query, colors and ownership included
+  def self.preload_bikes(notifications)
+    bikes = Bike.unscoped.where(id: notifications.filter_map(&:bike_id))
+      .includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_ownership)
+      .index_by(&:id)
+    notifications.each { |notification| notification.preloaded_bike = bikes[notification.bike_id] }
+    notifications
   end
 
   # Passing in an already formed bounding_box - added method to explicitly document required args
@@ -164,6 +184,11 @@ class ParkingNotification < ActiveRecord::Base
     @bike ||= bike_id.present? ? Bike.unscoped.find_by_id(bike_id) : nil
   end
 
+  # Not bike=, which assigns the association
+  def preloaded_bike=(value)
+    @bike = value
+  end
+
   def street_2
   end
 
@@ -176,7 +201,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def email_success?
-    notifications.delivery_success.exists?
+    notifications.delivered.exists?
   end
 
   def initial_record?
@@ -192,7 +217,7 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def send_email?
-    owner_known?
+    owner_known? && email != ApplicationMailer::CONTACT_EMAIL && !organization&.skip_email_to?(email)
   end
 
   def publicly_visible_attribute = :street
@@ -305,7 +330,10 @@ class ParkingNotification < ActiveRecord::Base
   end
 
   def set_calculated_attributes
-    self.initial_record_id ||= potential_initial_record&.id if is_repeat
+    if Binxtils::InputNormalizer.boolean(is_repeat)
+      self.initial_record ||= potential_initial_record
+      reuse_initial_record_location
+    end
     self.repeat_number ||= calculated_repeat_number
     self.resolved_at ||= calculated_resolved_at # Used by by calculated_status, so must come first
     self.status = calculated_status
@@ -357,11 +385,34 @@ class ParkingNotification < ActiveRecord::Base
 
   private
 
+  # The org form collapses its location controls for a repeat, so nothing locates the pin
+  def reuse_initial_record_location
+    return if id.present? || initial_record.blank? || street.present? || latitude.present?
+
+    self.attributes = initial_record.slice(*Geocodeable::GEO_ATTRS - [:street_2], :neighborhood, :accuracy, :location_from_address)
+    self.skip_geocoding = true
+  end
+
   def location_present
     # in case geocoder is failing (which happens sometimes), permit if either is present
     return true if latitude.present? && longitude.present? || formatted_address_string.present?
 
     errors.add(:base, "address is required")
+  end
+
+  # Organizations re-submit the impound form when the bike page hasn't caught up yet - tell them
+  # it worked rather than duplicating the record and re-emailing the owner
+  def bike_not_impounded
+    return unless impound_notification?
+
+    impound_record = ImpoundRecord.current.find_by(bike_id:)
+    return if impound_record.blank?
+
+    errors.add(:base, if impound_record.organization_id == organization_id
+      "This #{bike&.type} is already impounded (impound record ##{impound_record.display_id})"
+    else
+      "This #{bike&.type} is already impounded by another organization"
+    end)
   end
 
   def process_notification

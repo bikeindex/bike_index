@@ -1,0 +1,7 @@
+<%= form_with(url: "#", builder: BikeIndexFormBuilder, html: {data: {
+      controller: "ui--forms--turnstile", **UI::Forms::Turnstile::Component.form_data,
+      action: "input->ui--forms--turnstile#update"}}) do |f| %>
+  <%= f.email_field :email, value: email, placeholder: "you@example.com", class: "twinput tw:w-full" %>
+
+  <%= render(UI::Forms::Turnstile::Component.new(email:)) %>
+<% end %>

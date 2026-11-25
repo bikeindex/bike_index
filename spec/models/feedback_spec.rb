@@ -15,25 +15,25 @@ RSpec.describe Feedback, type: :model do
     it "enqueues an email job" do
       expect {
         FactoryBot.create(:feedback)
-      }.to change(Email::FeedbackNotificationJob.jobs, :size).by(1)
+      }.to change(EmailJobs::FeedbackNotificationJob.jobs, :size).by(1)
     end
 
     it "doesn't send email" do
       expect {
         FactoryBot.create(:feedback, feedback_type: "bike_delete_request")
-      }.to_not change(Email::FeedbackNotificationJob.jobs, :size)
+      }.to_not change(EmailJobs::FeedbackNotificationJob.jobs, :size)
     end
 
     it "doesn't enqueue an email job for serial updates" do
       expect {
         FactoryBot.create(:feedback, feedback_type: "serial_update_request")
-      }.to change(Email::FeedbackNotificationJob.jobs, :size).by(0)
+      }.to change(EmailJobs::FeedbackNotificationJob.jobs, :size).by(0)
     end
 
     it "doesn't enqueue an email job for manufacturer updates" do
       expect {
         FactoryBot.create(:feedback, feedback_type: "manufacturer_update_request")
-      }.to change(Email::FeedbackNotificationJob.jobs, :size).by(0)
+      }.to change(EmailJobs::FeedbackNotificationJob.jobs, :size).by(0)
     end
 
     it "auto sets the body for a lead_type" do
@@ -46,6 +46,26 @@ RSpec.describe Feedback, type: :model do
       expect(feedback.feedback_hash).to eq("package_size" => "small")
       expect(feedback.kind).to eq "lead_for_school"
       expect(feedback.kind_humanized).to eq "School lead"
+    end
+
+    context "with a lead name that fills the column" do
+      let(:name) { "S" * 255 }
+
+      it "truncates the generated title, and rejects a longer name or email rather than overflowing the column" do
+        feedback = Feedback.create(feedback_type: "lead_for_bike_shop", email: "shop@example.com", name:)
+        expect(feedback).to be_persisted
+        expect(feedback.title.length).to eq 255
+
+        expect(Feedback.new(feedback_type: "lead_for_bike_shop", email: "shop@example.com", name: "#{name}S")).to_not be_valid
+        expect(Feedback.new(feedback_type: "lead_for_bike_shop", email: "#{name}@example.com", name: "Shop")).to_not be_valid
+      end
+    end
+
+    it "sets the body for a lead submitted with a blank message, and keeps its role" do
+      feedback = Feedback.create(feedback_type: "lead_for_city", email: "staff@example.gov", name: "Portland",
+        body: "", contact_role: "law_enforcement")
+      expect(feedback).to be_valid
+      expect(feedback.reload).to have_attributes(body: "lead", contact_role: "law_enforcement")
     end
   end
 

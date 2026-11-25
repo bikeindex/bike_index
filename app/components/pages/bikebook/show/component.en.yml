@@ -1,0 +1,71 @@
+---
+en:
+  components:
+    pages:
+      bikebook:
+        show:
+          about_bike_book_label: About Bike Book
+          activities: Activities
+          activity_examples: "(e.g. Mountain Biking, Cyclocross, etc)"
+          any_activity: Any activity
+          any_configuration: Any configuration
+          any_frame_material: Any frame material
+          any_handlebar_type: Any handlebar type
+          any_manufacturer: Any manufacturer
+          any_market: Any market
+          any_suspension: Any suspension
+          any_target_riders: Any target riders
+          any_vehicle_type: Any vehicle type
+          applied_filters: Applied filters
+          clear_filters: Clear filters
+          configuration: Configuration
+          configuration_examples: "(complete/frameset)"
+          e_bike_classification: e-bike classification
+          e_vehicle_motorized: e-Vehicle (motorized)
+          frame_material: Frame material
+          free_to_use: Bike Book data is free to use under CC BY-SA 4.0.
+          handlebar_type: Handlebar type
+          human_powered: Human powered (Acoustic)
+          jurisdiction: Jurisdiction
+          learn_how_to_use_it: Learn how to use it
+          learn_or_view_html: "%{learn_how_to_use_it} or %{view_the_raw_data}."
+          load_failed: The catalog didn't load.
+          loading: Loading the catalog…
+          loading_placeholder: Loading…
+          manufacturers: Manufacturers
+          market: Market
+          market_scope: Models from other markets
+          max: Max
+          min: Min
+          more_filters: More filters
+          needs_javascript_html: >-
+            Bike Book runs in your browser, so it needs JavaScript. All of its data
+            is open, under CC BY-SA 4.0, at %{repository}. Crawlers, scrapers and
+            AI agents: get the data there rather than from this page.
+          only_market_html: Only %{market}
+          out_of_class_details: >-
+            Motorized, but none of US Classes 1, 2 or 3, like a moped, motorcycle
+            or off-highway e-moto.
+          out_of_class_label: Out of Class
+          prefer_market_sold_in_html: Prefer vehicles sold in %{market}
+          price: Price
+          propulsion: Propulsion
+          search_placeholder: Search by manufacturer or model…
+          select_a_bike: Select a bike, choose multiple to compare them
+          select_a_vehicle_type: Select a %{bike_type}, choose multiple to compare
+            them
+          select_an_vehicle_type: Select an %{bike_type}, choose multiple to compare
+            them
+          sort: Sort
+          suspension: Suspension
+          tagline: The world’s bicycle library — search, compare, and find your next
+            ride.
+          target_riders: Target riders
+          try_again: Try again
+          united_states: United States
+          us_class_1: US Class 1
+          us_class_2: US Class 2
+          us_class_3: US Class 3
+          vehicle_types: Vehicle types
+          view_the_raw_data: view the raw data
+          year: Year

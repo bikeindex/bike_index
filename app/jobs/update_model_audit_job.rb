@@ -35,27 +35,10 @@ class UpdateModelAuditJob < ApplicationJob
     "#{REDLOCK_PREFIX}-#{model_audit_id}-#{bike_id}"
   end
 
-  def self.new_lock_manager
-    Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
-  end
-
-  def self.locked_for?(model_audit_id)
-    lock_manager = new_lock_manager
-    lock_manager.locked?(redlock_key(model_audit_id))
-  end
-
-  def lock_duration_ms
-    (20.minutes * 1000).to_i
-  end
-
   def perform(model_audit_id = nil)
     return if SKIP_PROCESSING
 
-    lock_manager = self.class.new_lock_manager
-    redlock = lock_manager.lock(self.class.redlock_key(model_audit_id), lock_duration_ms)
-    return unless redlock
-
-    begin
+    with_redlock(model_audit_id, duration: 20.minutes) do
       model_audit = ModelAudit.find_by(id: model_audit_id)
       return if model_audit.blank?
 
@@ -71,9 +54,6 @@ class UpdateModelAuditJob < ApplicationJob
 
       OrganizationModelAudit.organizations_to_audit.pluck(:id)
         .each { |id| update_org_model_audit(model_audit, id) }
-    ensure
-      # Unlock!
-      lock_manager.unlock(redlock)
     end
   end
 
@@ -122,7 +102,7 @@ class UpdateModelAuditJob < ApplicationJob
       enqueue_delayed_processing_for_bike_ids(matching_bikes.pluck(:id))
     end
 
-    matching_bikes.update_all(model_audit_id: nil)
+    matching_bikes.update_all(model_audit_id: nil, updated_at: Time.current)
     OrganizationModelAudit.where(model_audit_id: model_audit.id).destroy_all
     model_audit.destroy
   end
@@ -141,7 +121,7 @@ class UpdateModelAuditJob < ApplicationJob
 
     # Update all non_matching bikes (so they aren't accidentally processed in update_org_model_audit)
     non_matching_bike_ids = model_audit.bikes.pluck(:id) - matching_bikes.pluck(:id)
-    Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil)
+    Bike.unscoped.where(id: non_matching_bike_ids).update_all(model_audit_id: nil, updated_at: Time.current)
     # enqueue for any non-matching bikes
     enqueue_delayed_processing_for_bike_ids(non_matching_bike_ids)
   end
@@ -152,16 +132,12 @@ class UpdateModelAuditJob < ApplicationJob
     bikes_count = bikes.count
     bike_at = bikes.last&.created_at || nil
 
-    organization_model_audit = model_audit.organization_model_audits
-      .where(organization_id: organization_id).first
+    organization_model_audit = model_audit.organization_model_audits.find_or_initialize_by(organization_id:)
+    organization_model_audit.update!(bikes_count:, last_bike_created_at: bike_at)
+    # The registration page shows the status, and bikes_count changes on most runs
+    return unless organization_model_audit.saved_change_to_certification_status?
 
-    if organization_model_audit.blank?
-      model_audit.organization_model_audits.create!(bikes_count: bikes_count,
-        organization_id: organization_id, last_bike_created_at: bike_at)
-    elsif organization_model_audit.present?
-      organization_model_audit.update!(bikes_count: bikes_count,
-        last_bike_created_at: bike_at)
-    end
+    bikes(model_audit).update_all(updated_at: Time.current)
   end
 
   def enqueue_delayed_processing_for_bike_ids(bike_ids)

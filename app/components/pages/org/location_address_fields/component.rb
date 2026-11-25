@@ -1,0 +1,26 @@
+# frozen_string_literal: true
+
+module Pages
+  module Org
+    module LocationAddressFields
+      class Component < ApplicationComponent
+        def initialize(form_builder:, show_label: true)
+          @builder = form_builder
+          @show_label = show_label
+
+          @initial_country_id = @builder.object.country_id || Country.united_states_id
+        end
+
+        private
+
+        def initial_state_class
+          (@initial_country_id == Country.united_states_id) ? "" : "tw:hidden!"
+        end
+
+        def initial_region_class
+          initial_state_class.blank? ? "tw:hidden!" : ""
+        end
+      end
+    end
+  end
+end

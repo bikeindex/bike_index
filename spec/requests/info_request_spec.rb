@@ -49,7 +49,7 @@ RSpec.describe InfoController, type: :request do
 
   describe "static pages" do
     pages = %w[about protect_your_bike serials resources security
-      donate terms vendor_terms privacy lightspeed]
+      terms vendor_terms privacy lightspeed]
     context "no user" do
       pages.each do |page|
         context "#{page} with revised_layout enabled" do
@@ -57,11 +57,7 @@ RSpec.describe InfoController, type: :request do
             get "/#{page}"
             expect(response.status).to eq(200)
             expect(response).to render_template(page.to_sym)
-            if page == "donate"
-              expect(response).to render_template("layouts/payments_layout")
-            else
-              expect(response).to render_template("layouts/application")
-            end
+            expect(response).to render_template("layouts/application")
           end
         end
       end
@@ -76,15 +72,120 @@ RSpec.describe InfoController, type: :request do
             get "/#{page}"
             expect(response.status).to eq(200)
             expect(response).to render_template(page.to_sym)
-            if page == "donate"
-              expect(response).to render_template("layouts/payments_layout")
-            else
-              expect(response).to render_template("layouts/application")
-            end
+            expect(response).to render_template("layouts/application")
           end
         end
       end
     end
+
+    describe "donate" do
+      include_context :active_stripe_prices
+
+      it "renders the donation forms with the active prices" do
+        get "/donate?source=newsletter"
+        expect(response.status).to eq(200)
+        expect(response).to render_template("layouts/application")
+        expect(response.body).to include("Fund the next recovery")
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="newsletter"/)
+        expect(response.body).to include("Become a member — $15/month")
+      end
+
+      context "signed in with a membership" do
+        include_context :request_spec_logged_in_as_user
+        before { FactoryBot.create(:membership, user: current_user) }
+
+        it "links to the membership rather than offering a second one" do
+          get "/donate"
+          expect(response.status).to eq(200)
+          expect(response.body).to include(edit_membership_path)
+          expect(response.body).to_not include('action="/membership"')
+        end
+      end
+
+      context "with a currency" do
+        before do
+          stripe_prices.each do |stripe_price|
+            FactoryBot.create(:stripe_price, stripe_price.slice(:membership_level, :interval)
+              .merge(currency_enum: "cad", amount_cents: stripe_price.amount_cents + 299))
+          end
+        end
+
+        it "checks out in it, showing its monthly prices" do
+          get "/donate?currency=cad"
+          expect(response.body).to match(/name="currency"[^>]*value="cad"/)
+          expect(response.body).to match(/name="payment\[currency\]"[^>]*value="CAD"/)
+          expect(response.body).to include("Become a member — $17.99/month")
+        end
+      end
+
+      context "with amount" do
+        it "redirects to the payment page" do
+          get "/donate?amount=120&source=newsletter"
+          expect(response).to redirect_to new_payment_path(amount: 120, source: "newsletter")
+        end
+      end
+    end
+
+    describe "donate/year-end-2026" do
+      include_context :active_stripe_prices
+
+      it "renders the year-end page outside the content wrapper, submitting the same forms as /donate" do
+        get "/donate/year-end-2026"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("Make a year-end gift to Bike Index")
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026"/)
+        expect(response.body).to include('action="/payments"')
+        expect(response.body).to_not include("sidebar-nav")
+      end
+
+      it "passes the email's source on and picks the recovered audience from it" do
+        get "/donate/year-end-2026?source=eoy-2026-recovered"
+        expect(response.body).to include("Your bike made it home")
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026-recovered"/)
+      end
+
+      it "falls back to the campaign's source for an array param" do
+        get "/donate/year-end-2026?source[]=eoy-2026-recovered"
+        expect(response.status).to eq(200)
+        expect(response.body).to match(/name="payment\[referral_source\]"[^>]*value="eoy-2026"/)
+      end
+
+      it "is where /donate/year-end goes, with the email's params" do
+        get "/donate/year-end?source=eoy-2026-recovered&initial_amount=500"
+        expect(response).to redirect_to("/donate/year-end-2026?initial_amount=500&source=eoy-2026-recovered")
+        expect(response.status).to eq(302)
+      end
+
+      it "redirects the underscored spelling, with the email's params" do
+        get "/donate/year_end_2026?source=eoy-2026-recovered"
+        expect(response).to redirect_to("/donate/year-end-2026?source=eoy-2026-recovered")
+        expect(response.status).to eq(301)
+      end
+    end
+
+    # serials is the one static page that links default_bike_search_path
+    describe "serials search links" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+      let(:search_hrefs) do
+        get "/serials"
+        Nokogiri::HTML(response.body).css("a.serial-search-screenshot").map { |link| link["href"] }
+      end
+      before { log_in(current_user) }
+
+      it "sends them to their own registrations" do
+        expect(search_hrefs).to eq([organization_registrations_path(organization_id: organization.to_param)])
+      end
+
+      context "law enforcement" do
+        let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
+
+        it "sends them to every registration" do
+          expect(search_hrefs).to eq([search_registrations_path(stolenness: "all")])
+        end
+      end
+    end
+
     %w[image_resources dev_and_design].each do |page|
       context page do
         it "redirects to resources" do
@@ -112,6 +213,12 @@ RSpec.describe InfoController, type: :request do
       get "/support_the_index"
       expect(response).to redirect_to donate_path
     end
+    it "keeps the params donate reads" do
+      %w[/support_bike_index /support_the_index /support_the_bike_index].each do |path|
+        get "#{path}?source=newsletter&initial_amount=500&currency=cad&other=x"
+        expect(response).to redirect_to donate_url(source: "newsletter", initial_amount: "500", currency: "cad")
+      end
+    end
     it "redirects support_the_index" do
       get "/support_bike_index"
       expect(response).to redirect_to donate_path
@@ -124,21 +231,25 @@ RSpec.describe InfoController, type: :request do
         expect(response).to redirect_to new_payment_path(amount: 12)
       end
     end
-    context "why_donate" do
-      it "redirects to why-donate" do
-        get "/why_donate"
-        expect(response).to redirect_to("/why-donate")
-      end
-    end
   end
 
   describe "why-donate" do
     let!(:blog) { FactoryBot.create(:blog, title: Blog.why_donate_slug) }
-    it "renders the blog" do
+    it "redirects to donate" do
       get "/why-donate"
-      expect(response.code).to eq "200"
-      expect(response).to render_template("news/show")
-      expect(assigns(:blog)).to eq blog
+      expect(response).to redirect_to("/donate")
+      get "/why_donate"
+      expect(response).to redirect_to("/why-donate")
+      get "/info/#{blog.title_slug}"
+      expect(response).to redirect_to("/donate")
+    end
+  end
+
+  describe "store" do
+    let!(:blog) { FactoryBot.create(:blog, title: Blog.store_slug) }
+    it "redirects to the shop" do
+      get "/info/#{blog.title_slug}"
+      expect(response).to redirect_to("/shop")
     end
   end
 
@@ -153,12 +264,16 @@ RSpec.describe InfoController, type: :request do
       expect(response).to render_template("lightspeed")
       expect(flash).to_not be_present
       expect(assigns(:show_general_alert)).to be_truthy
+      # Signing up comes back through the signup's own return_to, not a sign-in's
+      expect(response.body).to include new_organization_signup_path(return_to: lightspeed_interface_path)
+      expect(session[:return_to]).to be_blank
     end
     context "donate" do
+      include_context :active_stripe_prices
+
       it "renders without show alert" do
         get "/donate"
         expect(response.code).to eq("200")
-        expect(response).to render_template("donate")
         expect(flash).to_not be_present
         expect(assigns(:show_general_alert)).to be_falsey
       end
@@ -177,6 +292,17 @@ RSpec.describe InfoController, type: :request do
       get "/primary_activities.csv"
       expect(response.status).to eq(200)
       expect(response.content_type).to match("text/csv")
+    end
+  end
+
+  context "wheel_sizes" do
+    let!(:wheel_size) { FactoryBot.create(:wheel_size, name: "7 x 1.5in", iso_bsd: 102, priority: :rare, description: "7 x 1.5in (178 x 38) solid wheel (Rare)") }
+
+    it "gets a csv" do
+      get "/wheel_sizes.csv"
+      expect(response.status).to eq(200)
+      expect(response.content_type).to match("text/csv")
+      expect(response.body).to eq "name,iso_bsd,priority,description\n7 x 1.5in,102,rare,7 x 1.5in (178 x 38) solid wheel (Rare)\n"
     end
   end
 end

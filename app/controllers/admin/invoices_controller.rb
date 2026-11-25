@@ -7,7 +7,7 @@ module Admin
       @pagy, @invoices =
         pagy(:countish, matching_invoices
           .includes(:organization, :payments, :organization_features, :first_invoice)
-          .reorder(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
+          .reorder(sortable_order(Invoice)), limit: @per_page, page: permitted_page)
     end
 
     helper_method :matching_invoices

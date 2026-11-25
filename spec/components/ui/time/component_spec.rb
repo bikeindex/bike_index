@@ -46,6 +46,14 @@ RSpec.describe UI::Time::Component, type: :component do
       end
     end
 
+    context "with preposition" do
+      let(:options) { {time:, format:, preposition: true} }
+
+      it "renders the class the localizer reads" do
+        expect(component).to have_css("span.localizeTime.withPreposition")
+      end
+    end
+
     context "with default format (nil)" do
       let(:format) { nil }
 

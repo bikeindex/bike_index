@@ -1,0 +1,246 @@
+<div class="tw:mt-6 tw:mb-1 tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Edit
+    <%= link_to "user edit", edit_bike_path(@bike, return_to: edit_admin_bike_path(@bike)),
+            class: "twlink tw:ml-2 tw:text-sm" %>
+  <% end %>
+
+  <div class="tw:ml-auto">
+    <%= render(Atoms::CredibilityScore::Component.new(bike: @bike)) %>
+  </div>
+</div>
+
+<%= form_for [:admin, @bike], html: {data: {controller: "admin--bike-edit-form",
+      "admin--bike-edit-form-original-serial-value": @bike.serial_number}} do |f| %>
+  <%= render(UI::Alerts::ObjectError::Component.new(object: @bike)) %>
+
+  <div class="twfieldrow">
+    <div>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :cycle_type, required: true)) do %>
+        <%# cycle_type is an integer-backed enum: pass enum *labels* as option values and an explicit value: to override hotwire_combobox's enum branch (which would emit cycle_type_before_type_cast) %>
+        <%= render UI::Forms::Combobox::Component.new(name: :cycle_type, options: CycleType.select_options, html_options: {form: f, value: @bike.cycle_type, required: true}) %>
+      <% end %>
+    </div>
+
+    <div>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :serial_number, required: true,
+            html_options: {class: "tw:data-no-serial:bg-gray-100 tw:dark:data-no-serial:bg-gray-800 tw:data-no-serial:cursor-not-allowed",
+                           data: {"admin--bike-edit-form-target": "serial", no_serial: @bike.no_serial?.presence}})) %>
+    </div>
+
+    <div class="tw:self-center">
+      <%= render(UI::Forms::Checkbox::Component.new(name: :has_no_serial, label: "Unknown serial",
+            checked: @bike.serial_unknown?, class_name: "tw:mb-1",
+            html_options: {data: {"admin--bike-edit-form-target": "noSerial", serial: "unknown",
+                         action: "change->admin--bike-edit-form#serialChanged"}})) %>
+
+      <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :made_without_serial,
+            label: Bike.human_attribute_name(:made_without_serial),
+            html_options: {data: {"admin--bike-edit-form-target": "noSerial", serial: "made_without_serial",
+                         action: "change->admin--bike-edit-form#serialChanged"}})) %>
+    </div>
+  </div>
+
+  <div class="twfieldrow">
+    <div
+      data-controller="admin--bike-manufacturer"
+      data-action="hw-combobox:preselection->admin--bike-manufacturer#toggleWarning"
+    >
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :manufacturer_id, label_text: "Manufacturer", required: true)) do |group| %>
+        <% group.with_label_note { tag.em(link_to("mfg bikes", admin_bikes_path(search_manufacturer: @bike.mnfg_name), class: "twlink")) } %>
+
+        <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, html_options: {form: f, required: true}) %>
+
+        <%= tag.small("Manufacturer is <em>Other</em>, this isn't a listed manufacturer".html_safe,
+              class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning], hidden: !@bike.manufacturer&.other?,
+              data: {"admin--bike-manufacturer-target": "warning"}) %>
+      <% end %>
+    </div>
+
+    <div>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :year)) %>
+    </div>
+
+    <div>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :primary_frame_color_id, label_text: Bike.human_attribute_name(:primary_frame_color_id), required: true)) do %>
+        <%= render UI::Forms::Combobox::Component.new(name: :primary_frame_color_id, options: Color.all.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Choose color", required: true}) %>
+      <% end %>
+    </div>
+
+    <div>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :frame_model)) %>
+    </div>
+
+    <div>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :primary_activity_id)) do %>
+        <%= render UI::Forms::Combobox::Component.new(name: :primary_activity_id, options: primary_activity_options, include_blank: true, html_options: {form: f, placeholder: "Choose activity"}) %>
+      <% end %>
+    </div>
+  </div>
+
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :description, kind: :text_area)) %>
+
+  <div class="twfieldrow">
+    <div>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :owner_email, required: true, wrapper_class: "tw:mb-1")) do %>
+        <%= render(UI::Forms::Email::Component.new(form_builder: f, attribute: :owner_email, required: true)) %>
+      <% end %>
+
+      <%# its own checkbox rather than part of the group's label, so the required * stays with "Owner email" %>
+      <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :skip_email,
+            label: safe_join(["Don't send email",
+              tag.em("only applies if email changes", class: "less-strong tw:ml-1 tw:text-xs")], " "))) %>
+    </div>
+
+    <% if organization_options.any? %>
+      <div>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :creation_organization_id, label_text: Bike.human_attribute_name(:creation_organization_id))) do %>
+          <%= render UI::Forms::Combobox::Component.new(name: :creation_organization_id, options: organization_options, include_blank: true, html_options: {form: f, placeholder: "Choose organization"}) %>
+        <% end %>
+      </div>
+
+      <div>
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :bike_organization_ids, label_text: "Current orgs")) do %>
+          <%= render UI::Forms::Combobox::Component.new(name: :bike_organization_ids, options: organization_options,
+                multiselect_chip_src: organization_chips_admin_bikes_path,
+                html_options: {form: f, placeholder: "Add organization"}) %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <% if @bike.current_stolen_record.present? %>
+    <div class="tw:mt-8" id="edit-stolen-record">
+      <%= render(UI::Header::Component.new(text: "Edit stolen record", tag: :h3)) %>
+    </div>
+
+    <%= f.fields_for :stolen_records do |s| %>
+      <% next unless current_stolen_record_fields?(s) %>
+
+      <div class="twwiderow">
+        <div>
+          <div class="twfieldrow">
+            <div>
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :country_id)) do %>
+                <%= render UI::Forms::Combobox::Component.new(name: :country_id, options: Country.select_options, include_blank: true, html_options: {form: s, placeholder: "Choose country"}) %>
+              <% end %>
+            </div>
+
+            <div>
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :region_record_id, label_text: "State")) do %>
+                <%= render UI::Forms::ComboboxState::Component.new(name: :region_record_id, ids: true, html_options: {form: s, placeholder: "State"}) %>
+              <% end %>
+            </div>
+          </div>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :street, label_text: "Intersection or address",
+                html_options: {placeholder: "Intersection or address"})) %>
+
+          <div class="twfieldrow">
+            <div>
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :city, html_options: {placeholder: "City"})) %>
+            </div>
+
+            <div>
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :postal_code, label_text: "Zipcode",
+                    html_options: {placeholder: "Zipcode"})) %>
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :theft_description, kind: :text_area,
+                html_options: {placeholder: "Theft description"})) %>
+
+          <div class="twfieldrow">
+            <div>
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :police_report_department)) %>
+            </div>
+
+            <div>
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :police_report_number)) %>
+            </div>
+          </div>
+
+          <div class="twfieldrow">
+            <div>
+              <%= render(UI::Forms::Group::Component.new(form_builder: s, attribute: :estimated_value, kind: :number_field)) %>
+            </div>
+
+            <%# no longer an attribute on bikes (PR#1875) - unchecking it expands the recovery fields, and filling those in is what recovers the bike %>
+            <div class="tw:self-center">
+              <%= render(UI::Forms::Checkbox::Component.new(name: :stolen, label: "Bike is stolen", checked: true,
+                    html_options: {data: {"admin--bike-edit-form-target": "stolen",
+                                 action: "change->admin--bike-edit-form#stolenChanged"}})) %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tw:hidden" data-admin--bike-edit-form-target="recoveryFields">
+        <hr class="twhr">
+
+        <div class="twwiderow">
+          <div>
+            <%# required is toggled by the stimulus controller, but the fields only show when it is %>
+            <%= render(UI::Forms::Group::Component.new(attribute: :mark_recovered_reason, label_text: "How was it recovered", required: true)) do %>
+              <%= text_area_tag :mark_recovered_reason, nil, rows: 3, placeholder: "You HAVE to put something in here",
+                    class: "twinput", data: {"admin--bike-edit-form-target": "recoveryReason"} %>
+            <% end %>
+          </div>
+
+          <div>
+            <%= render(UI::Forms::Checkbox::Component.new(name: :mark_recovered_we_helped, label: "Did Bike Index help?",
+                  class_name: "tw:mb-2")) %>
+
+            <%= render(UI::Forms::Checkbox::Component.new(name: :can_share_recovery, label: "Can share")) %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% end %>
+
+  <div class="tw:mt-6 tw:flex tw:items-baseline tw:justify-between tw:gap-4">
+    <%= render(UI::Button::Component.new(text: "Update the #{@bike.type}", color: :primary, size: :lg, type: "submit")) %>
+
+    <% unless @bike.deleted? %>
+      <%= render(UI::ButtonLink::Component.new(text: "Delete #{@bike.type}", href: admin_bike_url(@bike), method: :delete, color: :error, confirm: "Are you sure?")) %>
+    <% end %>
+  </div>
+<% end %>
+
+<div class="tw:mt-8">
+  <% if bike_organizations.none? %>
+    <em class="less-strong">No organizations</em>
+  <% else %>
+    <%# instance_exec'd cell blocks can't see the ivar, so it comes across as a local %>
+    <% display_dev_info = @display_dev_info %>
+
+    <%= render(UI::Table::Base::Component.new(records: bike_organizations)) do |table| %>
+      <% table.column(label: "Organizations") do |bike_organization| %>
+        <%= render(Atoms::Admin::TableCells::Organization::Component.new(organization: bike_organization.organization,
+              organization_id: bike_organization.organization_id)) %>
+      <% end %>
+
+      <% table.column(label: "Created") do |bike_organization| %>
+        <%= render(UI::Time::Component.new(time: bike_organization.created_at)) %>
+
+        <% if display_dev_info %>
+          <span class="tw:ml-2"><%= render(UI::Code::Inline::Component.new(text: "ID: #{bike_organization.id}", small: true)) %></span>
+        <% end %>
+      <% end %>
+
+      <% table.column(label: "Edit claimed?") do |bike_organization| %>
+        <%= check_mark if bike_organization.can_edit_claimed %>
+      <% end %>
+
+      <% table.column(label: "Deleted") do |bike_organization| %>
+        <% if bike_organization.deleted_at.present? %>
+          <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
+            <%= render(UI::Time::Component.new(time: bike_organization.deleted_at)) %>
+          </span>
+        <% end %>
+      <% end %>
+    <% end %>
+  <% end %>
+</div>

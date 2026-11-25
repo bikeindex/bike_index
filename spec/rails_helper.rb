@@ -21,6 +21,8 @@ ENV["RAILS_ENV"] ||= "test"
 ENV["SKIP_MEMOIZE_STATIC_MODEL_RECORDS"] = "true"
 ENV["RACK_ATTACK_MAX_LIMIT"] ||= "12"
 ENV["RACK_ATTACK_API_MAX_LIMIT"] ||= "15"
+# Production's hourly budget can't be driven to 429 under RACK_ATTACK_MAX_LIMIT above
+ENV["RACK_ATTACK_REGISTER_DIRECT_UPLOAD_LIMIT"] ||= "5"
 require "spec_helper"
 # Load functionable patch before Rails boot so all Functionable modules get permissive test hooks
 require File.expand_path("../../config/boot", __FILE__)
@@ -53,14 +55,11 @@ RSpec.configure do |config|
   # include translation / localization methods
   config.include AbstractController::Translation
 
-  # Add our request/controller spec helpers
+  # Add our request spec helpers
   config.include RequestSpecHelpers, type: :request
-  config.include ControllerSpecHelpers, type: :controller
-  config.include JsonHelpers, type: :controller
   config.include JsonHelpers, type: :request
   config.include HtmlContentHelpers, type: :request
   config.include StripeHelpers, type: :request
-  config.include StripeHelpers, type: :controller
   config.include StripeHelpers, type: :service
 
   # Set default geocoder location
@@ -71,10 +70,12 @@ RSpec.configure do |config|
   config.include ViewComponent::SystemTestHelpers, type: :component
   config.include Capybara::RSpecMatchers, type: :component
   config.include HtmlContentHelpers, type: :component
-  # Every system spec drives Playwright (overridable per-example, e.g. rack_test).
-  # Without this, untagged `type: :system` specs fall back to Rails' default
-  # :selenium driver, which no longer loads.
-  config.before(:each, type: :system) { driven_by(:playwright) }
+  # Whatever Capybara has settled on: the default :playwright, or the `driver:`
+  # metadata an example overrides it with. Without this, untagged `type: :system`
+  # specs fall back to Rails' default :selenium driver, which no longer loads.
+  config.before(:each, type: :system) { driven_by(Capybara.current_driver) }
+  # Specs that assign Time.zone mid-example would otherwise leak it into later ones
+  config.after(:each) { Time.zone = Time.zone_default }
 end
 
 require "vcr"
@@ -92,7 +93,7 @@ VCR.configure do |config|
 
   %w[CLOUDFLARE_TOKEN EXCHANGE_RATE_API_KEY FACEBOOK_AD_TOKEN GOOGLE_GEOCODER MAILCHIMP_KEY
     MAXMIND_KEY R2_TEST_ACCESS_KEY R2_TEST_ACCESS_KEY_SECRET R2_TEST_ENDPOINT SENDGRID_EMAIL_VALIDATION_KEY
-    LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET STRAVA_TEST_ACCESS_TOKEN
+    LOGO_API_TOKEN STRAVA_KEY STRAVA_SECRET STRAVA_TEST_ACCESS_TOKEN CLOUDFLARE_TURNSTILE_SECRET_KEY
     STRAVA_TEST_REFRESH_TOKEN].each do |key|
     config.filter_sensitive_data("<#{key}>") { ENV[key] }
   end
@@ -107,6 +108,10 @@ VCR.configure do |config|
     i.request.headers.delete("X-Stripe-Client-User-Agent")
   end
 end
+
+# CarrierWave's SSRF filter resolves the host over real DNS, which VCR can't intercept,
+# and a slow lookup fails a remote_*_url download silently
+CarrierWave.configure { |config| config.skip_ssrf_protection = true }
 
 # retry flaky specs on CI
 if ENV["RETRY_FLAKY"]
@@ -185,6 +190,8 @@ end
 RSpec.configure do |config|
   config.before(:suite) do
     DatabaseCleaner.clean_with(:deletion)
+    # DatabaseCleaner only reaches the primary database, and CI seeds shard 0's before the suite
+    PaperTrail::Version.delete_all
   end
 
   config.before(:all, :context_state) do
@@ -203,7 +210,9 @@ RSpec.configure do |config|
     DatabaseCleaner.start
   end
 
-  config.after(:each) do |example|
+  # append_after, so it runs behind Capybara.reset_sessions! - which waits out the requests still
+  # in flight - rather than truncating under them
+  config.append_after(:each) do |example|
     next if example.metadata[:context_state]
 
     DatabaseCleaner.clean
@@ -230,10 +239,19 @@ RSpec.configure do |config|
     FileUtils.rm_rf(ApplicationUploader.cache_dir)
     FileUtils.mkdir_p(ApplicationUploader.cache_dir)
   end
+
+  config.after(:suite) { FileUtils.rm_rf(ApplicationUploader.root) }
 end
 
 CarrierWave.configure do |config|
+  test_uploads = "test_uploads#{ENV["TEST_ENV_NUMBER"]}"
   config.cache_dir = Rails.root.join("tmp", "cache", "carrierwave#{ENV["TEST_ENV_NUMBER"]}")
+  # store_dir keys on the record id, and each parallel worker hands out the same ids from its
+  # own database — one shared root has a worker asserting against another's file, and leaves
+  # every run's files for the next one. The segment goes on asset_host rather than base_path,
+  # which CarrierWave only reads when asset_host is blank, so the url still resolves to the file.
+  config.root = Rails.root.join("public", test_uploads)
+  config.asset_host = "#{ENV["BASE_URL"]}/#{test_uploads}"
   config.enable_processing = false
 end
 

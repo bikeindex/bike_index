@@ -165,6 +165,10 @@ env:
     - R2_DEV_ACCESS_KEY_SECRET
     - HONEYBADGER_API_KEY
     - HONEYBADGER_FRONTEND_API_KEY
+    # Base64-encoded (Saml::SettingsBuilder decodes). Throwaway per-environment keypair
+    # from `rake saml:generate_sp_keypair`, never production's.
+    - SAML_SP_CERTIFICATE
+    - SAML_SP_PRIVATE_KEY
 
 aliases:
   console: app exec --interactive --reuse "bin/rails console"
@@ -193,6 +197,8 @@ builder:
     Emitted for review-app deploys ONLY (pr present): sandbox must never carry
     this block, or a sandbox deploy could reboot/remove the shared infra that
     every PR app depends on. This is the one real fork between the two targets.
+    A sandbox reload_database does need them, so bin/kamal_review's
+    kamal_accessory re-renders with pr=0 for those two commands alone.
     WARNING: do not run `kamal accessory stop/remove` from a review-app deploy —
     it would tear down the shared infra and all in-flight PRs. %>
 <% if pr %>

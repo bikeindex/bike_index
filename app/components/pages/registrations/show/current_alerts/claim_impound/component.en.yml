@@ -1,0 +1,30 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          current_alerts:
+            claim_impound:
+              add_a_stolen_bike: add a stolen %{bike_type}
+              choose_stolen_bike: Choose stolen %{bike_type}
+              claim_found_bike: Claim found %{bike_type}
+              claim_impounded_bike: Claim impounded %{bike_type}
+              claim_submitted: This claim was submitted
+              claim_was_status: Your claim was %{status} — you should have received
+                an email with next steps.
+              claim_with_this_bike_type: You have a %{status} claim with this %{bike_type}.
+              does_this_look_like_your_bike: Does this look like your %{bike_type}?
+              need_stolen_bike_html: You need a stolen %{bike_type} registered to
+                file a claim — %{add_link}.
+              no_editing_after_submitting: After submitting, you won't be able to
+                edit the claim.
+              open_claim: Open claim
+              prove_its_yours: Verify your ownership — add details that prove this
+                %{bike_type} is yours
+              save_message: Save message
+              select_your_stolen_bike: Select your stolen %{bike_type} matching this
+                impounded %{bike_type}
+              submit_claim: Submit claim
+              view_claimed_bike_type: view the claimed %{kind} %{bike_type}
+              your_claim: Your claim

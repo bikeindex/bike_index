@@ -40,6 +40,7 @@ class Location < ApplicationRecord
   attr_accessor :skip_update
 
   before_validation :set_calculated_attributes
+  before_save :set_address_record_coordinates
   after_commit :update_associations
   before_destroy :ensure_destroy_permitted!
 
@@ -56,13 +57,6 @@ class Location < ApplicationRecord
 
   def other_organization_locations
     Location.where(organization_id: organization_id).where.not(id: id)
-  end
-
-  # Override AddressRecorded delegation to fall back to legacy fields
-  def address_present?
-    return address_record.address_present? if address_record?
-
-    [street, city, zipcode].any?(&:present?)
   end
 
   def find_or_build_address_record(current_country_id: nil)
@@ -100,8 +94,6 @@ class Location < ApplicationRecord
     end
     self.phone = Phonifyer.phonify(phone)
     self.shown = calculated_shown
-    self.latitude = address_record&.latitude
-    self.longitude = address_record&.longitude
     if address_record.present?
       address_record.organization_id = organization_id
       address_record.kind = :organization
@@ -136,6 +128,14 @@ class Location < ApplicationRecord
   end
 
   private
+
+  # AddressRecord geocodes in its own after_validation, which for a nested address record is
+  # after set_calculated_attributes has run -- so a new location would copy coordinates that
+  # aren't there yet, and the organization reads its own off the location
+  def set_address_record_coordinates
+    self.latitude = address_record&.latitude
+    self.longitude = address_record&.longitude
+  end
 
   def organization_present
     return if organization.present? || organization_id.present?

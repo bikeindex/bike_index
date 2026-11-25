@@ -29,6 +29,8 @@
 #
 
 class Notification < ApplicationRecord
+  include EmailDeliveryTrackable
+
   # TODO: create notifications for every email we send (including other models, e.g. Feedback)
   #
   # Every single notification that we send has a separate enum key - which is a lot!
@@ -36,9 +38,14 @@ class Notification < ApplicationRecord
   KIND_ENUM = YAML.load_file(Rails.root.join("config/notification_kinds_enums.yml")).freeze
 
   MESSAGE_CHANNEL_ENUM = {email: 0, text: 1}.freeze
-  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2}.freeze
+  DELIVERY_STATUS_ENUM = {delivery_pending: 0, delivery_success: 1, delivery_failure: 2,
+                          delivery_banned: 3, delivery_partial_success: 4}.freeze
+  DELIVERED_STATUSES = %w[delivery_success delivery_partial_success].freeze
+  SETTLED_STATUSES = (DELIVERED_STATUSES + %w[delivery_banned]).freeze
 
   UNDELIVERABLE_ERRORS = [Postmark::InactiveRecipientError, Postmark::InvalidEmailRequestError].freeze
+  UNDELIVERABLE_ERROR_NAMES = UNDELIVERABLE_ERRORS.map(&:name).freeze
+  SENDER_RECEIVER_NOTIFIABLE_TYPES = %w[StolenNotification OrganizationMessage].freeze
 
   enum :kind, KIND_ENUM
   enum :message_channel, MESSAGE_CHANNEL_ENUM
@@ -113,9 +120,16 @@ class Notification < ApplicationRecord
         pos_integration_broken_kinds
     end
 
+    # A ban blocks mail to the user, not mail about them - and account recovery is
+    # how a wrongly banned user gets back in
+    def email_ban_exempt_kinds
+      admin_kinds + %w[password_reset magic_login_link theft_alert_recovered]
+    end
+
     def sender_auto_kinds
       donation_kinds + theft_alert_kinds + user_alert_kinds + pos_integration_broken_kinds +
-        %w[bike_possibly_found stolen_twitter_alerter unknown_organization_for_ascend graduated_notification parking_notification]
+        %w[bike_possibly_found stolen_twitter_alerter unknown_organization_for_ascend graduated_notification parking_notification
+          pos_registration_match]
     end
 
     def search_message_channel_target(str)
@@ -126,13 +140,11 @@ class Notification < ApplicationRecord
 
     def notifications_sent_or_received_by(user_or_id)
       user_id = user_or_id.is_a?(User) ? user_or_id.id : user_or_id
-      # TODO: THIS IS SHITTY
-      customer_contact_ids = CustomerContact.where(creator_id: user_id).pluck(:id)
-      stolen_notification_ids = StolenNotification.where(sender: user_id).pluck(:id)
 
-      where(user_id: user_id)
-        .or(where(notifiable_type: "CustomerContact", notifiable_id: customer_contact_ids))
-        .or(where(notifiable_type: "StolenNotification", notifiable_id: stolen_notification_ids))
+      where(user_id:)
+        .or(where(notifiable_type: "CustomerContact", notifiable_id: CustomerContact.where(creator_id: user_id).select(:id)))
+        .or(where(notifiable_type: "StolenNotification", notifiable_id: StolenNotification.where(sender_id: user_id).select(:id)))
+        .or(where(notifiable_type: "OrganizationMessage", notifiable_id: OrganizationMessage.where(sender_id: user_id).select(:id)))
     end
   end
 
@@ -174,12 +186,6 @@ class Notification < ApplicationRecord
     Integrations::Twilio.new.get_message(twilio_sid)
   end
 
-  def user_email
-    return nil unless email?
-
-    user&.user_emails&.friendly_find(message_channel_target)
-  end
-
   def notifiable_display_name
     return nil if notifiable.blank?
 
@@ -192,7 +198,7 @@ class Notification < ApplicationRecord
 
     if notifiable_type == "CustomerContact"
       notifiable&.creator
-    elsif notifiable_type == "StolenNotification"
+    elsif sender_receiver_notifiable?
       notifiable&.sender
     elsif impound_claim?
       notifiable&.user
@@ -232,22 +238,6 @@ class Notification < ApplicationRecord
     calculated_email
   end
 
-  # This method takes a block
-  def track_email_delivery
-    return if delivery_success?
-
-    delivery = yield
-
-    self.message_id ||= message_id_from_delivery(delivery)
-    update(delivery_status: "delivery_success")
-    user_email&.update_last_email_errored!(email_errored: false)
-  rescue => e
-    update(delivery_status: "delivery_failure", delivery_error: e.class)
-    user_email&.update_last_email_errored!(email_errored: true)
-
-    raise e unless UNDELIVERABLE_ERRORS.any? { |error_class| e.is_a?(error_class) }
-  end
-
   def delivery_error_spam?
     delivery_error == "Postmark::InactiveRecipientError"
   end
@@ -256,10 +246,22 @@ class Notification < ApplicationRecord
     delivery_error == "Postmark::InvalidEmailRequestError"
   end
 
+  def email_ban_exempt?
+    self.class.email_ban_exempt_kinds.include?(kind)
+  end
+
+  def recipient_users
+    [user].compact
+  end
+
+  def recipient_emails
+    [message_channel_target].compact
+  end
+
   private
 
-  def message_id_from_delivery(delivery)
-    defined?(delivery.message_id) ? delivery.message_id : nil
+  def sender_receiver_notifiable?
+    SENDER_RECEIVER_NOTIFIABLE_TYPES.include?(notifiable_type)
   end
 
   def calculated_phone
@@ -268,7 +270,7 @@ class Notification < ApplicationRecord
 
   def calculated_email
     c_email = notifiable&.email if b_param? || %w[Payment UserEmail].include?(notifiable_type)
-    c_email ||= notifiable&.receiver_email if stolen_notification?
+    c_email ||= notifiable&.receiver_email if sender_receiver_notifiable?
     c_email ||= user&.email if user_id.present?
     c_email ||= notifiable&.user_email if customer_contact?
     c_email ||= bike_with_fallback&.owner_email
@@ -276,7 +278,7 @@ class Notification < ApplicationRecord
   end
 
   def calculated_user_id
-    return notifiable&.receiver_id if notifiable_type == "StolenNotification"
+    return notifiable&.receiver_id if sender_receiver_notifiable?
 
     notifiable&.user_id if defined?(notifiable.user_id)
   end

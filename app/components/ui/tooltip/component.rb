@@ -4,16 +4,19 @@ module UI
   module Tooltip
     class Component < ApplicationComponent
       TRIGGER_ACTIONS = "mouseenter->ui--tooltip#showOnHover mouseleave->ui--tooltip#hideOnHover " \
-        "focusin->ui--tooltip#showOnFocus focusout->ui--tooltip#hideOnFocusout"
+        "focusin->ui--tooltip#showPersistent click->ui--tooltip#showPersistent " \
+        "focusout->ui--tooltip#hideOnFocusout"
 
       TRIGGER_CLASS = "tw:inline-block tw:rounded tw:cursor-help " \
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
 
-      BUTTON_CLASS = "tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
+      BUTTON_CLASS = "keep-with-previous tw:inline-flex tw:items-center tw:justify-center tw:h-4 tw:w-4 tw:rounded-full " \
         "tw:bg-gray-200 tw:text-gray-700 tw:hover:bg-gray-300 " \
-        "tw:dark:bg-gray-700 tw:dark:text-gray-200 tw:dark:hover:bg-gray-600 " \
+        "tw:dark:bg-white/10 tw:dark:text-gray-200 tw:dark:hover:bg-white/20 " \
         "tw:text-2xs tw:font-bold tw:cursor-help " \
         "tw:focus:outline-none tw:focus:ring-3 tw:focus:ring-blue-500/40"
+
+      SURFACE_CLASS = "tw:bg-white tw:border-gray-200 tw:dark:bg-gray-800 tw:dark:border-gray-700"
 
       renders_one :body
       renders_one :tooltip_button, ->(**attrs, &block) {
@@ -62,22 +65,23 @@ module UI
         body? ? body : @text
       end
 
-      # A link or button in the body means the tooltip is meant to be clicked
-      # into (it stays open on click), so the popup needs pointer events.
-      def interactive_body?
-        tooltip_body.to_s.match?(/<(a|button)[\s>]/)
-      end
-
       def tooltip_span
-        pointer = interactive_body? ? "tw:pointer-events-auto" : "tw:pointer-events-none"
         tag.span(
-          tooltip_body,
+          safe_join([tooltip_body, arrow_span]),
           role: "tooltip",
           id: tooltip_id,
           data: {"ui--tooltip-target": "tooltip"},
-          class: "twtext-color tw:hidden #{pointer} tw:whitespace-nowrap tw:rounded " \
-            "tw:bg-white tw:px-2 tw:py-1 tw:text-xs tw:font-normal tw:border tw:border-gray-200 tw:shadow-lg tw:z-50 " \
-            "tw:dark:bg-gray-800 tw:dark:border-gray-700"
+          class: "tw:twtext-color tw:hidden tw:whitespace-normal tw:w-max tw:max-w-[min(24rem,90vw)] tw:rounded tw:text-left " \
+            "tw:px-2 tw:py-1 tw:font-sans tw:text-xs tw:font-normal tw:normal-case tw:border tw:shadow-lg #{SURFACE_CLASS}"
+        )
+      end
+
+      # The controller positions it and picks which two borders show
+      def arrow_span
+        tag.span(
+          "aria-hidden": true,
+          data: {"ui--tooltip-target": "arrow"},
+          class: "tw:absolute tw:h-2 tw:w-2 tw:rotate-45 tw:border-solid #{SURFACE_CLASS}"
         )
       end
     end

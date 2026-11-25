@@ -22,6 +22,37 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     expect(component).to_not have_css("input[aria-describedby]")
   end
 
+  # A field whose required-ness is decided in the browser carries both markers, since a
+  # controller can flip their hidden state but can't rebuild the label
+  context "required_toggleable" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, required:, required_toggleable: true))
+    end
+
+    it "renders both markers, hiding the required one" do
+      expect(component).to have_css("[data-required-marker][hidden]", text: "*", visible: :all)
+      expect(component).to have_css("[data-optional-marker]", text: "optional")
+      expect(component).to_not have_css("[data-optional-marker][hidden]", visible: :all)
+      expect(component).to_not have_css("input[required]")
+    end
+
+    context "required" do
+      let(:required) { true }
+
+      it "hides the optional one instead" do
+        expect(component).to have_css("[data-required-marker]", text: "*")
+        expect(component).to_not have_css("[data-required-marker][hidden]", visible: :all)
+        expect(component).to have_css("[data-optional-marker][hidden]", text: "optional", visible: :all)
+        expect(component).to have_css("input[required]")
+      end
+    end
+  end
+
+  it "renders one unmarked suffix without it" do
+    expect(component).to_not have_css("[data-required-marker], [data-optional-marker]", visible: :all)
+    expect(component).to have_css("label", text: "optional")
+  end
+
   context "with custom label" do
     let(:label_text) { "Display Name" }
 
@@ -74,12 +105,20 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     expect(component).to have_css("input.twinput")
   end
 
+  context "with optional_badge: false" do
+    let(:component) { render_inline(described_class.new(form_builder:, attribute:, optional_badge: false)) }
+
+    it "leaves the label unmarked" do
+      expect(component).to have_css("label", exact_text: "Name")
+    end
+  end
+
   context "when required" do
     let(:required) { true }
 
     it "marks the input required and appends an asterisk instead of the badge" do
       expect(component).to have_css("input[required]")
-      expect(component).to have_css("label span", text: "*")
+      expect(component).to have_css("label span[title='required']", text: "*")
       expect(component).to_not have_text("optional")
     end
   end
@@ -134,6 +173,19 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
     end
   end
 
+  describe "label_note" do
+    let(:component) do
+      render_inline(described_class.new(form_builder:, attribute:, required: true)) do |group|
+        group.with_label_note { "as it appears on the account" }
+      end
+    end
+
+    it "renders in the label, after the required marker" do
+      expect(component).to have_css("label[for='user_name'] small", text: "as it appears on the account")
+      expect(component.css("label").inner_html).to match(/\*<\/span> <small/)
+    end
+  end
+
   describe "helper_text" do
     let(:component) do
       render_inline(described_class.new(form_builder:, attribute:)) do |group|
@@ -154,7 +206,7 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
           render(UI::Forms::Group::Component.new(attribute: :cycle_type)) do |group|
             group.with_helper_text { "pick the closest match" }
             render(UI::Forms::Combobox::Component.new(name: :cycle_type, options: %w[Bike Tandem],
-              "aria-describedby": group.helper_text_id))
+              html_options: {"aria-describedby": group.helper_text_id}))
           end
         end
       end
@@ -176,7 +228,7 @@ RSpec.describe UI::Forms::Group::Component, type: :component do
   # has to beat Bootstrap's `.container label`, which is inline-block with a
   # .5rem margin and only applies inside a container.
   describe ".twlabel" do
-    let(:rule) { Rails.root.join("app/assets/tailwind/application.css").read[/^\s*\.twlabel \{(.*?)\}/m, 1] }
+    let(:rule) { Rails.root.join("app/assets/tailwind/bike_index_components.css").read[/^\s*\.twlabel \{(.*?)\}/m, 1] }
 
     it "is block, with the gap to its field" do
       expect(rule).to include("tw:block")

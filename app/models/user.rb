@@ -12,6 +12,7 @@
 #  banned                             :boolean          default(FALSE), not null
 #  can_send_many_marketplace_messages :boolean          default(FALSE), not null
 #  can_send_many_stolen_notifications :boolean          default(FALSE), not null
+#  color_scheme                       :integer          default("system"), not null
 #  confirmation_token                 :string(255)
 #  confirmed                          :boolean          default(FALSE), not null
 #  deleted_at                         :datetime
@@ -37,6 +38,7 @@
 #  passwordless_user                  :boolean          default(FALSE), not null
 #  phone                              :string(255)
 #  preferred_language                 :string
+#  preferred_unit_system              :integer
 #  show_bikes                         :boolean          default(FALSE), not null
 #  show_instagram                     :boolean          default(FALSE)
 #  show_phone                         :boolean          default(TRUE)
@@ -57,11 +59,13 @@
 #
 # Indexes
 #
-#  index_users_on_address_record_id         (address_record_id)
-#  index_users_on_email                     (email) WHERE (deleted_at IS NULL)
-#  index_users_on_email_trgm                (email) WHERE (deleted_at IS NULL) USING gin
-#  index_users_on_token_for_password_reset  (token_for_password_reset)
-#  index_users_on_username                  (username) WHERE (deleted_at IS NULL)
+#  index_users_on_address_record_id             (address_record_id)
+#  index_users_on_email                         (email) WHERE (deleted_at IS NULL)
+#  index_users_on_email_trgm                    (email) WHERE (deleted_at IS NULL) USING gin
+#  index_users_on_email_without_periods         (replace((email)::text, '.'::text, ''::text)) WHERE (deleted_at IS NULL)
+#  index_users_on_magic_link_token_outstanding  (magic_link_token) WHERE (magic_link_token IS NOT NULL)
+#  index_users_on_token_for_password_reset      (token_for_password_reset)
+#  index_users_on_username                      (username) WHERE (deleted_at IS NULL)
 #
 class User < ApplicationRecord
   include FeatureFlaggable
@@ -69,17 +73,23 @@ class User < ApplicationRecord
   include AddressRecordedWithinBoundingBox
 
   EMAIL_REGEX = /\A(\S+)@(.+)\.(\S+)\z/
-  # How long an emailed token stays good for. SessionsController reads it to tell an expired
-  # magic link apart from one that was already spent
-  AUTH_TOKEN_EXPIRY = 2.hours
+  # How long an emailed token stays good for - magic link sign in and password reset alike
+  AUTH_TOKEN_EXPIRY = 1.hour
+  # nil leaves it to UnitSystem
+  PREFERRED_UNIT_SYSTEM_ENUM = {metric: 0, imperial: 1}.freeze
+  COLOR_SCHEME_ENUM = {light: 0, dark: 1, system: 2}.freeze
 
   cattr_accessor :current_user
 
   acts_as_paranoid
   has_secure_password
 
+  enum :preferred_unit_system, PREFERRED_UNIT_SYSTEM_ENUM, prefix: true, validate: {allow_nil: true}
+  enum :color_scheme, COLOR_SCHEME_ENUM, prefix: true, validate: true
+
   has_many :ambassador_task_assignments
   has_many :b_params, foreign_key: :creator_id
+  has_many :bug_reports
   has_many :bike_sticker_updates
   has_many :created_bikes, class_name: "Bike", inverse_of: :creator, foreign_key: :creator_id
   has_many :created_ownerships, class_name: "Ownership", inverse_of: :creator, foreign_key: :creator_id
@@ -114,6 +124,7 @@ class User < ApplicationRecord
   has_many :ambassador_tasks, through: :ambassador_task_assignments
   has_many :organizations, through: :organization_roles
   has_many :owned_bikes, through: :ownerships, source: :bike
+  has_many :ownership_organizations, through: :current_ownerships, source: :organization
   has_many :updated_bike_stickers, -> { distinct }, through: :bike_sticker_updates, class_name: "BikeSticker", source: :bike_sticker
   has_many :uro_organizations, through: :user_registration_organizations, class_name: "Organization", source: :organization
   has_one :membership_active, -> { active }, class_name: "Membership"
@@ -153,8 +164,8 @@ class User < ApplicationRecord
   after_commit :perform_create_jobs, on: :create, unless: lambda { skip_update }
   after_commit :perform_user_update_jobs
 
-  scope :email_banned, -> { left_joins(:email_bans_active).where.not(email_bans: {id: nil}) }
-  scope :no_email_bans, -> { left_joins(:email_bans_active).where(email_bans: {id: nil}) }
+  scope :email_banned, -> { where(id: EmailBan.period_active.banning_account_email.select(:user_id)) }
+  scope :no_email_bans, -> { where.not(id: EmailBan.period_active.banning_account_email.select(:user_id)) }
   scope :banned, -> { where(banned: true) }
   scope :valid_only, -> { no_email_bans.where(banned: false) }
   scope :confirmed, -> { where(confirmed: true) }
@@ -167,6 +178,11 @@ class User < ApplicationRecord
   scope :member, -> { includes(:memberships).merge(Membership.active) }
 
   class << self
+    # Never find_by_<column> for these - a blank token matches IS NULL, which is nearly every row
+    def find_for_auth_token(auth_token_type, token)
+      where(auth_token_type => token).first if token.present?
+    end
+
     def fuzzy_email_find(email)
       UserEmail.confirmed.fuzzy_user_find(email)
     end
@@ -254,6 +270,9 @@ class User < ApplicationRecord
     user_emails.confirmed.pluck(:email)
   end
 
+  # The primary address counts before it's confirmed
+  def own_emails = [email] + confirmed_emails
+
   def secondary_emails
     user_emails.where.not(email: email).pluck(:email)
   end
@@ -316,16 +335,6 @@ class User < ApplicationRecord
     organization_roles.ambassador_organizations.limit(1).any?
   end
 
-  # In the bike show redesign rollout, so sees the controls for switching views
-  def registration_show_toggleable?
-    Flipper.enabled?(:bike_show_redesign_toggle, self)
-  end
-
-  # Defaults to the redesigned registration page, rather than the legacy bike show
-  def registration_show_redesign?
-    registration_show_toggleable? && !feature_registration_show_legacy?
-  end
-
   def can_create_listing?
     true # Currently, marketplace is free
   end
@@ -365,14 +374,19 @@ class User < ApplicationRecord
     # Prioritization of organizations
     orgs.ambassador.limit(1).first ||
       orgs.paid_money.limit(1).first ||
-      orgs.paid.limit(1).first ||
+      orgs.invoiced.limit(1).first ||
       orgs.law_enforcement.limit(1).first ||
       orgs.bike_shop.limit(1).first ||
       orgs.limit(1).first
   end
 
-  def paid_org?
-    organizations.paid.limit(1).any?
+  def invoiced_org?
+    organizations.invoiced.limit(1).any?
+  end
+
+  # Their registration was paid for, so don't ask them for a donation on top of it
+  def paid_organization_registration?
+    ownership_organizations.paid_money.exists?
   end
 
   def authorized?(obj, no_superuser_override: false)
@@ -396,6 +410,12 @@ class User < ApplicationRecord
     organizations.with_enabled_feature_slugs(features).limit(1).any?
   end
 
+  def contact_impounded?
+    return true if superuser?
+
+    organizations.contact_impounded.limit(1).any?
+  end
+
   def auth_token_time(auth_token_type)
     SecurityTokenizer.token_time(self[auth_token_type])
   end
@@ -415,31 +435,44 @@ class User < ApplicationRecord
     self.when_vendor_terms_of_service = Time.current
   end
 
-  def send_password_reset_email
+  # return_to rides in the link for the same reason it does on send_magic_link_email
+  def send_password_reset_email(return_to: nil)
     # If the auth token was just created, don't create a new one, it's too error prone
     return false if password_reset_just_sent?
 
     update_auth_token("token_for_password_reset")
     reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    Email::ResetPasswordJob.perform_async(id)
+    EmailJobs::ResetPasswordJob.perform_async(id, return_to)
     true
   end
 
-  def send_magic_link_email
-    # If the auth token was just created, don't create a new one, it's too error prone
-    return true if auth_token_time("magic_link_token") > Time.current - 1.minutes
+  # The emailed link is often opened in another browser, which has no session
+  # holding where the user was headed - so return_to rides along in the link
+  def send_magic_link_email(return_to: nil)
+    token_time = auth_token_time("magic_link_token")
+    # Throttles a double-submit
+    return true if token_time > Time.current - 1.minutes
 
-    update_auth_token("magic_link_token")
-    reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
-    Email::MagicLoginLinkJob.perform_async(id)
+    # Filtered mail can deliver an earlier link after the re-request, so resend it rather than
+    # killing it - until it's too near expiry to survive the same delay
+    if token_time < Time.current - AUTH_TOKEN_EXPIRY / 2
+      update_auth_token("magic_link_token")
+      reload # Attempt to ensure the database is updated, so sidekiq doesn't send before update is committed
+    end
+    EmailJobs::MagicLoginLinkJob.perform_async(id, return_to)
   end
 
-  # Unlike send_magic_link_email, reuses an unexpired token and sends no email
+  # Reuses any unexpired token, and sends no email
   def refreshed_magic_link_token
     if magic_link_token.blank? || auth_token_expired?("magic_link_token")
       update_auth_token("magic_link_token")
     end
     magic_link_token
+  end
+
+  # Newsletters are infrequent, so this outlives any reasonable "unsubscribe me" click
+  def unsubscribe_signed_id
+    signed_id(purpose: :unsubscribe, expires_in: 365.days)
   end
 
   def update_last_login(ip_address)
@@ -500,14 +533,13 @@ class User < ApplicationRecord
     !superuser? && organization_roles.admin.limit(1).none?
   end
 
-  def default_organization
-    return @default_organization if defined?(@default_organization) # Memoize, permit nil
-
-    @default_organization = organizations&.first # Maybe at some point use organization_roles to get the most recent, for now, speed
-  end
-
   def partner_sign_up
     (partner_data && partner_data["sign_up"].present?) ? partner_data["sign_up"] : nil
+  end
+
+  # Read by the confirmation email, which is built from the user record alone
+  def signup_return_to
+    partner_data && partner_data["return_to"].presence
   end
 
   def bikes(user_hidden = true)
@@ -540,7 +572,7 @@ class User < ApplicationRecord
   end
 
   def render_donation_request
-    return nil unless has_police_organization_role? && !organizations.law_enforcement.paid.limit(1).any?
+    return nil unless has_police_organization_role? && !organizations.law_enforcement.invoiced.limit(1).any?
 
     "law_enforcement"
   end
@@ -559,7 +591,7 @@ class User < ApplicationRecord
   end
 
   def email_banned?
-    email_bans_active.any?
+    email_bans_active.banning_account_email.any?
   end
 
   def set_calculated_attributes
@@ -570,7 +602,7 @@ class User < ApplicationRecord
     self.alert_slugs = (alert_slugs || [])
     # Rather than waiting for twilio to send, immediately update alert_slugs
     self.alert_slugs += ["phone_waiting_confirmation"] if phone_changed?
-    self.username = Slugifyer.slugify(username) if username
+    self.username = Slugifyer.slugify(username) if username && username_changed?
     self.email = EmailNormalizer.normalize(email)
     self.title = Binxtils::InputNormalizer.sanitize(title) if title.present?
     if no_non_theft_notification

@@ -36,6 +36,13 @@ class OrganizationFeature < ApplicationRecord
     reg_student_id
   ].freeze
 
+  # Only some of the REG_FIELDS have a required counterpart
+  REG_FIELDS_REQUIRED = %w[
+    require_reg_address
+    require_reg_phone
+    require_reg_student_id
+  ].freeze
+
   BIKE_ACTIONS = %w[
     additional_registrations_information
     impound_bikes
@@ -46,7 +53,6 @@ class OrganizationFeature < ApplicationRecord
   # NOTE: impound_bikes_public is automatically added if the org configures, no need to manually addz
   EXPECTED_SLUGS = (%w[
     avery_export
-    bike_search
     bike_stickers
     bike_stickers_user_editable
     child_organizations
@@ -54,6 +60,8 @@ class OrganizationFeature < ApplicationRecord
     credibility_badges
     csv_exports
     customize_emails
+    education_courses
+    education_courses_edit
     graduated_notifications
     hot_sheet
     impound_bikes_locations
@@ -65,9 +73,6 @@ class OrganizationFeature < ApplicationRecord
     passwordless_users
     regional_bike_counts
     registration_notes
-    registration_sequences
-    require_reg_address
-    require_reg_student_id
     saml_sso
     show_bulk_import
     show_bulk_import_impound
@@ -76,13 +81,14 @@ class OrganizationFeature < ApplicationRecord
     show_recoveries
     skip_ownership_email
     user_role_for_user_email_domain
-  ] + BIKE_ACTIONS + REG_FIELDS).freeze
+  ] + BIKE_ACTIONS + REG_FIELDS + REG_FIELDS_REQUIRED).freeze
 
   enum :kind, KIND_ENUM
 
   has_many :invoice_organization_features
   has_many :invoices, through: :invoice_organization_features
 
+  validates_presence_of :name
   validates_uniqueness_of :name
 
   after_commit :update_invoices
@@ -112,9 +118,14 @@ class OrganizationFeature < ApplicationRecord
       REG_FIELDS
     end
 
+    # Customizable by any organization with an invoice, unlike the reg fields
+    def email_customizable_labels
+      %w[owner_email email_placeholder]
+    end
+
     def reg_fields_with_customizable_labels
       # Can't rename bike_stickers
-      %w[owner_email] + reg_fields - %w[reg_bike_sticker]
+      email_customizable_labels + reg_fields - %w[reg_bike_sticker]
     end
 
     def reg_fields_organization_uniq

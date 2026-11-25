@@ -1,0 +1,22 @@
+<% if @bike.blank? %>
+  <small class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>">
+    Missing bike
+    <% if @bike_id.present? %>
+      <%= render(UI::Code::Inline::Component.new(text: @bike_id)) %>
+    <% end %>
+  </small>
+<% elsif @bike.present? %>
+  <% unless @skip_status %>
+    <%= render Atoms::RegistrationStatusBadge::Component.new(bike: @bike, skip_with_owner: true, size: :xs) %>
+  <% end %>
+  <%= render Atoms::Admin::Badges::BikeHiddenExplanation::Component.new(bike: @bike) %>
+  <% if bike_link_path.present? %>
+    <%= link_to bike_content, bike_link_path, class: "twlink" %>
+  <% else %>
+    <%= bike_content %>
+  <% end %>
+<% end %>
+
+<% if @render_search && computed_search_url.present? %>
+  <%= link_to search_emoji, computed_search_url, class: "display-sortable-link tw:ml-1 tw:text-xs" %>
+<% end %>

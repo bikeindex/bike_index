@@ -729,6 +729,44 @@ ALTER SEQUENCE public.bike_versions_id_seq OWNED BY public.bike_versions.id;
 
 
 --
+-- Name: bikebook_models; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bikebook_models (
+    id bigint NOT NULL,
+    catalog_id character varying NOT NULL,
+    manufacturer_id bigint NOT NULL,
+    name character varying NOT NULL,
+    model_slug character varying NOT NULL,
+    first_year integer NOT NULL,
+    final_year integer,
+    markets character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    variants jsonb DEFAULT '[]'::jsonb NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: bikebook_models_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bikebook_models_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bikebook_models_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bikebook_models_id_seq OWNED BY public.bikebook_models.id;
+
+
+--
 -- Name: bikes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -913,8 +951,8 @@ CREATE TABLE public.bug_reports (
     subject text,
     body text,
     is_member boolean DEFAULT false NOT NULL,
-    is_paid_organization boolean DEFAULT false NOT NULL,
-    is_paid_organization_staff boolean DEFAULT false NOT NULL,
+    is_invoiced_organization boolean DEFAULT false NOT NULL,
+    is_invoiced_organization_staff boolean DEFAULT false NOT NULL,
     github_pull_request integer,
     tags text[] DEFAULT '{}'::text[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
@@ -922,7 +960,8 @@ CREATE TABLE public.bug_reports (
     received_at timestamp(6) without time zone,
     from_name text,
     inbound_email_id bigint,
-    status integer DEFAULT 0 NOT NULL
+    status integer DEFAULT 0 NOT NULL,
+    receiver text
 );
 
 
@@ -1270,6 +1309,115 @@ ALTER SEQUENCE public.duplicate_bike_groups_id_seq OWNED BY public.duplicate_bik
 
 
 --
+-- Name: education_course_acknowledgments; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.education_course_acknowledgments (
+    id bigint NOT NULL,
+    education_course_id bigint,
+    b_param_id bigint,
+    bike_id bigint,
+    user_id bigint,
+    owner_email character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    acknowledged_at timestamp(6) without time zone
+);
+
+
+--
+-- Name: education_course_acknowledgments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.education_course_acknowledgments_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: education_course_acknowledgments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.education_course_acknowledgments_id_seq OWNED BY public.education_course_acknowledgments.id;
+
+
+--
+-- Name: education_course_pages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.education_course_pages (
+    id bigint NOT NULL,
+    education_course_id bigint NOT NULL,
+    title character varying,
+    subtitle text,
+    body text,
+    listing_order integer,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    organization_specific boolean DEFAULT false NOT NULL,
+    heading character varying
+);
+
+
+--
+-- Name: education_course_pages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.education_course_pages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: education_course_pages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.education_course_pages_id_seq OWNED BY public.education_course_pages.id;
+
+
+--
+-- Name: education_courses; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.education_courses (
+    id bigint NOT NULL,
+    organization_id bigint,
+    start_at timestamp(6) without time zone,
+    end_at timestamp(6) without time zone,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    faq_url character varying,
+    acknowledgment_text text,
+    deleted_at timestamp(6) without time zone
+);
+
+
+--
+-- Name: education_courses_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.education_courses_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: education_courses_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.education_courses_id_seq OWNED BY public.education_courses.id;
+
+
+--
 -- Name: email_bans; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -1280,7 +1428,8 @@ CREATE TABLE public.email_bans (
     end_at timestamp(6) without time zone,
     reason integer,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    user_email_id bigint
 );
 
 
@@ -1720,10 +1869,12 @@ CREATE TABLE public.hot_sheets (
     organization_id bigint,
     stolen_record_ids jsonb,
     recipient_ids jsonb,
-    delivery_status character varying,
     sheet_date date,
     created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
+    updated_at timestamp without time zone NOT NULL,
+    delivery_status integer DEFAULT 0,
+    delivery_error character varying,
+    message_id character varying
 );
 
 
@@ -2265,7 +2416,8 @@ CREATE TABLE public.manufacturers (
     twitter_name character varying,
     priority integer,
     motorized_only boolean DEFAULT false,
-    secondary_slug character varying
+    secondary_slug character varying,
+    previous_slugs character varying[] DEFAULT '{}'::character varying[] NOT NULL
 );
 
 
@@ -2714,6 +2866,39 @@ ALTER SEQUENCE public.organization_features_id_seq OWNED BY public.organization_
 
 
 --
+-- Name: organization_landing_pages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_landing_pages (
+    id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    body text,
+    enabled boolean DEFAULT false NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_landing_pages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_landing_pages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_landing_pages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_landing_pages_id_seq OWNED BY public.organization_landing_pages.id;
+
+
+--
 -- Name: organization_manufacturers; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2744,6 +2929,42 @@ CREATE SEQUENCE public.organization_manufacturers_id_seq
 --
 
 ALTER SEQUENCE public.organization_manufacturers_id_seq OWNED BY public.organization_manufacturers.id;
+
+
+--
+-- Name: organization_messages; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_messages (
+    id bigint NOT NULL,
+    bike_id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    sender_id bigint NOT NULL,
+    receiver_id bigint,
+    receiver_email character varying,
+    message text,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_messages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_messages_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_messages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_messages_id_seq OWNED BY public.organization_messages.id;
 
 
 --
@@ -2797,9 +3018,9 @@ CREATE TABLE public.organization_roles (
     claimed_at timestamp without time zone,
     email_invitation_sent_at timestamp without time zone,
     created_by_magic_link boolean DEFAULT false,
-    receive_hot_sheet boolean DEFAULT false,
     hot_sheet_notification integer DEFAULT 0,
-    role integer
+    role integer,
+    priority integer DEFAULT 0 NOT NULL
 );
 
 
@@ -2829,7 +3050,7 @@ ALTER SEQUENCE public.organization_roles_id_seq OWNED BY public.organization_rol
 CREATE TABLE public.organization_saml_configurations (
     id bigint NOT NULL,
     organization_id bigint NOT NULL,
-    enabled boolean DEFAULT false NOT NULL,
+    active boolean DEFAULT false NOT NULL,
     idp_entity_id character varying,
     idp_sso_target_url character varying,
     idp_slo_target_url character varying,
@@ -2860,6 +3081,52 @@ CREATE SEQUENCE public.organization_saml_configurations_id_seq
 --
 
 ALTER SEQUENCE public.organization_saml_configurations_id_seq OWNED BY public.organization_saml_configurations.id;
+
+
+--
+-- Name: organization_signups; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_signups (
+    id bigint NOT NULL,
+    id_token character varying NOT NULL,
+    email character varying,
+    name character varying,
+    kind integer,
+    website character varying,
+    phone character varying,
+    publicly_visible boolean DEFAULT true NOT NULL,
+    address jsonb DEFAULT '{}'::jsonb NOT NULL,
+    likely_spam boolean DEFAULT false NOT NULL,
+    email_confirmation_token character varying,
+    email_confirmation_sent_at timestamp(6) without time zone,
+    email_confirmations_sent integer DEFAULT 0 NOT NULL,
+    email_confirmed_at timestamp(6) without time zone,
+    return_to character varying,
+    organization_id bigint,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    pos_kind integer
+);
+
+
+--
+-- Name: organization_signups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_signups_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_signups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_signups_id_seq OWNED BY public.organization_signups.id;
 
 
 --
@@ -2922,9 +3189,8 @@ CREATE TABLE public.organizations (
     api_access_approved boolean DEFAULT false NOT NULL,
     approved boolean DEFAULT true,
     avatar character varying(255),
-    is_paid boolean DEFAULT false NOT NULL,
+    is_invoiced boolean DEFAULT false NOT NULL,
     lock_show_on_map boolean DEFAULT false NOT NULL,
-    landing_html text,
     enabled_feature_slugs jsonb,
     parent_organization_id integer,
     kind integer,
@@ -2944,7 +3210,9 @@ CREATE TABLE public.organizations (
     manufacturer_id bigint,
     direct_unclaimed_notifications boolean DEFAULT false,
     spam_registrations boolean DEFAULT false,
-    opted_into_theft_survey_2023 boolean DEFAULT false
+    opted_into_theft_survey_2023 boolean DEFAULT false,
+    paid_money boolean DEFAULT false NOT NULL,
+    send_self_registration_email boolean DEFAULT false NOT NULL
 );
 
 
@@ -3162,6 +3430,35 @@ ALTER SEQUENCE public.payments_id_seq OWNED BY public.payments.id;
 
 
 --
+-- Name: pghero_queries; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pghero_queries (
+    id bigint NOT NULL,
+    query text
+);
+
+
+--
+-- Name: pghero_queries_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pghero_queries_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pghero_queries_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pghero_queries_id_seq OWNED BY public.pghero_queries.id;
+
+
+--
 -- Name: pghero_query_stats; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3169,11 +3466,11 @@ CREATE TABLE public.pghero_query_stats (
     id bigint NOT NULL,
     database text,
     "user" text,
-    query text,
     query_hash bigint,
     total_time double precision,
     calls bigint,
-    captured_at timestamp without time zone
+    captured_at timestamp without time zone,
+    query_id bigint
 );
 
 
@@ -3194,6 +3491,43 @@ CREATE SEQUENCE public.pghero_query_stats_id_seq
 --
 
 ALTER SEQUENCE public.pghero_query_stats_id_seq OWNED BY public.pghero_query_stats.id;
+
+
+--
+-- Name: pos_registration_matches; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.pos_registration_matches (
+    id bigint NOT NULL,
+    duplicate_bike_group_id bigint,
+    bike_id bigint NOT NULL,
+    pos_bike_id bigint NOT NULL,
+    status integer DEFAULT 0 NOT NULL,
+    review_reasons text[] DEFAULT '{}'::text[] NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    merger_id bigint,
+    merged_at timestamp(6) without time zone
+);
+
+
+--
+-- Name: pos_registration_matches_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.pos_registration_matches_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: pos_registration_matches_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.pos_registration_matches_id_seq OWNED BY public.pos_registration_matches.id;
 
 
 --
@@ -3341,114 +3675,6 @@ ALTER SEQUENCE public.recovery_displays_id_seq OWNED BY public.recovery_displays
 
 
 --
--- Name: registration_sequence_acknowledgments; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.registration_sequence_acknowledgments (
-    id bigint NOT NULL,
-    registration_sequence_id bigint,
-    b_param_id bigint,
-    bike_id bigint,
-    user_id bigint,
-    owner_email character varying,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
-);
-
-
---
--- Name: registration_sequence_acknowledgments_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.registration_sequence_acknowledgments_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: registration_sequence_acknowledgments_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.registration_sequence_acknowledgments_id_seq OWNED BY public.registration_sequence_acknowledgments.id;
-
-
---
--- Name: registration_sequence_pages; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.registration_sequence_pages (
-    id bigint NOT NULL,
-    registration_sequence_id bigint NOT NULL,
-    title character varying,
-    subtitle text,
-    body text,
-    listing_order integer,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    organization_specific boolean DEFAULT false NOT NULL,
-    heading character varying
-);
-
-
---
--- Name: registration_sequence_pages_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.registration_sequence_pages_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: registration_sequence_pages_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.registration_sequence_pages_id_seq OWNED BY public.registration_sequence_pages.id;
-
-
---
--- Name: registration_sequences; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.registration_sequences (
-    id bigint NOT NULL,
-    organization_id bigint,
-    start_at timestamp(6) without time zone,
-    end_at timestamp(6) without time zone,
-    created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    faq_url character varying,
-    acknowledgment_text text,
-    deleted_at timestamp(6) without time zone
-);
-
-
---
--- Name: registration_sequences_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.registration_sequences_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: registration_sequences_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.registration_sequences_id_seq OWNED BY public.registration_sequences.id;
-
-
---
 -- Name: sales; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3526,9 +3752,11 @@ CREATE TABLE public.social_accounts (
     last_error character varying,
     last_error_at timestamp without time zone,
     street character varying,
-    zipcode character varying,
-    state_id bigint,
-    country_id bigint
+    country_id bigint,
+    postal_code character varying,
+    region_record_id bigint,
+    region_string character varying,
+    street_2 character varying
 );
 
 
@@ -3964,7 +4192,11 @@ CREATE TABLE public.stripe_events (
     stripe_id character varying,
     name character varying,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    payload jsonb,
+    stripe_event_id character varying,
+    stripe_account_id character varying,
+    processed_at timestamp(6) without time zone
 );
 
 
@@ -4420,7 +4652,9 @@ CREATE TABLE public.users (
     address_record_id bigint,
     can_send_many_marketplace_messages boolean DEFAULT false NOT NULL,
     feature_registration_show_legacy boolean DEFAULT false NOT NULL,
-    passwordless_user boolean DEFAULT false NOT NULL
+    passwordless_user boolean DEFAULT false NOT NULL,
+    preferred_unit_system integer,
+    color_scheme integer DEFAULT 2 NOT NULL
 );
 
 
@@ -4597,6 +4831,13 @@ ALTER TABLE ONLY public.bike_versions ALTER COLUMN id SET DEFAULT nextval('publi
 
 
 --
+-- Name: bikebook_models id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bikebook_models ALTER COLUMN id SET DEFAULT nextval('public.bikebook_models_id_seq'::regclass);
+
+
+--
 -- Name: bikes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -4685,6 +4926,27 @@ ALTER TABLE ONLY public.customer_contacts ALTER COLUMN id SET DEFAULT nextval('p
 --
 
 ALTER TABLE ONLY public.duplicate_bike_groups ALTER COLUMN id SET DEFAULT nextval('public.duplicate_bike_groups_id_seq'::regclass);
+
+
+--
+-- Name: education_course_acknowledgments id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.education_course_acknowledgments ALTER COLUMN id SET DEFAULT nextval('public.education_course_acknowledgments_id_seq'::regclass);
+
+
+--
+-- Name: education_course_pages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.education_course_pages ALTER COLUMN id SET DEFAULT nextval('public.education_course_pages_id_seq'::regclass);
+
+
+--
+-- Name: education_courses id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.education_courses ALTER COLUMN id SET DEFAULT nextval('public.education_courses_id_seq'::regclass);
 
 
 --
@@ -4954,10 +5216,24 @@ ALTER TABLE ONLY public.organization_features ALTER COLUMN id SET DEFAULT nextva
 
 
 --
+-- Name: organization_landing_pages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_landing_pages ALTER COLUMN id SET DEFAULT nextval('public.organization_landing_pages_id_seq'::regclass);
+
+
+--
 -- Name: organization_manufacturers id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_manufacturers ALTER COLUMN id SET DEFAULT nextval('public.organization_manufacturers_id_seq'::regclass);
+
+
+--
+-- Name: organization_messages id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_messages ALTER COLUMN id SET DEFAULT nextval('public.organization_messages_id_seq'::regclass);
 
 
 --
@@ -4979,6 +5255,13 @@ ALTER TABLE ONLY public.organization_roles ALTER COLUMN id SET DEFAULT nextval('
 --
 
 ALTER TABLE ONLY public.organization_saml_configurations ALTER COLUMN id SET DEFAULT nextval('public.organization_saml_configurations_id_seq'::regclass);
+
+
+--
+-- Name: organization_signups id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_signups ALTER COLUMN id SET DEFAULT nextval('public.organization_signups_id_seq'::regclass);
 
 
 --
@@ -5024,10 +5307,24 @@ ALTER TABLE ONLY public.payments ALTER COLUMN id SET DEFAULT nextval('public.pay
 
 
 --
+-- Name: pghero_queries id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pghero_queries ALTER COLUMN id SET DEFAULT nextval('public.pghero_queries_id_seq'::regclass);
+
+
+--
 -- Name: pghero_query_stats id; Type: DEFAULT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.pghero_query_stats ALTER COLUMN id SET DEFAULT nextval('public.pghero_query_stats_id_seq'::regclass);
+
+
+--
+-- Name: pos_registration_matches id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pos_registration_matches ALTER COLUMN id SET DEFAULT nextval('public.pos_registration_matches_id_seq'::regclass);
 
 
 --
@@ -5056,27 +5353,6 @@ ALTER TABLE ONLY public.rear_gear_types ALTER COLUMN id SET DEFAULT nextval('pub
 --
 
 ALTER TABLE ONLY public.recovery_displays ALTER COLUMN id SET DEFAULT nextval('public.recovery_displays_id_seq'::regclass);
-
-
---
--- Name: registration_sequence_acknowledgments id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.registration_sequence_acknowledgments ALTER COLUMN id SET DEFAULT nextval('public.registration_sequence_acknowledgments_id_seq'::regclass);
-
-
---
--- Name: registration_sequence_pages id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.registration_sequence_pages ALTER COLUMN id SET DEFAULT nextval('public.registration_sequence_pages_id_seq'::regclass);
-
-
---
--- Name: registration_sequences id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.registration_sequences ALTER COLUMN id SET DEFAULT nextval('public.registration_sequences_id_seq'::regclass);
 
 
 --
@@ -5392,6 +5668,14 @@ ALTER TABLE ONLY public.bike_versions
 
 
 --
+-- Name: bikebook_models bikebook_models_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bikebook_models
+    ADD CONSTRAINT bikebook_models_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: bikes bikes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -5493,6 +5777,30 @@ ALTER TABLE ONLY public.customer_contacts
 
 ALTER TABLE ONLY public.duplicate_bike_groups
     ADD CONSTRAINT duplicate_bike_groups_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: education_course_acknowledgments education_course_acknowledgments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.education_course_acknowledgments
+    ADD CONSTRAINT education_course_acknowledgments_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: education_course_pages education_course_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.education_course_pages
+    ADD CONSTRAINT education_course_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: education_courses education_courses_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.education_courses
+    ADD CONSTRAINT education_courses_pkey PRIMARY KEY (id);
 
 
 --
@@ -5800,11 +6108,27 @@ ALTER TABLE ONLY public.organization_features
 
 
 --
+-- Name: organization_landing_pages organization_landing_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_landing_pages
+    ADD CONSTRAINT organization_landing_pages_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organization_manufacturers organization_manufacturers_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.organization_manufacturers
     ADD CONSTRAINT organization_manufacturers_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_messages organization_messages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_messages
+    ADD CONSTRAINT organization_messages_pkey PRIMARY KEY (id);
 
 
 --
@@ -5829,6 +6153,14 @@ ALTER TABLE ONLY public.organization_roles
 
 ALTER TABLE ONLY public.organization_saml_configurations
     ADD CONSTRAINT organization_saml_configurations_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_signups organization_signups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_signups
+    ADD CONSTRAINT organization_signups_pkey PRIMARY KEY (id);
 
 
 --
@@ -5880,11 +6212,27 @@ ALTER TABLE ONLY public.payments
 
 
 --
+-- Name: pghero_queries pghero_queries_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pghero_queries
+    ADD CONSTRAINT pghero_queries_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: pghero_query_stats pghero_query_stats_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
 ALTER TABLE ONLY public.pghero_query_stats
     ADD CONSTRAINT pghero_query_stats_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: pos_registration_matches pos_registration_matches_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.pos_registration_matches
+    ADD CONSTRAINT pos_registration_matches_pkey PRIMARY KEY (id);
 
 
 --
@@ -5917,30 +6265,6 @@ ALTER TABLE ONLY public.rear_gear_types
 
 ALTER TABLE ONLY public.recovery_displays
     ADD CONSTRAINT recovery_displays_pkey PRIMARY KEY (id);
-
-
---
--- Name: registration_sequence_acknowledgments registration_sequence_acknowledgments_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.registration_sequence_acknowledgments
-    ADD CONSTRAINT registration_sequence_acknowledgments_pkey PRIMARY KEY (id);
-
-
---
--- Name: registration_sequence_pages registration_sequence_pages_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.registration_sequence_pages
-    ADD CONSTRAINT registration_sequence_pages_pkey PRIMARY KEY (id);
-
-
---
--- Name: registration_sequences registration_sequences_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.registration_sequences
-    ADD CONSTRAINT registration_sequences_pkey PRIMARY KEY (id);
 
 
 --
@@ -6133,13 +6457,6 @@ ALTER TABLE ONLY public.users
 
 ALTER TABLE ONLY public.wheel_sizes
     ADD CONSTRAINT wheel_sizes_pkey PRIMARY KEY (id);
-
-
---
--- Name: idx_on_registration_sequence_id_78f7372741; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX idx_on_registration_sequence_id_78f7372741 ON public.registration_sequence_acknowledgments USING btree (registration_sequence_id);
 
 
 --
@@ -6353,6 +6670,20 @@ CREATE INDEX index_bike_stickers_on_bike_sticker_batch_id ON public.bike_sticker
 
 
 --
+-- Name: index_bike_stickers_on_code_integer; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_code_integer ON public.bike_stickers USING btree (code_integer);
+
+
+--
+-- Name: index_bike_stickers_on_code_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bike_stickers_on_code_trgm ON public.bike_stickers USING gin (code public.gin_trgm_ops);
+
+
+--
 -- Name: index_bike_versions_on_bike_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6381,10 +6712,38 @@ CREATE INDEX index_bike_versions_on_primary_activity_id ON public.bike_versions 
 
 
 --
+-- Name: index_bikebook_models_on_catalog_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_bikebook_models_on_catalog_id ON public.bikebook_models USING btree (catalog_id);
+
+
+--
+-- Name: index_bikebook_models_on_manufacturer_id_and_model_slug; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikebook_models_on_manufacturer_id_and_model_slug ON public.bikebook_models USING btree (manufacturer_id, model_slug);
+
+
+--
 -- Name: index_bikes_current_listing_order; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_bikes_current_listing_order ON public.bikes USING btree (listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
+-- Name: index_bikes_current_manufacturer_listing_order; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_current_manufacturer_listing_order ON public.bikes USING btree (manufacturer_id, listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
+
+
+--
+-- Name: index_bikes_current_stolen_or_impounded_on_location; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikes_current_stolen_or_impounded_on_location ON public.bikes USING btree (latitude, longitude) WHERE ((status = ANY (ARRAY[1, 3])) AND (example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL));
 
 
 --
@@ -6556,6 +6915,13 @@ CREATE INDEX index_bug_reports_on_inbound_email_id ON public.bug_reports USING b
 
 
 --
+-- Name: index_bug_reports_on_receiver; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bug_reports_on_receiver ON public.bug_reports USING btree (receiver);
+
+
+--
 -- Name: index_bug_reports_on_status; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -6602,6 +6968,104 @@ CREATE INDEX index_components_on_manufacturer_id ON public.components USING btre
 --
 
 CREATE INDEX index_customer_contacts_on_bike_id ON public.customer_contacts USING btree (bike_id);
+
+
+--
+-- Name: index_education_course_acknowledgments_on_b_param_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_education_course_acknowledgments_on_b_param_id ON public.education_course_acknowledgments USING btree (b_param_id);
+
+
+--
+-- Name: index_education_course_acknowledgments_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_education_course_acknowledgments_on_bike_id ON public.education_course_acknowledgments USING btree (bike_id);
+
+
+--
+-- Name: index_education_course_acknowledgments_on_education_course_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_education_course_acknowledgments_on_education_course_id ON public.education_course_acknowledgments USING btree (education_course_id);
+
+
+--
+-- Name: index_education_course_acknowledgments_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_education_course_acknowledgments_on_user_id ON public.education_course_acknowledgments USING btree (user_id);
+
+
+--
+-- Name: index_education_course_acknowledgments_one_per_b_param; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_education_course_acknowledgments_one_per_b_param ON public.education_course_acknowledgments USING btree (b_param_id) WHERE (b_param_id IS NOT NULL);
+
+
+--
+-- Name: index_education_course_acknowledgments_pending; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_education_course_acknowledgments_pending ON public.education_course_acknowledgments USING btree (b_param_id) WHERE (acknowledged_at IS NULL);
+
+
+--
+-- Name: index_education_course_pages_on_education_course_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_education_course_pages_on_education_course_id ON public.education_course_pages USING btree (education_course_id);
+
+
+--
+-- Name: index_education_courses_on_deleted_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_education_courses_on_deleted_at ON public.education_courses USING btree (deleted_at);
+
+
+--
+-- Name: index_education_courses_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_education_courses_on_organization_id ON public.education_courses USING btree (organization_id);
+
+
+--
+-- Name: index_education_courses_one_active_default; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_education_courses_one_active_default ON public.education_courses USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL));
+
+
+--
+-- Name: index_education_courses_one_active_per_org; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_education_courses_one_active_per_org ON public.education_courses USING btree (organization_id) WHERE ((start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL));
+
+
+--
+-- Name: index_education_courses_one_draft_default; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_education_courses_one_draft_default ON public.education_courses USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (start_at IS NULL) AND (deleted_at IS NULL));
+
+
+--
+-- Name: index_education_courses_one_draft_per_org; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_education_courses_one_draft_per_org ON public.education_courses USING btree (organization_id) WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL) AND (deleted_at IS NULL));
+
+
+--
+-- Name: index_email_bans_on_user_email_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_email_bans_on_user_email_id ON public.email_bans USING btree (user_email_id);
 
 
 --
@@ -7067,10 +7531,45 @@ CREATE UNIQUE INDEX index_oauth_applications_on_uid ON public.oauth_applications
 
 
 --
+-- Name: index_organization_landing_pages_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_organization_landing_pages_on_organization_id ON public.organization_landing_pages USING btree (organization_id);
+
+
+--
 -- Name: index_organization_manufacturers_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_organization_manufacturers_on_organization_id ON public.organization_manufacturers USING btree (organization_id);
+
+
+--
+-- Name: index_organization_messages_on_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_bike_id ON public.organization_messages USING btree (bike_id);
+
+
+--
+-- Name: index_organization_messages_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_organization_id ON public.organization_messages USING btree (organization_id);
+
+
+--
+-- Name: index_organization_messages_on_receiver_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_receiver_id ON public.organization_messages USING btree (receiver_id);
+
+
+--
+-- Name: index_organization_messages_on_sender_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_messages_on_sender_id ON public.organization_messages USING btree (sender_id);
 
 
 --
@@ -7113,6 +7612,20 @@ CREATE INDEX index_organization_roles_on_user_id ON public.organization_roles US
 --
 
 CREATE UNIQUE INDEX index_organization_saml_configurations_on_organization_id ON public.organization_saml_configurations USING btree (organization_id);
+
+
+--
+-- Name: index_organization_signups_on_id_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_organization_signups_on_id_token ON public.organization_signups USING btree (id_token);
+
+
+--
+-- Name: index_organization_signups_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_signups_on_organization_id ON public.organization_signups USING btree (organization_id);
 
 
 --
@@ -7200,6 +7713,13 @@ CREATE INDEX index_ownerships_on_organization_id ON public.ownerships USING btre
 
 
 --
+-- Name: index_ownerships_on_owner_email_trgm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_ownerships_on_owner_email_trgm ON public.ownerships USING gin (owner_email public.gin_trgm_ops);
+
+
+--
 -- Name: index_ownerships_on_sale_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7207,10 +7727,10 @@ CREATE INDEX index_ownerships_on_sale_id ON public.ownerships USING btree (sale_
 
 
 --
--- Name: index_ownerships_on_user_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_ownerships_on_user_id_and_id; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_ownerships_on_user_id ON public.ownerships USING btree (user_id);
+CREATE INDEX index_ownerships_on_user_id_and_id ON public.ownerships USING btree (user_id, id) WHERE (user_id IS NOT NULL);
 
 
 --
@@ -7270,10 +7790,45 @@ CREATE INDEX index_payments_on_user_id ON public.payments USING btree (user_id);
 
 
 --
+-- Name: index_pghero_queries_on_query; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pghero_queries_on_query ON public.pghero_queries USING hash (query);
+
+
+--
 -- Name: index_pghero_query_stats_on_database_and_captured_at; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_pghero_query_stats_on_database_and_captured_at ON public.pghero_query_stats USING btree (database, captured_at);
+
+
+--
+-- Name: index_pos_registration_matches_on_bike_id_and_pos_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_pos_registration_matches_on_bike_id_and_pos_bike_id ON public.pos_registration_matches USING btree (bike_id, pos_bike_id);
+
+
+--
+-- Name: index_pos_registration_matches_on_duplicate_bike_group_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pos_registration_matches_on_duplicate_bike_group_id ON public.pos_registration_matches USING btree (duplicate_bike_group_id);
+
+
+--
+-- Name: index_pos_registration_matches_on_merger_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pos_registration_matches_on_merger_id ON public.pos_registration_matches USING btree (merger_id);
+
+
+--
+-- Name: index_pos_registration_matches_on_pos_bike_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_pos_registration_matches_on_pos_bike_id ON public.pos_registration_matches USING btree (pos_bike_id);
 
 
 --
@@ -7298,80 +7853,10 @@ CREATE INDEX index_public_images_on_imageable_id_and_imageable_type ON public.pu
 
 
 --
--- Name: index_recovery_displays_on_stolen_record_id; Type: INDEX; Schema: public; Owner: -
+-- Name: index_recovery_displays_on_stolen_record_id_unique; Type: INDEX; Schema: public; Owner: -
 --
 
-CREATE INDEX index_recovery_displays_on_stolen_record_id ON public.recovery_displays USING btree (stolen_record_id);
-
-
---
--- Name: index_registration_sequence_acknowledgments_on_b_param_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_registration_sequence_acknowledgments_on_b_param_id ON public.registration_sequence_acknowledgments USING btree (b_param_id);
-
-
---
--- Name: index_registration_sequence_acknowledgments_on_bike_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_registration_sequence_acknowledgments_on_bike_id ON public.registration_sequence_acknowledgments USING btree (bike_id);
-
-
---
--- Name: index_registration_sequence_acknowledgments_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_registration_sequence_acknowledgments_on_user_id ON public.registration_sequence_acknowledgments USING btree (user_id);
-
-
---
--- Name: index_registration_sequence_acknowledgments_one_per_b_param; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_registration_sequence_acknowledgments_one_per_b_param ON public.registration_sequence_acknowledgments USING btree (b_param_id) WHERE (b_param_id IS NOT NULL);
-
-
---
--- Name: index_registration_sequence_pages_on_registration_sequence_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_registration_sequence_pages_on_registration_sequence_id ON public.registration_sequence_pages USING btree (registration_sequence_id);
-
-
---
--- Name: index_registration_sequences_on_deleted_at; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_registration_sequences_on_deleted_at ON public.registration_sequences USING btree (deleted_at);
-
-
---
--- Name: index_registration_sequences_on_organization_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_registration_sequences_on_organization_id ON public.registration_sequences USING btree (organization_id);
-
-
---
--- Name: index_registration_sequences_one_active_per_org; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_registration_sequences_one_active_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NOT NULL) AND (end_at IS NULL) AND (deleted_at IS NULL));
-
-
---
--- Name: index_registration_sequences_one_draft_per_org; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_registration_sequences_one_draft_per_org ON public.registration_sequences USING btree (organization_id) WHERE ((start_at IS NULL) AND (organization_id IS NOT NULL) AND (deleted_at IS NULL));
-
-
---
--- Name: index_registration_sequences_single_template; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_registration_sequences_single_template ON public.registration_sequences USING btree (((organization_id IS NULL))) WHERE ((organization_id IS NULL) AND (deleted_at IS NULL));
+CREATE UNIQUE INDEX index_recovery_displays_on_stolen_record_id_unique ON public.recovery_displays USING btree (stolen_record_id);
 
 
 --
@@ -7459,6 +7944,13 @@ CREATE UNIQUE INDEX index_strava_integrations_on_user_id ON public.strava_integr
 
 
 --
+-- Name: index_stripe_events_on_stripe_event_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_stripe_events_on_stripe_event_id ON public.stripe_events USING btree (stripe_event_id);
+
+
+--
 -- Name: index_stripe_subscriptions_on_membership_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7543,6 +8035,13 @@ CREATE INDEX index_user_bans_on_user_id ON public.user_bans USING btree (user_id
 
 
 --
+-- Name: index_user_emails_on_email; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_emails_on_email ON public.user_emails USING btree (email);
+
+
+--
 -- Name: index_user_emails_on_email_confirmed; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7599,6 +8098,20 @@ CREATE INDEX index_users_on_email_trgm ON public.users USING gin (email public.g
 
 
 --
+-- Name: index_users_on_email_without_periods; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_email_without_periods ON public.users USING btree (replace((email)::text, '.'::text, ''::text)) WHERE (deleted_at IS NULL);
+
+
+--
+-- Name: index_users_on_magic_link_token_outstanding; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_users_on_magic_link_token_outstanding ON public.users USING btree (magic_link_token) WHERE (magic_link_token IS NOT NULL);
+
+
+--
 -- Name: index_users_on_token_for_password_reset; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -7624,6 +8137,13 @@ CREATE UNIQUE INDEX unique_assignment_to_ambassador ON public.ambassador_task_as
 --
 
 CREATE UNIQUE INDEX unique_schema_migrations ON public.schema_migrations USING btree (version);
+
+
+--
+-- Name: bikes_serial_normalized_tsvector; Type: STATISTICS; Schema: public; Owner: -
+--
+
+CREATE STATISTICS public.bikes_serial_normalized_tsvector ON to_tsvector('simple'::regconfig, serial_normalized::text) FROM public.bikes;
 
 
 --
@@ -7720,6 +8240,47 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261123074039'),
+('20261121050440'),
+('20261119180000'),
+('20261119102802'),
+('20261118155803'),
+('20261117051637'),
+('20261116222651'),
+('20261111155046'),
+('20261110154720'),
+('20261106120000'),
+('20261102171029'),
+('20261030102135'),
+('20261017210000'),
+('20261017200000'),
+('20261017174533'),
+('20261017174532'),
+('20261017120000'),
+('20261005170000'),
+('20261005120000'),
+('20261005003717'),
+('20261004230843'),
+('20261004225108'),
+('20261004180000'),
+('20261001170000'),
+('20260930161510'),
+('20260930161509'),
+('20260926005700'),
+('20260925220034'),
+('20260915181500'),
+('20260915110042'),
+('20260912102406'),
+('20260909120000'),
+('20260908163548'),
+('20260821100000'),
+('20260819120000'),
+('20260815152851'),
+('20260813100000'),
+('20260812200000'),
+('20260811085030'),
+('20260808224655'),
+('20260808120000'),
 ('20260808100000'),
 ('20260807153129'),
 ('20260807132506'),

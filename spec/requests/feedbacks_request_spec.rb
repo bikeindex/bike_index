@@ -8,6 +8,16 @@ RSpec.describe FeedbacksController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
     end
+
+    context "logged in" do
+      include_context :request_spec_logged_in_as_user
+
+      it "renders the detail prompt and the message template" do
+        get base_url
+        expect(response.body).to match(/The more detail you can share/)
+        expect(response.body).to match(/Bike serial number \(if applicable\):/)
+      end
+    end
   end
 
   describe "create" do
@@ -26,8 +36,8 @@ RSpec.describe FeedbacksController, type: :request do
     end
     let!(:user) { FactoryBot.create(:user_confirmed) }
 
-    # Nothing else covers ApplicationController's own handler - the controllers that override
-    # it never reach this branch, and it shipped a missing translation key for years
+    # Nothing else covers ApplicationController's own handler - the controllers that
+    # override it never reach this branch
     context "with a null origin" do
       include_context :test_csrf_token
 
@@ -46,7 +56,7 @@ RSpec.describe FeedbacksController, type: :request do
         log_in(user)
         expect {
           post base_url, params: {feedback: feedback_attrs.except(:email, :name)}
-        }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
+        }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
         expect(response).to redirect_to help_path
         expect(flash[:success]).to be_present
         feedback = Feedback.last
@@ -70,7 +80,7 @@ RSpec.describe FeedbacksController, type: :request do
                            }
                          },
             headers: {"HTTP_REFERER" => "http://www.example.com/partyyyyy"}
-        }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
+        }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
         expect(response).to redirect_to "http://www.example.com/partyyyyy"
         expect(flash[:success]).to be_present
         feedback = Feedback.last
@@ -92,7 +102,7 @@ RSpec.describe FeedbacksController, type: :request do
                              }
                            },
               headers: {"HTTP_REFERER" => "http://www.example.com/for_cities"}
-          }.to change(Email::FeedbackNotificationJob.jobs, :count).by(1)
+          }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(1)
           expect(response).to redirect_to "http://www.example.com/for_cities"
           expect(flash[:success]).to be_present
           feedback = Feedback.last
@@ -102,6 +112,25 @@ RSpec.describe FeedbacksController, type: :request do
           expect(feedback.package_size).to eq ""
         end
       end
+
+      context "from a demo modal that names where to return" do
+        let(:lead_params) { {name: "Chicago", feedback_type: "lead_for_city", email: "example@example.com"} }
+
+        it "re-renders and returns there, not at the /feedbacks a failed submit left as the referer" do
+          post base_url, params: {feedback: lead_params.merge(email: " "), return_to: "/for_cities#lead-sent"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/feedbacks", "HTTP_CF_IPCOUNTRY" => "US", "HTTP_CF_REGION" => "Indiana"}
+          expect(response).to render_template("landing_pages/for_cities")
+          expect(Capybara.string(response.body)).to have_field("state", type: :hidden, with: "US-IN")
+
+          post base_url, params: {feedback: lead_params, return_to: "/for_cities#lead-sent"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/feedbacks"}
+          expect(response).to redirect_to "http://www.example.com/for_cities#lead-sent"
+
+          post base_url, params: {feedback: lead_params, return_to: "https://evil.example.org/for_cities"},
+            headers: {"HTTP_REFERER" => "http://www.example.com/for_cities"}
+          expect(response).to redirect_to "http://www.example.com/for_cities"
+        end
+      end
     end
 
     context "feedback with additional" do
@@ -109,7 +138,7 @@ RSpec.describe FeedbacksController, type: :request do
         expect {
           post base_url, params: {feedback: feedback_attrs.merge(additional: "stuff")},
             headers: {"HTTP_REFERER" => for_schools_url}
-        }.to_not change(Email::FeedbackNotificationJob.jobs, :count)
+        }.to_not change(EmailJobs::FeedbackNotificationJob.jobs, :count)
         expect(flash[:error]).to match(/sign in/i)
       end
     end
@@ -119,7 +148,7 @@ RSpec.describe FeedbacksController, type: :request do
         it "does not create a feedback message" do
           expect {
             post base_url, params: {feedback: feedback_attrs.merge(email: "")}
-          }.to change(Email::FeedbackNotificationJob.jobs, :count).by(0)
+          }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(0)
 
           expect(response).to render_template(:index)
           feedback = assigns(:feedback)
@@ -132,8 +161,8 @@ RSpec.describe FeedbacksController, type: :request do
           log_in(user)
           expect {
             post base_url, params: {feedback: feedback_attrs.merge(body: "")},
-              headers: {"HTTP_REFERER" => for_schools_url}
-          }.to change(Email::FeedbackNotificationJob.jobs, :count).by(0)
+              headers: {"HTTP_REFERER" => "http://www.example.com/for_schools"}
+          }.to change(EmailJobs::FeedbackNotificationJob.jobs, :count).by(0)
           expect(response).to render_template("landing_pages/for_schools")
           feedback = assigns(:feedback)
           feedback_attrs.except(:body).each { |k, v| expect(feedback.send(k)).to eq(v) }

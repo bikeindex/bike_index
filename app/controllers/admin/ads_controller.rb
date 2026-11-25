@@ -4,7 +4,7 @@ module Admin
 
     before_action :set_period, only: %i[index]
     before_action :find_ad, except: [:index, :new, :create]
-    before_action :find_organizations, only: [:new, :edit]
+    before_action :find_organizations, only: [:new, :edit, :create, :update]
 
     def index
       @ads = Ad.all
@@ -22,7 +22,7 @@ module Admin
         flash[:success] = "Ad Saved!"
         redirect_to admin_ad_url(@ad)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -36,14 +36,14 @@ module Admin
         flash[:success] = "Ad Created!"
         redirect_to edit_admin_ad_url(@ad)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 
     protected
 
     def permitted_parameters
-      params.require(:ad).permit(:title, :body, :target_url, :organization_id, :image)
+      params.require(:ad).permit(:title, :body, :target_url, :organization_id, :image, :live)
     end
 
     def find_ad

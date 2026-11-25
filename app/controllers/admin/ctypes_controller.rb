@@ -8,9 +8,9 @@ module Admin
       @cgroups = Cgroup.commonness
       @ctype_counts = Ctype.group(:cgroup_id).count
       @ctypes = if sort_column == "cgroup"
-        Ctype.includes(:cgroup).joins(:cgroup).reorder("cgroups.name #{sort_direction}")
+        Ctype.includes(:cgroup).joins(:cgroup).reorder(sortable_order(Cgroup.arel_table[:name]))
       else
-        Ctype.includes(:cgroup).reorder("ctypes.#{sort_column} #{sort_direction}")
+        Ctype.includes(:cgroup).reorder(sortable_order(Ctype))
       end
     end
 
@@ -26,7 +26,7 @@ module Admin
         flash[:success] = "Component Type Saved!"
         redirect_to admin_ctypes_url
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
@@ -36,7 +36,7 @@ module Admin
         flash[:success] = "Component type created!"
         redirect_to admin_ctypes_url
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 

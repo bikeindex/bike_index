@@ -11,7 +11,8 @@ module API
           optional :propulsion_type, type: String, desc: "Propulsion Type slug or name (see **Selections: propulsion_types**). Also accepts 'motorized' to match any e-vehicle."
           optional :colors, desc: "Color slugs or ids, comma delineated (see **Selections: colors**)"
           optional :location, type: String, desc: "Location for proximity search (must set stolenness to `proximity`)", default: "IP"
-          optional :distance, type: String, desc: "Distance in miles from `location` for proximity search (must set stolenness to `proximity`)", default: 10
+          optional :distance, type: String, desc: "Distance from `location` for proximity search (must set stolenness to `proximity`)", default: 10
+          optional :distance_unit, type: String, desc: "Unit of `distance`", values: UnitSystem::DISTANCE_UNITS, default: "mi"
           optional :stolenness, type: String, desc: "Bikes matching Stolen status", values: %w[non stolen proximity for_sale all] + [""], default: "stolen"
           optional :query_items, type: Array, desc: "Our Fancy select query items, DO NOT USE, may change without notice", documentation: {hidden: true}
         end

@@ -3,7 +3,7 @@
 .related-fields
   .form-group.row.fancy-select.unfancy
     %label.form-well-label
-      = t(".where_was_it_stolen_type", stolen_type: @bike.status_humanized_translated)
+      = safe_join([t(".where_was_it_stolen_type", stolen_type: @bike.status_humanized_translated), render(UI::Forms::RequiredMarker::Component.new)], "\u00A0")
     .form-well-input#us_id_data{ data: { usid: Country.united_states_id } }
       = srecord.select(:country_id, Country.select_options,
         { required: true, prompt: t(".choose_country") },

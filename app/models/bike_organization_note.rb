@@ -20,7 +20,7 @@
 class BikeOrganizationNote < ApplicationRecord
   has_paper_trail only: %i[bike_id body]
 
-  belongs_to :bike
+  belongs_to :bike, touch: true
   belongs_to :organization
   belongs_to :user
 
@@ -31,6 +31,12 @@ class BikeOrganizationNote < ApplicationRecord
   def self.upsert(bike:, organization:, body:, user:)
     note = find_or_initialize_by(bike_id: bike.id, organization_id: organization.id)
     note.update!(body:, user:)
+  end
+
+  # upsert overwrites the note, so the ones it replaced come from its versions
+  def previous_notes
+    versions.where(event: "update").map(&:reify).select { it.body.present? }
+      .tap { ActiveRecord::Associations::Preloader.new(records: it, associations: :user).call }
   end
 
   private

@@ -30,8 +30,13 @@ class BikeV2Serializer < ApplicationSerializer
     :registry_name,
     :registry_url
 
+  # The serial depends on who's asking
+  def cache_key
+    [super, serial]
+  end
+
   def serial
-    object.serial_display
+    object.serial_display(scope)
   end
 
   def manufacturer_name
@@ -59,7 +64,7 @@ class BikeV2Serializer < ApplicationSerializer
   def location_found
     return nil unless object.status_impounded?
 
-    object.current_impound_record&.address_record&.formatted_address_string(render_country: true)
+    object.current_impound_record&.impounded_from_address&.formatted_address_string(render_country: true)
   end
 
   def date_stolen

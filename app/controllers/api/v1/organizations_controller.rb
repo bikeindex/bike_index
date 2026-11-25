@@ -22,11 +22,10 @@ module API
             end
             render json: organization_serialized(@organization)
           else
-            message = {"406": "Not permitted POS kind"}
-            render(json: message, status: 406) && return
+            render(json: {"406": "Not permitted POS kind"}, status: 406) && return
           end
         else
-          render(json: message, status: :unauthorized) && return
+          render(json: {"401": "Not permitted"}, status: :unauthorized) && return
         end
       end
 

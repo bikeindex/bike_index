@@ -1,0 +1,47 @@
+# frozen_string_literal: true
+
+module Pages
+  module Org
+    module Search
+      module ColumnSettings
+        # The panel, with a ColumnSettingsToggle to open it. It stores to the org search's own
+        # key — checking a box here changes what the real search page shows.
+        class ComponentPreview < ApplicationComponentPreview
+          # @!group Variants
+          # An organization without features — only the columns every organization gets
+          def default
+            render_panel(enabled_feature_slugs: [])
+          end
+
+          # Every feature enabled, so every column shows
+          def all_settings
+            render_panel(enabled_feature_slugs: OrganizationFeature::EXPECTED_SLUGS)
+          end
+
+          # The impound records search for an organization without impound locations
+          def impound_search_without_locations
+            render_panel(enabled_feature_slugs: %w[impound_bikes], impound: true)
+          end
+
+          # The export form's column fields, every feature enabled
+          def export_form
+            organization = ::Organization.new(short_name: "Preview org", enabled_feature_slugs: OrganizationFeature::EXPECTED_SLUGS)
+            settings = ComponentStructs::OrgSearchSettings.new(organization:)
+            render(Component.new(settings:, export_headers: settings.default_export_headers))
+          end
+          # @!endgroup
+
+          private
+
+          def render_panel(enabled_feature_slugs:, impound: false)
+            organization = ::Organization.new(short_name: "Preview org", enabled_feature_slugs:)
+            settings = ComponentStructs::OrgSearchSettings.new(organization:, impound:)
+
+            {template: "pages/org/search/column_settings/component_preview/panel",
+             locals: {settings:, data: Component.column_settings_data_attributes(impound:)}}
+          end
+        end
+      end
+    end
+  end
+end

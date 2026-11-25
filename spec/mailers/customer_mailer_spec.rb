@@ -66,6 +66,44 @@ RSpec.describe CustomerMailer, type: :mailer do
     end
   end
 
+  describe "pos_registration_match_email" do
+    let(:match) { FactoryBot.create(:pos_registration_match) }
+
+    it "renders email" do
+      mail = CustomerMailer.pos_registration_match_email(match, match.bike.user)
+      expect(mail.subject).to eq "Is this the same bike?"
+      expect(mail.to).to eq [match.bike.user.email]
+      expect(mail.tag).to eq "pos_registration_match_email"
+      expect(mail.body.encoded).to include("/my_account/pos_registration_matches/#{match.id}")
+    end
+  end
+
+  describe "donation ask" do
+    let(:html) { CustomerMailer.welcome_email(user).deliver_now.html_part.body.to_s }
+    let(:organization) { FactoryBot.create(:invoice_with_payment).organization }
+
+    it "renders" do
+      expect(html).to include(support_the_index_url)
+    end
+
+    context "paid organization member" do
+      let(:user) { FactoryBot.create(:organization_role_claimed, organization:).user }
+
+      it "doesn't render" do
+        expect(html).to_not include(support_the_index_url)
+      end
+    end
+
+    context "paid organization email domain" do
+      let(:user) { FactoryBot.create(:user, email: "someone@paid-university.edu") }
+      before { organization.update(user_email_domain: "paid-university.edu") }
+
+      it "doesn't render" do
+        expect(html).to_not include(support_the_index_url)
+      end
+    end
+  end
+
   describe "additional_email_confirmation" do
     let(:user_email) { FactoryBot.create(:user_email) }
     it "renders email" do
@@ -139,7 +177,7 @@ RSpec.describe CustomerMailer, type: :mailer do
     it "renders email" do
       mail = CustomerMailer.recovered_from_link(stolen_record)
       expect(mail.to).to eq([bike.owner_email])
-      expect(mail.subject).to eq "Your tall bike (multiple frames fused together) has been marked recovered!"
+      expect(mail.subject).to eq "Your tall bike has been marked recovered!"
       expect(mail.from).to eq(["bryan@bikeindex.org"])
       expect(mail.body.encoded).to match recovered_description
       expect(mail.deliver_now.text_part.body.to_s).to include(recovered_description).and include("was marked")
@@ -190,6 +228,17 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail2.subject).to eq(stolen_notification.subject)
       stolen_notification.reload
       expect(stolen_notification.send_dates[1]).to be > stolen_notification.updated_at.to_i - 2
+    end
+
+    # Honeybadger 135003447: the bike box read the token off a nil current_ownership
+    context "bike without a current ownership" do
+      let!(:bike) { FactoryBot.create(:stolen_bike) }
+
+      it "renders the bike link without a token" do
+        expect(bike.current_ownership).to be_nil
+        mail = CustomerMailer.stolen_notification_email(stolen_notification)
+        expect(mail.deliver_now.html_part.body.to_s).to include(%(href="#{bike_url(bike)}"))
+      end
     end
   end
 
@@ -256,16 +305,21 @@ RSpec.describe CustomerMailer, type: :mailer do
   describe "newsletter" do
     let(:mail_snippet) { FactoryBot.build(:mail_snippet, kind: :newsletter) }
     let(:user) { FactoryBot.create(:user) }
+    let(:mail) { CustomerMailer.newsletter(user:, mail_snippet:) }
 
     it "renders, includes unsubscribe" do
-      mail = CustomerMailer.newsletter(user:, mail_snippet:)
-
       expect(mail.from).to eq(["contact@bikeindex.org"])
       expect(mail.to).to eq([user.email])
       expect(mail.tag).to eq "newsletter"
       expect(mail.body.encoded).to match "unsubscribe"
       expect(mail.body.encoded).to match "binx-header-banner" # shared blue banner header, not the old logo
       expect(mail.body.encoded).to_not match "email_assets/logo.png"
+    end
+
+    it "includes one-click unsubscribe headers, pointing at the POST endpoint" do
+      expect(mail["List-Unsubscribe-Post"].value).to eq "List-Unsubscribe=One-Click"
+      signed_id = mail["List-Unsubscribe"].value[%r{/users/(.+)/unsubscribe_update>\z}, 1]
+      expect(User.find_signed(signed_id, purpose: :unsubscribe)).to eq user
     end
   end
 
@@ -278,6 +332,23 @@ RSpec.describe CustomerMailer, type: :mailer do
       expect(mail.to).to eq([marketplace_message.receiver.email])
       expect(mail.body.encoded.strip).to match marketplace_message.body
       expect(mail.message_stream).to eq "outbound"
+    end
+  end
+
+  describe "user_alert_email" do
+    let(:bike) do
+      FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record,
+        cycle_type: "personal-mobility", latitude: nil, longitude: nil)
+    end
+    let(:user_alert) { FactoryBot.create(:user_alert, kind: "stolen_bike_without_location", bike:, user: bike.owner) }
+
+    it "names the cycle type in the subject and the body" do
+      mail = CustomerMailer.user_alert_email(user_alert)
+      expect(mail.subject).to eq "Your stolen e-personal mobility device is missing its location"
+      body = mail.body.encoded
+      expect(body).to match "Your stolen e-personal mobility device is missing location"
+      expect(body).to match "won't find your e-personal mobility device"
+      expect(body).to_not match "personal-mobility"
     end
   end
 end

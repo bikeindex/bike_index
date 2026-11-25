@@ -9,11 +9,17 @@ module ControllerHelpers
   # matching the session store key pattern in config/initializers/session_store.rb
   AUTH_COOKIE_KEY = Rails.env.development? ? :"auth_#{ENV.fetch("DEV_PORT", 3042)}" : :auth
 
+  # The BikeHub app and BikeHub dev app, whose registered domains we'll hand a signed-in
+  # partner back to. Named rather than inline so specs can stub it.
+  PARTNER_DOORKEEPER_APP_IDS = [264, 356].freeze
+
   included do
     helper_method :current_user, :current_user_or_unconfirmed_user, :sign_in_partner, :user_root_url,
-      :user_root_bike_search?, :current_organization, :passive_organization, :current_location,
-      :page_id, :default_bike_search_path, :bikehub_url, :show_general_alert,
-      :display_dev_info?, :current_country_id, :current_currency
+      :current_organization, :passive_organization, :current_location,
+      :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
+      :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
+      :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state, :metric_units?,
+      :search_distance_unit, :request_location_hash, :color_scheme
     before_action :enable_rack_profiler
 
     before_action do
@@ -51,8 +57,43 @@ module ControllerHelpers
     currency_from_params || Currency.default
   end
 
+  def sort_state
+    @sort_state ||= ComponentStructs::SortState.new(search_params: helpers.sortable_search_params,
+      sort: helpers.sort_column, direction: helpers.sort_direction)
+  end
+
+  # Built lazily rather than in a before_action, because the subjects below are set by the action
+  def admin_index_state
+    @admin_index_state ||= ComponentStructs::IndexState.new(
+      params:, sort_state:,
+      render_chart: @render_chart, render_deleted: @render_deleted,
+      pagy: @pagy, per_page: @per_page, time_range: @time_range,
+      period: @period, start_time: @start_time, end_time: @end_time,
+      time_range_column: @time_range_column, current_organization:,
+      user_subject: @user_subject, bike: @bike,
+      marketplace_listing: @marketplace_listing, primary_activity: @primary_activity
+    )
+  end
+
   def current_country_id
     request_location_hash[:country_id]
+  end
+
+  def metric_units?
+    return @metric_units if defined?(@metric_units)
+
+    # local requests carry no CF country, so development reads as the US
+    @metric_units = UnitSystem.metric?(user: current_user, country_id: current_country_id || (Country.united_states_id if Rails.env.development?))
+  end
+
+  # A signed-out visitor's pick is a cookie the color-scheme controller writes
+  def color_scheme
+    current_user&.color_scheme || cookies[:color_scheme].presence_in(User.color_schemes.keys) || "system"
+  end
+
+  # A searched URL keeps the unit it was searched in
+  def search_distance_unit
+    params[:distance_unit].presence_in(UnitSystem::DISTANCE_UNITS) || UnitSystem.distance_unit(metric_units?)
   end
 
   def enable_rack_profiler
@@ -76,11 +117,11 @@ module ControllerHelpers
     end
   end
 
-  def store_return_and_authenticate_user(translation_key: nil, flash_type: :error)
+  def store_return_and_authenticate_user(translation_key: nil, flash_type: :error, sign_up_not_in: false)
     return if current_user&.confirmed? && current_user.terms_of_service
 
     store_return_to
-    authenticate_user(flash_type:) && return
+    authenticate_user(translation_key:, flash_type:, sign_up_not_in:) && return
   end
 
   # Auto-confirms an unconfirmed user whose email matches an ownership owner_email validated
@@ -95,7 +136,13 @@ module ControllerHelpers
     user.confirm(user.confirmation_token)
   end
 
-  def authenticate_user(translation_key: nil, translation_args: {}, flash_type: :error)
+  # Set by the partner linking in, not by us - BikeHub's create-account button sends sign_up
+  # and its log-in button sends log_in
+  def force_sign_up?
+    params[:unauthenticated_redirect] == "sign_up"
+  end
+
+  def authenticate_user(translation_key: nil, translation_args: {}, flash_type: :error, sign_up_not_in: false)
     translation_key ||= :you_have_to_log_in
 
     # Make absolutely sure the current user is confirmed - mainly for testing
@@ -106,8 +153,8 @@ module ControllerHelpers
     elsif current_user&.unconfirmed? || unconfirmed_current_user.present?
       redirect_to(please_confirm_email_users_path) && return
     else
-      force_sign_up = params[:unauthenticated_redirect] == "sign_up" # other option is sign_in
-      unless force_sign_up # Force signup doesn't show a flash message
+      # The partner's own button already said what this is, so anything we add contradicts it
+      unless force_sign_up?
         flash[flash_type] = translation(
           translation_key,
           **translation_args,
@@ -115,7 +162,7 @@ module ControllerHelpers
         )
       end
 
-      if force_sign_up || translation_key.to_s.match?(/create.+account/)
+      if force_sign_up? || sign_up_not_in
         redirect_to(new_user_url(partner: sign_in_partner)) && return
       else
         redirect_to(new_session_url(partner: sign_in_partner)) && return
@@ -134,25 +181,40 @@ module ControllerHelpers
     end
   end
 
-  def user_root_bike_search?
-    current_user.present? && current_user.default_organization.present? &&
-      current_user.default_organization.law_enforcement?
-  end
-
   def user_root_url
     return root_url unless current_user.present? && current_user.confirmed?
     return admin_root_url if current_user.superuser?
-    return my_account_url unless current_user.default_organization.present?
 
-    if user_root_bike_search?
-      default_bike_search_path
-    else
-      organization_root_url(organization_id: current_user.default_organization.to_param)
-    end
+    default_organization = OrganizationRole.default_organization(current_user)
+    return my_account_url if default_organization.blank?
+    # Every bike rather than default_bike_search_path: law enforcement is here to search
+    # the whole registry, not the handful their own organization registered
+    return every_bike_search_path if default_organization.law_enforcement?
+
+    organization_root_url(organization_id: default_organization.to_param)
+  end
+
+  # Deletes, so the donation modal only ever shows once - memoized because
+  # show_general_alert asks too, being what it gives way to
+  def render_donation_request?
+    return @render_donation_request if defined?(@render_donation_request)
+
+    @render_donation_request = session.delete(:render_donation_request).present?
+  end
+
+  # Set by going back to the embed form, cleared by taking the register flow's link the
+  # other way - the organized menu follows it
+  def old_register_view?
+    session[:old_register_view].present?
+  end
+
+  def old_unregistered_notification_view?
+    session[:old_unregistered_notification_view].present?
   end
 
   def show_general_alert
-    return @show_general_alert = false if @skip_general_alert || current_user.blank?
+    return @show_general_alert = false if @skip_general_alert || current_user.blank? ||
+      render_donation_request?
 
     return @show_general_alert = false unless (current_user.alert_slugs - UserAlert.disabled_kinds).any?
 
@@ -161,6 +223,12 @@ module ControllerHelpers
   end
 
   def default_bike_search_path
+    return every_bike_search_path unless passive_organization&.show_single_search_menu_item?
+
+    organization_registrations_path(organization_id: passive_organization.to_param)
+  end
+
+  def every_bike_search_path
     search_registrations_path(stolenness: "all")
   end
 
@@ -169,6 +237,8 @@ module ControllerHelpers
 
     fail ActiveRecord::RecordNotFound
   end
+
+  def local_return_to = LocalPath.only(params[:return_to])
 
   # Generally this is implicitly set - however! it can also be explicitly set
   def store_return_to(target = nil)
@@ -201,19 +271,24 @@ module ControllerHelpers
         translation(:reset_your_password,
           scope: [:controllers, :concerns, :controller_helpers, __method__])
       render(action: :update_password) && (return true)
-    when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
-      redirect_to(target) && (return true) if URI.parse(target).relative? || target.include?("/oauth/")
+    when /\A#{ENV["BASE_URL"]}/
+      redirect_to(target) && (return true) if target.include?("/oauth/")
+    when %r{\A/}
+      redirect_to(target) && (return true) if LocalPath.only(target)
     when "https://facebook.com/bikeindex"
       redirect_to(target, allow_other_host: true) && (return true)
     end
   end
 
+  # handle_target refuses an off-site target on arrival, too late to keep a caller-chosen
+  # URL out of mail we send
+  def emailable_return_to = LocalPath.only(session[:return_to])
+
   def permitted_return_to
     target = (session[:return_to] || cookies[:return_to] || params[:return_to])&.downcase
     return nil if invalid_return_to?(target)
 
-    # Either starting with our URL or /
-    target if target.start_with?(/#{ENV["BASE_URL"]}/, "/")
+    target.start_with?(/#{ENV["BASE_URL"]}/) ? target : LocalPath.only(target)
   end
 
   # Wrap `I18n.translate` for use in controllers, abstracting away
@@ -256,7 +331,7 @@ module ControllerHelpers
     end
 
     scope ||= [:controllers, controller_namespace, controller_name, controller_method.to_sym]
-    I18n.t(key, **kwargs, scope: scope.compact)
+    ActiveSupport::HtmlSafeTranslation.translate(key, **kwargs, scope: scope.compact)
   end
 
   # This is overridden in FeedbacksController and InfoController
@@ -288,7 +363,19 @@ module ControllerHelpers
     request.format.turbo_stream? || turbo_frame_request?
   end
 
-  protected
+  private
+
+  # For a bike the user can't see: a registration merged into its shop's POS registration sends its links to the
+  # same page of that one, if they can see it
+  def redirect_merged_bike_or_not_found(bike)
+    merged_into = PosRegistrationMatch.merged_into(bike) if request.get? || request.head?
+    fail ActiveRecord::RecordNotFound unless merged_into&.visible_by?(current_user)
+
+    id_param = request.path_parameters.key?(:bike_id) ? :bike_id : :id
+    # Keeps tokens, e.g. a parking notification's retrieval link, as query params only. An id there would win
+    redirect_to(url_for(request.path_parameters.merge(id_param => merged_into.id, :only_path => true,
+      :params => request.query_parameters.except("id", "bike_id"))))
+  end
 
   # passive_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the current_organization in any given request
@@ -298,9 +385,11 @@ module ControllerHelpers
     if session[:passive_organization_id].present?
       return @passive_organization = nil if session[:passive_organization_id].to_i == 0
 
-      @passive_organization = Organization.friendly_find(session[:passive_organization_id])
+      organization = Organization.friendly_find(session[:passive_organization_id])
+      # A signed in user can lose the membership the session still names
+      @passive_organization = organization if current_user.blank? || current_user.member_of?(organization)
     end
-    @passive_organization ||= set_passive_organization(current_user&.default_organization)
+    @passive_organization ||= set_passive_organization(OrganizationRole.default_organization(current_user))
   end
 
   # current_organization is the organization currently being used.
@@ -379,7 +468,7 @@ module ControllerHelpers
     redirect_to(my_account_url) && return
   end
 
-  def require_index_admin!
+  def require_index_admin!(controller_name: self.controller_name, action_name: self.action_name)
     if current_user.present?
       return true if current_user.superuser?(controller_name:, action_name:)
     end
@@ -393,6 +482,8 @@ module ControllerHelpers
 
       flash[:success] = translation(:accept_tos_for_orgs,
         scope: [:controllers, :concerns, :controller_helpers, __method__])
+      # Back here once they've accepted - a POST's path can't be revisited
+      store_return_to(request.fullpath) if request.get?
       redirect_to(accept_vendor_terms_path) && return
     elsif current_user.blank?
       flash[:notice] = translation(:please_sign_in,
@@ -408,7 +499,8 @@ module ControllerHelpers
   end
 
   def invalid_return_to?(target)
-    return true if target.blank?
+    # The session is a cookie, which overflows past 4KB
+    return true if target.blank? || target.length > 2000
 
     # return_to can't be a sign in/up page, or we'll loop
     ["/users/new", "/session/new", "/session/magic_link", "/integrations", "/users/please_confirm_email"].any? { |r| target.match?(r) }
@@ -429,9 +521,7 @@ module ControllerHelpers
     redirect_site = Addressable::URI.parse(redirect_redirect_uri)&.site&.downcase
     return nil if redirect_site.blank?
 
-    # redirect_site = Addressable::URI.parse(redirect_redirect_uri)&
-    # Get redirect uris from BikeHub app and BikeHub dev app (by their ids)
-    valid_redirect_urls = Doorkeeper::Application.where(id: [264, 356]).pluck(:redirect_uri)
+    valid_redirect_urls = Doorkeeper::Application.where(id: PARTNER_DOORKEEPER_APP_IDS).pluck(:redirect_uri)
       .map { |u| u.downcase.split("\s") }.flatten.map(&:strip)
     (valid_redirect_urls.any? { |u| u.start_with?(redirect_site) }) ? redirect_site : nil
   end

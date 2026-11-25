@@ -1,0 +1,15 @@
+<div
+  data-registrations--show--action-panels-target="panel"
+  data-panel-name="impound_update"
+  class="tw:hidden"
+>
+  <%= render(UI::Card::Component.new) do %>
+    <h2 class="tw:tweyebrow">
+      <%= translation(".title") %>
+    </h2>
+
+    <div class="tw:mt-4">
+      <%= render(Pages::Org::ImpoundRecords::UpdateForm::Component.new(current_organization: @organization, impound_record:, card: false)) %>
+    </div>
+  <% end %>
+</div>

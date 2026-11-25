@@ -8,9 +8,11 @@ RSpec.describe Admin::StripePricesController, type: :request do
 
     describe "index" do
       it "responds with 200 OK and renders the index template" do
+        stripe_price = FactoryBot.create(:stripe_price_basic)
         get base_url
         expect(response).to be_ok
         expect(response).to render_template(:index)
+        expect(response.body).to include(stripe_price.stripe_id)
       end
     end
   end

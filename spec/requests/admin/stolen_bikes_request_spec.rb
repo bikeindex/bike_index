@@ -10,17 +10,56 @@ RSpec.describe Admin::StolenBikesController, type: :request do
     describe "index" do
       it "renders" do
         _bike = FactoryBot.create(:bike)
+        stolen_record.update(police_report_department: "Oakland PD", police_report_number: "26-004512")
         get base_url
         expect(response.code).to eq("200")
         expect(response).to render_template("index")
         expect(flash).to_not be_present
         expect(assigns(:stolen_records)).to match_array([stolen_record])
+        expect(response.body).to include("Contact owner", "Oakland PD", "26-004512")
+        expect(response.body).to include('data-ui--table-column-order-storage-key-value="adminStolenBikesColumnsOrder"')
+        expect(response.body).to include('name="photo_cell"', 'data-narrow-hidden="true"', 'data-controller="ui--table-overflow"')
         # test the search_with_promoted_alert because scoping is weird
         get "#{base_url}?search_with_promoted_alert=true"
         expect(response.code).to eq("200")
         expect(response).to render_template("index")
         expect(flash).to_not be_present
         expect(assigns(:stolen_records)).to match_array([])
+      end
+
+      context "with a stolen record without a location" do
+        let!(:stolen_record_without_location) do
+          FactoryBot.create(:stolen_bike, latitude: nil, longitude: nil).current_stolen_record
+        end
+        it "counts and lists it separately" do
+          expect(stolen_record_without_location.latitude).to be_nil
+          get base_url
+          expect(assigns(:stolen_records)).to match_array([stolen_record])
+          expect(assigns(:unapproved_without_location_count)).to eq 1
+          get "#{base_url}?search_without_location=true"
+          expect(assigns(:stolen_records)).to match_array([stolen_record_without_location])
+        end
+      end
+
+      context "with a period" do
+        it "narrows by it" do
+          stolen_record.update_column :created_at, 1.month.ago
+          get base_url
+          expect(assigns(:stolen_records)).to match_array([stolen_record])
+          expect(response.body).to include("period=week")
+          get "#{base_url}?period=week"
+          expect(response.code).to eq("200")
+          expect(assigns(:stolen_records)).to match_array([])
+        end
+      end
+
+      context "with a duplicate" do
+        let!(:duplicate_bike_group) { FactoryBot.create(:duplicate_bike_group, bike1: bike) }
+        it "links to the duplicates" do
+          get base_url
+          expect(response.code).to eq("200")
+          expect(response.body).to include("/admin/bikes/#{bike.id}?active_tab=duplicates")
+        end
       end
     end
 
@@ -47,6 +86,23 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           expect(response.code).to eq("200")
           expect(response).to render_template("edit")
           expect(flash).to_not be_present
+        end
+
+        context "with a photo" do
+          let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
+          # A return_to without stolen_record_id read the stolen record's id as a bike's, and raised
+          it "returns from the photo edit to the stolen record" do
+            get "#{base_url}/#{recovered_record.id}/edit?stolen_record_id=1"
+            href = Nokogiri::HTML(response.body).at_css("a:contains('user edit')")["href"]
+            expect(Rack::Utils.parse_query(URI(href).query)["return_to"]).to eq "/admin/stolen_bikes/#{recovered_record.id}/edit?stolen_record_id=1"
+          end
+        end
+      end
+
+      context "with no bike" do
+        it "responds 404" do
+          get "#{base_url}/#{bike.id + 1000}/edit"
+          expect(response.code).to eq("404")
         end
       end
     end
@@ -94,28 +150,79 @@ RSpec.describe Admin::StolenBikesController, type: :request do
           expect(BikeJobs::ActivateTheftAlertJob.jobs.map { |j| j["args"] }.last.flatten).to eq([theft_alert.id])
         end
       end
-      context "multi_approve" do
-        let(:stolen_record2) { FactoryBot.create(:stolen_record) }
-        let!(:stolen_record3) { FactoryBot.create(:stolen_record) }
-        it "approves them all" do
-          bike.reload
-          stolen_record.reload
-          expect(stolen_record.approved).to be_falsey
-          expect(stolen_record2.approved).to be_falsey
-          Sidekiq::Job.clear_all
-          post "#{base_url}/multi_approve/approve", params: {
-            sr_selected: {stolen_record.id => stolen_record.id, stolen_record2.id => stolen_record2.id}
-          }
-          bike.reload
-          stolen_record.reload
-          expect(stolen_record.approved).to be_truthy
-          expect(stolen_record2.reload.approved).to be_truthy
-          # Sanity check!
-          expect(stolen_record3.reload.approved).to be_falsey
-          expect(flash[:success]).to be_present
-          expect(BikeJobs::ApproveStolenListingJob.jobs.count).to eq 2
-          expect(BikeJobs::ApproveStolenListingJob.jobs.map { |j| j["args"] }.flatten).to eq([bike.id, stolen_record2.bike_id])
+    end
+
+    describe "bulk_update" do
+      let(:stolen_record2) { FactoryBot.create(:stolen_record) }
+      let!(:stolen_record3) { FactoryBot.create(:stolen_record) }
+      let(:sr_selected) { {stolen_record.id => stolen_record.id, stolen_record2.id => stolen_record2.id} }
+
+      it "approves them all" do
+        expect(stolen_record.reload.approved).to be_falsey
+        expect(stolen_record2.approved).to be_falsey
+        Sidekiq::Job.clear_all
+        patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "approve"}
+        expect(stolen_record.reload.approved).to be_truthy
+        expect(stolen_record2.reload.approved).to be_truthy
+        # Sanity check!
+        expect(stolen_record3.reload.approved).to be_falsey
+        expect(flash[:success]).to eq "2 stolen bikes approved"
+        expect(BikeJobs::ApproveStolenListingJob.jobs.map { |j| j["args"] }.flatten).to match_array([bike.id, stolen_record2.bike_id])
+      end
+
+      it "marks the bikes spam" do
+        patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "spam"}
+        expect(flash[:success]).to eq "2 stolen bikes marked spam"
+        expect(Bike.unscoped.find(bike.id).likely_spam).to be_truthy
+        expect(Bike.unscoped.find(stolen_record2.bike_id).likely_spam).to be_truthy
+        expect(stolen_record3.bike.reload.likely_spam).to be_falsey
+      end
+
+      it "deletes the bikes" do
+        patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "delete"}
+        expect(flash[:success]).to eq "2 stolen bikes deleted"
+        expect(Bike.unscoped.find(bike.id).deleted_at).to be_present
+        expect(Bike.unscoped.find(stolen_record2.bike_id).deleted_at).to be_present
+        expect(stolen_record3.bike.reload.deleted_at).to be_blank
+      end
+
+      context "with sr_selected as an array" do
+        it "approves them" do
+          patch "#{base_url}/bulk_update", params: {sr_selected: [stolen_record.id, stolen_record2.id], bulk_action: "approve"}
+          expect(flash[:success]).to eq "2 stolen bikes approved"
+          expect(stolen_record.reload.approved).to be_truthy
         end
+      end
+
+      context "nothing selected" do
+        it "flashes an error" do
+          patch "#{base_url}/bulk_update", params: {bulk_action: "approve"}
+          expect(flash[:error]).to be_present
+        end
+      end
+
+      context "unknown action" do
+        it "flashes an error" do
+          patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "destroy_all"}
+          expect(flash[:error]).to be_present
+          expect(stolen_record.reload.approved).to be_falsey
+        end
+      end
+    end
+
+    context "with only the stolen_bikes approve ability" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let!(:superuser_ability) { SuperuserAbility.create(user: current_user, controller_name: "stolen_bikes", action_name: "approve") }
+      let(:sr_selected) { {stolen_record.id => stolen_record.id} }
+
+      it "bulk approves, but doesn't delete" do
+        patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "approve"}
+        expect(flash[:success]).to eq "1 stolen bike approved"
+        expect(stolen_record.reload.approved).to be_truthy
+
+        patch "#{base_url}/bulk_update", params: {sr_selected:, bulk_action: "delete"}
+        expect(flash[:error]).to match(/administrator/)
+        expect(bike.reload.deleted_at).to be_blank
       end
     end
 

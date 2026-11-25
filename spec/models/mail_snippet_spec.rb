@@ -46,6 +46,12 @@ RSpec.describe MailSnippet, type: :model do
     end
   end
 
+  describe "kind_display" do
+    it "names the kind and the emails it appears in" do
+      expect(MailSnippet.kind_display("header")).to eq "Header - in all emails"
+    end
+  end
+
   describe "organization_email" do
     let(:mail_snippet) { MailSnippet.new(kind: kind) }
     let(:kind) { "header" }

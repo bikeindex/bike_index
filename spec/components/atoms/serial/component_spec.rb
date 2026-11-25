@@ -1,0 +1,159 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe Atoms::Serial::Component, type: :component do
+  let(:instance) { described_class.new(bike:, **options) }
+  let(:component) { render_inline(instance) }
+  let(:options) { {} }
+  let(:bike) { FactoryBot.create(:bike, serial_number: "FFF333") }
+
+  it "renders the serial" do
+    expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
+  end
+
+  context "with explanation: :serial_tooltip" do
+    let(:options) { {explanation: :serial_tooltip} }
+
+    it "makes the serial the tooltip's trigger" do
+      expect(component.css("button span.serial-span").text).to eq "FFF333"
+      expect(component.css("[role=tooltip]").text).to eq "Serial number: FFF333"
+    end
+  end
+
+  context "serial unknown" do
+    let(:bike) { FactoryBot.create(:bike, serial_number: "unknown") }
+
+    it "renders the word rather than the number" do
+      expect(component.to_html.strip).to eq '<span class="less-strong">unknown</span>'
+    end
+  end
+
+  context "made without serial" do
+    let(:bike) { FactoryBot.create(:bike, made_without_serial: true) }
+
+    it "renders made without serial" do
+      expect(component.to_html.strip).to eq '<span class="less-strong">made without serial</span>'
+    end
+  end
+
+  context "hidden serial" do
+    let(:bike) { FactoryBot.create(:bike, serial_number: "FFF333", cycle_type: :tandem) }
+    before { bike.status = "status_impounded" }
+
+    it "hides the serial and explains why" do
+      expect(component.to_html.strip)
+        .to eq '<span class="less-strong">hidden</span> <em class="less-strong tw:text-xs">because tandem is impounded</em>'
+    end
+
+    context "with explanation: :tooltip" do
+      let(:options) { {explanation: :tooltip} }
+
+      it "hides the serial with the explanation in a tooltip" do
+        expect(component.css("span.less-strong").text).to eq "hidden"
+        expect(component.css("em")).to be_blank
+        expect(component.css("button").text).to eq "?"
+        expect(component.css("[role=tooltip]").text).to eq "because tandem is impounded"
+      end
+    end
+
+    context "with explanation: :serial_tooltip" do
+      let(:options) { {explanation: :serial_tooltip} }
+
+      it "puts why in the serial's own tooltip" do
+        expect(component.css("button span.less-strong").text).to eq "hidden"
+        expect(component.css("[role=tooltip]").text).to eq "Serial number: hidden (because tandem is impounded)"
+      end
+    end
+
+    context "for an organization the bike is registered with" do
+      let(:bike) { FactoryBot.create(:bike_organized, :impounded, serial_number: "FFF333", cycle_type: :tandem).reload }
+      let(:options) { {organization: bike.organizations.first} }
+
+      it "shows the serial with the unauthorized-users note" do
+        expect(component.css("span.serial-span").text).to eq "FFF333"
+        expect(component.css("em").text).to eq "hidden for unauthorized users"
+      end
+
+      context "with another organization" do
+        let(:options) { {organization: FactoryBot.create(:organization)} }
+
+        it "hides the serial" do
+          expect(component.css("span.less-strong").text).to eq "hidden"
+        end
+      end
+    end
+
+    context "for a user who may see it" do
+      let(:options) { {user: FactoryBot.create(:superuser)} }
+
+      it "shows the serial with the unauthorized-users note, and why in a tooltip" do
+        expect(component.css("span.serial-span").text).to eq "FFF333"
+        expect(component.css("em").text).to eq "hidden for unauthorized users"
+        expect(component.css("[role=tooltip]").text).to eq "because tandem is impounded"
+      end
+
+      context "with explanation: :tooltip" do
+        let(:options) { super().merge(explanation: :tooltip) }
+
+        it "shows the serial with the note in a tooltip" do
+          expect(component.css("span.serial-span").text).to eq "FFF333"
+          expect(component.css("[role=tooltip]").text).to eq "hidden for unauthorized users"
+        end
+      end
+    end
+  end
+
+  context "owner of a bike impounded by an organization" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, serial_number: "FFF333") }
+    let(:options) { {user: bike.user} }
+    before { FactoryBot.create(:impound_record_with_organization, bike:) }
+
+    it "shows the serial with the unauthorized-users note, although not authorized" do
+      expect(bike.reload.authorized?(bike.user)).to be_falsey
+      expect(component.css("span.serial-span").text).to eq "FFF333"
+      expect(component.css("em").text).to eq "hidden for unauthorized users"
+      expect(component.css("[role=tooltip]").text).to eq "because bike is impounded"
+    end
+  end
+
+  context "no serial" do
+    let(:bike) { Bike.new }
+
+    it "renders nothing" do
+      expect(component.to_html).to be_blank
+    end
+  end
+
+  context "with a bike_version" do
+    let(:bike) { FactoryBot.create(:bike_version, bike: FactoryBot.create(:bike, serial_number: "FFF333")) }
+
+    it "renders the serial" do
+      expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
+    end
+  end
+
+  context "with a serial rather than a bike" do
+    let(:instance) { described_class.new(serial: "FFF333", **options) }
+
+    it "renders the serial" do
+      expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
+    end
+
+    context "with html_class" do
+      let(:options) { {html_class: "tw:underline!"} }
+
+      it "adds the class to the span" do
+        expect(component.to_html.strip).to eq '<span class="serial-span tw:underline!">FFF333</span>'
+      end
+    end
+
+    context "matching a placeholder" do
+      let(:instance) { described_class.new(serial: "unknown", **options) }
+
+      it "renders the serial rather than the placeholder" do
+        expect(component.to_html.strip).to eq '<span class="serial-span">unknown</span>'
+      end
+    end
+  end
+end

@@ -15,6 +15,8 @@ export default class extends Controller {
     // A bfcache restore resumes the page without reconnecting, so the reset
     // needs pageshow as well as connect (which covers Turbo cache restores)
     window.addEventListener('pageshow', this.reset)
+    // For a submit that ended without the page going anywhere - see register--retry
+    this.element.addEventListener('spinner:reset', this.reset)
     this.reset()
   }
 
@@ -22,6 +24,7 @@ export default class extends Controller {
     this.form?.removeEventListener('submit', this.start)
     this.form = null
     window.removeEventListener('pageshow', this.reset)
+    this.element.removeEventListener('spinner:reset', this.reset)
   }
 
   start = () => {

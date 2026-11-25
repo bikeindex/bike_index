@@ -1,3 +1,7 @@
+@import "legacy_includes/css_layers";
+
+@layer legacy {
+
 /**** app/assets/stylesheets/og_application.ass ***/
 .red-text {
     color: #c0392b
@@ -6238,17 +6242,6 @@ label {
     cursor: default
 }
 
-.less-strong {
-    color: #b1b1b1
-}
-
-input.less-strong {
-    border: none;
-    background: transparent;
-    font-size: .8em;
-    box-shadow: none
-}
-
 .overflow-text {
     overflow: hidden;
     text-overflow: ellipsis;
@@ -8949,10 +8942,6 @@ label.index-image-select input {
     margin: -.25em .5em 0 0
 }
 
-#binx_stolen_widget {
-    height: 350px
-}
-
 @media (min-width: 800px) {
     .involve-yerself {
         *zoom: 1;
@@ -10074,10 +10063,6 @@ body .selectize-dropdown .active {
     display: none
 }
 
-.full-screen-table .less-strong {
-    color: #b1b1b1
-}
-
 .full-screen-table .less-strong-hold {
     position: relative
 }
@@ -10114,12 +10099,6 @@ body .selectize-dropdown .active {
     .medium-screens {
         display: none
     }
-}
-
-.table td.table-cell-check {
-    font-family: Courier;
-    text-align: center;
-    font-weight: bold
 }
 
 .error-text {
@@ -16314,3 +16293,5 @@ body.welcome-page .content:before {
 .text-success {
     color: #27ae60;
 }
+
+} // end @layer legacy

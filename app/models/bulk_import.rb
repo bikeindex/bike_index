@@ -20,7 +20,7 @@
 class BulkImport < ApplicationRecord
   PROGRESS_ENUM = {pending: 0, ongoing: 1, finished: 2}.freeze
   KIND_ENUM = {organization_import: 0, unorganized: 1, ascend: 2, impounded: 3, stolen: 4}.freeze
-  VALID_FILE_EXTENSIONS = %(csv tsv).freeze
+  VALID_FILE_EXTENSIONS = %w[csv tsv].freeze
   TIMEOUT_FAILURE_DELAY = 20.minutes.freeze
   mount_uploader :file, BulkImportUploader
 
@@ -115,6 +115,11 @@ class BulkImport < ApplicationRecord
     import_errors["bikes"] == "none_imported"
   end
 
+  # Rows that matched a bike registered before this import, so registered nothing new
+  def matched_count
+    data&.dig("matched_count").to_i
+  end
+
   def ascend_unprocessable?
     ascend? && organization_id.blank?
   end
@@ -143,13 +148,19 @@ class BulkImport < ApplicationRecord
     !no_notify
   end
 
-  def no_duplicate=(val)
-    self.data ||= {}
-    data["no_duplicate"] = Binxtils::InputNormalizer.boolean(val)
+  def allow_duplicate=(val)
+    self.data = (data || {}).merge("allow_duplicate" => Binxtils::InputNormalizer.boolean(val))
   end
 
-  def no_duplicate
-    ascend? || Binxtils::InputNormalizer.boolean(data&.dig("no_duplicate"))
+  def allow_duplicate
+    return false if ascend?
+
+    Binxtils::InputNormalizer.boolean(data&.dig("allow_duplicate"))
+  end
+
+  # Short serials (e.g. "1") are often junk shared by distinct bikes with one owner email
+  def no_duplicate_for?(serial)
+    !allow_duplicate && SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(serial)).to_s.length >= 6
   end
 
   def creator
@@ -205,10 +216,15 @@ class BulkImport < ApplicationRecord
     }
   end
 
+  def stolen_record=(val)
+    self.data = (data || {}).merge("stolen_record" => val)
+  end
+
   def stolen_record_attrs
     return {} unless stolen? && data&.dig("stolen_record").present?
 
-    data["stolen_record"].merge(proof_of_ownership: true, receive_notifications: true)
+    StolenRecord.legacy_attrs_renamed(data["stolen_record"])
+      .merge(proof_of_ownership: true, receive_notifications: true)
   end
 
   def set_calculated_attributes
@@ -220,7 +236,7 @@ class BulkImport < ApplicationRecord
     unless creator.present?
       add_file_error("Needs to have a user or an organization with an auto user", skip_save: true)
     end
-    if finished? && bikes.count == 0
+    if finished? && bikes.count == 0 && matched_count.zero?
       import_errors["bikes"] = "none_imported"
     end
     true

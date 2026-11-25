@@ -8,18 +8,16 @@ description: >-
   "in production" (`Vips::Error`, `NoMethodError in AfterStolenRecordSaveJob`),
   or phrasings like "fix this Honeybadger error", "why is this erroring in
   prod", "what's causing this exception", "look at this HB fault". Use
-  `bin/binx_hb` for fault and notice detail rather than the Honeybadger MCP,
-  whose notice objects run ~3K tokens each. Not for a broad production health
-  sweep across many sources, and not for reading raw log files (that's
-  production-log-inspection).
+  `bin/binx_hb` for fault and notice detail; it is the only Honeybadger reader
+  this repo uses. Not for a broad production health sweep across many sources,
+  and not for reading raw log files (that's production-log-inspection).
 ---
 
 # Fixing a Honeybadger exception
 
 ## Pull the fault with `bin/binx_hb`
 
-Run it from the repo root — `bin/binx_hb` with no arguments prints its own usage.
-Two modes matter here: `fault` for the summary, `notice` for the backtrace.
+Run it from the repo root. Two modes matter here: `fault` for the summary, `notice` for the backtrace.
 
 ```
 bin/binx_hb fault  https://app.honeybadger.io/projects/35931/faults/133010748
@@ -32,14 +30,9 @@ line — answer follow-up questions with `jq` against that file rather than
 fetching again.
 
 It reads `HONEYBADGER_PERSONAL_AUTH_TOKEN` from `.env.development`. Without it
-the command exits saying so; fall back to the Honeybadger MCP's
-`list_fault_notices` **through a subagent**, so the payload stays out of the main
-context.
-
-**Why not the MCP directly:** its notice objects carry `backtrace` and
-`application_trace` as byte-identical copies plus full environment blobs — ~3K
-tokens for a backtrace `binx_hb` projects in ~700. The MCP is still right for
-aggregates (`get_project_report`, `get_fault_counts`).
+the command exits saying so — get a new token at honeybadger.io/users/edit and
+ask the user to set it. Aggregates are covered too — `binx_hb faults`, `trend`
+and `counts`.
 
 ## Read the notice in this order
 
@@ -65,6 +58,10 @@ Decide which kind of fault it is first — the two need different work.
 
 - Reproduce from `args`/`params` before changing code — `bundle exec rails
   runner` against the dev database is usually enough.
+- **A decoder error isn't proof the file is bad.** Production's libvips and libheif are Ubuntu's
+  packages (`.cloud66/deploy_hooks.yml`), older than Homebrew's — download the stored file and
+  decode it locally before treating it as corrupt. The "bad seek" in fault 134271942 read as
+  truncation, and was a valid iPhone HEIC that libheif 1.17 couldn't parse.
 - Cover the fix with a spec; the `rspec-testing` skill has the house style.
 - Check whether the same pattern exists elsewhere. `Errno::ENOENT` in one image
   job usually means every image job shares the bug.
@@ -79,7 +76,7 @@ and then nothing, with a `message` naming the provider rather than your code.
   *retryable* job — `retry: false` reports every blip, and `ScheduledJob`
   defaults to it.
 - A retry only silences a blip shorter than Sidekiq's first backoff,
-  `15 + rand(30)` seconds. Check the notice timestamps against that.
+  `15 + rand(10)` seconds. Check the notice timestamps against that.
 - Check what a mid-operation failure leaves behind — retrying doesn't help work
   that isn't idempotent. `ActiveStorage::Blob#purge` destroys the row before
   deleting the file, so a failed delete orphans the file for good.

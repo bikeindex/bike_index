@@ -35,6 +35,10 @@ module BikeAttributable
     %w[status_stolen status_impounded].include?(status)
   end
 
+  def status_abandoned_or_impounded?
+    %w[status_abandoned status_impounded].include?(status)
+  end
+
   def status_found?
     return false unless status_impounded?
 
@@ -50,12 +54,6 @@ module BikeAttributable
 
   def status_humanized_translated
     Bike.status_humanized_translated(status_humanized)
-  end
-
-  def status_humanized_no_with_owner
-    return "" if status == "status_with_owner"
-
-    status_humanized
   end
 
   # We may eventually remove the boolean. For now, we're just going with it.
@@ -76,11 +74,11 @@ module BikeAttributable
   end
 
   def frame_colors
-    [
-      primary_frame_color&.name,
-      secondary_frame_color&.name,
-      tertiary_frame_color&.name
-    ].compact
+    frame_color_records.map(&:name)
+  end
+
+  def frame_color_records
+    [primary_frame_color, secondary_frame_color, tertiary_frame_color].compact
   end
 
   # When displaying the cycle_type, generally this is what you want
@@ -196,30 +194,12 @@ module BikeAttributable
     ].flatten.reject(&:blank?).uniq
   end
 
-  # development with remote image url fix
-  REMOTE_IMAGE_FALLBACK_URLS = Rails.env.development?
-
   def image_url(size = nil)
     if thumb_path.blank?
       return stock_photo_url.present? ? stock_photo_url : nil
     end
 
-    public_image = public_images.limit(1).first
-    # PublicImage owns which backend a row is on
-    return public_image.image_url(size) if public_image&.activestorage?
-
-    image_col = public_image&.image
-    # NOTE: avoid image_col.blank? — on Fog storage it issues an S3 HEAD per call (timed out the API search).
-    return nil if image_col&.path.blank? && !REMOTE_IMAGE_FALLBACK_URLS
-
-    image_url = image_col&.send(:url, size)
-    # image_col.blank? and image_url.present? indicates it's a remote file in local development
-    if REMOTE_IMAGE_FALLBACK_URLS && image_col.blank? && image_url.present?
-      # Create a image_url using the aws path
-      "https://files.bikeindex.org" + image_url.gsub(ENV["BASE_URL"], "")
-    else
-      image_url
-    end
+    public_images.first&.image_url(size)
   end
 
   protected

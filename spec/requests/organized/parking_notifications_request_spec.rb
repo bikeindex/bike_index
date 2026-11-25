@@ -9,106 +9,159 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
   let(:enabled_feature_slugs) { %w[parking_notifications impound_bikes] }
 
   describe "index" do
+    def notification_rows = response.body.scan(%r{/parking_notifications/(\d+)"}).flatten.map(&:to_i).uniq
+
     it "renders" do
       get base_url
       expect(response.status).to eq(200)
-      expect(response).to render_template(:index)
+      expect(response.body).to match("No matching notifications")
     end
-    context "json" do
-      it "returns empty" do
-        get base_url, params: {format: :json}
-        expect(response.status).to eq(200)
-        expect(json_result).to eq("parking_notifications" => [])
-        expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
-        expect(response.headers["Access-Control-Request-Method"]).not_to be_present
-        expect(response.headers["Vary"]).to eq "Accept,Accept-Encoding"
-      end
-      context "with an impound_record" do
-        let(:impound_record) { FactoryBot.create(:impound_record_with_organization, organization: current_organization) }
-        let!(:parking_notification1) do
-          FactoryBot.create(:parking_notification_organized,
-            organization: current_organization,
-            bike: bike,
-            created_at: Time.current - 1.hour,
-            impound_record: impound_record)
-        end
-        let(:target) do
-          {
-            id: parking_notification1.id,
-            kind: "parked_incorrectly_notification",
-            kind_humanized: "Parked incorrectly",
-            status: "impounded",
-            created_at: parking_notification1.created_at.to_i,
-            lat: parking_notification1.latitude,
-            lng: parking_notification1.longitude,
-            user_id: parking_notification1.user_id,
-            user_display_name: parking_notification1.user.display_name,
-            impound_record_id: impound_record&.id,
-            message: parking_notification1.message,
-            internal_notes: parking_notification1.internal_notes,
-            image_url: nil,
-            resolved_at: parking_notification1.resolved_at&.to_i,
-            unregistered_bike: false,
-            notification_number: 1,
-            bike: {
-              id: bike.id,
-              title: bike.title_string
-            }
-          }
-        end
-        it "renders json, no cors present" do
-          get base_url, params: {search_status: "all", format: :json}
-          expect(response.status).to eq(200)
-          parking_notifications = json_result["parking_notifications"]
-          expect(parking_notifications.count).to eq 1
-          expect(parking_notifications.first).to eq target.as_json
-          expect(response.headers["Access-Control-Allow-Origin"]).not_to be_present
-          expect(response.headers["Access-Control-Request-Method"]).not_to be_present
+    context "with parking notifications" do
+      let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization: current_organization, bike:) }
+      let!(:parking_notification_retrieved) { FactoryBot.create(:parking_notification_organized, :retrieved, organization: current_organization) }
+      let(:bounding_box_params) { {search_southwest_coords: "40.7,-74.1", search_northeast_coords: "40.8,-73.9"} }
+      def notification_path(notification) = organization_parking_notification_path(notification, organization_id: current_organization.id)
 
-          # Also test that current is default scope
-          get base_url, params: {format: :json}
-          expect(response.status).to eq(200)
-          parking_notifications = json_result["parking_notifications"]
-          expect(parking_notifications.count).to eq 0
-        end
+      it "renders the current ones for the map" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response.body).to include(notification_path(parking_notification))
+        expect(response.body).to include(%(data-latitude="#{parking_notification.latitude}"))
+        expect(response.body).not_to include(notification_path(parking_notification_retrieved))
+        expect(response.body).to include(%(data-org--parking-notifications-index-bounding-box-value="[]"))
+
+        get base_url, params: bounding_box_params.merge(search_status: "all", map_location: "New York")
+        expect(response.status).to eq(200)
+        expect(response.body).to include(notification_path(parking_notification_retrieved))
+        expect(response.body).to include(%(data-org--parking-notifications-index-bounding-box-value="[40.7,-74.1,40.8,-73.9]"))
+        expect(response.body).to include(%(href="#{base_url}?search_status=all">search everywhere</a>))
+        # organization_id is the path's, so no link repeats it as a query param
+        expect(response.body).to include(%(href="#{base_url}?search_kind=appears_abandoned_notification&amp;search_northeast_coords=40.8%2C-73.9))
+        expect(response.body).not_to match(/parking_notifications\?[^"]*organization_id=/)
+        expect(response.body).to match(/data-org--parking-notifications-index-place-value="\[-?[\d.]+,-?[\d.]+\]"/)
       end
     end
     context "with searched bike" do
       let(:coords1) { [40.79426110344111, -77.86604158369109] }
       let(:coords2) { [40.69908378081713, -77.76302033475155] }
-      let(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords1.first, longitude: coords1.last) }
-      let(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords2.first, longitude: coords2.last) }
+      let!(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords1.first, longitude: coords1.last) }
+      let!(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization, latitude: coords2.first, longitude: coords2.last) }
       let(:bike) { parking_notification2.bike }
-      it "renders", vcr: true do
+
+      it "renders" do
         expect(parking_notification1.to_coordinates).to eq coords1
         expect(parking_notification2.to_coordinates).to eq coords2
         expect(bike.owner_email).to_not eq parking_notification1.bike.owner_email
-        get base_url, params: {search_bike_id: bike.id, per_page: 250}, headers: json_headers
+        get base_url, params: {search_bike_id: bike.id}
         expect(response.status).to eq(200)
-        expect(json_result["parking_notifications"].count).to eq 1
-        expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
-        expect(response.header["Per-Page"]).to eq "250"
+        expect(notification_rows).to eq([parking_notification2.id])
 
-        get base_url, params: {search_email: bike.owner_email, per_page: 500}, headers: json_headers
+        get base_url, params: {search_email: bike.owner_email}
+        expect(notification_rows).to eq([parking_notification2.id])
+
+        # Newest first, and per_page caps what's loaded
+        get base_url, params: {per_page: 1}
+        expect(notification_rows).to eq([parking_notification2.id])
+        expect(response.body).to include(%(<span class="">2</span> total matches))
+        expect(response.body).to include(%(first <span class="">1</span> loaded))
+
+        get base_url, params: {search_southwest_coords: "40.79184719166159,-77.87257982819405", search_northeast_coords: "40.80632036997267,-77.85346084130906"}
+        expect(notification_rows).to eq([parking_notification1.id])
+      end
+    end
+    context "searching notes" do
+      let!(:parking_notification1) { FactoryBot.create(:parking_notification, organization: current_organization, message: "Locked to the RAILING by the door") }
+      let!(:parking_notification2) { FactoryBot.create(:parking_notification, organization: current_organization, internal_notes: "Owner called about it") }
+
+      it "matches the message and the internal notes" do
+        get base_url, params: {search_notes: " railing "}
         expect(response.status).to eq(200)
-        expect(json_result["parking_notifications"].count).to eq 1
-        expect(json_result["parking_notifications"].first.dig("bike", "id")).to eq bike.id
-        expect(response.header["Per-Page"]).to eq "250" # Because it's over the max permitted
+        expect(notification_rows).to eq([parking_notification1.id])
+        expect(response.body).to include(%(placeholder="Search notification message/notes"))
+        expect(response.body).to include(%(value=" railing "))
 
-        # Pagination tests
-        get "#{base_url}?per_page=1&page=2", headers: json_headers
-        expect(response.status).to eq(200)
-        expect(response.header["Total"]).to eq("2")
-        expect(response.header["Per-Page"]).to eq "1"
-        expect(response.header["Link"].match('page=1&per_page=1>; rel=\"prev\"')).to be_present
-        expect(json_result[:parking_notifications].count).to eq 1
-        expect(json_result[:parking_notifications].first[:id]).to eq parking_notification1.id # Because it was created last
+        get base_url, params: {search_notes: "owner called"}
+        expect(notification_rows).to eq([parking_notification2.id])
 
-        # location tests
-        get "#{base_url}?search_southwest_coords=40.79184719166159,-77.87257982819405&search_northeast_coords=40.80632036997267,-77.85346084130906", headers: json_headers
-        expect(json_result[:parking_notifications].count).to eq 1
-        expect(json_result[:parking_notifications].first[:id]).to eq parking_notification1.id
-        expect(response.header["Per-Page"]).to eq "200"
+        get base_url, params: {search_notes: "%"}
+        expect(notification_rows).to eq([])
+      end
+    end
+    context "json" do
+      it "isn't served" do
+        get base_url, params: {format: :json}
+        expect(response.status).to eq(406)
+      end
+    end
+  end
+
+  describe "new" do
+    it "renders the unregistered notification form, which submits to organized bikes" do
+      get "#{base_url}/new"
+      expect(response.status).to eq(200)
+      expect(response.body).to include(%(action="/o/#{current_organization.to_param}/bikes"))
+      expect(response.body).to include("parking_notification[kind]")
+      expect(response.body).to include("/o/#{current_organization.to_param}/registrations/settings")
+      expect(checked_kind).to eq "appears_abandoned_notification"
+
+      get "#{base_url}/new", params: {kind: "impound_notification"}
+      expect(checked_kind).to eq "impound_notification"
+
+      get "#{base_url}/new", params: {kind: "not_a_kind"}
+      expect(checked_kind).to eq "appears_abandoned_notification"
+    end
+
+    def checked_kind
+      Nokogiri::HTML(response.body).at_css("input[name='parking_notification[kind]'][checked]")["value"]
+    end
+
+    context "with the old unregistered notification page" do
+      let(:current_organization) { FactoryBot.create(:organization_with_organization_features, :with_auto_user, enabled_feature_slugs:) }
+      let(:registrations_url) { "/o/#{current_organization.to_param}/registrations" }
+      let(:legacy_path) { new_organization_bike_path(organization_id: current_organization.to_param, parking_notification: true) }
+      # Not a let - it's read after each request in turn, and a let would memoize the first
+      def old_view_checkbox
+        get "#{registrations_url}/settings"
+        Nokogiri::HTML(response.body).at_css("input[name=old_unregistered_notification_view]")
+      end
+
+      it "sends the page to the legacy form, apart from the registration page's setting" do
+        expect(old_view_checkbox["checked"]).to be_blank
+
+        post "#{registrations_url}/switches", params: {old_unregistered_notification_view: true}
+        expect(session[:old_unregistered_notification_view]).to be_truthy
+        expect(old_view_checkbox["checked"]).to be_present
+        get "#{base_url}/new"
+        expect(response).to redirect_to legacy_path
+
+        impounded_path = new_organization_bike_path(organization_id: current_organization.to_param,
+          parking_notification: true, kind: "impound_notification")
+        get "#{base_url}/new", params: {kind: "impound_notification"}
+        expect(response).to redirect_to impounded_path
+        follow_redirect!
+        iframe_src = Nokogiri::HTML(response.body).at_css("iframe")["src"]
+        expect(iframe_src).to include("kind=impound_notification")
+        get iframe_src
+        expect(checked_kind).to eq "impound_notification"
+
+        # Both submit together, so the old registration page alone turns this off
+        post "#{registrations_url}/switches", params: {old_view: true}
+        expect(session[:old_register_view]).to be_truthy
+        get "#{base_url}/new"
+        expect(response.status).to eq 200
+      end
+    end
+
+    context "organization without parking_notifications" do
+      let(:enabled_feature_slugs) { [] }
+
+      it "redirects, and the settings don't offer its old page" do
+        get "#{base_url}/new"
+        expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
+        expect(flash[:error]).to be_present
+
+        get "/o/#{current_organization.to_param}/registrations/settings"
+        expect(response.body).to_not include("old_unregistered_notification_view")
       end
     end
   end
@@ -119,6 +172,8 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
       get "#{base_url}/#{parking_notification.to_param}"
       expect(response.status).to eq(200)
       expect(response).to render_template :show
+      expect(response.body).to include('data-registrations--show--map-latitude-value="40.7143528"')
+      expect(response.body).to_not match("maps.googleapis.com")
     end
   end
 
@@ -171,7 +226,7 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           current_organization.reload
           invoice = current_organization.current_invoices.first
           expect(invoice.paid_in_full?).to be_truthy
-          expect(current_organization.is_paid).to be_truthy
+          expect(current_organization.is_invoiced).to be_truthy
           expect(current_organization.enabled?("parking_notifications")).to be_falsey
           expect {
             post base_url, params: {
@@ -179,6 +234,84 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
             }
             expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
             expect(flash[:error]).to be_present
+          }.to_not change(ParkingNotification, :count)
+        end
+      end
+
+      context "repeat with no location of its own" do
+        let!(:earlier_notification) { FactoryBot.create(:parking_notification_organized, organization: current_organization, bike:, kind: "parked_incorrectly_notification") }
+        let(:repeat_params) do
+          {bike_id: bike.id, is_repeat: "true", use_entered_address: "false", latitude: "", longitude: "", street: "", city: "", country_id: Country.united_states.id}
+        end
+
+        it "reuses the earlier notification's location, impounding" do
+          expect {
+            post base_url, params: {parking_notification: repeat_params.merge(kind: "impound_notification")}
+            expect(flash[:success]).to eq "Impounded this bike"
+          }.to change(ImpoundRecord, :count).by(1)
+
+          parking_notification = ParkingNotification.last
+          expect(parking_notification.initial_record_id).to eq earlier_notification.id
+          expect(parking_notification).to have_attributes(earlier_notification.reload.attributes.slice("street", "city", "latitude", "longitude"))
+          expect(parking_notification.street).to be_present
+        end
+
+        it "reuses the earlier notification's location, notifying" do
+          expect {
+            post base_url, params: {parking_notification: repeat_params.merge(kind: "appears_abandoned_notification")}
+            expect(flash[:success]).to be_present
+          }.to change(ParkingNotification, :count).by(1)
+
+          expect(ParkingNotification.last).to have_attributes(earlier_notification.reload.attributes.slice("street", "latitude", "longitude"))
+        end
+
+        it "keeps a first notice to its own location" do
+          first_notice_params = repeat_params.merge(kind: "appears_abandoned_notification", is_repeat: "false")
+          expect {
+            post base_url, params: {parking_notification: first_notice_params}
+            expect(flash[:error]).to match(/address/i)
+          }.to_not change(ParkingNotification, :count)
+
+          post base_url, params: {parking_notification: first_notice_params.merge(latitude: default_location[:latitude], longitude: default_location[:longitude])}
+          expect(flash[:success]).to be_present
+          expect(ParkingNotification.last).to have_attributes(initial_record_id: nil, repeat_number: 0, formatted_address_string: default_location[:formatted_address_no_country])
+        end
+      end
+
+      context "organization with impound_bikes without parking_notifications" do
+        let(:enabled_feature_slugs) { %w[impound_bikes] }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, created_at: Time.current - 3.hours) }
+        let(:impound_params) { parking_notification_params.merge(kind: "impound_notification") }
+
+        it "impounds before redirecting, leaving the email to sidekiq" do
+          Sidekiq::Job.clear_all
+          ActionMailer::Base.deliveries = []
+          expect {
+            post base_url, params: {parking_notification: impound_params}
+            expect(flash[:success]).to eq "Impounded this bike"
+          }.to change(ImpoundRecord, :count).by(1)
+
+          impound_record = ImpoundRecord.last
+          expect(impound_record).to have_attributes(organization_id: current_organization.id, user_id: current_user.id, bike_id: bike.id)
+          expect(ParkingNotification.last.impound_record_id).to eq impound_record.id
+          expect(bike.reload.status).to eq "status_impounded"
+          expect(ActionMailer::Base.deliveries.count).to eq 0
+
+          ProcessParkingNotificationJob.drain
+          expect(ActionMailer::Base.deliveries.count).to eq 1
+          expect(ImpoundRecord.where(bike_id: bike.id).count).to eq 1
+        end
+
+        it "does not create other kinds or send repeats" do
+          parking_notification = FactoryBot.create(:parking_notification_organized, organization: current_organization, bike:)
+          root_path = organization_root_path(organization_id: current_organization.to_param)
+          expect {
+            post base_url, params: {parking_notification: parking_notification_params}
+            expect(response).to redirect_to root_path
+            expect(flash[:error]).to be_present
+
+            post base_url, params: {kind: "impound_notification", ids: parking_notification.id.to_s, parking_notification: impound_params}
+            expect(response).to redirect_to root_path
           }.to_not change(ParkingNotification, :count)
         end
       end
@@ -454,6 +587,10 @@ RSpec.describe Organized::ParkingNotificationsController, type: :request do
           expect(assigns(:notifications_failed_resolved).pluck(:id)).to eq([parking_notification_initial.id])
           expect(assigns(:notifications_repeated)).to eq([])
         end
+        # The failed ids round-trip through the session to the redirected page
+        follow_redirect!
+        expect(response.body).to include("Unable to send 1 notification")
+        expect(response.body).to include("role=\"alert\"")
       end
     end
     context "replaced" do

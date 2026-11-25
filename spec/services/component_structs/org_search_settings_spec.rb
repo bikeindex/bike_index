@@ -1,0 +1,279 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe ComponentStructs::OrgSearchSettings do
+  let(:instance) { described_class.new(**options) }
+  let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs:) }
+  let(:enabled_feature_slugs) { [] }
+  let(:search_stickers) { nil }
+  let(:search_address) { nil }
+  let(:search_status) { "all" }
+  let(:options) { {organization:, search_stickers:, search_address:, search_status:} }
+
+  describe "active_search_filter_descriptions" do
+    it "returns empty when no filters active" do
+      expect(instance.active_search_filter_descriptions).to eq([])
+    end
+
+    context "with search_stickers: with" do
+      let(:search_stickers) { "with" }
+
+      it "returns sticker filter description" do
+        descriptions = instance.active_search_filter_descriptions
+        expect(descriptions.length).to eq(1)
+        expect(descriptions.first).to include("stickers")
+      end
+    end
+
+    context "with search_stickers: none" do
+      let(:search_stickers) { "none" }
+
+      it "returns no sticker filter description" do
+        descriptions = instance.active_search_filter_descriptions
+        expect(descriptions.length).to eq(1)
+        expect(descriptions.first).to include("no")
+        expect(descriptions.first).to include("sticker")
+      end
+    end
+
+    context "with search_address: with_street" do
+      let(:search_address) { "with_street" }
+
+      it "returns address filter description" do
+        descriptions = instance.active_search_filter_descriptions
+        expect(descriptions.length).to eq(1)
+        expect(descriptions.first).to include("address")
+      end
+    end
+
+    context "with search_address: without_street" do
+      let(:search_address) { "without_street" }
+
+      it "returns no address filter description" do
+        descriptions = instance.active_search_filter_descriptions
+        expect(descriptions.length).to eq(1)
+        expect(descriptions.first).to include("no")
+        expect(descriptions.first).to include("address")
+      end
+    end
+
+    context "with search_status: stolen" do
+      let(:search_status) { "stolen" }
+
+      it "returns stolen filter description" do
+        descriptions = instance.active_search_filter_descriptions
+        expect(descriptions.length).to eq(1)
+        expect(descriptions.first).to include("stolen")
+      end
+    end
+
+    context "with search_status: impounded" do
+      let(:search_status) { "impounded" }
+
+      it "returns impounded filter description" do
+        descriptions = instance.active_search_filter_descriptions
+        expect(descriptions.length).to eq(1)
+        expect(descriptions.first).to include("impounded")
+      end
+    end
+
+    context "with search_status: not_impounded" do
+      let(:search_status) { "not_impounded" }
+
+      it "returns not impounded filter description" do
+        descriptions = instance.active_search_filter_descriptions
+        expect(descriptions.length).to eq(1)
+        expect(descriptions.first).to include("not")
+        expect(descriptions.first).to include("impounded")
+      end
+    end
+
+    context "with search_status: with_owner" do
+      let(:search_status) { "with_owner" }
+
+      it "returns not stolen or impounded filter description" do
+        descriptions = instance.active_search_filter_descriptions
+        expect(descriptions.length).to eq(1)
+        expect(descriptions.first).to include("not stolen or impounded")
+      end
+    end
+
+    context "with search_status: stolen_or_impounded" do
+      let(:search_status) { "stolen_or_impounded" }
+
+      it "returns stolen or impounded filter description" do
+        expect(instance.active_search_filter_descriptions).to eq(["only <strong>stolen</strong> or <strong>impounded</strong>"])
+      end
+    end
+
+    context "with multiple filters active" do
+      let(:search_stickers) { "with" }
+      let(:search_address) { "with_street" }
+      let(:search_status) { "stolen" }
+
+      it "returns all active filter descriptions" do
+        expect(instance.active_search_filter_descriptions.length).to eq(3)
+      end
+    end
+  end
+
+  describe "panel_columns" do
+    it "lists the always-visible view column with the toggleable ones" do
+      expect(instance.panel_columns).to include("view_cell")
+      expect(instance.enabled_columns).not_to include("view_cell")
+    end
+  end
+
+  describe "panel_labels" do
+    it "prefixes the time columns, leaving the table headers short" do
+      expect(instance.panel_labels[:created_at_cell]).to eq "Time - Registered"
+      expect(instance.panel_labels[:updated_at_cell]).to eq "Time - Registration Updated"
+      expect(instance.panel_labels[:occurred_at_cell]).to eq "Time - Status"
+      expect(instance.panel_labels[:acknowledgment_cell]).to eq "Time - Education course acknowledged"
+      expect(instance.column_renames[:created_at_cell]).to eq "Registered"
+      expect(instance.panel_labels[:color_cell]).to eq "Color"
+    end
+  end
+
+  describe "impound" do
+    it "adds the impound columns and sorts, and drops the export" do
+      expect(instance.panel_columns).not_to include(*described_class::IMPOUND_COLUMNS)
+      impound_settings = described_class.new(organization:, impound: true)
+      expect(impound_settings.initially_checked_columns).to include("impound_id_cell", *described_class::IMPOUND_COLUMNS)
+      expect(impound_settings.panel_columns).to include(*described_class::IMPOUND_COLUMNS)
+      expect(impound_settings.impound_panel_columns).to match_array(["impound_id_cell", "impound_current_location_cell", *described_class::IMPOUND_COLUMNS])
+      expect([instance.impound?, impound_settings.impound?]).to eq [false, true]
+      expect(instance.impound_search?).to be_falsey
+      expect(impound_settings.sort_column_label("user_id")).to eq "Last updator"
+      expect(impound_settings.sort_column_label("impounded_at")).to eq "Impounded"
+      expect(impound_settings.sort_column_label("resolved_at")).to eq "Resolved"
+      expect(impound_settings.render_export?).to be_falsey
+    end
+  end
+
+  describe "panel_hints" do
+    it "explains the status time, and nothing else" do
+      expect(instance.panel_hints).to eq("occurred_at_cell" => "when stolen, impounded, etc")
+    end
+  end
+
+  describe "initially_checked_columns" do
+    it "returns default columns" do
+      cols = instance.initially_checked_columns
+      expect(cols).to include("photo_cell", "created_at_cell", "manufacturer_cell", "model_cell",
+        "color_cell", "owner_email_cell", "owner_name_cell", "creation_description_cell")
+      expect(cols).not_to include("sticker_cell")
+    end
+
+    context "with bike_stickers enabled" do
+      let(:enabled_feature_slugs) { %w[bike_stickers] }
+
+      it "includes sticker_cell" do
+        expect(instance.initially_checked_columns).to include("sticker_cell")
+      end
+    end
+  end
+
+  describe "column_renames" do
+    let(:enabled_feature_slugs) { %w[reg_student_id] }
+
+    it "names the organization in its own columns" do
+      expect(instance.column_renames[:color_cell]).to eq "Color"
+      expect(instance.column_renames[:notes_cell]).to eq "Registration Notes <em>by #{organization.short_name}</em>"
+      expect(instance.column_renames[:reg_student_id_cell]).to eq "Student ID <em>for #{organization.short_name}</em>"
+    end
+  end
+
+  describe "sort_column_label" do
+    it "labels a permitted sort by its column, and nothing else" do
+      expect(instance.sort_column_label("id")).to eq "Registered"
+      expect(instance.sort_column_label("serial_number")).to be_nil
+      expect(instance.sort_column_label(nil)).to be_nil
+    end
+  end
+
+  describe "enabled_columns" do
+    let(:enabled_feature_slugs) { %w[impound_bikes] }
+
+    it "adds the feature's columns" do
+      expect(instance.enabled_columns).to include("impound_id_cell", "url_cell")
+    end
+
+    context "without impound_bikes" do
+      let(:enabled_feature_slugs) { [] }
+
+      it "doesn't include the impound columns" do
+        expect(instance.enabled_columns).to_not include("impound_id_cell")
+      end
+    end
+  end
+
+  describe "filter_groups" do
+    let(:enabled_feature_slugs) { %w[bike_stickers reg_address impound_bikes] }
+    let(:search_status) { "impounded" }
+
+    it "returns a group per enabled filter, carrying the searched value" do
+      groups = instance.filter_groups
+      expect(groups.map { it[:name] })
+        .to eq(%i[search_stickers search_address search_status search_unregisteredness])
+      expect(groups.find { it[:name] == :search_status }[:selected]).to eq "impounded"
+      expect(groups.find { it[:name] == :search_stickers }[:entries].map { it[:value] })
+        .to eq ["", "with", "none"]
+      expect(groups.find { it[:name] == :search_status }[:entries].map { it[:value] })
+        .to eq %w[all not_impounded impounded stolen stolen_or_impounded with_owner]
+    end
+
+    context "with no optional features" do
+      let(:enabled_feature_slugs) { [] }
+      let(:search_status) { "all" }
+
+      it "returns only the ungated ones, without the impound statuses" do
+        groups = instance.filter_groups
+        expect(groups.map { it[:name] }).to eq %i[search_status search_unregisteredness]
+        expect(groups.find { it[:name] == :search_status }[:selected]).to eq "all"
+        expect(groups.find { it[:name] == :search_status }[:entries].map { it[:value] })
+          .to eq %w[all stolen with_owner]
+      end
+    end
+  end
+
+  describe "export_disabled?" do
+    let(:enabled_feature_slugs) { %w[csv_exports] }
+
+    it "is true once the search reaches past the organization, which still renders the export" do
+      expect(instance.export_disabled?).to be false
+
+      search_all = described_class.new(**options.merge(search_all: true))
+      expect(search_all.render_export?).to be true
+      expect(search_all.export_disabled?).to be true
+    end
+  end
+
+  describe "export_columns" do
+    it "is each column an export can write, in the panel's order, without the View button" do
+      expect(instance.export_columns.keys).to eq(instance.panel_columns - ["view_cell"])
+      expect(instance.export_columns["created_at_cell"]).to eq "registered_at"
+    end
+  end
+
+  describe "export_header_label" do
+    it "is the panel's label, or a legacy header's own name" do
+      expect(instance.export_header_label("registered_at")).to eq "Time - Registered"
+      expect(instance.export_header_label("owner_email")).to eq "Sent to"
+      expect(instance.export_header_label("is_stolen")).to eq "Is stolen"
+      expect(instance.export_header_label("address_2")).to eq "Address 2"
+    end
+  end
+
+  describe "search_params" do
+    let(:options) do
+      super().merge(sortable_search_params: {sort: "id"}, interpreted_params: {query_items: ["v_1"]})
+    end
+
+    it "merges the interpreted params over the sortable ones, with the organization" do
+      expect(instance.search_params)
+        .to eq({sort: "id", query_items: ["v_1"], organization_id: organization.to_param})
+    end
+  end
+end

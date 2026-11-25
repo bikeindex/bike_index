@@ -8,13 +8,10 @@ export default class extends Controller {
   static targets = ['motorized', 'motorizedWrapper']
   static values = { alwaysMotorized: Array, neverMotorized: Array }
 
+  // Modules load lazily, so this one can arrive after the selection - or after
+  // form-persist has announced the restore that filled the combobox
   connect () {
-    this.element.addEventListener('hw-combobox:selection', this.update)
     this.update()
-  }
-
-  disconnect () {
-    this.element.removeEventListener('hw-combobox:selection', this.update)
   }
 
   update = () => {

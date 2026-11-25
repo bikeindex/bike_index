@@ -32,8 +32,6 @@
 
 # b_param stands for Bike param
 class BParam < ApplicationRecord
-  # TODO: #3952 - stolen record legacy attrs, to support accepting the old names
-  LEGACY_STOLEN_ATTRS = {"address" => "street", "zipcode" => "postal_code", "state_id" => "region_record_id"}.freeze
   REGISTRATION_INFO_ATTRS = %w[
     accuracy
     bike_code
@@ -45,6 +43,8 @@ class BParam < ApplicationRecord
     phone
     postal_code
     region_string
+    register_separate_attestation
+    register_single_page
     street
     student_id
     user_name
@@ -68,6 +68,8 @@ class BParam < ApplicationRecord
     propulsion_type
     propulsion_type_slug
     rear_gear_type_slug
+    register_separate_attestation
+    register_single_page
     revised_new
     state_id
     stolen
@@ -91,26 +93,32 @@ class BParam < ApplicationRecord
   before_save :clean_params
   # Leaving the flow is exactly when nothing else bumps the user, so the alert can't
   # wait for their next update job
-  after_commit :update_creator_alert
+  after_commit :update_unfinished_registration_alerts
 
   scope :with_bike, -> { where.not(created_bike_id: nil) }
   scope :without_bike, -> { where(created_bike_id: nil) }
   scope :without_creator, -> { where(creator_id: nil) }
-  scope :partial_registrations, -> { where(origin: "embed_partial") }
+  scope :partial_registrations, -> { where(origin: "embed_partial").or(step_1_submitted).without_bike }
   scope :bike_params, -> { where("(params -> 'bike') IS NOT NULL") }
   scope :bike_params_empty, -> { where("(params -> 'bike') IS NULL") } # failsafe, shouldn't happen!
   # register/new shells whose step 1 was never submitted (manufacturer is required
   # at submit) - only seeds and a prefilled email, nothing worth keeping
-  scope :without_bike_values, -> { bike_params_empty.or(where(origin: "register_flow").where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
-  scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION) }
+  scope :without_bike_values, -> { bike_params_empty.or(where(origin: Ownership::ORIGIN_REG_FLOW).where("(params -> 'bike' -> 'manufacturer_id') IS NULL")) }
+  scope :step_1_submitted, -> { where(origin: Ownership::ORIGIN_REG_FLOW).where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL") }
+  # One owing an education course never expires - its bike is unfinished until it's agreed to
+  scope :unexpired, -> { where("created_at >= ?", Time.current - TOKEN_EXPIRATION).or(acknowledgment_pending) }
   # Tokenized lookups resume registrations for up to a month
   scope :recent_with_token, ->(toke) { where(id_token: toke).where("created_at >= ?", Time.current - 1.month) }
   scope :unexpired_with_token, ->(toke) { unexpired.where(id_token: toke) }
-  # Step 1 submitted, no bike yet, and the token still resumes it
-  scope :unfinished_registrations, -> {
-    unexpired.without_bike.where(origin: "register_flow")
-      .where("(params -> 'bike' -> 'manufacturer_id') IS NOT NULL")
+  # = ANY(ARRAY(...)) rather than IN (...): the pkey can take it, so ORing it with an
+  # indexed condition is a BitmapOr instead of a seq scan
+  scope :acknowledgment_pending, -> { where("b_params.id = ANY(ARRAY(?))", EducationCourseAcknowledgment.pending.select(:b_param_id)) }
+  # Pages acknowledged, but not yet agreed to as a whole. The b_param_id term keeps a NULL out of NOT IN
+  scope :education_course_in_progress, -> {
+    where("(params -> 'education_course') IS NOT NULL")
+      .where.not(id: EducationCourseAcknowledgment.acknowledged.where.not(b_param_id: nil).select(:b_param_id))
   }
+  scope :unfinished_registrations, -> { unexpired.step_1_submitted.and(without_bike.or(acknowledgment_pending)) }
   scope :unprocessed_image, -> { where(image_processed: false).where.not(image: nil) }
   scope :with_cycle_type, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NOT NULL") }
   scope :cycle_type_bike, -> { bike_params.where("(params -> 'bike' -> 'cycle_type') IS NULL").or(bike_params_empty) }
@@ -151,17 +159,15 @@ class BParam < ApplicationRecord
       h
     end
 
-    # TODO: #3952 - stolen record legacy attrs
-    def rename_legacy_stolen_attrs(s_attrs)
-      LEGACY_STOLEN_ATTRS.each_with_object(s_attrs) do |(legacy, renamed), attrs|
-        value = attrs.delete(legacy)
-        attrs[renamed] = value if value.present? && attrs[renamed].blank?
-      end
+    # The lookup half of find_or_new_from_token - what the embed forms resolve their token
+    # to, so anything acting on one of those forms can reach the same record
+    def find_from_token(toke = nil, user_id: nil)
+      b = where(creator_id: user_id, id_token: toke).first if toke.present? && user_id.present?
+      b || with_organization_or_no_creator(toke)
     end
 
     def find_or_new_from_token(toke = nil, user_id: nil, organization_id: nil, bike_sticker: nil)
-      b = where(creator_id: user_id, id_token: toke).first if toke.present? && user_id.present?
-      b ||= with_organization_or_no_creator(toke)
+      b = find_from_token(toke, user_id:)
       b ||= BParam.new(creator_id: user_id, params: {revised_new: true}.as_json)
       b.creator_id ||= user_id
       if bike_sticker.present?
@@ -293,17 +299,39 @@ class BParam < ApplicationRecord
       PropulsionType.motorized?(PropulsionType.for_vehicle(cycle_type)) # Fallback to PropulsionType lookup
   end
 
+  # Set by a register step's honeypot
+  def likely_spam? = Binxtils::InputNormalizer.boolean(bike["likely_spam"])
+
   def with_bike?
     created_bike_id.present?
   end
 
+  # The bike is created ahead of the education course, which is still required -
+  # so the registration isn't finished until it's agreed to
+  def acknowledgment_pending?
+    persisted? && EducationCourseAcknowledgment.pending.exists?(b_param_id: id)
+  end
+
+  def pending_acknowledgment
+    EducationCourseAcknowledgment.pending.find_by(b_param_id: id) if persisted?
+  end
+
+  def finished_registration? = with_bike? && !acknowledgment_pending?
+
   # Step 1 was submitted (manufacturer is required there), so it's more than the shell
   # new creates, and the token still resumes it. A destroyed one is false so that the
-  # after_commit a destroy fires resolves its alert rather than re-saving it
-  def unfinished_registration?
-    !destroyed? && origin == "register_flow" && !with_bike? && manufacturer_id.present? &&
-      created_at.present? && created_at > Time.current - TOKEN_EXPIRATION
+  # after_commit a destroy fires resolves its alert rather than re-saving it. One with a
+  # bike here owes an education course, which doesn't expire unless the bike is deleted
+  # or transferred.
+  # self_made? last, taking the user callers already hold: one made for someone else
+  # isn't the creator's bike to alert about
+  def unfinished_registration?(user = creator)
+    !destroyed? && register_flow? && !finished_registration? && manufacturer_id.present? &&
+      (with_bike? ? created_bike_initially_owned? : created_at.present? && created_at > Time.current - TOKEN_EXPIRATION) &&
+      self_made?(user)
   end
+
+  def register_flow? = Ownership::ORIGIN_REG_FLOW.include?(origin)
 
   # Get it unscoped, because unregistered_bike notifications
   def created_bike
@@ -323,7 +351,7 @@ class BParam < ApplicationRecord
     # Set the date_stolen if it was passed, if something else didn't already set date_stolen
     date_stolen = params.dig("bike", "date_stolen")
     s_attrs["date_stolen"] ||= date_stolen if date_stolen.present?
-    self.class.rename_legacy_stolen_attrs(s_attrs.except("phone_no_show", "show_address"))
+    s_attrs.except("phone_no_show", "show_address")
   end
 
   def impound_attrs
@@ -353,6 +381,8 @@ class BParam < ApplicationRecord
 
     "status_with_owner"
   end
+
+  def status_humanized = Bike.status_humanized(status)
 
   def status_stolen?
     status == "status_stolen"
@@ -437,23 +467,32 @@ class BParam < ApplicationRecord
     bike["user_name"]
   end
 
+  # The separate attestation switch hands the education course to an owner who isn't user
+  def rules_left_to_owner?(user) = params["register_separate_attestation"].present? && !self_made?(user)
+
   def self_made?(user = creator)
     return false if user.blank?
 
-    ([user.email] + user.confirmed_emails).include?(EmailNormalizer.normalize(owner_email))
+    user.own_emails.include?(EmailNormalizer.normalize(owner_email))
   end
 
   def creation_organization
     Organization.friendly_find(creation_organization_id)
   end
 
+  def auto_organization
+    Organization.friendly_find(auto_organization_id)
+  end
+
   def manufacturer
     bike["manufacturer_id"] && Manufacturer.friendly_find(bike["manufacturer_id"])
   end
 
-  def partial_registration?
-    origin == "embed_partial"
-  end
+  # Unsaved - read through the same whitelist that turns these into the created bike's address
+  def address_record = AddressRecord.new(self.class.address_record_attributes(bike))
+
+  # Mirrors Bike#registration_address_record
+  def registration_address_record = @registration_address_record ||= address_record
 
   def email_confirmed?
     params["email_confirmed_at"].present?
@@ -527,6 +566,19 @@ class BParam < ApplicationRecord
 
   def creation_organization_id
     bike && bike["creation_organization_id"] || params && params["creation_organization_id"]
+  end
+
+  # Assigned from who the registrant is rather than named by a link, so step 2 offers to
+  # drop it. Kept once offered, so declining survives the next request's assignment
+  def auto_organization_id
+    id = auto_organization_assigned? ? params["auto_organization_id"].to_i : 0
+    id if id.positive?
+  end
+
+  # 0 for a registrant no organization could be assigned from - the assignment was made
+  # either way, so it isn't made again
+  def auto_organization_assigned?
+    (params && params["auto_organization_id"]).present?
   end
 
   def owner_email
@@ -713,11 +765,11 @@ class BParam < ApplicationRecord
   end
 
   def partial_notification_pre_tracking?
-    (created_at || Time.current) < Email::PartialRegistrationJob::NOTIFICATION_STARTED
+    (created_at || Time.current) < EmailJobs::PartialRegistrationJob::NOTIFICATION_STARTED
   end
 
   def partial_notification_resends
-    return partial_notifications if partial_notification_pre_tracking?
+    return partial_notifications if partial_notification_pre_tracking? || register_flow?
 
     partial_notifications.offset(1)
   end
@@ -744,14 +796,22 @@ class BParam < ApplicationRecord
       .merge(addy_hash.blank? ? {} : {"address_record_attributes" => addy_hash})
   end
 
+  # origin, so the API and embed forms don't pay for a lookup that can't alert. Only with a
+  # creator: anonymously, anyone could alert any account by typing in its email
+  def update_unfinished_registration_alerts
+    return if creator_id.blank? || !register_flow?
+
+    [creator, (User.fuzzy_email_find(owner_email) unless self_made?)].compact.each do |user|
+      UserAlert.update_unfinished_registration(user:, b_param: self)
+      UserAlert.refresh_alert_slugs(user)
+    end
+  end
+
   private
 
-  # origin, so the API and embed forms don't pay for a lookup that can't alert
-  def update_creator_alert
-    return if creator_id.blank? || origin != "register_flow"
-
-    UserAlert.update_unfinished_registration(user: creator, b_param: self)
-    UserAlert.refresh_alert_slugs(creator)
+  def created_bike_initially_owned?
+    Bike.unscoped.where(id: created_bike_id, deleted_at: nil).joins(:current_ownership)
+      .merge(Ownership.initial).exists?
   end
 
   def ensure_valid_params

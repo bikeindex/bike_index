@@ -474,6 +474,12 @@ RSpec.describe BikeServices::Displayer do
         end
       end
     end
+    context "with a Bike Book catalog stock photo" do
+      let(:stock_photo_url) { "https://bikebook.bikeindex.org/aventon/2022/level-2.jpg" }
+      it "is the stock photo" do
+        expect(BikeServices::Displayer.thumb_image_url(bike)).to eq stock_photo_url
+      end
+    end
   end
 
   describe "header_image_urls" do
@@ -518,28 +524,6 @@ RSpec.describe BikeServices::Displayer do
           expect(alert_image.reload.image_url(:square)).to be_present
           expect(result).to eq target
         end
-      end
-    end
-  end
-
-  describe "vehicle_search?" do
-    it "is falsey" do
-      expect(described_class.vehicle_search?({})).to be_falsey
-
-      expect(described_class.vehicle_search?({query_items: %w[m_1300], serial: "DD"})).to be_falsey
-    end
-
-    context "with query_items v_19" do
-      let(:params_merged) { {query_items: ["v_19"], search_email: "", serial: "DD"} }
-      it "is truthy" do
-        expect(described_class.vehicle_search?(params_merged)).to be_truthy
-      end
-    end
-
-    context "with query_items v_12" do
-      let(:params_merged) { {query_items: %w[p_10 m_1300], search_email: "", serial: "DD"} }
-      it "is truthy" do
-        expect(described_class.vehicle_search?(params_merged)).to be_truthy
       end
     end
   end

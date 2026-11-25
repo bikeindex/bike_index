@@ -1,0 +1,25 @@
+<%= render(UI::Alerts::ObjectError::Component.new(object: @organization)) %>
+
+<%= form_for @organization, as: :organization, url: form_url, action: "update" do |f| %>
+  <%= render(UI::Container::Component.new(width: :wide)) do %>
+    <%= f.fields_for :mail_snippets do |snippet| %>
+      <% if snippet.object.kind == @edit_template %>
+        <%= render(UI::Forms::Group::Component.new(form_builder: snippet, attribute: :body, kind: :text_area,
+          label_text: "#{snippet.object.kind.titleize} snippet",
+          html_options: {rows: 10, placeholder: description_for(snippet.object.kind)})) %>
+
+        <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+          <%= render(UI::Forms::Checkbox::Component.new(form_builder: snippet, attribute: :is_enabled,
+            label: enable_label)) %>
+
+          <%= render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit", html_class: "tw:ml-auto")) %>
+        </div>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>
+
+<%= render(UI::Forms::Files::UploadMultiple::Component.new(url: public_images_path, file_param: "public_image[image]",
+      params: {mail_snippet_id: @mail_snippet.id}, accept: ImageUploader.permitted_extensions, list_html_options: {class: "tw:mt-6 tw:mb-4 twwiderow twwiderow-3"})) do %>
+  <%= render partial: "public_images/admin_public_image", collection: @mail_snippet.public_images.with_attached_file, as: :public_image %>
+<% end %>

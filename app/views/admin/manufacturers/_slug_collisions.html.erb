@@ -1,0 +1,29 @@
+<%# locals: (slug_collisions:) %>
+<% if slug_collisions.any? %>
+  <% header = capture do %>
+    <%= number_display(slug_collisions.count) %> <%= "slug collision".pluralize(slug_collisions.count) %>
+  <% end %>
+  <%= render(UI::Alerts::Base::Component.new(kind: :warning, header:)) do %>
+    <p>
+      A slug or secondary slug finds the manufacturer that has it now. A
+      previous slug several manufacturers share finds the first alphabetically.
+    </p>
+
+    <ul class="tw:list-disc tw:pl-4">
+      <% slug_collisions.each do |collision| %>
+        <li>
+          <%= render(UI::Code::Inline::Component.new(text: collision[:slug])) %>
+
+          <% if collision[:manufacturer] %>
+            belongs to
+            <%= link_to(collision[:manufacturer][:name], admin_manufacturer_path(collision[:manufacturer][:id]), class: "twlink-underlined") %>,
+            and
+          <% end %>
+
+          is a previous slug of
+          <%= safe_join(collision[:previous_slug_manufacturers].map { link_to(it[:name], admin_manufacturer_path(it[:id]), class: "twlink-underlined") }, ", ") %>
+        </li>
+      <% end %>
+    </ul>
+  <% end %>
+<% end %>

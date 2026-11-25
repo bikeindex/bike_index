@@ -1,0 +1,23 @@
+<% if organization_present? %>
+  <%= link_to admin_organization_path(@organization_id), class: "twlink" do %>
+    <% if organization_subject.blank? %>
+      <small class="<%= error_text_class %>" title="<%= @organization_id %>">
+        Missing organization
+      </small>
+      <%= render(UI::Code::Inline::Component.new(text: @organization_id, small: true)) %>
+    <% elsif organization_subject.deleted? %>
+      <small>
+        <span class="less-strong"><%= display_name %></span>
+
+        <% if organization_subject.deleted? %>
+          <span class="<%= error_text_class %>">deleted!</span>
+        <% end %>
+      </small>
+    <% else %>
+      <%= display_name %>
+    <% end %>
+  <% end %>
+  <% if @render_search && computed_search_url.present? %>
+    <%= link_to search_emoji, computed_search_url, class: "display-sortable-link tw:text-xs" %>
+  <% end %>
+<% end %>

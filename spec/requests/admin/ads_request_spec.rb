@@ -5,12 +5,45 @@ RSpec.describe Admin::AdsController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
+    let!(:ad) { Ad.create(title: "Ad title", body: "Ad body", organization: FactoryBot.create(:organization)) }
+
     it "responds with OK and renders the index template" do
       get base_url
 
       expect(response).to be_ok
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+      expect(response.body).to include(ad.title)
+    end
+  end
+
+  describe "create" do
+    it "re-renders the form when the title is blank" do
+      expect { post base_url, params: {ad: {title: ""}} }.not_to change(Ad, :count)
+
+      expect(response.status).to eq 422
+      expect(response).to render_template(:new)
+    end
+  end
+
+  describe "update" do
+    let(:ad) { Ad.create(title: "Ad title", body: "Ad body", organization: FactoryBot.create(:organization)) }
+
+    it "makes it live" do
+      patch "#{base_url}/#{ad.id}", params: {ad: {live: "1"}}
+
+      expect(response).to redirect_to(admin_ad_url(ad))
+      expect(ad.reload.live).to be_truthy
+    end
+
+    context "with a blank title" do
+      it "re-renders the form" do
+        patch "#{base_url}/#{ad.id}", params: {ad: {title: ""}}
+
+        expect(response.status).to eq 422
+        expect(response).to render_template(:edit)
+        expect(ad.reload.title).to eq "Ad title"
+      end
     end
   end
 end

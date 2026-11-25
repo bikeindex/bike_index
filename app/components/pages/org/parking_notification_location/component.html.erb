@@ -1,0 +1,59 @@
+<%= @form.hidden_field :latitude, data: {"org--parking-notification-form-target": "latitude"} %>
+<%= @form.hidden_field :longitude, data: {"org--parking-notification-form-target": "longitude"} %>
+<%= @form.hidden_field :accuracy, data: {"org--parking-notification-form-target": "accuracy"} %>
+
+<div
+  class="tw:mb-4"
+  data-org--parking-notification-form-target="locationSection"
+>
+  <div class="tw:mb-3">
+    <%= render(UI::Forms::RadioButtonGroup::Component.new(name: "location_mode", kind: :toggle, selected: "current", entries: [{value: "current", label: translation(".set_on_map")}, {value: "entered", label: translation(".enter_address_manually")}], html_options: {data: {action: "org--parking-notification-form#selectLocationMode", "org--parking-notification-form-target": "locationMode"}})) %>
+  </div>
+
+  <div data-org--parking-notification-form-target="mapSection">
+    <%# The map and the hint for using it stand or fall together %>
+    <div data-org--parking-notification-form-target="mapFrame">
+      <%#
+        Capped against the viewport so the map doesn't crowd out the rest
+        of the form on a short screen
+      %>
+
+      <div
+        class="
+          tw:h-100 tw:max-h-[90vh] tw:w-full tw:overflow-hidden
+          tw:rounded-sm tw:bg-gray-100 tw:dark:bg-gray-900
+        "
+      >
+        <%# The target lives inside the map so it comes along into fullscreen %>
+        <div
+          data-org--parking-notification-form-target="map"
+          class="tw:relative tw:h-full tw:w-full"
+        >
+          <%# A fixed target marks the map center; moving the map places it %>
+          <%= helpers.inline_svg_tag("kelsey/registration_show/map-target.svg", class: "tw:absolute tw:top-1/2 tw:left-1/2 tw:z-10 tw:h-12 tw:w-12 tw:-translate-1/2 tw:drop-shadow-md", aria_hidden: true) %>
+        </div>
+      </div>
+
+      <p class="tw:mt-1 tw:text-xs tw:opacity-65">
+        <%= translation(".map_hint") %>
+      </p>
+    </div>
+
+    <p
+      hidden
+      data-org--parking-notification-form-target="mapUnavailable"
+      class="tw:mt-2 tw:text-sm tw:opacity-65"
+    >
+      <%= translation(".map_unavailable") %>
+    </p>
+  </div>
+
+  <div
+    data-org--parking-notification-form-target="addressGroup"
+    class="tw:hidden"
+  >
+    <%= @form.hidden_field :use_entered_address, value: false, data: {"org--parking-notification-form-target": "useEnteredAddress"} %>
+
+    <%= render(UI::Forms::AddressGroup::Component.new(form_builder: @form, street_label: translation(".address_or_intersection"))) %>
+  </div>
+</div>

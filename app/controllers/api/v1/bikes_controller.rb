@@ -55,7 +55,10 @@ module API
       end
 
       def show
-        render json: Bike.unscoped.find_id(params[:id]), serializer: SingleBikeSerializer
+        bike = Bike.unscoped.find_id(params[:id])
+        raise ActiveRecord::RecordNotFound unless bike.visible_by?(current_user)
+
+        render json: bike, serializer: SingleBikeSerializer
       end
 
       def create
@@ -97,7 +100,10 @@ module API
       end
 
       def permitted_b_params
-        params.as_json
+        b_params = params.as_json
+        return b_params if b_params["stolen_record"].blank?
+
+        b_params.merge("stolen_record" => StolenRecord.legacy_attrs_renamed(b_params["stolen_record"]))
       end
     end
   end

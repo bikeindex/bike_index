@@ -1,6 +1,8 @@
 require "rails_helper"
 
 RSpec.describe LoggedSearch, type: :model do
+  it_behaves_like "address_recorded_within_bounding_box"
+
   describe "ENDPOINT_ENUM" do
     let(:endpoint_enum) { LoggedSearch::ENDPOINT_ENUM }
     it "has separate values" do

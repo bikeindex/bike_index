@@ -73,28 +73,30 @@
 #
 # Indexes
 #
-#  index_bikes_current_listing_order               (listing_order) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
-#  index_bikes_on_creation_organization_id         (creation_organization_id) WHERE (creation_organization_id IS NOT NULL)
-#  index_bikes_on_current_ownership_id             (current_ownership_id)
-#  index_bikes_on_current_stolen_record_id         (current_stolen_record_id) WHERE (current_stolen_record_id IS NOT NULL)
-#  index_bikes_on_deleted_at                       (deleted_at) WHERE (deleted_at IS NOT NULL)
-#  index_bikes_on_example                          (example) WHERE (example IS NOT NULL)
-#  index_bikes_on_latitude_and_longitude           (latitude,longitude)
-#  index_bikes_on_listing_order                    (listing_order)
-#  index_bikes_on_lower_frame_model                ("left"(lower(frame_model), 255))
-#  index_bikes_on_lower_mnfg_name                  (lower((mnfg_name)::text))
-#  index_bikes_on_manufacturer_id                  (manufacturer_id)
-#  index_bikes_on_model_audit_id                   (model_audit_id) WHERE (model_audit_id IS NOT NULL)
-#  index_bikes_on_owner_email_trgm                 (owner_email) USING gin
-#  index_bikes_on_primary_activity_id              (primary_activity_id) WHERE (primary_activity_id IS NOT NULL)
-#  index_bikes_on_primary_frame_color_id           (primary_frame_color_id)
-#  index_bikes_on_search_vector                    (search_vector) USING gin
-#  index_bikes_on_secondary_frame_color_id         (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL)
-#  index_bikes_on_serial_normalized_no_space_trgm  (serial_normalized_no_space) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
-#  index_bikes_on_serial_normalized_tsvector       (to_tsvector('simple'::regconfig, (serial_normalized)::text)) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
-#  index_bikes_on_status                           (status)
-#  index_bikes_on_tertiary_frame_color_id          (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL)
-#  index_bikes_on_user_hidden                      (user_hidden) WHERE (user_hidden IS NOT NULL)
+#  index_bikes_current_listing_order                    (listing_order) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
+#  index_bikes_current_manufacturer_listing_order       (manufacturer_id,listing_order DESC) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
+#  index_bikes_current_stolen_or_impounded_on_location  (latitude,longitude) WHERE ((status = ANY (ARRAY[1, 3])) AND (example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL))
+#  index_bikes_on_creation_organization_id              (creation_organization_id) WHERE (creation_organization_id IS NOT NULL)
+#  index_bikes_on_current_ownership_id                  (current_ownership_id)
+#  index_bikes_on_current_stolen_record_id              (current_stolen_record_id) WHERE (current_stolen_record_id IS NOT NULL)
+#  index_bikes_on_deleted_at                            (deleted_at) WHERE (deleted_at IS NOT NULL)
+#  index_bikes_on_example                               (example) WHERE (example IS NOT NULL)
+#  index_bikes_on_latitude_and_longitude                (latitude,longitude)
+#  index_bikes_on_listing_order                         (listing_order)
+#  index_bikes_on_lower_frame_model                     ("left"(lower(frame_model), 255))
+#  index_bikes_on_lower_mnfg_name                       (lower((mnfg_name)::text))
+#  index_bikes_on_manufacturer_id                       (manufacturer_id)
+#  index_bikes_on_model_audit_id                        (model_audit_id) WHERE (model_audit_id IS NOT NULL)
+#  index_bikes_on_owner_email_trgm                      (owner_email) USING gin
+#  index_bikes_on_primary_activity_id                   (primary_activity_id) WHERE (primary_activity_id IS NOT NULL)
+#  index_bikes_on_primary_frame_color_id                (primary_frame_color_id)
+#  index_bikes_on_search_vector                         (search_vector) USING gin
+#  index_bikes_on_secondary_frame_color_id              (secondary_frame_color_id) WHERE (secondary_frame_color_id IS NOT NULL)
+#  index_bikes_on_serial_normalized_no_space_trgm       (serial_normalized_no_space) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
+#  index_bikes_on_serial_normalized_tsvector            (to_tsvector('simple'::regconfig, (serial_normalized)::text)) WHERE ((example = false) AND (user_hidden = false) AND (likely_spam = false) AND (deleted_at IS NULL)) USING gin
+#  index_bikes_on_status                                (status)
+#  index_bikes_on_tertiary_frame_color_id               (tertiary_frame_color_id) WHERE (tertiary_frame_color_id IS NOT NULL)
+#  index_bikes_on_user_hidden                           (user_hidden) WHERE (user_hidden IS NOT NULL)
 #
 class Bike < ApplicationRecord
   include ActiveModel::Dirty
@@ -106,6 +108,8 @@ class Bike < ApplicationRecord
   include PgSearch::Model
 
   PUBLIC_COORD_LENGTH = 2 # Truncate public coordinates decimal length
+  # Bike.current, which the default scope uses
+  CURRENT_ATTRIBUTES = {example: false, user_hidden: false, deleted_at: nil, likely_spam: false}.freeze
 
   acts_as_paranoid without_default_scope: true
 
@@ -155,6 +159,7 @@ class Bike < ApplicationRecord
   has_many :parking_notifications
   has_many :graduated_notifications
   has_many :notifications
+  has_many :organization_messages
   has_many :theft_surveys, -> { theft_survey }, class_name: "Notification"
   has_many :theft_alerts
   has_many :marketplace_listings, as: :item
@@ -182,7 +187,7 @@ class Bike < ApplicationRecord
 
   attr_writer :phone, :user_name, :external_image_urls # reading is managed by a method
 
-  delegate :bulk_import, :claimed?, :creation_description,
+  delegate :bulk_import, :claimed?, :creation_kind,
     :creator_unregistered_parking_notification?, :owner, :owner_name, :pos?,
     :pos_kind, :registration_info, :user, :user_id,
     :student_id, :student_id=, :organization_affiliation, :organization_affiliation=,
@@ -193,7 +198,9 @@ class Bike < ApplicationRecord
   after_commit :remove_address_record_if_deleted
 
   scope :motorized, -> { where(propulsion_type: PropulsionType::MOTORIZED) }
-  scope :current, -> { where(example: false, user_hidden: false, deleted_at: nil, likely_spam: false) }
+  scope :current, -> { where(CURRENT_ATTRIBUTES) }
+  # Starts from unscoped, so it drops anything chained before it - call it on Bike, not an association
+  scope :current_with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
   scope :claimed, -> { includes(:ownerships).where(ownerships: {claimed: true}) }
   scope :unclaimed, -> { includes(:ownerships).where(ownerships: {claimed: false}) }
   scope :not_stolen, -> { where.not(status: %w[status_stolen status_abandoned]) }
@@ -216,7 +223,9 @@ class Bike < ApplicationRecord
   scope :example, -> { unscoped.where(example: true) }
   scope :non_example, -> { where(example: false) }
   scope :ignored, -> { where(example: true).or(where.not(deleted_at: nil)).or(where(likely_spam: true)) }
-  scope :with_user_hidden, -> { unscoped.non_example.not_spam.without_deleted }
+  # An organization sees its own impounded bikes even when they're hidden - only chain it off the org's bikes
+  scope :status_impounded_with_user_hidden, -> { unscope(where: :user_hidden).status_impounded }
+  scope :current_owner, ->(user_id) { joins(:current_ownership).where(ownerships: {user_id:}) }
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
 
   scope :for_sale, -> { includes(:marketplace_listings).where(marketplace_listings: {status: :for_sale}) }
@@ -226,11 +235,6 @@ class Bike < ApplicationRecord
   pg_search_scope :pg_search,
     against: {serial_number: "A", cached_data: "B", all_description: "C"},
     using: {tsearch: {tsvector_column: "search_vector"}}
-
-  pg_search_scope :admin_search,
-    against: {owner_email: "A"},
-    associated_against: {ownerships: :owner_email, creator: :email},
-    using: {tsearch: {dictionary: "english", prefix: true}}
 
   class << self
     def statuses
@@ -252,8 +256,19 @@ class Bike < ApplicationRecord
       query.present? ? pg_search(query) : all
     end
 
-    def admin_text_search(query)
-      query.present? ? admin_search(query) : all
+    # Unioned rather than OR'd because an OR keeps every branch off its index
+    def admin_email_search(query)
+      return all if query.blank?
+
+      matching = "%#{EmailNormalizer.normalize(query)}%"
+      bike_ids = [
+        Ownership.where("ownerships.owner_email ILIKE ?", matching).select(:bike_id),
+        Ownership.joins(:creator).where("users.email ILIKE ?", matching).select(:bike_id),
+        unscoped.where("bikes.owner_email ILIKE ?", matching).select(:id)
+      ].map { |relation| relation.reorder(nil).arel.ast }
+        .reduce { |left, right| Arel::Nodes::UnionAll.new(left, right) }
+
+      where(arel_table[:id].in(bike_ids))
     end
 
     def search_phone(str)
@@ -406,9 +421,9 @@ class Bike < ApplicationRecord
     errors.full_messages.reject { |m| m[/(bike can.t be blank|are you sure the bike was created)/i] }
   end
 
-  # Have to remove self from duplicate bike groups
+  # A bike matching on two segments joins once per group; DISTINCT can't pluck under the default ORDER BY
   def duplicate_bikes
-    duplicate_bikes_including_self.where.not(id: id)
+    Bike.where(id: duplicate_bikes_including_self.select(:id)).where.not(id:)
   end
 
   def calculated_listing_order
@@ -461,10 +476,12 @@ class Bike < ApplicationRecord
     !impounded? && owner_name.present? && valid_mailing_address?
   end
 
-  # matches current scope
-  def current?
-    !example? && !user_hidden && deleted_at.blank? && !likely_spam
-  end
+  def current_with_user_hidden? = !example? && deleted_at.blank? && !likely_spam
+
+  def current? = current_with_user_hidden? && !user_hidden
+
+  # The register flow creates the bike ahead of its organization's education course
+  def unfinished_registration? = persisted? && EducationCourseAcknowledgment.pending.exists?(bike_id: id)
 
   def current_parking_notification
     parking_notifications.current.first
@@ -472,7 +489,7 @@ class Bike < ApplicationRecord
 
   def messages_count
     notifications.count + parking_notifications.count + Feedback.bike(id).count +
-      UserAlert.where(bike_id: id).count
+      UserAlert.where(bike_id: id).count + organization_messages.count
   end
 
   # The appropriate edit template to use in the edit view.
@@ -489,6 +506,12 @@ class Bike < ApplicationRecord
     status_impounded? || unregistered_parking_notification?
   end
 
+  # Only e-vehicles agree to an organization's education course, and an unregistered parking
+  # notification has no registrant to agree to it
+  def education_course_applies?
+    motorized? && !unregistered_parking_notification?
+  end
+
   def not_updated_by_user?
     updated_by_user_at.blank? || updated_by_user_at == created_at
   end
@@ -497,10 +520,10 @@ class Bike < ApplicationRecord
     updated_by_user_at || updated_at
   end
 
-  def serial_display(u = nil)
+  def serial_display(u = nil, organization: nil)
     if serial_hidden?
       # show the serial to the user, even if authorization_requires_impound_organization?
-      return "Hidden" unless can_see_hidden_serial?(u)
+      return "Hidden" unless can_see_hidden_serial?(u, organization:)
     end
     return serial_number.humanize if no_serial?
 
@@ -604,6 +627,7 @@ class Bike < ApplicationRecord
   def contact_owner?(u = nil, organization = nil)
     return false unless u.present?
     return true if status_stolen? && current_stolen_record.present?
+    return true if contactable_away_from_owner?(u, organization)
     return false unless owner&.notification_unstolen
     return u.enabled?("unstolen_notifications") unless organization.present? # Passed organization overrides user setting to speed stuff up
 
@@ -631,16 +655,16 @@ class Bike < ApplicationRecord
     @phone ||= current_stolen_record&.phone
     @phone ||= user&.phone
     # Only grab the phone number from registration_info if this is the first_ownership (otherwise it should be user, etc)
-    @phone ||= registration_info&.dig("phone") if first_ownership?
+    @phone ||= (registration_info&.dig("phone") if first_ownership?)
     @phone
   end
 
-  def phoneable_by?(passed_user = nil)
+  def phoneable_by?(passed_user = nil, organization = nil)
     return false unless phone.present?
     return true if passed_user&.superuser?(controller_name: "bikes", action_name: "show")
 
     if current_stolen_record.blank?
-      return false unless contact_owner?(passed_user) # This return false if user isn't present
+      return false unless contact_owner?(passed_user, organization) # This return false if user isn't present
 
       return !passed_user.ambassador? # we aren't giving ambassadors access to phones rn
     end
@@ -678,10 +702,17 @@ class Bike < ApplicationRecord
   end
 
   def fetch_current_stolen_record
-    return current_stolen_record if defined?(manual_csr)
+    return current_stolen_record if manual_csr || id.blank?
 
     # Don't access through association, or else it won't find without a reload
     self.current_stolen_record = StolenRecord.where(bike_id: id, current: true).reorder(:id).last
+  end
+
+  def current_for_sale_marketplace_listing
+    return nil unless is_for_sale
+
+    cml = current_marketplace_listing
+    (cml.present? && cml.for_sale?) ? cml : nil
   end
 
   def current_event_record
@@ -709,25 +740,26 @@ class Bike < ApplicationRecord
   end
 
   def valid_mailing_address?
-    addy = registration_address
-    return false if addy.blank? || addy.values.all?(&:blank?)
-    return false if addy["street"].blank? || addy["city"].blank?
-    return true if creation_organization&.default_location.blank?
+    registration_record = registration_address_record
+    registration_record&.street.present? && registration_record.city.present? &&
+      !registration_address_organization_default?(creation_organization)
+  end
 
-    creation_organization.default_location.address_hash_legacy != addy
+  def registration_address_organization_default?(organization)
+    registration_address_record&.internal_address_attrs == organization&.default_address_record&.internal_address_attrs
+  end
+
+  def mailing_address_record
+    registration_address_record if valid_mailing_address?
+  end
+
+  def registration_address_record
+    BikeServices::CalculateLocation.registration_address_record(self)
   end
 
   def address_hash
-    current_stolen_record&.address_hash || current_impound_record&.address_hash ||
+    current_stolen_record&.address_hash || current_impound_record&.impounded_from_address&.address_hash ||
       address_record&.address_hash
-  end
-
-  def registration_address(unmemoize = false, address_record_id: false)
-    # unmemoize is necessary during save, because things may have changed
-    return @registration_address if !unmemoize && defined?(@registration_address)
-
-    @registration_address =
-      BikeServices::CalculateLocation.registration_address_hash(self, address_record_id:)
   end
 
   def external_image_urls
@@ -798,6 +830,17 @@ class Bike < ApplicationRecord
 
   private
 
+  # Messaging whoever has the vehicle, rather than opening a claim against it, is for the
+  # organizations we already trust with unstolen registrations - never for a registration
+  # of their own, which they reach the ordinary way. Passed organization overrides the
+  # user's own trust, like the unstolen branch it sits above
+  def contactable_away_from_owner?(u = nil, organization = nil)
+    return false unless u.present? && status_abandoned_or_impounded?
+    return u.contact_impounded? unless organization.present?
+
+    !organized?(organization) && organization.contact_impounded? && u.member_of?(organization)
+  end
+
   def validated_organization_id(organization_id)
     return nil unless organization_id.present?
 
@@ -837,18 +880,18 @@ class Bike < ApplicationRecord
       case frame_size.downcase
       when /xxs/
         "xxs"
-      when /x*sma/, "xs"
+      when /(x|extra)\W?sma/, "xs"
         "xs"
       when /sma/, "s"
         "s"
       when /med/, "m"
         "m"
-      when /(lg)|(large)/, "l"
-        "l"
       when /xxl/
         "xxl"
-      when /x*l/, "xl"
+      when /(x|extra)\W?l/, "xl"
         "xl"
+      when /(lg)|(large)/, "l"
+        "l"
       end
     end
     true
@@ -926,19 +969,15 @@ class Bike < ApplicationRecord
     self.current_impound_record = impound_records.current.last
   end
 
-  def current_for_sale_marketplace_listing
-    return nil unless is_for_sale
-
-    cml = current_marketplace_listing
-    (cml.present? && cml.for_sale?) ? cml : nil
-  end
-
   def authorization_requires_impound_organization?
     # If there is a current impound record
     current_impound_record.present? && current_impound_record.organized?
   end
 
-  def can_see_hidden_serial?(u = nil)
+  def can_see_hidden_serial?(u = nil, organization: nil)
+    # An organization stands in for its members, so a page cached for it renders one serial
+    return true if organization.present? &&
+      (current_impound_record&.organization_id == organization.id || organized?(organization))
     return false if u.blank?
     return true if authorized?(u) || u.id.present? && u.id == user&.id ||
       current_impound_record.present? && current_impound_record.authorized?(u)

@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          impound_record_fields:
+            created: Created
+            current_location: Current location
+            impounded_by: Impounded by
+            impounded_from: Impounded from
+            last_update_by: Last update by
+            notes: Notes
+            status: Status

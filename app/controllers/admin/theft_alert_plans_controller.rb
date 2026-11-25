@@ -18,7 +18,7 @@ module Admin
       if @theft_alert_plan.save
         redirect_to(edit_admin_theft_alert_plan_path(@theft_alert_plan))
       else
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 
@@ -32,7 +32,7 @@ module Admin
       if @theft_alert_plan.update(theft_alert_plan_params)
         redirect_to(admin_theft_alert_plans_path)
       else
-        render :edit
+        render :edit, status: :unprocessable_entity
       end
     end
 

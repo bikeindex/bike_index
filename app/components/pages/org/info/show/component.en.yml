@@ -1,0 +1,23 @@
+---
+en:
+  components:
+    pages:
+      org:
+        info:
+          show:
+            add_a_registration: Add a registration
+            associated_with_org_html: Registrations from this link are associated
+              with <strong>%{org_name}</strong>.
+            continue_where_you_were: Continue where you were
+            copy_registration_link: Copy registration link
+            get_qr_code_html: Get a %{qr_code_link} which opens the link when scanned.
+            has_paid_functionality: Your organization has paid functionality.
+            invite_your_team: Invite your team
+            next_invoice_due_html: Next invoice due %{time}.
+            no_invoices_upcoming: No invoices upcoming.
+            no_password_yet: You sign in with emailed links for now.
+            org_is_active: "%{name} is active"
+            organization_set_up_next_steps: Organization set up next steps
+            qr_code: QR code
+            set_a_password: Set a password
+            your_public_registration_link: Your public registration link

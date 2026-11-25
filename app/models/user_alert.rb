@@ -49,7 +49,7 @@ class UserAlert < ApplicationRecord
 
   scope :dismissed, -> { where.not(dismissed_at: nil) }
   scope :resolved, -> { where.not(resolved_at: nil) }
-  scope :inactive, -> { where.not(resolved_at: nil).or(where(dismissed_at: nil)) }
+  scope :inactive, -> { resolved.or(dismissed) }
   scope :active, -> { where(resolved_at: nil, dismissed_at: nil) }
   scope :ignored_member, -> { where(kind: ignored_kinds_member) }
   scope :ignored_superuser, -> { where(kind: ignored_kinds_superuser) }
@@ -58,7 +58,7 @@ class UserAlert < ApplicationRecord
   scope :dismissable, -> { where(kind: dismissable_kinds) }
   scope :with_notification, -> { joins(:notification).where.not(notifications: {id: nil}) }
   scope :create_notification, -> {
-    where(kind: notification_kinds, updated_at: notify_period)
+    joins(:user).where(kind: notification_kinds, updated_at: notify_period)
       .left_joins(:notification).where(notifications: {id: nil})
   }
 
@@ -129,18 +129,35 @@ class UserAlert < ApplicationRecord
   def self.update_unfinished_registrations(user)
     user.b_params.unfinished_registrations
       .each { |b_param| update_unfinished_registration(user:, b_param:) }
+    resolve_finished_registrations(user)
+  end
 
-    # Expiry is silent, and CleanBParamsJob deletes without callbacks, so those alerts
-    # never reach the after_commit that would resolve them
+  # Expiry is silent, CleanBParamsJob deletes without callbacks, and deleting or
+  # transferring the bike doesn't touch the b_param - so those alerts never reach the
+  # after_commit that would resolve them
+  def self.resolve_finished_registrations(user)
     user.user_alerts.active.unfinished_registration.includes(:alertable)
-      .reject { |user_alert| user_alert.alertable&.unfinished_registration? }
+      .reject { |user_alert| user_alert.alertable&.unfinished_registration?(user) }
       .each(&:resolve!)
+  end
+
+  # Deleted and transferred bikes leave these, which is all the other updates revisit.
+  # An organization member can buy a theft alert for a bike they don't own
+  def self.alert_bike_ids(user)
+    bike_ids = user.bike_ids
+    other_ids = user.theft_alerts.where.not(bike_id: bike_ids).distinct.pluck(:bike_id)
+    bike_ids + Bike.current_with_user_hidden.where(id: other_ids).select { it.authorized?(user) }.map(&:id)
+  end
+
+  def self.resolve_without_bike(user, bike_ids: alert_bike_ids(user))
+    user.user_alerts.active.where.not(bike_id: nil).where.not(bike_id: bike_ids)
+      .update_all(resolved_at: Time.current, updated_at: Time.current)
   end
 
   def self.update_unfinished_registration(user:, b_param:)
     user_alert = find_or_build_by(kind: "unfinished_registration",
       user_id: user.id, alertable: b_param)
-    if b_param.unfinished_registration?
+    if b_param.unfinished_registration?(user)
       # Nothing is assigned after the lookup, so saving a found one only re-runs the
       # uniqueness select find_or_build_by just did - in the register flow's request
       user_alert.save if user_alert.new_record?
@@ -162,7 +179,7 @@ class UserAlert < ApplicationRecord
   end
 
   def self.update_stolen_bike_without_location(user:, bike:)
-    user_alert = UserAlert.find_or_build_by(kind: "stolen_bike_without_location",
+    user_alert = UserAlert.active.find_or_build_by(kind: "stolen_bike_without_location",
       user_id: user.id, bike_id: bike.id)
     if bike.current_stolen_record&.without_street?
       user_alert.save
@@ -244,7 +261,7 @@ class UserAlert < ApplicationRecord
   def create_notification?
     return false if inactive? || notification.present? ||
       !self.class.notify_period.cover?(updated_at) ||
-      self.class.notification_kinds.exclude?(kind)
+      self.class.notification_kinds.exclude?(kind) || user.blank?
 
     # Check if the relevant object is updated since
     if theft_alert_without_photo? || stolen_bike_without_location?
@@ -257,9 +274,9 @@ class UserAlert < ApplicationRecord
 
   def email_subject
     if kind == "theft_alert_without_photo"
-      "Your stolen #{bike.cycle_type} needs a photo"
+      "Your stolen #{bike.type} needs a photo"
     elsif kind == "stolen_bike_without_location"
-      "Your stolen #{bike.cycle_type} is missing its location"
+      "Your stolen #{bike.type} is missing its location"
     else
       kind_humanized
     end

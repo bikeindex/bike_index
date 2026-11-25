@@ -1,0 +1,11 @@
+<%= render(UI::Forms::Checkbox::Component.new(name: :search_all, value: "true", checked: @settings.search_all?,
+  class_name: "tw:mb-0!",
+  html_options: {form: "Search_Form", disabled: @locked,
+                 data: {action: "change->org--search#filterChanged", "org--search-target": "searchAll",
+                        "org--multi-search-target": "searchAll"}})) do %>
+  <%= translation(".search_all_html", org_name: @settings.organization.short_name) %>
+
+  <%= tag.span(render(UI::Tooltip::Component.new(text: @locked_hint)),
+    class: "tw:leading-none", hidden: !@locked,
+    data: {"org--search-target": "searchAllHint", "org--multi-search-target": "searchAllHint"}) %>
+<% end %>

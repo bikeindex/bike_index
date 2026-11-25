@@ -2,6 +2,12 @@ require "rails_helper"
 
 RSpec.describe SpamEstimator::Text do
   describe "estimate" do
+    context "a pharmacy term" do
+      it "is 100, since the shape checks score well-formed prose 0" do
+        expect(described_class.estimate("Buy Ambien online for insomnia")).to eq 100
+      end
+    end
+
     context "garbage" do
       let(:str) { "VhriBJhD1nuwH" }
       it "returns for garbage" do
@@ -228,6 +234,51 @@ RSpec.describe SpamEstimator::Text do
       expect(described_class.send(:capital_count_suspiciousness, "#{str} #{str} bbc")).to be_between(20, 30)
       expect(described_class.send(:capital_count_suspiciousness, "#{str}#{str.downcase}aabbc")).to be_between(5, 20)
       expect(described_class.send(:capital_count_suspiciousness, "#{str.downcase}#{str.downcase}AABBC")).to be_between(0, 5)
+    end
+  end
+
+  describe "seo_spam_matches" do
+    it "tallies matched terms, normalizing case and diacritics" do
+      expect(described_class.seo_spam_matches("Nhà cái uy tín nha cai casino"))
+        .to eq({"nha cai" => 2, "uy tin" => 1, "casino" => 1})
+    end
+
+    it "is empty for a blank string" do
+      expect(described_class.seo_spam_matches(nil)).to eq({})
+      expect(described_class.seo_spam_matches("")).to eq({})
+    end
+
+    it "counts generic medical words, but not an MG Road address" do
+      expect(described_class.seo_spam_matches("Sports medicine clinic. We manage medication and fit prescription glasses. Fish oil 1000mg."))
+        .to eq({"medicine" => 1, "medication" => 1, "prescription" => 1, "1000mg" => 1})
+      expect(described_class.seo_spam_matches("Visit us at 123 MG Road, Bengaluru, or 45 MG Rd")).to eq({})
+    end
+
+    it "counts bike names only after a buying verb" do
+      expect(described_class.seo_spam_matches("Buy Soma online, order Norco")).to eq({"buy soma" => 1, "order norco" => 1})
+    end
+
+    it "counts account resellers, however they join the words" do
+      {
+        "Buy 100% verified accounts" => {"buy 100% verified accounts" => 1},
+        "Aged verified cash app accounts for sale" => {"verified cash app accounts" => 1},
+        "buy-verified-revolut-account" => {"buy verified" => 1},
+        "buyverifiedrevolutaccounts" => {"buyverifiedrevolutaccounts" => 1},
+        "buy bitcoin casino accounts" => {"bitcoin" => 1, "casino" => 1, "buy bitcoin casino accounts" => 1}
+      }.each { |text, matches| expect(described_class.seo_spam_matches(text)).to eq(matches) }
+    end
+
+    # inside SEO_SPAM_REGEX it backtracked past Regexp.timeout on "buy" + 1,000 letters
+    it "matches account resellers in linear time" do
+      expect(Regexp.linear_time?(described_class::ACCOUNT_RESELLER_REGEX)).to be true
+    end
+
+    it "doesn't count ordinary talk of buying or verified accounts" do
+      ["Verified seller account on eBay", "Follow my verified Strava account", "We buy parts for wholesale accounts.",
+        "Buy and sell accounts", "Buy now pay later account", "I verified this account last week",
+        "I verified both accounts", "I verified my account", "Buy the bike with your account credit."].each do |text|
+        expect(described_class.seo_spam_matches(text)).to eq({})
+      end
     end
   end
 end

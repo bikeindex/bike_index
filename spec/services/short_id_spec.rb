@@ -5,11 +5,11 @@ RSpec.describe ShortId do
     it "returns the class-prefixed base36 id, grouped in threes" do
       expect(ShortId.encode("Bike", 3431156)).to eq "r/21J-HW"
       expect(ShortId.encode("BikeVersion", 3431156)).to eq "v/21J-HW"
-      expect(ShortId.encode("MarketplaceListing", 3431156)).to eq "m/21J-HW"
+      expect(ShortId.encode("MarketplaceListing", 3431156)).to eq "f/21J-HW"
       expect(ShortId.encode("Bike", nil)).to be_nil
     end
-    it "keeps ids with an under-3-digit base36 form as decimals, round-tripping cleanly" do
-      [1, 35, 36, 37, 1295].each do |id|
+    it "keeps ids with an under-3-digit or all-digit base36 form as decimals, round-tripping cleanly" do
+      [1, 35, 36, 37, 1295, 1296, 3359232].each do |id|
         short_id = ShortId.encode("Bike", id)
         expect(short_id).to eq "r/#{id}"
         expect(ShortId.decode("Bike", short_id)).to eq id.to_s

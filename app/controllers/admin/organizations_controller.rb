@@ -2,27 +2,39 @@ module Admin
   class OrganizationsController < Admin::BaseController
     include Binxtils::SortableTable
 
-    before_action :find_organization, only: %i[show edit update destroy]
-    before_action :set_admin_form_page_id, only: %i[new edit]
+    # Each has a template of its own rendering its slice of the organization form; #edit
+    # picks between them, so only "edit" is an action
+    FORM_TABS = %w[edit locations invoice_functionality sso].freeze
+    # Like FORM_TABS, each names a template of its own - one #show renders in place of the profile
+    SHOW_TABS = %w[education_courses].freeze
+
+    before_action :find_organization, only: %w[show edit update destroy]
+    before_action :set_admin_form_page_id, only: %w[edit new]
 
     def index
       @per_page = permitted_per_page
       organizations = if sort_column == "bikes"
         matching_organizations.left_joins(:bikes).group(:id)
-          .order("COUNT(bikes.id) #{sort_direction}")
+          .order(sortable_order("COUNT(bikes.id)", nulls_last: false))
       else
         matching_organizations
-          .reorder("organizations.#{sort_column} #{sort_direction}")
+          .reorder(sortable_order(Organization))
       end
       @pagy, @organizations = pagy(:countish, organizations, limit: @per_page, page: permitted_page)
     end
 
     def show
-      @locations = @organization.locations
+      active_tab = params[:active_tab].presence_in(SHOW_TABS)
+      return render(action: active_tab) if active_tab.present?
+
       @deleted_organization_roles = @organization.deleted? || Binxtils::InputNormalizer.boolean(params[:deleted_organization_roles])
       bikes = @organization.bikes.reorder("created_at desc")
       @bikes_count = bikes.size
       @pagy, @bikes = pagy(:countish, bikes, limit: 10, page: permitted_page)
+    end
+
+    def edit
+      render action: form_tab || "edit"
     end
 
     def recover
@@ -32,10 +44,6 @@ module Admin
 
     def new
       @organization = Organization.new
-    end
-
-    def edit
-      @embedable_email = @organization.auto_user.email if @organization.auto_user
     end
 
     def update
@@ -58,9 +66,9 @@ module Admin
         update_organization_stolen_message
         flash[:success] = "Organization Saved!"
         UpdateOrganizationPosKindJob.perform_async(@organization.id) if run_update_pos_kind
-        redirect_to admin_organization_url(@organization)
+        redirect_to form_tab_url
       else
-        render action: :edit
+        render action: form_tab || "edit", status: :unprocessable_entity
       end
     end
 
@@ -71,7 +79,7 @@ module Admin
         flash[:success] = "Organization Created!"
         redirect_to edit_admin_organization_url(@organization)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 
@@ -80,15 +88,40 @@ module Admin
       redirect_to admin_organizations_url
     end
 
+    # The features filter is a multiselect combobox, which renders its selections through
+    # this rather than holding them itself
+    def feature_chips
+      displays = Pages::Admin::Organizations::Index::SearchForm::Component.option_groups
+        .values.flatten.to_h { [it[:value], it[:display]] }
+
+      chips = params[:combobox_values].to_s.split(",").filter_map do |value|
+        next if displays[value].blank?
+
+        helpers.hw_combobox_selection_chip(display: displays[value], value:, for_id: params[:for_id])
+      end
+
+      render turbo_stream: helpers.safe_join(chips)
+    end
+
     helper_method :matching_organizations
 
     protected
 
+    def form_tab = params[:tab].presence_in(FORM_TABS)
+
+    # "edit" is the tab #edit renders by default, so it stays out of the URL
+    def form_tab_url
+      return admin_organization_url(@organization) if form_tab.blank?
+
+      edit_admin_organization_url(@organization, tab: (form_tab unless form_tab == "edit"))
+    end
+
+    # fetch rather than require: a tab that renders none of these still submits - the reg
+    # labels are top-level params, and a locations tab for an organization without any posts
+    # nothing but the blank-fields template, which the browser leaves behind
     def permitted_parameters
-      approved_kind = params.dig(:organization, :kind)
-      approved_kind = "other" unless Organization.kinds.include?(approved_kind)
       params
-        .require(:organization)
+        .fetch(:organization, {})
         .permit(
           :access_token,
           :api_access_approved,
@@ -117,27 +150,48 @@ module Admin
           :spam_registrations,
           :website,
           [locations_attributes:],
-          organization_saml_configuration_attributes: %i[id enabled idp_entity_id
+          organization_saml_configuration_attributes: %i[id active idp_entity_id
             idp_sso_target_url idp_slo_target_url idp_cert idp_cert_fingerprint
             idp_cert_multi email_attribute_name name_id_format]
-        ).merge(kind: approved_kind)
-        .merge(registration_field_labels: registration_field_labels_val)
+        ).merge(approved_kind).merge(registration_field_labels_param)
+    end
+
+    # A tab that doesn't render the field mustn't clear it - only the kind select answers
+    # for kind, and only the tab holding the label fields can blank a label
+    def approved_kind
+      kind = params.dig(:organization, :kind)
+      return {} if kind.blank?
+
+      {kind: Organization.kinds.include?(kind) ? kind : "other"}
+    end
+
+    def registration_field_labels_param
+      return {} unless form_tab.nil? || form_tab == "invoice_functionality"
+
+      {registration_field_labels: registration_field_labels_val}
     end
 
     def matching_organizations
       return @matching_organizations if defined?(@matching_organizations)
 
-      @search_paid = Binxtils::InputNormalizer.boolean(params[:search_paid])
+      @search_invoiced = Binxtils::InputNormalizer.boolean(params[:search_invoiced])
       matching_organizations = search_deleted_scope(Organization.all)
-      matching_organizations = matching_organizations.paid if @search_paid
+      matching_organizations = matching_organizations.invoiced if @search_invoiced
       matching_organizations = matching_organizations.admin_text_search(params[:search_query]) if params[:search_query].present?
 
       @features_and_settings_ids = []
-      features_and_settings = Array(params[:search_features_and_settings]).reject(&:blank?)
+      # The combobox posts one comma-joined value; bookmarked URLs still carry an array
+      features_and_settings = Array(params[:search_features_and_settings])
+        .flat_map { it.to_s.split(",") }.reject(&:blank?)
       organization_features = OrganizationFeature.where(id: features_and_settings)
-      if organization_features.any? # HACK - doesn't search InvoiceOrganizationFeature, just feature slugs
-        matching_organizations = matching_organizations.with_enabled_feature_slugs(organization_features.feature_slugs)
-        @features_and_settings_ids += organization_features.pluck(:id)
+      if organization_features.any?
+        feature_slugs = organization_features.feature_slugs
+        matching_organizations = matching_organizations.with_enabled_feature_slugs(feature_slugs) if feature_slugs.any?
+        # A feature without slugs enables nothing, so only an active invoice says who has it
+        matching_organizations = organization_features.where(feature_slugs: []).reduce(matching_organizations) do |organizations, feature|
+          organizations.where(id: feature.invoices.active.select(:organization_id))
+        end
+        @features_and_settings_ids += organization_features.pluck(:id).map(&:to_s)
       end
       selected_settings = organization_settings & features_and_settings
       if selected_settings.include?("theft_survey")

@@ -8,7 +8,8 @@ RSpec.describe Admin::MarketplaceListingsController, type: :request do
   base_url = "/admin/marketplace_listings"
 
   describe "#index" do
-    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing) }
+    let(:buyer) { FactoryBot.create(:user) }
+    let!(:marketplace_listing) { FactoryBot.create(:marketplace_listing, buyer:) }
 
     it "responds with ok" do
       get base_url
@@ -16,6 +17,7 @@ RSpec.describe Admin::MarketplaceListingsController, type: :request do
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
       expect(assigns(:collection).pluck(:id)).to eq([marketplace_listing.id])
+      expect(response.body).to include(buyer.email)
     end
   end
 end

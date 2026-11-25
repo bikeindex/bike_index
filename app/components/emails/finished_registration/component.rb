@@ -9,14 +9,19 @@ module Emails
           ownership.organization_id.blank?
       end
 
-      def initialize(ownership:, bike: nil, email_preview: false)
+      def initialize(ownership:, bike: nil, email_preview: false, versioned: true)
         @ownership = ownership
         @bike = bike
         @email_preview = email_preview
+        @versioned = versioned
       end
 
       def email_sent_at
         @ownership&.created_at if @ownership&.persisted?
+      end
+
+      def snippet_time
+        email_sent_at if @versioned
       end
 
       private
@@ -39,6 +44,10 @@ module Emails
 
       def show_default_security_section?
         !show_security_snippet? && !bike.status_impounded?
+      end
+
+      def show_view_bike_cta?
+        claimed? && !bike.status_impounded?
       end
 
       def show_whats_next_section?
@@ -64,9 +73,9 @@ module Emails
       def intro_body
         return translation("were_sorry_your_bike_type_was_stolen", bike_type: bike.type) if bike.status_stolen?
         return if bike.status_impounded?
-        return translation("registration_complete_message") if claimed?
+        return translation("registration_complete_message", bike_type: bike.type) if claimed?
 
-        translation("registration_confirm_message")
+        translation("registration_confirm_message", bike_type: bike.type)
       end
 
       def detail_message
@@ -74,14 +83,14 @@ module Emails
 
         if registered_by_owner?
           translation("you_added_a_bike_type_on_bike_index", bike_type: bike_type_for_message)
-        elsif new_bike?
-          "<strong>#{org_name}</strong> #{translation("org_added_a_bike", bike_type: bike_type_for_message)}".html_safe
         else
-          "<strong>#{org_name}</strong> #{translation("org_sent_a_bike", bike_type: bike_type_for_message)}".html_safe
+          message = new_bike? ? translation("org_added_a_bike", bike_type: bike_type_for_message) : translation("org_sent_a_bike", bike_type: bike_type_for_message)
+          safe_join([tag.strong(org_name), message], " ")
         end
       end
 
-      def claim_cta_text
+      def cta_text
+        return translation("view_your_bike", bike_type: bike.type) if claimed?
         return translation("claim_the_bike_type", bike_type: bike.type) if registered_by_owner?
 
         translation("confirm_this_bike_type", bike_type: bike.type)
@@ -92,7 +101,7 @@ module Emails
       end
 
       def organization_snippet_body(kind)
-        @organization_snippet_bodies ||= Hash.new { |h, k| h[k] = organization&.mail_snippet_body(k, time: email_sent_at) }
+        @organization_snippet_bodies ||= Hash.new { |h, k| h[k] = organization&.mail_snippet_body(k, time: snippet_time) }
         @organization_snippet_bodies[kind]
       end
 
@@ -121,7 +130,7 @@ module Emails
       end
 
       def donation_message?
-        bike.status_stolen? && !(organization && !organization.paid?)
+        bike.status_stolen? && !(organization && !organization.is_invoiced?)
       end
 
       def registered_by_owner?
@@ -152,7 +161,7 @@ module Emails
 
       def bike_url_with_token
         if @email_preview
-          OrganizedServices::EmailPreview::TOKEN_PATH
+          OrgServices::EmailPreview::TOKEN_PATH
         else
           bike_url(bike, t: @ownership.token, email:)
         end
@@ -160,7 +169,7 @@ module Emails
 
       def recovery_url
         if @email_preview
-          OrganizedServices::EmailPreview::TOKEN_PATH
+          OrgServices::EmailPreview::TOKEN_PATH
         else
           edit_bike_recovery_url(bike_id: bike.id, token: bike.fetch_current_stolen_record.find_or_create_recovery_link_token)
         end

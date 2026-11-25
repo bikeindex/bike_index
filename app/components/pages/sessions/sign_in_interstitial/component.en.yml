@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    pages:
+      sessions:
+        sign_in_interstitial:
+          click_button_to_continue: Click the button below to continue
+          finish_signing_in: Finish signing in
+          sign_in: Sign in

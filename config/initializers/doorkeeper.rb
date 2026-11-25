@@ -21,22 +21,18 @@ Doorkeeper.configure do
   orm :active_record
 
   # This block is be called to check whether the resource owner is authenticated or not.
-  resource_owner_authenticator do |request_envi|
+  resource_owner_authenticator do
     user = User.from_auth(cookies.signed[ControllerHelpers::AUTH_COOKIE_KEY])
     if user.present? && user.confirmed?
       user # Return user immediately, if user is confirmed
     else
       # If user isn't confirmed, check for unconfirmed scope. If it's present, return user even tho unconfirmed
-      unconfirmed_scope = request_envi&.params && request_envi.params[:scope].to_s[/unconfirmed/i].present?
+      unconfirmed_scope = params[:scope].to_s[/unconfirmed/i].present?
       if user.present? && unconfirmed_scope
         user
       else
         session[:return_to] = request.fullpath
-        if request_envi&.params && request_envi.params[:unauthenticated_redirect] == "sign_up"
-          redirect_to(new_user_url)
-        else
-          redirect_to(new_session_url)
-        end
+        redirect_to(force_sign_up? ? new_user_url : new_session_url)
       end
     end
   end
@@ -79,6 +75,22 @@ Doorkeeper.configure do
   # falls back to the `:access_token` or `:bearer_token` params from the `params` object.
   # Check out the wiki for more information on customization
   # access_token_methods :from_bearer_authorization, :from_access_token_param, :from_bearer_param
+  #
+  # Doorkeeper's built-in extractors refuse a token sent by more than one method
+  # (RFC 6750 §2), but API clients send the same token in the query and the body.
+  # Accept that, and refuse only when the tokens differ.
+  access_token_methods(lambda do |request|
+    body = begin
+      request.POST
+    rescue ActionDispatch::Http::Parameters::ParseError
+      {}
+    end
+    tokens = [
+      Doorkeeper::OAuth::Token.from_bearer_authorization(request),
+      *%w[access_token bearer_token].flat_map { |key| [request.GET[key], body[key]] }
+    ].filter_map(&:presence).uniq
+    tokens.first if tokens.one?
+  end)
 
   # Change the native redirect uri for client apps
   # When clients register with the following redirect uri, they won't be redirected to any server and the authorization code will be displayed within the provider

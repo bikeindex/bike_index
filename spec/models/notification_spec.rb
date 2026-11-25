@@ -16,8 +16,8 @@ RSpec.describe Notification, type: :model do
     let!(:notification1) { FactoryBot.create(:notification, user: user) }
     it "gets from and by" do
       expect {
-        Email::StolenNotificationJob.new.perform(stolen_notification.id)
-        Email::StolenNotificationJob.new.perform(stolen_notification.id, true)
+        EmailJobs::StolenNotificationJob.new.perform(stolen_notification.id)
+        EmailJobs::StolenNotificationJob.new.perform(stolen_notification.id, true)
       }.to change(Notification, :count).by 2
 
       expect(Notification.pluck(:kind)).to match_array(%w[confirmation_email stolen_notification_sent stolen_notification_blocked])
@@ -141,133 +141,24 @@ RSpec.describe Notification, type: :model do
     end
   end
 
-  describe "track_email_delivery" do
-    let(:user) { FactoryBot.create(:user) }
-    let(:notification) { FactoryBot.create(:notification, kind: :confirmation_email, user:) }
-    let(:user_email) { FactoryBot.create(:user_email, user:, email: user.email, confirmation_token: "xxxx") }
-
-    it "adds email success" do
-      expect(notification.reload.delivery_status).to eq "delivery_pending"
-      notification.track_email_delivery do
-        CustomerMailer.confirmation_email(notification.user).deliver_now
-      end
-      expect(notification.reload.delivery_status).to eq "delivery_success"
-      expect(notification.delivery_error).to be_nil
+  describe "delivery scopes" do
+    let(:statuses) { Notification.delivery_statuses.keys }
+    let!(:notifications) { statuses.map { FactoryBot.create(:notification, delivery_status: it) } }
+    let!(:undeliverable) do
+      FactoryBot.create(:notification, delivery_status: :delivery_failure,
+        delivery_error: "Postmark::InactiveRecipientError")
     end
 
-    context "with user_email" do
-      before { user_email.update(last_email_errored: true) }
+    it "settles what settled? does, and counts a partial success as delivered" do
+      expect(statuses).to match_array(%w[delivery_pending delivery_success delivery_failure
+        delivery_banned delivery_partial_success])
+      settled = (notifications + [undeliverable]).select(&:settled?)
 
-      it "updates the user_email to be last_email_errored: false" do
-        expect(user_email.reload).to be_valid
-        expect(user_email.reload.last_email_errored?).to be_truthy
-        expect(user.reload.email).to eq user_email.email
-        expect(notification.reload.message_channel_target).to eq user.email
-        expect(notification.user_email&.id).to eq user_email.id
-        user.update_column :updated_at, Time.current - 1.hour
-        expect(notification.reload.delivery_status).to eq "delivery_pending"
-        notification.track_email_delivery do
-          CustomerMailer.confirmation_email(notification.user).deliver_now
-        end
-        expect(notification.reload.delivery_status).to eq "delivery_success"
-        expect(notification.delivery_error).to be_nil
-        expect(user_email.reload.last_email_errored?).to be_falsey
-        # it breaks the user cache
-        expect(user.reload.updated_at).to be_within(2).of Time.current
-      end
-    end
-
-    context "with a delivery_error" do
-      before { notification.update(delivery_status: "delivery_failure", delivery_error: "SomeErrorThing") }
-      it "updates_delivery_status, doesn't remove delivery_error" do
-        notification.reload
-        notification.track_email_delivery do
-          CustomerMailer.confirmation_email(notification.user).deliver_now
-        end
-        expect(notification.reload.delivery_status).to eq "delivery_success"
-        expect(notification.delivery_error).to eq "SomeErrorThing"
-      end
-    end
-
-    context "sent a second time" do
-      it "only delivers once" do
-        expect(notification.reload.delivery_status).to eq "delivery_pending"
-        notification.track_email_delivery do
-          CustomerMailer.confirmation_email(notification.user).deliver_now
-        end
-        expect(notification.reload.delivery_status).to eq "delivery_success"
-        expect(ActionMailer::Base.deliveries.count).to eq 1
-
-        notification.track_email_delivery do
-          CustomerMailer.confirmation_email(notification.user).deliver_now
-        end
-        expect(notification.reload.delivery_status).to eq "delivery_success"
-        expect(ActionMailer::Base.deliveries.count).to eq 1
-      end
-    end
-
-    context "with unknown postmark error" do
-      it "raises and adds the error to the notification" do
-        expect(notification.reload.delivery_status).to eq "delivery_pending"
-        expect(notification.user_email).to be_nil
-        expect do
-          notification.track_email_delivery do
-            raise Postmark::ApiInputError.build("error", {"ErrorCode" => 499})
-          end
-        end.to raise_error(Postmark::ApiInputError)
-
-        expect(notification.reload.delivery_status).to eq "delivery_failure"
-        expect(notification.delivery_error).to eq "Postmark::ApiInputError"
-      end
-    end
-
-    context "with InactiveRecipientError" do
-      let(:error_message) do
-        "You tried to send to recipient(s) that have been marked as inactive. Found inactive addresses: " \
-        "example@bikeindex.org. Inactive recipients are ones that have generated a hard bounce, a spam " \
-        "complaint, or a manual suppression."
-      end
-      let(:inactive_recipient_error) do
-        Postmark::ApiInputError.build("error", {"ErrorCode" => 406, "Message" => error_message})
-      end
-      it "adds the error to the notification" do
-        expect(notification.reload.delivery_status).to eq "delivery_pending"
-        expect(notification.user_email).to be_nil
-        notification.track_email_delivery { raise inactive_recipient_error }
-
-        expect(notification.reload.delivery_status).to eq "delivery_failure"
-        expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
-      end
-      context "when there is a user_email" do
-        it "updates the user_email to be failed" do
-          expect(user.reload.confirmed?).to be_falsey
-          expect(user_email.reload).to be_valid
-          expect(user_email.confirmed?).to be_falsey # this needs to work for unconfirmed emails too!
-          expect(user_email.last_email_errored?).to be_falsey
-
-          expect(notification.reload.delivery_status).to eq "delivery_pending"
-          expect(notification.user_email&.id).to eq user_email.id
-
-          notification.track_email_delivery { raise inactive_recipient_error }
-
-          expect(notification.reload.delivery_status).to eq "delivery_failure"
-          expect(notification.delivery_error).to eq "Postmark::InactiveRecipientError"
-
-          expect(user_email.reload.last_email_errored).to be_truthy
-        end
-      end
-    end
-
-    context "with InvalidEmailRequestError" do
-      let(:invalid_email_error) { Postmark::ApiInputError.build("error", {"ErrorCode" => 300}) }
-      it "adds the error to the notification without raising" do
-        expect(notification.reload.delivery_status).to eq "delivery_pending"
-        notification.track_email_delivery { raise invalid_email_error }
-
-        expect(notification.reload.delivery_status).to eq "delivery_failure"
-        expect(notification.delivery_error).to eq "Postmark::InvalidEmailRequestError"
-        expect(notification.delivery_error_invalid?).to be_truthy
-      end
+      expect(settled.map(&:delivery_status)).to match_array(%w[delivery_success delivery_banned
+        delivery_partial_success delivery_failure])
+      expect(Notification.settled.pluck(:id)).to match_array(settled.map(&:id))
+      expect(Notification.delivered.pluck(:delivery_status))
+        .to match_array(%w[delivery_success delivery_partial_success])
     end
   end
 end

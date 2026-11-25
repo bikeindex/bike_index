@@ -10,13 +10,14 @@ import { collapse } from 'utils/collapse_utils'
 // "I'm 100% sure") swaps the serial section for a made-without checkbox and
 // submits the serial as "made_without_serial".
 export default class extends Controller {
-  static targets = ['input', 'missing', 'madeWithoutLink', 'serialSection', 'madeWithoutRow', 'madeWithoutCheckbox']
+  static targets = ['input', 'inputRow', 'missing', 'madeWithoutLink', 'serialSection', 'madeWithoutRow', 'madeWithoutCheckbox']
 
   ABSENT_VALUES = ['unknown', 'made_without_serial']
 
   connect () {
     this.boundSync = this.syncRestored.bind(this)
     window.addEventListener('form-persist:restored', this.boundSync)
+    this.syncRestored()
   }
 
   disconnect () {
@@ -49,9 +50,10 @@ export default class extends Controller {
     this.applyMadeWithout()
   }
 
+  // setSerial fills the input first: it's required, and a required field that is
+  // display:none while empty blocks submission instead of reporting anything
   applyMissing (duration) {
-    this.inputTarget.readOnly = true
-    this.inputTarget.classList.add('tw:text-gray-400', 'tw:cursor-not-allowed')
+    collapse('hide', this.inputRowTarget, duration)
     collapse('show', this.madeWithoutLinkTarget, duration)
   }
 
@@ -77,18 +79,17 @@ export default class extends Controller {
       this.stashedSerial = this.inputTarget.value
     }
     this.inputTarget.value = value
-    // readonly rather than disabled, so the value still submits
-    this.inputTarget.readOnly = true
-    this.inputTarget.classList.add('tw:text-gray-400', 'tw:cursor-not-allowed')
     this.dispatchInput()
   }
 
+  // Instantly, so a serialSection animating open around it measures its full height.
+  // Both callers mean "the rider is entering a serial again", so it always comes back -
+  // including after a made-without confirm hid it on the way past
   restoreSerial () {
     if (this.ABSENT_VALUES.includes(this.inputTarget.value)) {
       this.inputTarget.value = this.stashedSerial || ''
     }
-    this.inputTarget.readOnly = false
-    this.inputTarget.classList.remove('tw:text-gray-400', 'tw:cursor-not-allowed')
+    collapse('show', this.inputRowTarget, 0)
     this.dispatchInput()
   }
 

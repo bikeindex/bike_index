@@ -6,4 +6,5 @@
   = render partial: "form"
 
   .form-group.destroy-button
-    = button_to t(".delete_this_lock"), { action: 'destroy', id: @lock}, method: :delete, data: { confirm: t(".are_you_sure") }, class: "btn btn-danger btn-lg"
+    = render(UI::ButtonLink::Component.new(text: t(".delete_this_lock"), href: {action: "destroy", id: @lock},
+      method: :delete, color: :error, size: :lg, confirm: t(".are_you_sure")))

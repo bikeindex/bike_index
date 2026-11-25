@@ -1,0 +1,58 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe SharedBlocks::MainContent::Organized::Component, type: :component do
+  let(:organization) { FactoryBot.build(:organization) }
+  let(:action_name) { "index" }
+  let(:component) do
+    render_inline(described_class.new(current_organization: organization, current_user: nil,
+      show_general_alert: false, controller_name:, action_name:))
+  end
+  let(:container_class) { component.at_css(".organized-wrap > div")["class"] }
+
+  context "law enforcement without the verified features" do
+    let(:organization) { FactoryBot.build(:organization, kind: "law_enforcement") }
+    let(:controller_name) { "users" }
+
+    it "renders a dismissable alert" do
+      expect(component.at_css("[role=alert] a[href='mailto:gavin@bikeindex.org']")).to be_present
+      expect(component.at_css("[role=alert] button[aria-label='Close']")).to be_present
+    end
+  end
+
+  context "users" do
+    let(:controller_name) { "users" }
+    it "is a container" do
+      expect(container_class).to eq "container"
+    end
+  end
+
+  context "registrations" do
+    let(:controller_name) { "registrations" }
+    it "is fluid" do
+      expect(container_class).to eq "container-fluid"
+    end
+
+    context "new" do
+      let(:action_name) { "new" }
+      it "has no container" do
+        expect(container_class).to be_blank
+      end
+    end
+
+    context "settings" do
+      let(:action_name) { "settings" }
+      it "is a container" do
+        expect(container_class).to eq "container"
+      end
+    end
+  end
+
+  context "parking_notifications" do
+    let(:controller_name) { "parking_notifications" }
+    it "is fluid" do
+      expect(container_class).to eq "container-fluid"
+    end
+  end
+end

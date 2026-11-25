@@ -1,0 +1,15 @@
+---
+en:
+  components:
+    pages:
+      org:
+        search_results:
+          bikes_table:
+            assign_bike_sticker: Assign sticker
+            course_acknowledgment_title: Education course acknowledgment at
+            email_hidden: email hidden
+            hidden: hidden
+            link_sticker: link sticker
+            more_notes: "+%{count} more"
+            not_registered_with: Hidden because it is not registered with %{org_name}
+            view: View

@@ -1,0 +1,66 @@
+<%= render(UI::Header::Component.new(text: tag.span("Theft information", class: UI::Alerts::Base::Component::TEXT_CLASSES[:error]), tag: :h2, html_class: "tw:mt-6")) %>
+
+<div class="tw:flex tw:flex-wrap">
+  <div class="tw:w-full tw:md:w-1/2 tw:md:pr-4">
+    <%= render(UI::Table::List::Component.new) do |list| %>
+      <% list.with_row(label: "ID", value: render(UI::Code::Inline::Component.new(text: @stolen_record.id)), class: "tw:text-sm", if: @display_dev_info) %>
+
+      <% list.with_row(label: "Theft description", value: @stolen_record.theft_description) %>
+
+      <% list.with_row(label: "Stolen record created", value: render(UI::Time::Component.new(time: @stolen_record.created_at))) %>
+
+      <% list.with_row(label: "Stolen at", value: render(UI::Time::Component.new(time: @stolen_record.date_stolen))) %>
+
+      <% list.with_row(label: "Callable by", value: callable_by) %>
+
+      <% list.with_row(label: "Link to recover", if: !@stolen_record.recovered?) do %>
+        <input
+          type="text"
+          class="twinput"
+          readonly
+          autocomplete="off"
+          value="<%= recovery_link %>"
+        >
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="tw:w-full tw:md:w-1/2">
+    <%= render(UI::Table::List::Component.new) do |list| %>
+      <% list.with_row(label: "Approved?") do %>
+        <% if @stolen_record.approved %>
+          <%= check_mark %>
+        <% else %>
+          <small class="less-strong">nope</small>
+        <% end %>
+      <% end %>
+
+      <% list.with_row(label: "Estimated $", value: @stolen_record.estimated_value) %>
+
+      <% list.with_row(label: "Location") do %>
+        <%= @stolen_record.formatted_address_string(visible_attribute: :street) %>
+
+        <% if @stolen_record.without_street? %>
+          <em class="tw:text-sm <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>">
+            missing address (user alerted)
+          </em>
+        <% end %>
+      <% end %>
+
+      <% list.with_row(label: "Phone") do %>
+        <%= render(Atoms::Phone::Component.new(phone: @stolen_record.phone, skip_link: true)) %>
+
+        <% if @stolen_record.secondary_phone.present? %>
+          <small class="tw:block">
+            <span class="less-strong">secondary:</span>
+            <%= render(Atoms::Phone::Component.new(phone: @stolen_record.secondary_phone, skip_link: true)) %>
+          </small>
+        <% end %>
+      <% end %>
+
+      <% list.with_row(label: "Police Department", value: @stolen_record.police_report_department) %>
+
+      <% list.with_row(label: "Police Report", value: @stolen_record.police_report_number) %>
+    <% end %>
+  </div>
+</div>

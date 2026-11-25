@@ -31,17 +31,17 @@ module API
               organization_short_name: membership.organization.short_name,
               organization_slug: membership.organization.slug,
               organization_id: membership.organization_id,
-              organization_access_token: membership.organization.access_token,
+              organization_access_token: membership.organization_access_token,
               organization_logo_url: (membership.organization.avatar_url if membership.organization.avatar?),
-              user_is_organization_admin: membership.role == "admin",
-              menu: OrganizedServices::UserMenuItems.for(organization: membership.organization, current_user:)
+              user_is_organization_admin: membership.admin?,
+              menu: UserServices::MenuItemsOrg.for(organization: membership.organization, current_user:)
             }
           end
 
           def organization_memberships
             return {} unless current_scopes.include?("read_organization_membership")
 
-            {memberships: current_user.organization_roles.map { |m| serialized_membership(m) }}
+            {memberships: OrganizationRole.ordered_for(current_user).includes(:organization).map { |m| serialized_membership(m) }}
           end
 
           private
@@ -85,7 +85,7 @@ module API
         get "/bikes" do
           ActiveModel::ArraySerializer.new(current_user.bikes,
             each_serializer: BikeV2Serializer,
-            root: "bikes").as_json
+            root: "bikes", scope: current_user).as_json
         end
       end
     end

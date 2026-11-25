@@ -5,7 +5,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @parking_notifications = pagy(:countish, matching_parking_notifications.includes(:user, :organization, :bike)
-        .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
+        .order(sortable_order(ParkingNotification)), limit: @per_page, page: permitted_page)
     end
 
     helper_method :matching_parking_notifications
@@ -34,6 +34,7 @@ module Admin
       else
         @search_status = "all"
       end
+      parking_notifications = parking_notifications.where(bike_id: params[:search_bike_id]) if params[:search_bike_id].present?
       parking_notifications = parking_notifications.where(organization_id: current_organization.id) if current_organization.present?
       @matching_parking_notifications = parking_notifications.where(created_at: @time_range)
     end

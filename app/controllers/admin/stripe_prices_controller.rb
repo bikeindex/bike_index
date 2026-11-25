@@ -5,7 +5,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
-        matching_stripe_prices.reorder("stripe_prices.#{sort_column} #{sort_direction}"),
+        matching_stripe_prices.reorder(sortable_order(StripePrice)),
         limit: @per_page,
         page: permitted_page)
     end

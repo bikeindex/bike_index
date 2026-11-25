@@ -1,0 +1,23 @@
+# frozen_string_literal: true
+
+module SharedBlocks
+  module Footer
+    class Component < ApplicationComponent
+      FACEBOOK_PIXEL_ID = "199066297131941"
+
+      def initialize(current_user:, color_scheme:, skip_facebook:)
+        @current_user = current_user
+        @color_scheme = color_scheme
+        @skip_facebook = skip_facebook
+      end
+
+      private
+
+      # No page_id: the links resolve their own active state in the browser and the locale
+      # form submits to whatever URL it's on, so one render serves every page
+      def cache_key
+        [self.class.cache_digest, @current_user, @color_scheme, @skip_facebook]
+      end
+    end
+  end
+end

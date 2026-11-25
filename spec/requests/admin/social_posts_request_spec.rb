@@ -7,10 +7,12 @@ RSpec.describe Admin::SocialPostsController, type: :request do
 
   describe "index" do
     it "renders" do
+      subject.reload
       get base_url
       expect(response).to be_ok
       expect(response).to render_template(:index)
       expect(flash).to be_blank
+      expect(response.body).to include(subject.platform_id)
     end
   end
 

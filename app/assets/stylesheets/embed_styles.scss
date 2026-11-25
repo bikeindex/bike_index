@@ -1,3 +1,7 @@
+@import "legacy_includes/css_layers";
+
+@layer legacy {
+
 @import "legacy_includes/selectize_bootstrap3.scss";
 @import "legacy_includes/_colors.scss";
 @import "legacy_includes/_variables.scss";
@@ -283,12 +287,13 @@ a {
   padding-top: 1em;
   border-top: 1px solid $grayLightish;
 
+  // organized/bikes/new_iframe still hand-rolls its photo field
   .filefield-button {
     float: left;
   }
 
-  span {
-    float: left;
+  // Direct children only - the upload component brings a span of its own
+  > span {
     color: $grayMed;
   }
 }
@@ -344,98 +349,6 @@ a {
 
 .other-value {
   display: none;
-}
-
-#alert-block {
-  z-index: 100;
-  position: fixed;
-  top: 100px;
-
-  left: 10%;
-  width: 80%;
-  max-width: 700px;
-
-  // @include clearfix;
-  margin: 0 auto;
-
-  .alert {
-    @include box-shadow((-2px) 2px 4px rgba(black, 0.2));
-
-    // For IE 8
-    -ms-filter: "progid:DXImageTransform.Microsoft.Shadow(Strength=2, Direction=135, Color='#000000')";
-    width: 100%;
-    opacity: 0.95;
-    max-width: 700px;
-  }
-}
-
-.alert {
-  @include border-radius(1px);
-
-  padding: 15px 35px 20px 14px;
-  margin-bottom: $baseLineHeight;
-
-  // background-color: $warningBackground;
-  // border: 1px solid $warningBorder;
-  // color: $warningText;
-  &.alert-error {
-    background-color: darken($warningBackground, 2%);
-    border: 1px solid darken($warningBorder, 7%);
-    color: darken($warningText, 20%);
-  }
-
-  &.alert-success {
-    background-color: darken($blue, 2%);
-    border: none;
-    color: white;
-  }
-}
-
-.alert h4 {
-  margin: 0 0 0.5em;
-}
-
-// Adjust close link position
-.alert .close {
-  position: relative;
-  top: -2px;
-  right: -21px;
-  float: right;
-  line-height: $baseLineHeight;
-  font-size: 30px;
-  cursor: pointer;
-  color: $grayLight;
-  z-index: 10000;
-
-  &:hover {
-    text-shadow: 0 0 2px rgba(black, 0.2);
-    color: $grayMed;
-  }
-}
-
-.alert-success {
-  @extend .alert;
-
-  background-color: $successBackground;
-  border-color: $successBorder;
-  color: $successText;
-}
-
-.alert-danger,
-.alert-error {
-  @extend .alert;
-
-  background-color: $errorBackground;
-  border-color: $errorBorder;
-  color: $errorText;
-}
-
-.alert-info {
-  @extend .alert;
-
-  background-color: $infoBackground;
-  border-color: $infoBorder;
-  color: $infoText;
 }
 
 //
@@ -667,10 +580,6 @@ a {
   }
 }
 
-.less-strong {
-  opacity: 0.65;
-}
-
 .below-input-help {
   font-size: 80%;
   padding-bottom: 0.75em;
@@ -687,4 +596,18 @@ a {
 }
 .cursor-not-allowed {
   cursor: not-allowed;
+}
+
+} // end @layer legacy
+
+// Deliberately outside @layer legacy: tailwind's own `body { @apply tw:base-font }` is
+// unlayered, so only another unlayered rule can outrank it -- and this id beats its type
+// selector. Inside the layer it would lose, and the embed would take tailwind's font.
+// $sansFontFamily is inlined because the layer block scopes it.
+#bi_embed {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  line-height: normal;
+  // base-font sets these two as well, and neither was ever styled here
+  color: #000;
+  -webkit-font-smoothing: auto;
 }

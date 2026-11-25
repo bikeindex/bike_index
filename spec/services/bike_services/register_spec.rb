@@ -26,14 +26,40 @@ RSpec.describe BikeServices::Register do
         }.to_not change(BParam, :count)
       end
 
-      context "once step 1 is submitted" do
+      it "takes the status onto it, and keeps it when the next link names none" do
+        described_class.b_param_for(user:, token_id: blank_b_param.id_token, status: "status_stolen")
+        expect(blank_b_param.reload.status).to eq "status_stolen"
+
+        described_class.b_param_for(user:, token_id: blank_b_param.id_token)
+        expect(blank_b_param.reload.status).to eq "status_stolen"
+      end
+
+      # "false" blanks the address even for a signed-in user, status or no status
+      context "signed in, asking for no address" do
+        let(:user) { FactoryBot.create(:user_confirmed) }
         let!(:blank_b_param) do
-          BParam.create(origin: "register_flow", params: {bike: {manufacturer_id: 12}}.as_json)
+          BParam.create(origin: "register_flow", params: {bike: {owner_email: user.email}}.as_json)
         end
 
+        it "clears it alongside the status it takes" do
+          described_class.b_param_for(user:, token_id: blank_b_param.id_token,
+            status: "status_stolen", email: "false")
+
+          expect(blank_b_param.reload.owner_email).to be_blank
+          expect(blank_b_param.status).to eq "status_stolen"
+        end
+      end
+
+      context "once step 1 is submitted" do
+        let!(:started_b_param) do
+          BParam.create(origin: "register_flow", params: {bike: {manufacturer_id: 12, status: "status_with_owner"}}.as_json)
+        end
+
+        # Redirecting into a started registration would surprise - RegisterController#show
+        # is what goes back to one, by its token
         it "creates a fresh registration" do
           expect {
-            expect(described_class.b_param_for(user:, token_id: blank_b_param.id_token)).to_not eq blank_b_param
+            expect(described_class.b_param_for(user:, token_id: started_b_param.id_token)).to_not eq started_b_param
           }.to change(BParam, :count).by 1
         end
       end
@@ -54,7 +80,198 @@ RSpec.describe BikeServices::Register do
           expect(described_class.b_param_for(user:, token_id: blank_b_param.id_token)).to eq blank_b_param
           expect(blank_b_param.reload.owner_email).to eq user.email
           # A prefilled email doesn't mark step 1 submitted
-          expect(described_class.permitted_step(blank_b_param, "2", sequence: nil)).to eq "1"
+          expect(described_class.permitted_step(blank_b_param, "2", course: nil)).to eq "1"
+        end
+      end
+    end
+  end
+
+  describe "with_prefill" do
+    let(:params) { {"bike" => bike, "prefill" => {"manufacturer" => "Nope Cycles", "frame_model" => "Haul LT"}} }
+    let(:bike) { {"owner_email" => "owner@example.com"} }
+
+    it "fills a blank manufacturer and model, an unknown manufacturer as Other, named" do
+      expect(described_class.with_prefill(params)["bike"]).to eq("owner_email" => "owner@example.com",
+        "manufacturer_id" => Manufacturer.other.id, "manufacturer_other" => "Nope Cycles", "frame_model" => "Haul LT")
+    end
+
+    context "with the bike's own values" do
+      let(:bike) { {"manufacturer_id" => 12, "frame_model" => "Mine"} }
+
+      it "keeps them" do
+        expect(described_class.with_prefill(params)["bike"]).to eq bike
+      end
+    end
+  end
+
+  describe "find_token" do
+    let(:creator) { FactoryBot.create(:user_confirmed) }
+    let(:b_param) do
+      BParam.create(origin: "register_flow", creator_id: creator.id, created_bike_id: FactoryBot.create(:bike).id,
+        params: {bike: bike_params}.as_json)
+    end
+    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment_pending, b_param:) }
+
+    it "only resumes a bike's registration for its creator until the safety rules are agreed to" do
+      expect(described_class.resume(params_token: b_param.id_token, user: nil)).to eq([nil, true])
+      expect(described_class.find_token(params_token: b_param.id_token, user: creator)&.id).to eq b_param.id
+
+      acknowledgment.update(acknowledged_at: Time.current)
+      expect(described_class.find_token(params_token: b_param.id_token, user: nil)&.id).to eq b_param.id
+    end
+  end
+
+  describe "discard_extra" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:oldest) do
+      FactoryBot.create(:b_param_unfinished_registration, creator: user, updated_at: Time.current - 2.hours)
+    end
+    let!(:middle) do
+      FactoryBot.create(:b_param_unfinished_registration, creator: user, updated_at: Time.current - 1.hour)
+    end
+    let!(:most_recent) { FactoryBot.create(:b_param_unfinished_registration, creator: user) }
+
+    it "destroys every started registration but the most recent" do
+      expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-2)
+      expect(BParam.pluck(:id)).to eq([most_recent.id])
+    end
+
+    context "with a confirmation email out on one" do
+      before do
+        middle.generate_email_confirmation_token!
+        middle.update(updated_at: Time.current - 1.hour)
+      end
+
+      it "keeps it - the email promises the address it can still finish that registration" do
+        expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-1)
+        expect(BParam.pluck(:id)).to match_array([middle.id, most_recent.id])
+      end
+    end
+
+    context "with a more recent one owing the safety rules" do
+      let!(:pending) do
+        FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: FactoryBot.create(:bike).id)
+          .tap { FactoryBot.create(:education_course_acknowledgment_pending, b_param: it) }
+      end
+
+      it "keeps it, and the most recent without a bike" do
+        expect(BParam.unfinished_registrations.reorder(updated_at: :desc).first.id).to eq pending.id
+        expect { described_class.discard_extra(user:) }.to change(BParam, :count).by(-2)
+        expect(BParam.pluck(:id)).to match_array([most_recent.id, pending.id])
+      end
+    end
+  end
+
+  describe "assign_organization" do
+    let(:b_param) { BParam.create(origin: "register_flow", params: {bike: bike_params}.as_json) }
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
+
+    it "doesn't assign anything without an organization or a user" do
+      described_class.assign_organization(b_param, nil, user: nil)
+      expect(b_param.reload.creation_organization_id).to be_blank
+      expect(b_param.auto_organization_id).to be_blank
+    end
+
+    # Marked assigned so the next request doesn't look the registrant up again
+    it "assigns nothing for a user in no organization with no bikes, and says so" do
+      described_class.assign_organization(b_param, nil, user:)
+      expect(b_param.reload.creation_organization_id).to be_blank
+      expect(b_param.auto_organization_id).to be_blank
+      expect(b_param.auto_organization_assigned?).to be_truthy
+
+      expect { described_class.assign_organization(b_param, nil, user:) }
+        .to_not change { b_param.reload.updated_at }
+    end
+
+    context "with a user in one organization" do
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, organization:) }
+
+      it "assigns it, and marks it as the automatic assignment step 2 can drop" do
+        described_class.assign_organization(b_param, nil, user:)
+        expect(b_param.reload.creation_organization_id).to eq organization.id
+        expect(b_param.auto_organization_id).to eq organization.id
+        expect(b_param.organization_id).to eq organization.id
+      end
+
+      it "doesn't reassign once step 2 dropped it" do
+        described_class.assign_organization(b_param, nil, user:)
+        described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+          bike_params: {"user_name" => "Sarah Rider"}, register_with_organization: nil)
+        expect(b_param.reload.creation_organization_id).to be_blank
+        expect(b_param.auto_organization_id).to eq organization.id
+        expect(b_param.organization_id).to be_blank
+
+        described_class.assign_organization(b_param, nil, user:)
+        expect(b_param.reload.creation_organization_id).to be_blank
+      end
+
+      it "takes it back when step 2 is resubmitted with the box checked" do
+        described_class.assign_organization(b_param, nil, user:)
+        described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+          bike_params: {"user_name" => "Sarah Rider"}, register_with_organization: nil)
+        described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+          bike_params: {"user_name" => "Sarah Rider"}, register_with_organization: "1")
+
+        expect(b_param.reload.creation_organization_id).to eq organization.id
+        expect(b_param.organization_id).to eq organization.id
+      end
+
+      context "with a link naming a different organization" do
+        let(:link_organization) { FactoryBot.create(:organization) }
+
+        it "takes the link's, and stops offering to drop it" do
+          described_class.assign_organization(b_param, nil, user:)
+          described_class.assign_organization(b_param, link_organization, user:)
+
+          expect(b_param.reload.creation_organization_id).to eq link_organization.id
+          expect(b_param.auto_organization_id).to be_blank
+        end
+      end
+
+      context "once the bike exists" do
+        it "doesn't assign" do
+          b_param.update(created_bike_id: FactoryBot.create(:bike).id)
+          described_class.assign_organization(b_param, nil, user:)
+          expect(b_param.reload.auto_organization_id).to be_blank
+        end
+      end
+    end
+
+    context "with a user in two organizations" do
+      let!(:organization_roles) do
+        [organization, FactoryBot.create(:organization)]
+          .map { FactoryBot.create(:organization_role_claimed, user:, organization: it) }
+      end
+
+      it "doesn't assign either of them" do
+        described_class.assign_organization(b_param, nil, user:)
+        expect(b_param.reload.creation_organization_id).to be_blank
+        expect(b_param.auto_organization_id).to be_blank
+      end
+    end
+
+    context "with a user whose other bike is registered with an organization" do
+      let!(:bike) do
+        FactoryBot.create(:bike_organized, :with_ownership_claimed,
+          creation_organization: organization, user:)
+      end
+
+      it "assigns that organization" do
+        described_class.assign_organization(b_param, nil, user:)
+        expect(b_param.reload.creation_organization_id).to eq organization.id
+        expect(b_param.auto_organization_id).to eq organization.id
+      end
+
+      context "and another bike with a second organization" do
+        let!(:bike_2) do
+          FactoryBot.create(:bike_organized, :with_ownership_claimed,
+            creation_organization: FactoryBot.create(:organization), user:)
+        end
+
+        it "doesn't assign either of them" do
+          described_class.assign_organization(b_param, nil, user:)
+          expect(b_param.reload.creation_organization_id).to be_blank
         end
       end
     end
@@ -98,8 +315,8 @@ RSpec.describe BikeServices::Register do
         expect(b_param.reload.bike["frame_size"]).to eq "m"
         expect(described_class.send(:details_completed?, b_param)).to be_falsey
         # Not finished, so the flow stays on step 2 rather than redirecting past it
-        expect(described_class.finished?(b_param, sequence: nil)).to be_falsey
-        expect(described_class.permitted_step(b_param, "2", sequence: nil)).to eq "2"
+        expect(described_class.finished?(b_param, course: nil)).to be_falsey
+        expect(described_class.permitted_step(b_param, "2", course: nil)).to eq "2"
       end
 
       context "registering their own bike" do
@@ -109,6 +326,39 @@ RSpec.describe BikeServices::Register do
           expect(described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
             bike_params: {"frame_size" => "m"})).to be_truthy
           expect(described_class.send(:details_completed?, b_param.reload)).to be_truthy
+        end
+
+        context "whose account has no name" do
+          let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com", name: nil) }
+
+          it "doesn't complete the step" do
+            expect(described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+              bike_params: {"frame_size" => "m"})).to be_falsey
+            expect(described_class.send(:details_completed?, b_param.reload)).to be_falsey
+          end
+        end
+      end
+    end
+
+    context "registering their own bike with a user_name" do
+      let(:user) { FactoryBot.create(:user_confirmed, email: "owner@example.com", name:) }
+      let(:name) { nil }
+      let(:result) do
+        described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil,
+          bike_params: {"user_name" => "Sarah Rider"})
+      end
+
+      it "names their account" do
+        expect(result).to be_truthy
+        expect(user.reload.name).to eq "Sarah Rider"
+      end
+
+      context "whose account already has a name" do
+        let(:name) { "Their Own Choice" }
+
+        it "keeps it" do
+          expect(result).to be_truthy
+          expect(user.reload.name).to eq "Their Own Choice"
         end
       end
     end
@@ -130,16 +380,18 @@ RSpec.describe BikeServices::Register do
 
   describe "permitted_step" do
     it "allows steps 1 and 2 once step 1 is submitted" do
-      expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "2"
-      expect(described_class.permitted_step(b_param, "1", sequence: nil)).to eq "1"
-      expect(described_class.permitted_step(b_param, "finished", sequence: nil)).to eq "2"
+      expect(described_class.permitted_step(b_param, nil, course: nil)).to eq "2"
+      expect(described_class.permitted_step(b_param, "1", course: nil)).to eq "1"
+      expect(described_class.permitted_step(b_param, "finished", course: nil)).to eq "2"
+      expect(described_class.current_step(b_param)).to eq "2"
+      expect(described_class.current_step(BParam.new(origin: "api_v3", params: b_param.params))).to be_nil
     end
 
     context "step 1 not submitted" do
       let(:bike_params) { {owner_email: "prefilled@example.com"} }
 
       it "clamps to step 1 - a prefilled email isn't a submission" do
-        expect(described_class.permitted_step(b_param, "2", sequence: nil)).to eq "1"
+        expect(described_class.permitted_step(b_param, "2", course: nil)).to eq "1"
       end
     end
 
@@ -149,7 +401,7 @@ RSpec.describe BikeServices::Register do
       end
 
       it "clamps to finished" do
-        expect(described_class.permitted_step(b_param, "1", sequence: nil)).to eq "finished"
+        expect(described_class.permitted_step(b_param, "1", course: nil)).to eq "finished"
       end
     end
 
@@ -161,7 +413,7 @@ RSpec.describe BikeServices::Register do
 
       it "clamps to finished - awaiting the email confirmation" do
         expect(described_class.creator_available?(b_param)).to be_falsey
-        expect(described_class.permitted_step(b_param, "2", sequence: nil)).to eq "finished"
+        expect(described_class.permitted_step(b_param, "2", course: nil)).to eq "finished"
       end
 
       context "with a creator" do
@@ -172,7 +424,252 @@ RSpec.describe BikeServices::Register do
 
         it "stays browsable - update creates the bike instead" do
           expect(described_class.creator_available?(b_param)).to be_truthy
-          expect(described_class.permitted_step(b_param, "2", sequence: nil)).to eq "2"
+          expect(described_class.permitted_step(b_param, "2", course: nil)).to eq "2"
+        end
+      end
+    end
+  end
+
+  describe "single_page" do
+    it "drops step 2 - the one page asks for both, so step 1 isn't done without the details" do
+      flow = described_class.flow(b_param, course: nil, single_page: true)
+      expect(flow.steps).to eq %w[1]
+      expect(flow.single_page?).to be_truthy
+      expect(described_class.permitted_step(b_param, nil, course: nil, flow:)).to eq "1"
+      # The same registration is past step 1 when the flow has a step 2 to move on to
+      expect(described_class.permitted_step(b_param, nil, course: nil)).to eq "2"
+    end
+
+    context "a theft to report" do
+      let(:bike_params) { super().merge(status: "status_stolen") }
+
+      it "keeps the report after the one page" do
+        expect(described_class.flow(b_param, course: nil, single_page: true).steps).to eq %w[1 report]
+      end
+    end
+  end
+
+  describe "settings" do
+    let(:bike_params) { super().merge(creation_organization_id: 12) }
+    let(:session_settings) { {"organization_id" => 12, "single_page" => true, "separate_attestation" => false} }
+
+    it "is the session's, for the organization they were set on" do
+      expect(described_class.settings(b_param, session_settings)).to eq(single_page: true, separate_attestation: false)
+      expect(described_class.settings(b_param, session_settings.merge("organization_id" => 13)))
+        .to eq(single_page: false, separate_attestation: false)
+      expect(described_class.settings(b_param, nil)).to eq(single_page: false, separate_attestation: false)
+    end
+
+    context "saved by step 1" do
+      let(:b_param) do
+        BParam.new(origin: "register_flow", params: {bike: bike_params, register_single_page: false,
+                                                     register_separate_attestation: true}.as_json)
+      end
+
+      it "is what the registration saved, whatever the session holds now" do
+        expect(described_class.settings(b_param, session_settings)).to eq(single_page: false, separate_attestation: true)
+      end
+    end
+  end
+
+  describe "report step" do
+    let(:creator) { FactoryBot.create(:user) }
+    let(:bike_params) { {owner_email: "owner@example.com", manufacturer_id: 12, status: "status_stolen"} }
+    let(:b_param) do
+      BParam.create(origin: "register_flow", creator_id: creator.id,
+        params: {details_completed: true, bike: bike_params}.as_json)
+    end
+    let(:report_params) do
+      {date: "2026-08-05T14:30", timezone: "America/Chicago", theft_description: "Cut lock",
+       police_report_number: "42", locking_description: "U-lock", receive_notifications: "0",
+       address_record_attributes: {street: "1 Main St", city: "Chicago", street_2: "Apt 2"}}
+    end
+
+    it "comes after step 2, and saves the stolen record the bike is created with" do
+      expect(described_class.report_step?(b_param.status)).to be_truthy
+      flow = described_class.flow(b_param, course: nil)
+      expect(flow.steps).to eq %w[1 2 report]
+      expect(flow.single_page?).to be_falsey
+      expect(flow.before("report")).to eq "2"
+      # Not finished: the theft is still to be reported
+      expect(described_class.finished?(b_param, course: nil)).to be_falsey
+      expect(described_class.permitted_step(b_param, nil, course: nil)).to eq "report"
+
+      expect(described_class.save_report(b_param, report_params:)).to be_truthy
+      stolen_attrs = b_param.reload.stolen_attrs
+      expect(stolen_attrs).to match(hash_including("theft_description" => "Cut lock",
+        "police_report_number" => "42", "locking_description" => "U-lock",
+        "receive_notifications" => "0", "street" => "1 Main St", "city" => "Chicago"))
+      # A stolen record has no second address line to put it on
+      expect(stolen_attrs["street_2"]).to be_blank
+      # Entered in Chicago, so 14:30 there rather than wherever the server is
+      expect(stolen_attrs["date_stolen"].to_time).to be_within(1).of(Time.parse("2026-08-05T19:30:00 UTC"))
+
+      # Everything's in - the submission that saved it creates the bike
+      expect(described_class.send(:report_completed?, b_param)).to be_truthy
+    end
+
+    describe "when and where a theft has to answer" do
+      # A failed step saves anyway, so the re-render still has everything they entered
+      def expect_incomplete(params, error)
+        expect(described_class.save_report(b_param, report_params: params)).to be_falsey
+        expect(b_param.errors.full_messages.to_sentence).to match error
+        expect(b_param.reload.stolen_attrs["theft_description"]).to eq "Cut lock"
+        expect(described_class.send(:report_completed?, b_param)).to be_falsey
+        expect(described_class.permitted_step(b_param, nil, course: nil)).to eq "report"
+      end
+
+      it "rejects a blank date" do
+        expect_incomplete(report_params.except(:date), /when it was stolen/)
+      end
+
+      # Rather than 500ing on it, or quietly recording the moment they submitted
+      it "rejects an unparseable date" do
+        expect_incomplete(report_params.merge(date: "2026-13-45T99:99"), /when it was stolen/)
+      end
+
+      it "rejects a location with no street" do
+        expect_incomplete(report_params.merge(address_record_attributes: {city: "Chicago"}),
+          /where it was stolen/)
+      end
+
+      it "rejects a location with no city" do
+        expect_incomplete(report_params.merge(address_record_attributes: {street: "1 Main St"}),
+          /where it was stolen/)
+      end
+
+      it "names both when neither is answered" do
+        expect_incomplete(report_params.except(:date, :address_record_attributes),
+          /when it was stolen.*where it was stolen/m)
+      end
+    end
+
+    context "the status changes after the report" do
+      # Going back to step 2 and picking a different one. user_name: the registration is
+      # for an address that isn't the creator's, so step 2 doesn't pass without a name
+      def resubmit_step_2(status, **bike_attrs)
+        described_class.save_step_2(b_param, user: creator, image: nil, image_signed_id: nil,
+          bike_params: {"status" => status, "user_name" => "Sally Rider"}.merge(bike_attrs))
+      end
+
+      before { described_class.save_report(b_param, report_params:) }
+
+      it "drops the report the new status has no use for" do
+        expect(resubmit_step_2("status_with_owner")).to be_truthy
+
+        # Not just the bike's status: BParam reads it back off the record the report saved
+        expect(b_param.reload.status).to eq "status_with_owner"
+        expect(b_param.stolen_attrs).to be_blank
+        expect(described_class.report_step?(b_param.status)).to be_falsey
+        expect(described_class.send(:report_completed?, b_param)).to be_truthy
+      end
+
+      it "asks the other report's questions when it's still a status that reports" do
+        resubmit_step_2("status_impounded")
+
+        expect(b_param.reload.status).to eq "status_impounded"
+        expect(b_param.stolen_attrs).to be_blank
+        # The theft report doesn't stand in for the find, so the step opens again
+        expect(described_class.permitted_step(b_param, nil, course: nil)).to eq "report"
+      end
+
+      it "keeps the report when the status it was made for doesn't change" do
+        resubmit_step_2("status_stolen", "frame_model" => "Marlin 7")
+
+        expect(b_param.reload.stolen_attrs["theft_description"]).to eq "Cut lock"
+        expect(described_class.send(:report_completed?, b_param)).to be_truthy
+      end
+    end
+
+    context "found" do
+      let(:bike_params) { super().merge(status: "status_impounded") }
+
+      it "saves the impound record instead, keeping the address nested" do
+        expect(described_class.permitted_step(b_param, nil, course: nil)).to eq "report"
+        expect(described_class.save_report(b_param, report_params:)).to be_truthy
+
+        impound_attrs = b_param.reload.impound_attrs
+        expect(impound_attrs["impounded_at"].to_time).to be_within(1).of(Time.parse("2026-08-05T19:30:00 UTC"))
+        expect(impound_attrs["address_record_attributes"]).to match(hash_including("street" => "1 Main St",
+          "city" => "Chicago", "street_2" => "Apt 2"))
+        expect(b_param.stolen_attrs).to be_blank
+      end
+
+      # Asked in its own words, since it isn't a theft being described
+      it "asks a find when and where too" do
+        expect(described_class.save_report(b_param, report_params: {})).to be_falsey
+        expect(b_param.errors.full_messages.to_sentence)
+          .to match(/when you found it.*where you found it/m)
+        expect(described_class.send(:report_completed?, b_param.reload)).to be_falsey
+      end
+    end
+
+    context "registered with the owner" do
+      let(:bike_params) { super().except(:status) }
+
+      it "has no report to make" do
+        expect(described_class.report_step?(b_param.status)).to be_falsey
+        expect(described_class.flow(b_param, course: nil).steps).to eq %w[1 2]
+        expect(described_class.permitted_step(b_param, "report", course: nil)).to eq "2"
+      end
+    end
+
+    context "without a creator" do
+      let(:b_param) do
+        BParam.create(origin: "register_flow",
+          params: {details_completed: true, bike: bike_params}.as_json)
+      end
+
+      it "waits for the confirmation email, and is what's left once it's confirmed" do
+        expect(described_class.creator_available?(b_param)).to be_falsey
+        # The report can't be filled in yet, so the registration is only waiting on the email
+        expect(described_class.finished?(b_param, course: nil)).to be_truthy
+        expect(described_class.permitted_step(b_param, "report", course: nil)).to eq "finished"
+
+        b_param.update(creator_id: creator.id)
+        expect(described_class.permitted_step(b_param, nil, course: nil)).to eq "report"
+      end
+    end
+
+    context "with acknowledgment pages" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
+      let(:bike_params) do
+        super().merge(cycle_type: "e-scooter", creation_organization_id: organization.id)
+      end
+
+      it "comes before them" do
+        expect(described_class.education_course(b_param)).to eq course
+        # Two detail steps, the report, a page each and the review
+        flow = described_class.flow(b_param, course:)
+        expect(flow.steps).to eq %w[1 2 report 3 4 review]
+        expect(described_class.permitted_step(b_param, "3", course:)).to eq "report"
+        expect(flow.before("3")).to eq "report"
+
+        described_class.save_report(b_param, report_params:)
+        expect(described_class.permitted_step(b_param, nil, course:)).to eq "3"
+        expect(flow.position("3")).to eq 4
+      end
+
+      context "without a creator" do
+        let(:b_param) do
+          BParam.create(origin: "register_flow",
+            params: {details_completed: true, bike: bike_params}.as_json)
+        end
+
+        it "comes after them - the emailed link is clicked once they're acknowledged" do
+          pages = described_class.course_pages(course)
+          expect(described_class.flow(b_param, course:).steps).to eq %w[1 2 3 4 review report]
+          expect(described_class.permitted_step(b_param, "report", course:)).to eq "3"
+
+          pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
+          described_class.save_acknowledgment(b_param, course, acknowledged_all: "1")
+          expect(described_class.finished?(b_param, course:)).to be_truthy
+
+          # Confirming the email is what opens the report
+          b_param.update(creator_id: creator.id)
+          expect(described_class.permitted_step(b_param, nil, course:)).to eq "report"
+          expect(described_class.flow(b_param, course:).before("report")).to eq "2"
         end
       end
     end
@@ -180,8 +677,8 @@ RSpec.describe BikeServices::Register do
 
   describe "e-vehicle acknowledgment" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
-    let(:pages) { sequence.registration_sequence_pages.to_a }
+    let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
+    let(:pages) { course.education_course_pages.to_a }
     let(:bike_params) do
       {owner_email: "owner@example.com", manufacturer_id: 12, cycle_type: "e-scooter",
        creation_organization_id: organization.id}
@@ -191,11 +688,27 @@ RSpec.describe BikeServices::Register do
         params: {details_completed: true, bike: bike_params}.as_json)
     end
 
-    describe "registration_sequence" do
-      it "is the organization's active sequence" do
-        expect(described_class.registration_sequence(b_param)).to eq sequence
+    describe "complete" do
+      let(:bike_params) do
+        super().merge(manufacturer_id: FactoryBot.create(:manufacturer).id, serial_number: "XYZ 123",
+          primary_frame_color_id: FactoryBot.create(:color).id, status: "status_with_owner")
+      end
+
+      # Only the switch leaves the education course to the owner - a caller without a course doesn't
+      it "doesn't hold the bike for the owner without separate attestation" do
+        b_param.update(creator_id: FactoryBot.create(:user_confirmed).id)
+        bike = described_class.complete(b_param, user: nil, course: nil, ip_address: nil)
+        expect(bike.id).to be_present
+        expect(EducationCourseAcknowledgment.count).to eq 0
+        expect(EmailJobs::PartialRegistrationJob.jobs).to be_empty
+      end
+    end
+
+    describe "education_course" do
+      it "is the organization's active course" do
+        expect(described_class.education_course(b_param)).to eq course
         # Two detail steps, a page each and the review
-        expect(described_class.total_steps(sequence)).to eq 5
+        expect(described_class.flow(b_param, course:).steps.count).to eq 5
       end
 
       context "not an e-vehicle" do
@@ -203,17 +716,200 @@ RSpec.describe BikeServices::Register do
 
         it "is nil - only e-vehicles acknowledge safety rules" do
           expect(b_param.motorized?).to be_falsey
-          expect(described_class.registration_sequence(b_param)).to be_nil
-          expect(described_class.total_steps(nil)).to eq 2
+          expect(described_class.education_course(b_param)).to be_nil
+          expect(described_class.flow(b_param, course: nil).steps.count).to eq 2
         end
       end
 
-      context "the organization's sequence is still a draft" do
-        let!(:sequence) { FactoryBot.create(:registration_sequence, :with_pages, organization:) }
+      context "the organization's course is still a draft" do
+        let!(:course) { FactoryBot.create(:education_course, :with_pages, organization:) }
 
         it "is nil - a draft isn't shown to registrants" do
-          expect(sequence).to be_draft
-          expect(described_class.registration_sequence(b_param)).to be_nil
+          expect(course).to be_draft
+          expect(described_class.education_course(b_param)).to be_nil
+        end
+      end
+
+      context "with the default course" do
+        let!(:default_course) { FactoryBot.create(:education_course_default_active, :with_pages) }
+
+        it "is the organization's own course over the default course" do
+          expect(described_class.education_course(b_param)).to eq course
+        end
+
+        context "without an organization" do
+          let(:bike_params) { super().except(:creation_organization_id) }
+
+          it "is the default course, except for the legacy forms" do
+            expect(described_class.education_course(b_param)).to eq default_course
+            expect(described_class.education_course(b_param, default_course: false)).to be_nil
+          end
+        end
+
+        context "the organization's course is still a draft" do
+          let!(:course) { FactoryBot.create(:education_course, :with_pages, organization:) }
+
+          it "is the default course, except for the legacy forms" do
+            expect(described_class.education_course(b_param)).to eq default_course
+            expect(described_class.education_course(b_param, default_course: false)).to be_nil
+          end
+
+          it "stays on the default course once started, until resumed on the organization's own" do
+            described_class.acknowledge_page(b_param, default_course.education_course_pages.first, checked: %w[1 1])
+            course.make_active!
+
+            expect(described_class.education_course(b_param)).to eq default_course
+            expect(described_class.resume_education_course(b_param, course: default_course)).to eq([default_course, false])
+            default_course.update(end_at: Time.current)
+            expect(described_class.resume_education_course(b_param, course: default_course.reload)).to eq([course, true])
+          end
+
+          it "leaves the legacy forms on the organization's own, even started on the default course" do
+            described_class.acknowledge_page(b_param, default_course.education_course_pages.first, checked: %w[1 1])
+            expect(described_class.education_course(b_param, default_course: false)).to be_nil
+            course.make_active!
+            expect(described_class.education_course(b_param, default_course: false)).to eq course
+          end
+        end
+
+        context "the organization has no live course" do
+          let!(:course) { nil }
+          let(:pages) { [] }
+          let(:member) { FactoryBot.create(:user_confirmed, email: "member@example.com") }
+
+          it "is the default course for a registrant's own, and anonymously" do
+            expect(described_class.education_course(b_param)).to eq default_course
+            b_param.update(creator_id: FactoryBot.create(:user_confirmed, email: b_param.owner_email).id)
+            expect(described_class.education_course(b_param.reload)).to eq default_course
+          end
+
+          it "is nil for a member registering someone else's, even for the owner they've emailed" do
+            b_param.update(creator_id: member.id)
+            expect(b_param.self_made?(member)).to be_falsey
+            expect(described_class.education_course(b_param.reload)).to be_nil
+            owner = FactoryBot.create(:user_confirmed, email: b_param.owner_email)
+            expect(described_class.education_course(b_param, user: owner)).to be_nil
+          end
+
+          it "is nil for a theft or a find, even with the pages started" do
+            described_class.acknowledge_page(b_param, default_course.education_course_pages.first, checked: %w[1 1])
+            %w[status_stolen status_impounded].each do |status|
+              b_param.params = b_param.params.deep_merge("bike" => {"status" => status})
+              expect(described_class.education_course(b_param)).to be_nil
+            end
+          end
+
+          it "doesn't walk the default course's organization-specific pages" do
+            default_course.education_course_pages.first.update_column(:organization_specific, true)
+            expect(default_course.reload.education_course_pages.count).to eq 2
+            expect(described_class.course_pages(default_course).map(&:id)).to eq([default_course.education_course_pages.last.id])
+          end
+
+          describe "motorized_review" do
+            let(:single_page) { described_class.flow(b_param, course: nil, single_page: true) }
+
+            it "depends on the email typed, since the default course is only for the registrant's own" do
+              expect(described_class.motorized_review(b_param, single_page, separate_attestation: false)).to eq :own_emails
+              default_course.update(end_at: Time.current)
+              expect(described_class.motorized_review(b_param, single_page, separate_attestation: false)).to be false
+            end
+          end
+        end
+
+        context "started on the default course, then naming an organization with its own" do
+          let(:bike_params) { super().except(:creation_organization_id) }
+          let!(:acknowledgment) do
+            described_class.acknowledge_page(b_param, default_course.education_course_pages.first, checked: %w[1 1])
+            described_class.save_acknowledgment(b_param, default_course, acknowledged_all: "1")
+            EducationCourseAcknowledgment.find_by(b_param_id: b_param.id)
+          end
+
+          it "owes the organization's rules, with the default course's agreement gone" do
+            expect(described_class.education_course(b_param)).to eq default_course
+            expect(described_class.acknowledged?(b_param, course: default_course)).to be_truthy
+
+            described_class.assign_organization(b_param, organization)
+            b_param.reload
+            expect(b_param.creation_organization_id).to eq organization.id
+            expect(b_param.params["details_completed"]).to be_nil
+            expect(b_param.params["education_course"]).to be_nil
+            expect(described_class.education_course(b_param)).to eq course
+            expect(described_class.acknowledged?(b_param, course:)).to be_falsey
+            expect(EducationCourseAcknowledgment.count).to eq 0
+          end
+        end
+
+        context "started under an automatic organization, then dropping it at step 2" do
+          let(:user) { FactoryBot.create(:user_confirmed, email: b_param.owner_email) }
+          let(:bike_params) { super().except(:creation_organization_id).merge(creation_organization_id: organization.id) }
+
+          it "restarts the rules on the default course" do
+            b_param.update(creator_id: user.id, params: b_param.params.merge("auto_organization_id" => organization.id))
+            described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])
+            expect(described_class.education_course(b_param.reload, user:)).to eq course
+
+            described_class.save_step_2(b_param, user:, image: nil, image_signed_id: nil, bike_params: {"user_name" => "Owner"}.with_indifferent_access,
+              register_with_organization: "false")
+            expect(b_param.reload.creation_organization_id).to be_blank
+            expect(b_param.params["education_course"]).to be_nil
+            expect(described_class.education_course(b_param, user:)).to eq default_course
+          end
+        end
+      end
+
+      context "separate_attestation" do
+        let(:member) { FactoryBot.create(:user_confirmed, email: "member@example.com") }
+        let(:registrant) { FactoryBot.create(:user_confirmed, email: "owner@example.com") }
+
+        it "is nil for a registration made for someone else, whose owner the rules are left to" do
+          expect(described_class.education_course(b_param, separate_attestation: true, user: member)).to be_nil
+          expect(described_class.flow(b_param, course: nil).steps.count).to eq 2
+        end
+
+        it "is the course when the registrant is the one registering" do
+          expect(described_class.education_course(b_param, separate_attestation: true, user: registrant))
+            .to eq course
+        end
+      end
+
+      describe "motorized_review" do
+        let(:bike_params) { super().merge(cycle_type: "bike") }
+        let(:single_page) { described_class.flow(b_param, course: nil, single_page: true) }
+
+        it "is what an e-vehicle would get, before the registration says it's one" do
+          expect(described_class.motorized_review(b_param, single_page, separate_attestation: false)).to be true
+          expect(described_class.motorized_review(b_param, single_page, separate_attestation: true)).to eq :own_emails
+          # Two steps, so the submit label never has to guess
+          expect(described_class.motorized_review(b_param, described_class.flow(b_param, course: nil),
+            separate_attestation: false)).to be false
+        end
+      end
+
+      context "with a page acknowledged, then a newer version activated" do
+        let(:new_course) { FactoryBot.create(:education_course, :with_pages, organization:) }
+        before do
+          described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])
+          new_course.make_active!
+        end
+
+        it "stays on the version being agreed to, until resumed on the newer one" do
+          started = described_class.education_course(b_param)
+          expect(started).to eq course
+
+          expect(described_class.resume_education_course(b_param, course: started)).to eq([new_course, true])
+          expect(described_class.acknowledged_page_ids(b_param)).to eq([])
+          expect(described_class.education_course(b_param)).to eq new_course
+          expect(described_class.resume_education_course(b_param, course: new_course)).to eq([new_course, false])
+        end
+
+        context "already agreed to" do
+          before { described_class.save_acknowledgment(b_param, course, acknowledged_all: "1") }
+
+          it "isn't restarted" do
+            started = described_class.education_course(b_param)
+            expect(started.archived?).to be_truthy
+            expect(described_class.resume_education_course(b_param, course: started)).to eq([course, false])
+          end
         end
       end
     end
@@ -221,47 +917,48 @@ RSpec.describe BikeServices::Register do
     it "opens one page at a time, then the review" do
       expect(pages.count).to eq 2
       # The details are in, so the first safety page is where the flow now stands
-      expect(described_class.acknowledged?(b_param, sequence:)).to be_falsey
-      expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "3"
-      expect(described_class.permitted_step(b_param, "4", sequence:)).to eq "3"
-      expect(described_class.page_for_step("3", sequence:)).to eq pages.first
-      expect(described_class.page_for_step("review", sequence:)).to be_nil
+      expect(described_class.acknowledged?(b_param, course:)).to be_falsey
+      expect(described_class.permitted_step(b_param, nil, course:)).to eq "3"
+      expect(described_class.permitted_step(b_param, "4", course:)).to eq "3"
+      expect(described_class.page_for_step("3", course:)).to eq pages.first
+      expect(described_class.page_for_step("review", course:)).to be_nil
 
       expect(described_class.acknowledge_page(b_param, pages.first, checked: %w[1 1])).to be_truthy
       expect(described_class.acknowledged_page_ids(b_param)).to eq([pages.first.id])
-      expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "4"
+      expect(described_class.permitted_step(b_param, nil, course:)).to eq "4"
+      expect(described_class.current_step(b_param)).to eq "4"
       # Every earlier step stays browsable
-      expect(described_class.permitted_step(b_param, "3", sequence:)).to eq "3"
-      expect(described_class.permitted_step(b_param, "1", sequence:)).to eq "1"
+      expect(described_class.permitted_step(b_param, "3", course:)).to eq "3"
+      expect(described_class.permitted_step(b_param, "1", course:)).to eq "1"
 
       described_class.acknowledge_page(b_param, pages.last, checked: %w[1 1])
-      expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "review"
-      expect(described_class.acknowledged?(b_param, sequence:)).to be_falsey
+      expect(described_class.permitted_step(b_param, nil, course:)).to eq "review"
+      expect(described_class.acknowledged?(b_param, course:)).to be_falsey
 
       expect {
-        expect(described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")).to be_truthy
-      }.to change(RegistrationSequenceAcknowledgment, :count).by 1
-      expect(described_class.acknowledged?(b_param, sequence:)).to be_truthy
+        expect(described_class.save_acknowledgment(b_param, course, acknowledged_all: "1")).to be_truthy
+      }.to change(EducationCourseAcknowledgment, :count).by 1
+      expect(described_class.acknowledged?(b_param, course:)).to be_truthy
 
-      # The agreement is its own record, naming who agreed and to which sequence
-      acknowledgment = RegistrationSequenceAcknowledgment.last
-      expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
+      # The agreement is its own record, naming who agreed and to which course
+      acknowledgment = EducationCourseAcknowledgment.last
+      expect(acknowledgment).to have_attributes(education_course_id: course.id,
         b_param_id: b_param.id, owner_email: b_param.owner_email, bike_id: nil,
-        acknowledgment_text: sequence.acknowledgment)
+        acknowledgment_text: course.acknowledgment)
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array(pages.map(&:id))
       expect(acknowledgment.acknowledged_at).to be_within(5).of(Time.current)
 
       # Without a creator the registration now waits on the confirmation email
-      expect(described_class.finished?(b_param, sequence:)).to be_truthy
+      expect(described_class.finished?(b_param, course:)).to be_truthy
     end
 
     it "attests once, even if the review is submitted twice" do
       pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
-      described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")
+      described_class.save_acknowledgment(b_param, course, acknowledged_all: "1")
 
       expect {
-        expect(described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "1")).to be_truthy
-      }.to_not change(RegistrationSequenceAcknowledgment, :count)
+        expect(described_class.save_acknowledgment(b_param, course, acknowledged_all: "1")).to be_truthy
+      }.to_not change(EducationCourseAcknowledgment, :count)
     end
 
     it "refuses a page with any rule unchecked" do
@@ -269,21 +966,21 @@ RSpec.describe BikeServices::Register do
       expect(described_class.acknowledge_page(b_param, pages.first, checked: nil)).to be_falsey
       expect(described_class.acknowledge_page(b_param, nil, checked: %w[1 1])).to be_falsey
       expect(described_class.acknowledged_page_ids(b_param)).to eq([])
-      expect(described_class.permitted_step(b_param, nil, sequence:)).to eq "3"
+      expect(described_class.permitted_step(b_param, nil, course:)).to eq "3"
     end
 
     it "refuses an unchecked acknowledgment" do
       pages.each { described_class.acknowledge_page(b_param, it, checked: %w[1 1]) }
       expect {
-        expect(described_class.save_acknowledgment(b_param, sequence, acknowledged_all: "0")).to be_falsey
-      }.to_not change(RegistrationSequenceAcknowledgment, :count)
-      expect(described_class.acknowledged?(b_param, sequence:)).to be_falsey
+        expect(described_class.save_acknowledgment(b_param, course, acknowledged_all: "0")).to be_falsey
+      }.to_not change(EducationCourseAcknowledgment, :count)
+      expect(described_class.acknowledged?(b_param, course:)).to be_falsey
     end
 
-    context "without a sequence" do
+    context "without a course" do
       it "has nothing to acknowledge" do
-        expect(described_class.acknowledged?(b_param, sequence: nil)).to be_truthy
-        expect(described_class.permitted_step(b_param, nil, sequence: nil)).to eq "finished"
+        expect(described_class.acknowledged?(b_param, course: nil)).to be_truthy
+        expect(described_class.permitted_step(b_param, nil, course: nil)).to eq "finished"
       end
     end
   end
@@ -294,7 +991,7 @@ RSpec.describe BikeServices::Register do
     it "mints a token and emails it, once per interval" do
       expect(described_class.send_confirmation_email(b_param)).to be_truthy
       expect(b_param.reload.email_confirmation_token).to be_present
-      Email::PartialRegistrationJob.drain
+      EmailJobs::PartialRegistrationJob.drain
       expect(Notification.count).to eq 1
 
       # Anyone holding the registration's token can ask for a resend, so it's rate limited

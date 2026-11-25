@@ -42,15 +42,23 @@ module Bikeindex
     # builds them without a query - at the cost of only being able to count them from the bucket.
     config.active_storage.track_variants = false
 
-    # Use our custom error pages
-    config.exceptions_app = routes
+    # Our error pages get the failed request's env - clear its params if they don't parse,
+    # or they raise again and fall through to Rails' unlogged plain-text 500
+    config.exceptions_app = lambda do |env|
+      ActionDispatch::Request.new(env).then { it.GET && it.POST }
+      routes.call(env)
+    rescue ActionController::BadRequest, ActionDispatch::Http::Parameters::ParseError
+      routes.call(env.merge("action_dispatch.request.request_parameters" => {},
+        "action_dispatch.request.query_parameters" => {}))
+    end
 
     config.time_zone = "Central Time (US & Canada)"
 
     # Please, add to the `ignore` list any other `lib` subdirectories that do
     # not contain `.rb` files, or that should not be reloaded or eager loaded.
     # Common ones are `templates`, `generators`, or `middleware`, for example.
-    config.autoload_lib(ignore: %w[assets tasks rails])
+    # i18n_tasks is required by config/i18n-tasks.yml, which runs without Rails
+    config.autoload_lib(ignore: %w[assets tasks rails i18n_tasks])
 
     # Force sql schema use so we get psql extensions
     config.active_record.schema_format = :sql
@@ -72,7 +80,7 @@ module Bikeindex
     # and render it as a 500 before it can reach this filter. Above them it never fires.
     config.middleware.insert_after ActionDispatch::DebugExceptions, IpSpoofAttackFilter
     config.middleware.use Rack::Deflater
-    config.middleware.insert 0, Rack::UTF8Sanitizer
+    config.middleware.insert 0, Rack::UTF8Sanitizer, sanitize_null_bytes: true
 
     # Add middleware to make i18n configuration thread-safe
     config.middleware.use I18n::Middleware

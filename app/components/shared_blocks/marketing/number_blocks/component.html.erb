@@ -1,0 +1,24 @@
+<dl class="tw:m-0 tw:grid tw:grid-cols-2 tw:gap-x-7 tw:gap-y-5 <%= @list_classes %> <%= @html_class %>">
+  <% @items.each do |value, label| %>
+    <div class="tw:flex tw:flex-col tw:border-gray-200 tw:nth-[n+3]:border-t-2 tw:nth-[n+3]:pt-3 tw:dark:border-gray-700 <%= @item_classes %>">
+      <dt
+        class="
+          tw:text-[13.5px] tw:font-normal tw:text-gray-500
+          tw:lg:text-[14.5px] tw:dark:text-gray-400
+        "
+      >
+        <%= label %>
+      </dt>
+
+      <dd
+        class="
+          tw:order-first tw:m-0 tw:font-header tw:text-[24px]
+          tw:font-extrabold tw:text-slate-900 tw:lg:text-[30px]
+          tw:dark:text-gray-100
+        "
+      >
+        <%= value %>
+      </dd>
+    </div>
+  <% end %>
+</dl>

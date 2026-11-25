@@ -14,7 +14,7 @@ module Admin
     end
 
     def create
-      @external_registry_credential = ExternalRegistryCredential.new(external_registry_credential_params)
+      @external_registry_credential = ExternalRegistryCredential.new(external_registry_credential_params(:type))
 
       if @external_registry_credential.save
         flash[:notice] = "Saved!"
@@ -22,7 +22,7 @@ module Admin
       else
         flash[:error] =
           @external_registry_credential.errors.full_messages.to_sentence
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 
@@ -35,7 +35,7 @@ module Admin
         redirect_to admin_external_registry_credentials_url
       else
         flash[:error] = @external_registry_credential.errors.full_messages.to_sentence
-        render :edit
+        render :edit, status: :unprocessable_entity
       end
     end
 
@@ -55,13 +55,8 @@ module Admin
       @external_registry_credential = ExternalRegistryCredential.find(params[:id])
     end
 
-    def external_registry_credential_params
-      model_type = params[:type]&.underscore&.tr("/", "_")
-      params[model_type][:type] = params[:type]
-
-      params
-        .require(model_type)
-        .permit(:app_id, :access_token, :refresh_token, :type)
+    def external_registry_credential_params(*extra_attributes)
+      params.require(:external_registry_credential).permit(:app_id, :access_token, :refresh_token, *extra_attributes)
     end
   end
 end

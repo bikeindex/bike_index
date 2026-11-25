@@ -29,99 +29,58 @@
   .mt-4
     = render partial: "/shared/bike_search_form", locals: {search_path: bike_versions_path, skip_serial_field: true, include_hidden_search_fields: true}
 
-
-
-  #timeSelectionBtnGroup.mt-4.text-right{ role: "group", class: @period == "custom" ? "custom-period-selected" : "", "data-nosubmit" => "#{false}" }
-    %span.mr-2.less-strong.d-block.d-lg-inline-block
-      Bikes listed
-    %button.btn.btn-outline-secondary.btn-sm.period-select-standard{ class: ("active" if @period == "all"), data: { period: "all" } }
-      any time
-    %button#periodSelectCustom.btn.btn-outline-secondary.btn-sm.ml-2{ class: ("active" if @period == "custom"), data: { period: "custom" } }
-      custom time frame
-
-  %form#timeSelectionCustom.custom-time-selection.mt-2.mb-2.collapse{ class: @period == "custom" ? "in show" : "" }
-    .form-group
-      = label_tag :start_time_selector, "from", class: "control-label mr-2"
-      = datetime_local_field_tag :start_time_selector, @start_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
-    .form-group.end-time-contrtol
-      = label_tag :end_time_selector, "to", class: "control-label mr-2"
-      = datetime_local_field_tag :end_time_selector, @end_time.strftime("%Y-%m-%dT%H:%M"), step: 60, class: "form-control"
-    %button#updatePeriodSelectCustom.btn.btn-success.btn-sm.ml-2
-      update
-
+  .mt-4{class: "tw:flex tw:justify-end"}
+    = render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params:, prepend_text: "Bikes listed")
   .row.mt-4
     .col-xs-12
       %p
         #{number_with_delimiter(matching_stolen_bike_listings.count)} matching listings
-        %em
-          = humanized_time_range_column(@time_range_column)
-          = humanized_time_range(@time_range)
+        - unless @period == "all"
+          %em
+            = UI::PeriodSelect::Component.column_label(@time_range_column)
+            = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
         - if sortable_search_params?
           %span.less-strong
             \- view
             = link_to "all stolen bike listings", stolen_bike_listings_path
 .container-fluid
-  .full-screen-table.mt-4
-    %table.table.table-bordered.table-striped.table-sm
-      %thead.thead-light.sortable
-        -#- if display_dev_info?
-        -#  %th.small folder
-        %th
-          = sortable "listed_at"
-        %th
-          = sortable "amount_cents", "price"
-        %th
-          = sortable "mnfg_name", "Manufacturer"
-        %th
-          Color
-        %th
-          Model
-        %th
-          Size
-        %th
-          Listing text
-        %th
-          Photos
-      %tbody
-        - @stolen_bike_listings.each do |stolen_bike_listing|
-          %tr
-            -#- if display_dev_info?
-            -#  %td{style: "min-width: 13em;"}
-            -#    %code.small.only-dev-visible
-            -#      = stolen_bike_listing.updated_photo_folder
-            %td
-              %small.localizeTime
-                = l stolen_bike_listing.listed_at, format: :convert_time
-              - if display_dev_info?
-                %em.small.less-strong.only-dev-visible
-                  = stolen_bike_listing.line
-            %td
-              %span{ title: "#{stolen_bike_listing.amount_formatted} #{stolen_bike_listing.currency_name}"}
-                = stolen_bike_listing.amount_usd_formatted
-            %td
-              = stolen_bike_listing.mnfg_name
-            %td
-              = stolen_bike_listing.frame_colors.to_sentence
-            %td
-              = stolen_bike_listing.frame_model
-            %td
-              = stolen_bike_listing.frame_size&.upcase
-            %td.listing-text-cell
-              = stolen_bike_listing.listing_text
-
-            %td
-              .listing-images
-                - if stolen_bike_listing.full_photo_urls.any?
-                  - preview_image = stolen_bike_listing.full_photo_urls.first
-                  = link_to image_tag(preview_image), preview_image, id: [stolen_bike_listing.id, 0].join("-"), class: "preview-image"
-                  - urls = stolen_bike_listing.full_photo_urls[1..stolen_bike_listing.full_photo_urls.length]
-                  - if urls.any?
-                    .additional-photos.mt-1.less-strong
-                      %em
-                        additional photos:
-                        = safe_join(urls.each_with_index.map { |u, i| content_tag(:a, i + 1, href: u, id: [stolen_bike_listing.id, i + 1].join("-")) }, ", ")
-                - else
-                  %em.less-strong We haven't uploaded the photos for this bike yet
+  .mt-4
+    - show_dev_info = display_dev_info?
+    = render(UI::Table::Base::Component.new(records: @stolen_bike_listings, render_sortable: true, sort_state:)) do |table|
+      -# - table.column(label: "folder", classes: "tw:min-w-[13em]", header_classes: "tw:text-xs") do |stolen_bike_listing|
+      -#   %code.small.only-dev-visible
+      -#     = stolen_bike_listing.updated_photo_folder
+      - table.column(sortable: "listed_at") do |stolen_bike_listing|
+        %small= render(UI::Time::Component.new(time: stolen_bike_listing.listed_at))
+        - if show_dev_info
+          %em.small.less-strong.only-dev-visible
+            = stolen_bike_listing.line
+      - table.column(sortable: "amount_cents", label: "price") do |stolen_bike_listing|
+        %span{ title: "#{stolen_bike_listing.amount_formatted} #{stolen_bike_listing.currency_name}"}
+          = stolen_bike_listing.amount_usd_formatted
+      - table.column(sortable: "mnfg_name", label: "Manufacturer") do |stolen_bike_listing|
+        = stolen_bike_listing.mnfg_name
+      - table.column(label: "Color") do |stolen_bike_listing|
+        = stolen_bike_listing.frame_colors.to_sentence
+      - table.column(label: "Model") do |stolen_bike_listing|
+        = stolen_bike_listing.frame_model
+      - table.column(label: "Size") do |stolen_bike_listing|
+        = stolen_bike_listing.frame_size&.upcase
+      - table.column(label: "Listing text", classes: "listing-text-cell") do |stolen_bike_listing|
+        = stolen_bike_listing.listing_text
+      - table.column(label: "Photos") do |stolen_bike_listing|
+        .listing-images
+          - if stolen_bike_listing.full_photo_urls.any?
+            - preview_image = stolen_bike_listing.full_photo_urls.first
+            = link_to image_tag(preview_image), preview_image, id: [stolen_bike_listing.id, 0].join("-"), class: "preview-image"
+            - urls = stolen_bike_listing.full_photo_urls[1..stolen_bike_listing.full_photo_urls.length]
+            - if urls.any?
+              .additional-photos.mt-1.less-strong
+                %em
+                  additional photos:
+                  = safe_join(urls.each_with_index.map { |u, i| content_tag(:a, i + 1, href: u, id: [stolen_bike_listing.id, i + 1].join("-")) }, ", ")
+          - else
+            %em.less-strong We haven't uploaded the photos for this bike yet
 
   .paginate-container.paginate-container-bottom.row
     .col-md-4.mt-4
@@ -137,8 +96,3 @@
   .row
     .col-md-8.mt-4.offset-md-2
       = render partial: "/shared/google_ad", locals: {klass: "ad-block ad-google adFullWidth"}
-
--# include javascript pack for the time period select
-<script src="/vendored_assets/application.js"></script>
-
-

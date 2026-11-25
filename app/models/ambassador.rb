@@ -12,6 +12,7 @@
 #  banned                             :boolean          default(FALSE), not null
 #  can_send_many_marketplace_messages :boolean          default(FALSE), not null
 #  can_send_many_stolen_notifications :boolean          default(FALSE), not null
+#  color_scheme                       :integer          default("system"), not null
 #  confirmation_token                 :string(255)
 #  confirmed                          :boolean          default(FALSE), not null
 #  deleted_at                         :datetime
@@ -37,6 +38,7 @@
 #  passwordless_user                  :boolean          default(FALSE), not null
 #  phone                              :string(255)
 #  preferred_language                 :string
+#  preferred_unit_system              :integer
 #  show_bikes                         :boolean          default(FALSE), not null
 #  show_instagram                     :boolean          default(FALSE)
 #  show_phone                         :boolean          default(TRUE)
@@ -57,11 +59,13 @@
 #
 # Indexes
 #
-#  index_users_on_address_record_id         (address_record_id)
-#  index_users_on_email                     (email) WHERE (deleted_at IS NULL)
-#  index_users_on_email_trgm                (email) WHERE (deleted_at IS NULL) USING gin
-#  index_users_on_token_for_password_reset  (token_for_password_reset)
-#  index_users_on_username                  (username) WHERE (deleted_at IS NULL)
+#  index_users_on_address_record_id             (address_record_id)
+#  index_users_on_email                         (email) WHERE (deleted_at IS NULL)
+#  index_users_on_email_trgm                    (email) WHERE (deleted_at IS NULL) USING gin
+#  index_users_on_email_without_periods         (replace((email)::text, '.'::text, ''::text)) WHERE (deleted_at IS NULL)
+#  index_users_on_magic_link_token_outstanding  (magic_link_token) WHERE (magic_link_token IS NOT NULL)
+#  index_users_on_token_for_password_reset      (token_for_password_reset)
+#  index_users_on_username                      (username) WHERE (deleted_at IS NULL)
 #
 class Ambassador < User
   default_scope -> { ambassadors }

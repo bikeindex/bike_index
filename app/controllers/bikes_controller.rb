@@ -1,24 +1,26 @@
 class BikesController < Bikes::BaseController
   skip_before_action :verify_authenticity_token, only: %i[create]
+  skip_before_action :redirect_scanned_id, except: %i[show update pdf resolve_token]
+  before_action :hand_off_to_redesign, only: %i[show]
+  # Redeclared to run behind the hand-off, since registrations#show repeats them
+  before_action :find_bike, only: %i[show update pdf resolve_token]
+  before_action :assign_current_organization, only: %i[show]
+  before_action :ensure_user_allowed_to_edit, only: %i[update pdf]
   before_action :sign_in_if_not!, only: %i[show]
   before_action :render_ad, only: %i[show]
-  skip_before_action :find_bike, except: %i[show update pdf resolve_token]
-  skip_before_action :assign_current_organization, except: %i[show]
-  skip_before_action :ensure_user_allowed_to_edit, except: %i[update pdf]
   around_action :set_reading_role, only: %i[show]
 
   def show
     redirect_to(format: "png") && return if request.format == "gif"
-    redirect_to(registration_path(@bike, request.query_parameters)) && return if show_redesign?
 
     if @bike.current_stolen_record.present?
       # Show contact owner box on load - happens if user has clicked on it and then logged in
-      @contact_owner_open = @bike.contact_owner?(current_user) && params[:contact_owner].present?
+      @contact_owner_open = @bike.contact_owner?(current_user) && contact_owner_param?
       @stolen_record = @bike.current_stolen_record
     end
     if current_user.present? && BikeServices::Displayer.display_impound_claim?(@bike, current_user)
       impound_claims = @bike.impound_claims_claimed.where(user_id: current_user.id)
-      @contact_owner_open = params[:contact_owner].present?
+      @contact_owner_open = contact_owner_param?
       @impound_claim = impound_claims.not_rejected.last
       @impound_claim ||= @bike.current_impound_record&.impound_claims&.build
       @submitted_impound_claims = impound_claims.where.not(id: @impound_claim.id).submitted
@@ -30,7 +32,10 @@ class BikesController < Bikes::BaseController
     @show_for_sale = show_for_sale?(@bike)
     find_token
     respond_to do |format|
-      format.html { render :show }
+      format.html do
+        ActiveRecord::Associations::Preloader.new(records: [@bike], associations: {public_images: {file_attachment: :blob}}).call
+        render :show
+      end
       format.png do
         qrcode = RQRCode::QRCode.new(bike_url(@bike))
         render plain: qrcode.as_png(size: 1200, border_modules: 0), template: nil, format: :png
@@ -44,7 +49,7 @@ class BikesController < Bikes::BaseController
     end
     filename = "Registration_" + @bike.updated_at.strftime("%m%d_%H%M")[0..]
     unless @bike.pdf.present? && @bike.pdf.file.filename == "#{filename}.pdf"
-      pdf = render_to_string pdf: filename, template: "bikes/pdf"
+      pdf = render_to_string pdf: filename, template: "pages/bikes/pdf"
       save_path = "#{Rails.root}/tmp/#{filename}.pdf"
       File.open(save_path, "wb") do |file|
         file << pdf
@@ -63,7 +68,7 @@ class BikesController < Bikes::BaseController
       flash[:error] = translation(:unable_to_find_sticker, scanned_id: params[:scanned_id])
       redirect_to user_root_url
     elsif @bike_sticker.bike.present?
-      redirect_to(bike_url(@bike_sticker.bike_id, scanned_id: params[:scanned_id], organization_id: params[:organization_id])) && return
+      redirect_to(RegistrationView.path(@bike_sticker.bike_id, user: current_user, session:, scanned_id: params[:scanned_id], organization_id: params[:organization_id])) && return
     elsif current_user.present?
       if current_user.member_of?(@bike_sticker.organization)
         set_passive_organization(@bike_sticker.organization)
@@ -86,7 +91,7 @@ class BikesController < Bikes::BaseController
       redirect_to(new_user_path) && return
     end
     find_or_new_b_param
-    redirect_to(bike_path(@b_param.created_bike_id)) && return if @b_param.created_bike.present?
+    redirect_to(RegistrationView.path(@b_param.created_bike_id, user: current_user, session:)) && return if @b_param.created_bike.present?
 
     # Let them know if they sent an invalid b_param token - notice rather than error because we're aggressive about removing b_params
     flash[:notice] = translation(:we_couldnt_find_that_registration) if @b_param.id.blank? && params[:b_param_token].present?
@@ -99,15 +104,15 @@ class BikesController < Bikes::BaseController
     find_or_new_b_param
     org_param = (@b_param.organization || current_organization)&.slug # Protect from nil - see #2308
     if params.dig(:bike, :embeded).present? && org_param.present? # NOTE: if embeded, doesn't verify csrf token
-      if @b_param.created_bike.present?
-        redirect_to edit_bike_url(@b_param.created_bike)
-      end
-      if params[:bike][:image].present? # Have to do in the controller, before assigning
-        @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
-      end
-      @b_param.update(params: permitted_bparams,
+      redirect_to(edit_bike_url(@b_param.created_bike)) && return if @b_param.created_bike.present?
+      # Have to do in the controller, before assigning
+      @b_param.image = params[:bike].delete(:image) if params.dig(:bike, :image).present?
+      # These params replace the b_param's rather than merging into them, so a resubmission
+      # after an error has to carry the signed id already stored
+      signed_id = params[:bike].delete(:image_signed_id).presence || @b_param.image_signed_id
+      @b_param.update(params: permitted_bparams.merge({"image_signed_id" => signed_id}.compact),
         origin: (params[:bike][:embeded_extended] ? "embed_extended" : "embed"))
-      @bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
+      @bike = BikeServices::Register.create_legacy_bike(@b_param, ip_address: forwarded_ip_address)
       if @bike.errors.any?
         flash[:error] = @b_param.bike_errors.to_sentence
         if params[:bike][:embeded_extended]
@@ -128,7 +133,7 @@ class BikesController < Bikes::BaseController
       end
 
       @b_param.clean_params(permitted_bparams)
-      @bike = BikeServices::Creator.new(ip_address: forwarded_ip_address).create_bike(@b_param)
+      @bike = BikeServices::Register.create_legacy_bike(@b_param, ip_address: forwarded_ip_address)
       if @bike.errors.any?
         redirect_to new_bike_url(b_param_token: @b_param.id_token)
       else
@@ -158,11 +163,13 @@ class BikesController < Bikes::BaseController
     end
     assign_bike_stickers(params[:bike_sticker]) if params[:bike_sticker].present?
     assign_strava_gear if params.key?(:strava_gear_id)
+    # reload clears errors, so a failed save's messages go in the flash first
+    flash[:error] ||= @bike.errors.full_messages.to_sentence if @bike.errors.any?
     @bike = @bike.reload
 
     @edit_templates = nil # update templates in case bike state has changed
-    if @bike.errors.any? || flash[:error].present?
-      edit_bike_url(@bike, edit_template: params[:edit_template])
+    if flash[:error].present?
+      redirect_to(edit_bike_url(@bike, edit_template: params[:edit_template])) && return
     else
       flash[:success] ||= translation(:bike_was_updated)
       return if return_to_if_present
@@ -189,7 +196,7 @@ class BikesController < Bikes::BaseController
       matching_notification = @bike.parking_notifications.where(retrieval_link_token: params[:token]).first
       if matching_notification.present?
         if matching_notification.active?
-          flash[:success] = translation(:marked_retrieved, bike_type: @bike.type)
+          flash[:success] = translation(:bike_type_marked_retrieved, bike_type: @bike.type_titleize)
           # Quick hack to skip making another endpoint
           retrieved_kind = params[:user_recovery].present? ? "user_recovery" : "link_token_recovery"
           matching_notification.mark_retrieved!(retrieved_by_id: current_user&.id, retrieved_kind: retrieved_kind)
@@ -204,27 +211,29 @@ class BikesController < Bikes::BaseController
       end
     end
 
-    redirect_to bike_path(@bike.id)
+    redirect_to RegistrationView.path(@bike.id, user: current_user, session:)
   end
 
   private
 
-  # no_redesign reaches the classic page without changing the viewer's preference
-  def show_redesign?
-    return false if Binxtils::InputNormalizer.boolean(params[:no_redesign])
+  # The redesign page's ui--collapse leaves contact_owner=0 in a URL a viewer can carry
+  # here, and .present? would read that as open
+  def contact_owner_param?
+    Binxtils::InputNormalizer.boolean(params[:contact_owner])
+  end
 
-    request.format.html? && current_user&.registration_show_redesign?
+  # An id that decodes to nothing has no registration path, so find_bike 404s it
+  def hand_off_to_redesign
+    return if !request.format.html? || RegistrationView.show_legacy?(user: current_user, session:)
+
+    id = ShortId.decode("Bike", params[:id])
+    redirect_to(registration_path(id, request.query_parameters)) if id.present?
   end
 
   def show_for_sale?(bike)
-    return false unless bike.status_with_owner?
-    return true if bike.is_for_sale?
-
-    marketplace_listing = bike.current_marketplace_listing
-    return false if marketplace_listing.blank? ||
-      !Binxtils::InputNormalizer.boolean(params[:show_marketplace_preview])
-
-    return false unless marketplace_listing.visible_by?(current_user)
+    return true if bike.status_with_owner? && bike.is_for_sale?
+    return false unless params[:view_as] == "marketplace_preview" &&
+      BikeServices::ShowViews.marketplace_preview?(bike:, current_user:)
 
     @marketplace_preview = true
   end

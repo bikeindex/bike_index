@@ -11,13 +11,37 @@
 @source "../../javascript";
 @source "../../../public/*.html";
 @import "./combobox.css";
+@import "./code_json.css";
 @import "./lexxy_overrides.css";
 
 /* Class-based dark mode (the legacy config's darkMode: 'selector'); a `.dark`
- * ancestor activates tw:dark:* utilities. */
-@custom-variant dark (&:where(.dark, .dark *));
+ * ancestor activates tw:dark:* utilities. An `.inverted` ancestor flips it. */
+@custom-variant dark (&:where(:where(.dark, .dark *):not(:where(.inverted, .inverted *)), :where(.inverted, .inverted *):not(:where(.dark, .dark *))));
 
-/* The selected/pressed state of a button, link or menu item, however it's flagged.
+/* Below anything holding the org registrations search's checked search_all: the owner email
+ * field and the chart card fold away on it */
+@custom-variant search-all-checked (&:where(:has([data-org--search-target=searchAll]:checked) *));
+
+/* /bikebook reads lengths, weights and speeds in imperial units below an `.imperial` ancestor */
+@custom-variant imperial (&:where(.imperial, .imperial *));
+
+/* /bikebook with its similar models open */
+@custom-variant similar-open (&:where(:has(#similar-toggle[aria-expanded=true]) *));
+
+/* A table's card running to the page's edges: once its .twwiderow has dropped to one column,
+ * the same 672px as .twfullbleed, or its table is wider than the card, which ui--table-overflow flags */
+@custom-variant table-bleed {
+  @container twwiderow (width < 672px) {
+    @slot;
+  }
+
+  &:where([data-table-bleed=true], [data-table-bleed=true] *) {
+    @slot;
+  }
+}
+
+/* The selected/pressed state of a button, link or menu item, however it's flagged —
+ * including a <label> around a checked radio (UI::Forms::RadioButtonGroup).
  * Keep it the last @custom-variant: tailwind sorts custom variants in declaration
  * order, and sorting after `dark` is what lets tw:is-active:* beat the resting,
  * hover and dark colors it overrides without `!important`.
@@ -25,12 +49,17 @@
  * The :not()s keep a disabled element from looking active, and tie the specificity of
  * the hovers they beat (guarded not-disabled:not-aria-disabled:) — sorting last only
  * settles ties, so without them a pressed button renders its hover color. */
-@custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active):not(:disabled):not([aria-disabled="true"]));
+@custom-variant is-active (&:is([data-active="true"], [aria-pressed="true"], [aria-current], :active, :has(> :checked)):not(:disabled):not([aria-disabled="true"]));
 
 @theme {
   --font-sans: "Open Sans", sans-serif;
   --font-header: "Montserrat", sans-serif;
   --breakpoint-xs: 23rem; /* 368px (iphone mini is 375px) */
+  --breakpoint-navbar: 62rem; /* 992px, the $grid-breakpoint-lg the navbar switches at */
+
+  /* 11px, below tailwind's own xs; the line box stays xs's 1rem */
+  --text-2xs: 0.6875rem;
+  --text-2xs--line-height: calc(1 / 0.6875);
 
   /* OG Bike Index brand palettes (formerly config/tailwind.config.js) */
   /* Blue 500 and up carry the redesign's saturation (kelsey_styles.css's
@@ -98,86 +127,30 @@
   --color-purple-800: #3a2f62;
   --color-purple-900: #2c244b;
   --color-purple-950: #1c162f;
+
+  /* Replaces Tailwind's default `yellow`, whose dark end reads brown. 300-500 are
+   * UI::Button's yellow and its hover and active; 800-950 are khaki on purpose. */
+  --color-yellow-50: #fff6da;
+  --color-yellow-100: #ffefbd;
+  --color-yellow-200: #ffe590;
+  --color-yellow-300: #ffd660;
+  --color-yellow-400: #ffcc33;
+  --color-yellow-500: #f5bc1b;
+  --color-yellow-600: #c99a12;
+  --color-yellow-700: #9c7a14;
+  --color-yellow-800: #776018;
+  --color-yellow-900: #5a4b1c;
+  --color-yellow-950: #3f3720;
+
+  /* The dev-info marking, the legacy stylesheets' $dev-color */
+  --color-dev: #9400d3;
 }
 
+@import "./bike_index_components.css";
+@import "./bikebook.css";
+@import "./legacy_dark.css";
+
 @layer components {
-  .twlink {
-    @apply tw:text-blue-600 tw:dark:text-blue-400 tw:transition-colors;
-  }
-
-  /* Guarded so a disabled UI::Button/UI::ButtonLink in link color holds its color.
-   * Every other color guards its hover in the utilities; link color's lives here. */
-  .twlink:not(:disabled, [aria-disabled="true"]):hover {
-    @apply tw:text-blue-700 tw:underline tw:dark:text-blue-300;
-  }
-
-  .twlink.active,
-  .twlink:not(:disabled, [aria-disabled="true"]):active {
-    @apply tw:text-blue-700 tw:dark:text-blue-300 tw:font-bold tw:underline;
-  }
-
-  /* Links inherit the alert's own color, so the underline is what marks them as links */
-  .twalert-body .twlink {
-    @apply tw:underline tw:hover:text-blue-800;
-  }
-
-  .twless-strong {
-    @apply tw:opacity-65 tw:decoration-gray-900/65 tw:dark:decoration-gray-400/65;
-  }
-
-  .twinput {
-    @apply tw:bg-white tw:border tw:border-gray-200 tw:dark:bg-gray-700 tw:dark:border-gray-700 tw:rounded-sm
-      tw:placeholder-gray-500 tw:text-gray-900 tw:text-base tw:dark:placeholder-gray-400 tw:dark:text-gray-200
-      tw:focus-visible:outline-0 tw:focus-visible:ring tw:focus-visible:ring-purple-500/40 tw:focus-visible:border-purple-500 tw:dark:focus-visible:ring-purple-500/40 tw:dark:focus:border-purple-500
-      tw:w-full tw:py-1.5 tw:px-2.5 tw:block;
-  }
-  /* block + the gap to its field, so a label spaces the same whatever renders
-   * below it. Bootstrap's `.container label` is inline-block with a .5rem
-   * margin, and it only applies inside a container -- owning both here is what
-   * stops the spacing depending on where the field sits. Utilities still win,
-   * so `twlabel tw:m-0` and the checkbox's `tw:flex` override as before. */
-  .twlabel {
-    @apply tw:block tw:mb-1 tw:text-sm tw:font-medium tw:text-gray-800 tw:dark:text-gray-500 tw:cursor-pointer;
-  }
-
-  [aria-expanded="true"] .twdropdown-chevron {
-    @apply tw:rotate-180;
-  }
-
-  .twdropdown {
-    @apply tw:flex-col tw:list-none tw:py-0 tw:mb-0;
-  }
-
-  .twdropdown li[role="menuitem"]:first-child > a {
-    @apply tw:pt-2 tw:rounded-t-lg;
-  }
-
-  .twdropdown li[role="menuitem"]:last-child > a {
-    @apply tw:pb-2 tw:rounded-b-lg;
-  }
-
-  .twdropdown li[role="menuitem"] > a {
-    @apply tw:block tw:px-4 tw:py-1 tw:text-left tw:text-base tw:text-gray-700 tw:no-underline
-      tw:hover:bg-gray-100 tw:hover:text-gray-900
-      tw:dark:text-gray-200 tw:dark:hover:bg-gray-700 tw:dark:hover:text-gray-100;
-  }
-
-  .twdropdown li[role="menuitem"]:has(+ li[role="separator"]) > a {
-    @apply tw:pb-2;
-  }
-
-  .twdropdown li[role="separator"] + li[role="menuitem"] > a {
-    @apply tw:pt-2;
-  }
-
-  .twdropdown li[role="separator"] {
-    @apply tw:border-t tw:border-gray-200 tw:dark:border-gray-700;
-  }
-
-  .twhr {
-    @apply tw:border-0 tw:h-px tw:bg-gray-200 tw:dark:bg-gray-700 tw:my-8;
-  }
-
   /* Style tables with CSS selectors to prevent caching issues */
   .ui-table tbody tr:nth-child(odd) {
     @apply tw:bg-white tw:dark:bg-gray-900;
@@ -193,16 +166,16 @@
   .ui-table thead tr th:last-child {
     @apply tw:rounded-tr-sm;
   }
-  .ui-table tbody tr:last-child td:first-child {
+  .ui-table :is(tbody:last-child, tfoot) tr:last-child :is(td, th):first-child {
     @apply tw:rounded-bl-sm;
   }
-  .ui-table tbody tr:last-child td:last-child {
+  .ui-table :is(tbody:last-child, tfoot) tr:last-child :is(td, th):last-child {
     @apply tw:rounded-br-sm;
   }
-  .ui-table-bordered tbody tr td:first-child {
+  .ui-table-bordered :is(tbody, tfoot) tr :is(td, th):first-child {
     @apply tw:ui-table-bordered-td-first;
   }
-  .ui-table-bordered tbody tr td:last-child {
+  .ui-table-bordered :is(tbody, tfoot) tr :is(td, th):last-child {
     @apply tw:ui-table-bordered-td-last;
   }
   .ui-table-bordered thead tr th:first-child {
@@ -211,24 +184,25 @@
   .ui-table-bordered thead tr th:last-child {
     @apply tw:ui-table-bordered-th-last;
   }
-
-  /* Turbo sets [busy] on the results frame during requests. Hide the existing
-     results and overlay a spinner; min-height gives the spinner a place to
-     land on the initial auto-submit when the frame is still empty. */
-  .search-results-frame-wrapper {
-    @apply tw:relative;
+  /* A table with no thead, as UI::Table::List is, draws its top edge on its first row */
+  .ui-table-bordered tbody:first-child tr:first-child :is(td, th) {
+    @apply tw:border-t;
   }
-  .search-results-frame-wrapper > turbo-frame[busy] {
-    @apply tw:opacity-0 tw:pointer-events-none;
+  .ui-table tbody:first-child tr:first-child :is(td, th):first-child {
+    @apply tw:rounded-tl-sm;
   }
-  .search-results-frame-wrapper > .search-loading-overlay {
-    @apply tw:hidden tw:absolute tw:top-0 tw:left-0 tw:right-0 tw:pointer-events-none tw:z-1;
+  .ui-table tbody:first-child tr:first-child :is(td, th):last-child {
+    @apply tw:rounded-tr-sm;
   }
-  .search-results-frame-wrapper:has(> turbo-frame[busy]) {
-    @apply tw:min-h-48;
+  /* A 🔎 or tooltip "?" stays on the line of what it follows. Only the whole cell
+     works: Chromium still breaks after a preceding element that wraps. A .keep-together
+     already holds it with its last word, so the rest of the cell can wrap. UI::Table::List
+     has no scroller to spill into, so its cells always wrap */
+  .ui-table:not(.ui-table-list) td:has(.keep-with-previous:not(.keep-together *)) {
+    @apply tw:whitespace-nowrap;
   }
-  .search-results-frame-wrapper:has(> turbo-frame[busy]) > .search-loading-overlay {
-    @apply tw:block;
+  .table_cell_check {
+    @apply tw:font-mono tw:text-center tw:font-bold;
   }
 }
 
@@ -247,34 +221,119 @@
 }
 
 @utility base-font {
-  @apply tw:antialiased tw:font-sans tw:text-gray-900 tw:dark:text-gray-400;
+  @apply tw:antialiased tw:font-sans tw:twtext-color;
 }
 
 @layer base {
   button:not(:disabled),
+  select:not(:disabled),
   [role="button"]:not(:disabled),
   input:where([type="button"], [type="reset"], [type="submit"]):not(:disabled) {
     cursor: pointer;
   }
 }
 
+@layer base {
+  /* Tailwind's shadows take this color over the one they're written with, which is pitched for
+   * a light page and doesn't show on a dark one. It doesn't inherit, so every element sets it.
+   * A shadow that's a chosen color rather than a shadow sets its own: tw:dark:shadow-gray-300 */
+  * {
+    @variant dark {
+      /* A drop shadow's filter reads this rather than a color */
+      --tw-drop-shadow-md: 0 3px 3px rgb(0 0 0 / 0.5);
+
+      &,
+      &::before,
+      &::after {
+        --tw-shadow-color: rgb(0 0 0 / 0.5);
+      }
+    }
+  }
+}
+
 body {
-  @apply tw:base-font;
+  @apply tw:base-font tw:dark:bg-gray-900 tw:dark:scheme-dark;
+
+  /* .primary-header-nav's margin-bottom, which the full-bleed pages pull up by to sit
+     flush under the navbar. Defined here rather than beside the nav in revised.scss,
+     which the admin and component-preview layouts don't load; the layout zeroes it on
+     <main> when the general alert stands in the gap instead */
+  --nav-gap: 36px;
 }
-/*
-  'dark:' syntax isn't working for the body element, unclear why - hacking with this for now
-*/
-body.dark {
-  @apply tw:bg-gray-900 tw:text-gray-400;
+@media (min-width: 992px) {
+  body {
+    --nav-gap: 60px;
+  }
 }
 
-/* TODO: use this in the body instead of separately */
-.twtext-color {
-  @apply tw:text-gray-900 tw:dark:text-gray-400;
+/* .primary-footer's margin-top, which the full-bleed pages pull down by to sit flush on the
+   footer. On :root, so a page that zeroes it on body wins from any layer */
+:root {
+  --footer-gap: 72px;
+}
+/* The controller narrows it as the sidebar collapses, in an inline style that
+   outranks this; the expanded width keeps the content still until stimulus connects */
+:root:has(> body.with-org-sidebar) {
+  --org-sidebar-width: 266px;
 }
 
-.twtext-color\! {
-  @apply tw:text-gray-900! tw:dark:text-gray-400!;
+/* The org sidebar is fixed, so the page it covers is pushed over instead. There's no
+   navbar here, so main's inset stands in for its gap -- named the same so a
+   full-bleed page pulls up under it with the same -mt-(--nav-gap) */
+body.with-org-sidebar {
+  --nav-gap: 28px;
+
+  margin-left: var(--org-sidebar-width);
+  transition: margin-left 0.18s ease;
+  /* The sidebar is fixed, so the general alert is the first in-flow child and its
+     margin-top would otherwise collapse out through body, over the canvas -- which
+     the browser paints near-black when it prefers dark */
+  display: flow-root;
+}
+
+/* The sidebar runs the height of the window, so the content does too -- a short page
+   would otherwise end partway down it, with the footer riding up beside the rows */
+body.with-org-sidebar main {
+  @apply tw:pt-(--nav-gap);
+
+  min-height: 100vh;
+}
+
+/* A page that is one shell stretches to fill that height, so a full-bleed background
+   reaches the bottom rather than stopping at its content. Guarded on :only-child so
+   a multi-element page keeps block layout, where its margins still collapse */
+body.with-org-sidebar main:has(> :only-child) {
+  @apply tw:flex tw:flex-col;
+}
+
+/* Bootstrap's .container has auto side margins, which opt it out of the cross-axis
+   stretch -- unstretched it goes max-content wide, so the width is asked for */
+body.with-org-sidebar main > :only-child {
+  flex-grow: 1;
+  width: 100%;
+}
+
+/* Fixed to the viewport, which body's margin doesn't reach */
+body.with-org-sidebar #flash-messages {
+  left: var(--org-sidebar-width);
+  transition: left 0.18s ease;
+}
+
+/* SharedBlocks::Navbar::OrgSidebar::Component::MOBILE_BREAKPOINT, below which the sidebar is
+   a top bar in the flow -- which takes its own space, so there's nothing to hold
+   open for it. `width <` rather than a max-width of 759px, so a fractional viewport
+   between the two doesn't land outside both this and the template's min-[760px] */
+@media (width < 760px) {
+  body.with-org-sidebar {
+    --nav-gap: 16px;
+
+    /* Shadows what the controller writes on the document, so every reader of it follows */
+    --org-sidebar-width: 0px;
+  }
+
+  body.with-org-sidebar main {
+    min-height: 0;
+  }
 }
 
 /* select2 is used by everythingcombox. Here are styles to make it look like the other inputs */

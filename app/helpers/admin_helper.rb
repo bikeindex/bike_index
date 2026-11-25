@@ -8,6 +8,12 @@ module AdminHelper
     (sortable_search_params.reject { |_k, v| v.blank? }.keys - UNFILTERING_SEARCH_KEYS).any?
   end
 
+  # search_status: "all" because the index otherwise only shows the investigate statuses
+  def bug_report_search_link(search_params)
+    link_to search_emoji, admin_bug_reports_path(search_params.merge(search_status: "all")),
+      class: "display-sortable-link tw:ml-1 tw:text-xs"
+  end
+
   def edit_mail_snippet_path_for(mail_snippet)
     if mail_snippet.organization_message?
       edit_organization_email_path(mail_snippet.kind, organization_id: mail_snippet.organization_id)
@@ -16,22 +22,11 @@ module AdminHelper
     end
   end
 
-  def credibility_scorer_color(score)
-    return "#dc3545" if score < 31
-    return "#ffc107" if score < 70
-
-    "#28a745"
-  end
-
-  def credibility_scorer_color_table(score)
-    (score < 31) ? credibility_scorer_color(score) : ""
-  end
-
   def admin_email_domain_spam_color(spam_score)
     if spam_score > 9
-      "text-danger"
+      UI::Alerts::Base::Component::TEXT_CLASSES[:error]
     elsif spam_score < EmailDomain::SPAM_SCORE_AUTO_BAN
-      "text-info"
+      UI::Alerts::Base::Component::TEXT_CLASSES[:notice]
     else
       ""
     end
@@ -49,10 +44,23 @@ module AdminHelper
       admin_stolen_bike_path(obj.id, stolen_record_id: obj.id)
     elsif obj.instance_of?(ImpoundRecord)
       admin_impound_record_path("pkey-#{obj.id}")
-    elsif obj.instance_of?(UserPhone)
+    elsif obj.instance_of?(UserPhone) || obj.instance_of?(UserEmail)
       admin_user_path(obj.user_id)
+    elsif obj.instance_of?(ParkingNotification)
+      admin_parking_notifications_path(search_bike_id: obj.bike_id)
+    elsif obj.instance_of?(GraduatedNotification)
+      admin_graduated_notifications_path(search_bike_id: obj.bike_id)
+    elsif obj.instance_of?(OrganizationStatus)
+      admin_organization_statuses_path(organization_id: obj.organization_id)
     elsif obj.instance_of?(UserAlert)
       admin_user_alerts_path(user_id: obj.user_id)
+    elsif obj.instance_of?(PosRegistrationMatch)
+      admin_pos_registration_matches_path(user_id: obj.bike&.user_id, period: "all")
+    elsif obj.instance_of?(OrganizationMessage)
+      admin_organization_messages_path(search_bike_id: obj.bike_id)
+    elsif obj.instance_of?(OrganizationSignup)
+      # The organization once it exists - until then, the emails sent to the address
+      obj.organization_id.present? ? admin_organization_path(obj.organization_id) : admin_notifications_path(query: obj.email)
     elsif obj.instance_of?(Blog)
       admin_news_path(obj) # blogs are administered as news
     else
@@ -62,43 +70,12 @@ module AdminHelper
 
   def theft_alert_status_class(theft_alert)
     text_class = if theft_alert.active?
-      "text-info"
+      UI::Alerts::Base::Component::TEXT_CLASSES[:notice]
     elsif theft_alert.pending?
-      "text-warning"
+      UI::Alerts::Base::Component::TEXT_CLASSES[:warning]
     elsif theft_alert.inactive?
-      "less-strong small"
+      "less-strong tw:text-xs"
     end
-    theft_alert.recovered? ? text_class + " small" : text_class
-  end
-
-  def render_admin_pagination_with_count(collection:, count: nil, skip_total: false, skip_today: false, skip_pagination: false, humanized_time_range_column_override: nil, viewing: nil)
-    render(Admin::PaginationWithCount::Component.new(
-      collection:,
-      count:,
-      skip_total:,
-      skip_today:,
-      skip_pagination:,
-      humanized_time_range_column_override:,
-      viewing:,
-      pagy: @pagy,
-      per_page: @per_page,
-      time_range: @time_range,
-      period: @period,
-      time_range_column: @time_range_column,
-      params:
-    ))
-  end
-
-  def render_admin_current_header(viewing: nil, kind_humanized: nil)
-    render(Admin::CurrentHeader::Component.new(
-      params:,
-      viewing:,
-      kind_humanized:,
-      user_subject: @user_subject,
-      bike: @bike,
-      marketplace_listing: @marketplace_listing,
-      primary_activity: @primary_activity,
-      current_organization:
-    ))
+    theft_alert.recovered? ? text_class + " tw:text-xs" : text_class
   end
 end

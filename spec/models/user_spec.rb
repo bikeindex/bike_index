@@ -224,33 +224,6 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "registration_show_redesign?" do
-    let(:user) { FactoryBot.create(:user_confirmed) }
-
-    it "is falsey when not in the rollout" do
-      expect(user.registration_show_toggleable?).to be_falsey
-      expect(user.registration_show_redesign?).to be_falsey
-    end
-
-    context "in the rollout" do
-      before { Flipper.enable_actor(:bike_show_redesign_toggle, user) }
-
-      it "is truthy" do
-        expect(user.registration_show_toggleable?).to be_truthy
-        expect(user.registration_show_redesign?).to be_truthy
-      end
-
-      context "switched to the legacy view" do
-        let(:user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
-
-        it "is toggleable, but not the redesign" do
-          expect(user.registration_show_toggleable?).to be_truthy
-          expect(user.registration_show_redesign?).to be_falsey
-        end
-      end
-    end
-  end
-
   describe "superuser?" do
     let(:user) { User.new }
     it "is true for superuser attribute" do
@@ -401,6 +374,13 @@ RSpec.describe User, type: :model do
       user2 = FactoryBot.build(:user, username: "COOLNAME")
       expect(user2.valid?).to be_falsey
       expect(user2.errors[:username]).to include("has already been taken")
+    end
+
+    it "doesn't reslugify an unchanged username" do
+      user = FactoryBot.create(:user)
+      user.update_column :username, "-legacy--name"
+      user.reload.update(name: "New name")
+      expect(user.reload.username).to eq "-legacy--name"
     end
   end
 
@@ -586,8 +566,8 @@ RSpec.describe User, type: :model do
       end
       it "input time" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("token_for_password_reset", (Time.current - 121.minutes).to_i)
-        expect(user.reload.auth_token_time("token_for_password_reset")).to be < (Time.current - 1.hours)
+        user.update_auth_token("token_for_password_reset", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago.to_i)
+        expect(user.reload.auth_token_time("token_for_password_reset")).to be < (Time.current - User::AUTH_TOKEN_EXPIRY)
         expect(user.auth_token_expired?("token_for_password_reset")).to be_truthy
       end
     end
@@ -603,12 +583,18 @@ RSpec.describe User, type: :model do
         expect(user.auth_token_time("magic_link_token")).to be > Time.current - 2.seconds
         expect(user.auth_token_expired?("magic_link_token")).to be_falsey
       end
-      it "uses input time, it returns the token" do
+      it "uses input time, and expires once past the window" do
         user = FactoryBot.create(:user)
-        user.update_auth_token("magic_link_token", (Time.current - 1.hour).to_i)
-        user.reload
-        expect(user.auth_token_time("magic_link_token")).to be < (Time.current - 1.hours)
+        # The token stores whole seconds, so compare against what was passed in rather
+        # than a second reading of the clock: that gap is the truncation plus however
+        # long the write took, which on a loaded runner overran the old 1 second window
+        token_time = 1.minute.ago.to_i
+        user.update_auth_token("magic_link_token", token_time)
+        expect(user.reload.auth_token_time("magic_link_token")).to eq Time.at(token_time)
         expect(user.auth_token_expired?("magic_link_token")).to be_falsey
+
+        user.update_auth_token("magic_link_token", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago.to_i)
+        expect(user.reload.auth_token_expired?("magic_link_token")).to be_truthy
       end
     end
   end
@@ -618,7 +604,7 @@ RSpec.describe User, type: :model do
       user = FactoryBot.create(:user)
       expect {
         expect(user.send_password_reset_email).to be_truthy
-      }.to change(Email::ResetPasswordJob.jobs, :size).by(1)
+      }.to change(EmailJobs::ResetPasswordJob.jobs, :size).by(1)
       expect(user.reload.token_for_password_reset).not_to be_nil
     end
 
@@ -630,7 +616,7 @@ RSpec.describe User, type: :model do
       expect {
         expect(user.send_password_reset_email).to be_falsey
         expect(user.send_password_reset_email).to be_falsey
-      }.to change(Email::ResetPasswordJob.jobs, :size).by(0)
+      }.to change(EmailJobs::ResetPasswordJob.jobs, :size).by(0)
       user.reload
       expect(user.token_for_password_reset).to eq current_token
     end
@@ -642,7 +628,7 @@ RSpec.describe User, type: :model do
       expect(user.magic_link_token).to be_nil
       expect {
         user.send_magic_link_email
-      }.to change(Email::MagicLoginLinkJob.jobs, :size).by(1)
+      }.to change(EmailJobs::MagicLoginLinkJob.jobs, :size).by(1)
       expect(user.reload.magic_link_token).not_to be_nil
     end
 
@@ -653,9 +639,26 @@ RSpec.describe User, type: :model do
       user.send_magic_link_email
       expect {
         user.send_magic_link_email
-      }.to change(Email::ResetPasswordJob.jobs, :size).by(0)
+      }.to change(EmailJobs::MagicLoginLinkJob.jobs, :size).by(0)
       user.reload
       expect(user.magic_link_token).to eq token
+    end
+
+    it "resends the unexpired token, and replaces it once past half the expiry" do
+      user = FactoryBot.create(:user)
+      user.update_auth_token("magic_link_token", 5.minutes.ago.to_i)
+      token = user.magic_link_token
+      expect {
+        user.send_magic_link_email
+      }.to change(EmailJobs::MagicLoginLinkJob.jobs, :size).by(1)
+      expect(user.reload.magic_link_token).to eq token
+
+      user.update_auth_token("magic_link_token", (Time.current - User::AUTH_TOKEN_EXPIRY / 2 - 1.minute).to_i)
+      token = user.magic_link_token
+      expect {
+        user.send_magic_link_email
+      }.to change(EmailJobs::MagicLoginLinkJob.jobs, :size).by(1)
+      expect(user.reload.magic_link_token).to_not eq token
     end
   end
 
@@ -666,7 +669,7 @@ RSpec.describe User, type: :model do
       token = user.refreshed_magic_link_token
       expect(token).to be_present
       expect(user.refreshed_magic_link_token).to eq token
-      user.update_auth_token("magic_link_token", (Time.current - 3.hours).to_i)
+      user.update_auth_token("magic_link_token", (User::AUTH_TOKEN_EXPIRY + 1.minute).ago.to_i)
       expect(user.refreshed_magic_link_token).to_not eq token
     end
   end
@@ -770,12 +773,46 @@ RSpec.describe User, type: :model do
         user.reload
         expect(user.render_donation_request).to eq "law_enforcement"
       end
-      context "police department paid" do
-        before { organization.update_column :is_paid, true }
+      context "police department with an invoice" do
+        before { organization.update_column :is_invoiced, true }
         it "is 'law_enforcement'" do
           user.reload
-          expect(user.organizations.paid.count).to eq 1
+          expect(user.organizations.invoiced.count).to eq 1
           expect(user.render_donation_request).to be_nil
+        end
+      end
+    end
+  end
+
+  describe "paid_organization_registration?" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user:) }
+
+    it "is false" do
+      expect(User.new.paid_organization_registration?).to be_falsey
+      expect(user.reload.paid_organization_registration?).to be_falsey
+    end
+
+    context "organization paid money" do
+      before { organization.update_column :paid_money, true }
+
+      it "is true" do
+        expect(user.reload.paid_organization_registration?).to be_truthy
+      end
+
+      # The transfer leaves their ownership behind, organization and all, with only current false
+      it "is false once they've transferred it away" do
+        BikeServices::OwnershipTransferer.find_or_create(bike, updator: user, new_owner_email: "newowner@example.com")
+
+        expect(user.reload.paid_organization_registration?).to be_falsey
+      end
+
+      context "registration isn't the user's" do
+        let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+
+        it "is false" do
+          expect(user.reload.paid_organization_registration?).to be_falsey
         end
       end
     end

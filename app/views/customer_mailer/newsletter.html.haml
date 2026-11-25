@@ -24,8 +24,7 @@
         %p.less-strong.text-center.mt-5{style: "font-size: 85%"}
           Don't want to receive Bike Index newsletters?
           = link_to "update your contact preferences", edit_my_account_url, class: "gray-link"
-          - if @user.present?
-            or
-            = link_to "unsubscribe", unsubscribe_user_url(@user.signed_id(purpose: :unsubscribe, expires_in: 365.days)), class: "gray-link"
+          or
+          = link_to "unsubscribe", unsubscribe_user_url(@unsubscribe_signed_id), class: "gray-link"
 
 

@@ -39,6 +39,15 @@ module UI
           ))
         end
 
+        def toggle
+          render(UI::Forms::RadioButtonGroup::Component.new(
+            name: :location_mode,
+            kind: :toggle,
+            selected: "current",
+            entries: [{value: "current", label: "Set on map"}, {value: "entered", label: "Enter address manually"}]
+          ))
+        end
+
         def full_width
           render(UI::Forms::RadioButtonGroup::Component.new(
             name: :frame_size,

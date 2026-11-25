@@ -6,42 +6,52 @@ module UI
       BASE_CLASSES = "tw:inline-flex tw:border tw:items-center tw:leading-4 tw:rounded-full"
 
       SIZES = {
-        xs: "tw:text-[11px] tw:font-semibold tw:px-[7px] tw:py-px",
+        xs: "tw:text-2xs tw:font-semibold tw:px-[7px] tw:py-px",
         sm: "tw:text-xs tw:font-medium tw:px-1 tw:py-px",
         md: "tw:text-xs tw:font-bold tw:px-2 tw:py-1",
-        lg: "tw:text-md tw:font-extrabold tw:px-3 tw:py-1"
+        lg: "tw:text-sm tw:font-extrabold tw:px-3 tw:py-1",
+        inherit: "tw:text-[length:inherit] tw:font-bold tw:px-2 tw:py-px"
       }
 
       # Soft tinted pills matching the redesign: light background + saturated text
       COLORS = {
-        notice: "tw:bg-blue-50 tw:text-blue-700 tw:border-transparent tw:dark:bg-blue-950 tw:dark:text-blue-200",
-        error: "tw:bg-red-50 tw:text-red-700 tw:border-transparent tw:dark:bg-red-950 tw:dark:text-red-200",
-        warning: "tw:bg-amber-50 tw:text-amber-700 tw:border-transparent tw:dark:bg-amber-950 tw:dark:text-amber-200",
-        success: "tw:bg-green-50 tw:text-green-700 tw:border-transparent tw:dark:bg-green-950 tw:dark:text-green-200",
+        notice: "tw:bg-blue-50 tw:text-blue-700 tw:border-transparent tw:dark:bg-blue-400/15 tw:dark:text-blue-200",
+        error: "tw:bg-red-50 tw:text-red-700 tw:border-transparent tw:dark:bg-red-400/15 tw:dark:text-red-200",
+        warning: "tw:bg-yellow-50 tw:text-yellow-800 tw:border-transparent tw:dark:bg-yellow-300/25 tw:dark:text-yellow-200",
+        success: "tw:bg-green-50 tw:text-green-700 tw:border-transparent tw:dark:bg-green-400/15 tw:dark:text-green-200",
         # Special badge classes:
-        cyan: "tw:bg-cyan-50 tw:text-cyan-700 tw:border-transparent tw:dark:bg-cyan-950 tw:dark:text-cyan-200",
+        cyan: "tw:bg-cyan-50 tw:text-cyan-700 tw:border-transparent tw:dark:bg-cyan-400/15 tw:dark:text-cyan-200",
         # The redesign's quiet pill. Text is --redesign-gray-500 rather than the
         # mockup's #9a9aa2, which sat at 2.45:1 on this background.
-        gray: "tw:bg-[#f0f0f2] tw:text-[#666666] tw:border-transparent tw:dark:bg-gray-800 tw:dark:text-gray-400",
-        purple: "tw:bg-purple-50 tw:text-purple-700 tw:border-transparent tw:dark:bg-purple-950 tw:dark:text-purple-200",
-        rose: "tw:bg-rose-50 tw:text-rose-700 tw:border-transparent tw:dark:bg-rose-950 tw:dark:text-rose-200",
-        orange: "tw:bg-orange-50 tw:text-orange-700 tw:border-transparent tw:dark:bg-orange-950 tw:dark:text-orange-200",
-        empty: "tw:bg-white tw:text-gray-700 tw:border-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-200 tw:dark:border-gray-600"
+        gray: "tw:bg-[#f0f0f2] tw:text-[#666666] tw:border-transparent tw:dark:bg-white/10 tw:dark:text-gray-400",
+        purple: "tw:bg-purple-50 tw:text-purple-700 tw:border-transparent tw:dark:bg-purple-400/15 tw:dark:text-purple-200",
+        # The -400 rather than the palette's -700, by choice: 2.5:1 on its own background,
+        # so it reads softer than every other pill rather than as a mistyped shade
+        pink: "tw:bg-pink-50 tw:text-pink-400 tw:border-transparent tw:dark:bg-pink-400/15 tw:dark:text-pink-400",
+        rose: "tw:bg-rose-50 tw:text-rose-700 tw:border-transparent tw:dark:bg-rose-400/15 tw:dark:text-rose-200",
+        orange: "tw:bg-orange-50 tw:text-orange-700 tw:border-transparent tw:dark:bg-orange-400/15 tw:dark:text-orange-200",
+        empty: "tw:bg-white tw:text-gray-700 tw:border-gray-300 tw:dark:bg-gray-900 tw:dark:text-gray-200 tw:dark:border-gray-600",
+        # UI::Button's yellow
+        yellow: "tw:bg-yellow-300 tw:text-slate-900 tw:border-transparent"
       }.freeze
 
       # Solid pills (saturated background + white text) — e.g. the redesign audience pill
       SOLID_COLORS = {
         notice: "tw:bg-blue-500 tw:text-white tw:border-transparent",
-        error: "tw:bg-red-600 tw:text-white tw:border-transparent",
-        warning: "tw:bg-amber-500 tw:text-white tw:border-transparent",
+        error: "tw:bg-red-600 tw:text-white tw:border-transparent tw:dark:bg-red-700",
+        warning: "tw:bg-yellow-300 tw:text-slate-900 tw:border-transparent",
         success: "tw:bg-green-600 tw:text-white tw:border-transparent",
         cyan: "tw:bg-cyan-500 tw:text-white tw:border-transparent",
         gray: "tw:bg-gray-500 tw:text-white tw:border-transparent",
         purple: "tw:bg-purple-500 tw:text-white tw:border-transparent",
+        pink: "tw:bg-pink-500 tw:text-white tw:border-transparent",
         rose: "tw:bg-rose-500 tw:text-white tw:border-transparent",
         orange: "tw:bg-orange-500 tw:text-white tw:border-transparent",
         empty: "tw:bg-gray-500 tw:text-white tw:border-transparent"
       }.freeze
+
+      # Shown in place of the title, for a tooltip that needs markup - a link, a list. The title stays the trigger's name
+      renders_one :tooltip_body
 
       def self.badge_classes(color:, size:, cursor: "tw:cursor-default", solid: false)
         palette = solid ? SOLID_COLORS : COLORS
@@ -63,30 +73,37 @@ module UI
         label = content.presence || @text
         label = safe_join([leading, label]) if leading
         badge = content_tag(:span, label, class: badge_class)
-        return badge unless custom_title?
-        render(UI::Tooltip::Component.new(text: @title)) { badge }
+        return badge unless tooltip?
+
+        render(UI::Tooltip::Component.new(text: @title)) do |tooltip|
+          tooltip.with_body_content(tooltip_body.to_s) if tooltip_body?
+          badge
+        end
       end
 
       private
 
       # An inline icon (@icon is a path under app/assets/images, sans .svg) takes
-      # precedence over the status dot
+      # precedence over the status dot. Both are decorative - the badge's text is
+      # its accessible name - so they stay out of the accessibility tree.
       def leading_element
-        return helpers.inline_svg_tag("#{@icon}.svg", class: "tw:mr-1 tw:size-3.5") if @icon.present?
+        return helpers.inline_svg_tag("#{@icon}.svg", class: "tw:mr-1 tw:size-3.5", aria_hidden: true) if @icon.present?
         indicator_dot if @indicator
       end
 
       # A small status dot inheriting the badge's text color
       def indicator_dot
-        content_tag(:span, "", class: "tw:mr-1.5 tw:inline-block tw:size-1.5 tw:rounded-full tw:bg-current")
+        content_tag(:span, "", class: "tw:mr-1.5 tw:inline-block tw:size-1.5 tw:rounded-full tw:bg-current", aria: {hidden: true})
       end
 
       def custom_title?
         @title.present? && @title != @text
       end
 
+      def tooltip? = custom_title? || tooltip_body?
+
       def badge_class
-        self.class.badge_classes(color: @color, size: @size, solid: @solid, cursor: custom_title? ? "tw:cursor-help" : "tw:cursor-default")
+        self.class.badge_classes(color: @color, size: @size, solid: @solid, cursor: tooltip? ? "tw:cursor-help" : "tw:cursor-default")
       end
     end
   end

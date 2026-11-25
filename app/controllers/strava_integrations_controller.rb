@@ -9,8 +9,8 @@ class StravaIntegrationsController < ApplicationController
   def new
     state = SecureRandom.hex(24)
     session[:strava_oauth_state] = state
-    if params[:return_to]&.start_with?("/")
-      session[:strava_return_to] = params[:return_to]
+    if local_return_to
+      session[:strava_return_to] = local_return_to
     elsif params[:scope] == "strava_search"
       session[:strava_return_to] = strava_search_path
     end
@@ -77,7 +77,7 @@ class StravaIntegrationsController < ApplicationController
   private
 
   def authenticate_user_for_strava
-    store_return_and_authenticate_user(translation_key: :create_account, flash_type: :notice)
+    store_return_and_authenticate_user(flash_type: :notice)
   end
 
   def find_strava_integration

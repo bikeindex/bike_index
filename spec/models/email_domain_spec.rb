@@ -1,6 +1,18 @@
 require "rails_helper"
 
 RSpec.describe EmailDomain, type: :model do
+  describe "risky_email?" do
+    # Ownership#spam_risky_email? reads this with the Turnstile challenge switched off
+    it "matches the domains the spam complaints come from" do
+      expect(EmailDomain.risky_email?("rider@yahoo.com")).to be_truthy
+      expect(EmailDomain.risky_email?("rider@hotmail.co.uk")).to be_truthy
+      # users_controller asks before the record is saved, so before EmailNormalizer runs
+      expect(EmailDomain.risky_email?("Rider@Yahoo.com")).to be_truthy
+      expect(EmailDomain.risky_email?("rider@gmail.com")).to be_falsey
+      expect(EmailDomain.risky_email?(nil)).to be_falsey
+    end
+  end
+
   describe "Factory" do
     let(:email_domain) { FactoryBot.create(:email_domain) }
     it "is valid" do
@@ -9,6 +21,14 @@ RSpec.describe EmailDomain, type: :model do
   end
 
   describe "validate domain" do
+    context "without a domain" do
+      it "is invalid, whatever stands in for it" do
+        ["", " ", "@", nil].each do |domain|
+          expect(FactoryBot.build(:email_domain, domain:)).not_to be_valid
+        end
+      end
+    end
+
     context "without ." do
       let(:email_domain) { FactoryBot.build(:email_domain, domain: "@somethingcom") }
       it "is invalid" do

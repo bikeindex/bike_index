@@ -10,7 +10,7 @@
       <%= helpers.inline_svg_tag(default_icon, class: "tw:h-4 tw:w-4", aria_hidden: true) %>
     <% end %>
 
-    <span class="tw:sr-only"><%= @kind.to_s.titleize %></span>
+    <span class="tw:sr-only"><%= announcement %></span>
   </div>
 
   <% if @dismissable %>
@@ -22,26 +22,12 @@
     >
       <span class="tw:sr-only">Close</span>
 
-      <svg
-        class="tw:h-3 tw:w-3"
-        aria-hidden="true"
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 14 14"
-      >
-        <path
-          stroke="currentColor"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="m1 1 6 6m0 0 6 6M7 7l6-6M7 7l-6 6"
-        />
-      </svg>
+      <%= helpers.inline_svg_tag("icons/x.svg", class: "tw:h-3 tw:w-3", aria_hidden: true) %>
     </button>
   <% end %>
 
   <% if @header.present? %>
-    <h4 class="uncap tw:mb-2! tw:text-lg! <%= header_color_classes %>">
+    <h4 class="tw:mb-2 tw:font-sans tw:text-lg tw:normal-case <%= header_color_classes %>">
       <%= @header %>
     </h4>
   <% end %>

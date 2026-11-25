@@ -1,8 +1,16 @@
 import { Controller } from '@hotwired/stimulus'
+import { urlParam, setUrlParam } from 'utils/url_param'
 
 // Connects to data-controller='landing-pages--tabs'
+// param: a query param that records the selected tab, so a reload returns to it
 export default class extends Controller {
   static targets = ['button', 'panel']
+  static values = { param: String }
+
+  connect () {
+    const button = this.paramValue && this.buttonTargets.find(btn => btn.dataset.tab === urlParam(this.paramValue))
+    if (button) this.activate(button)
+  }
 
   // Tab functionality
   select (event) {
@@ -40,7 +48,11 @@ export default class extends Controller {
     button.classList.add('active')
     button.setAttribute('aria-selected', 'true')
     button.removeAttribute('tabindex')
+    if (this.paramValue) setUrlParam(this.paramValue, tabName)
     const panel = this.panelTargets.find(p => p.id === `tab-${tabName}`)
-    if (panel) panel.classList.add('active')
+    if (panel) {
+      panel.classList.add('active')
+      this.dispatch('activated', { target: panel })
+    }
   }
 }

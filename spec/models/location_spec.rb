@@ -26,6 +26,22 @@ RSpec.describe Location, type: :model do
       expect(location.address_record.kind).to eq "organization"
       expect(location.address_record.city).to eq "Chicago"
     end
+
+    # A nested address_record geocodes after set_calculated_attributes has run, so the
+    # coordinates have to be copied later — the organization reads them off the location
+    it "copies the geocoded coordinates through to the organization" do
+      organization = FactoryBot.create(:organization)
+      organization.update(locations_attributes: {"0" => {name: "Main Office", publicly_visible: "1",
+                                                         address_record_attributes: {street: "123 Main St", city: "Chicago",
+                                                                                     country_id: Country.united_states_id}}})
+      location = organization.reload.locations.first
+
+      expect(location.address_record.latitude).to be_present
+      expect(location.latitude).to eq location.address_record.latitude
+      expect(location.longitude).to eq location.address_record.longitude
+      expect(organization.location_latitude).to eq location.latitude
+      expect(organization.search_coordinates_set?).to be true
+    end
   end
 
   describe "factory" do

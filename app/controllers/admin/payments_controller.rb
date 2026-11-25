@@ -7,11 +7,11 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @payments = pagy(:countish, matching_payments.includes(:user, :organization, :invoice)
-        .order(sort_column + " " + sort_direction), limit: @per_page, page: permitted_page)
+        .order(sortable_order(Payment)), limit: @per_page, page: permitted_page)
     end
 
     def new
-      @payment = Payment.new
+      @payment = Payment.new(payment_method: Payment.admin_creatable_payment_methods.first)
     end
 
     def show
@@ -24,7 +24,7 @@ module Admin
     def update
       if assign_to_membership_param?
         if @payment.can_assign_to_membership?
-          Users::CreateOrUpdateMembershipFromPaymentJob.new.perform(@payment.id, current_user.id)
+          UserJobs::CreateOrUpdateMembershipFromPaymentJob.new.perform(@payment.id, current_user.id)
           flash[:success] = "Payment updated"
         else
           flash[:error] = "This payment can't be assigned to a membership - maybe it already has been?"
@@ -53,7 +53,7 @@ module Admin
         else
           "Not able to create #{permitted_create_parameters[:payment_method]} method of payments"
         end
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 
@@ -127,9 +127,8 @@ module Admin
       Time.at(1417588530)
     end
 
-    def default_period
-      "year"
-    end
+    # A user's payments are few enough to show them all
+    def default_period = params[:user_id].present? ? "all" : "year"
 
     def assign_to_membership_param?
       Binxtils::InputNormalizer.boolean(params[:assign_to_membership])

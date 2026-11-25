@@ -1,0 +1,15 @@
+# frozen_string_literal: true
+
+module Pages
+  module Homepage
+    module Top
+      class ComponentPreview < ApplicationComponentPreview
+        # @display kelsey_stylesheet true
+        def default
+          render(Pages::Homepage::Top::Component.new(recoveries_value: Counts.recoveries_value,
+            organization_count: Counts.organizations, recovery_displays: RecoveryDisplay.with_photo.limit(5)))
+        end
+      end
+    end
+  end
+end

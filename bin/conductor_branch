@@ -1,0 +1,49 @@
+#!/bin/bash
+# Conductor names a workspace's branch <name>-v1 when another worktree already
+# holds <name>. Move this checkout onto <name> itself, so commits land on the
+# branch the PR shows.
+set -u
+cd "$(dirname "$0")/.." || exit 0
+
+LOCAL=$(git branch --show-current)
+[[ "$LOCAL" =~ -v[0-9]+$ ]] || exit 0
+UPSTREAM=$(git rev-parse --abbrev-ref '@{u}' 2>/dev/null) || exit 0
+NAME=${UPSTREAM#origin/}
+[[ "$LOCAL" =~ ^"$NAME"-v[0-9]+$ ]] || exit 0
+
+# workspace setup and the SessionStart hook can run at once; the second leaves it to the first.
+# The lock is a symlink naming its holder's pid, so one a killed run left behind can be cleared
+LOCK="$(git rev-parse --absolute-git-dir)/conductor_branch.pid"
+if ! ln -s "$$" "$LOCK" 2>/dev/null; then
+  LOCK_PID=$(readlink "$LOCK")
+  if kill -0 "$LOCK_PID" 2>/dev/null; then
+    echo "Leaving $LOCAL to bin/conductor_branch (pid $LOCK_PID), which is already moving this checkout."
+    exit 0
+  fi
+  rm -f "$LOCK"
+  ln -s "$$" "$LOCK" || exit 0
+fi
+trap 'rm -f "$LOCK"' EXIT
+
+# a workspace deleted without `git worktree remove` still holds its branch
+git worktree prune
+HOLDER=$(git for-each-ref --format='%(worktreepath)' "refs/heads/$NAME")
+# --detach leaves that worktree's files and index as they are
+[[ -n "$HOLDER" ]] && git -C "$HOLDER" checkout -q --detach
+reattach() { [[ -n "$HOLDER" ]] && git -C "$HOLDER" checkout -q "$NAME"; }
+
+if ! CHECKOUT_ERROR=$(git checkout -q "$NAME" 2>&1); then
+  reattach
+  echo "Still on $LOCAL: git checkout $NAME failed - fix this and re-run bin/conductor_branch before committing: $CHECKOUT_ERROR"
+  exit 0
+fi
+if ! git merge -q --no-edit "$LOCAL" >/dev/null 2>&1; then
+  git merge --abort
+  git checkout -q "$LOCAL"
+  reattach
+  echo "Still on $LOCAL: it doesn't merge cleanly into $NAME. ${HOLDER:+Run git -C $HOLDER checkout --detach, then }git checkout $NAME, git merge $LOCAL, resolve it per the merge-conflicts skill, and git branch -D $LOCAL."
+  exit 0
+fi
+# -d also wants it merged into its upstream, which unpushed work on it isn't
+git branch -q -D "$LOCAL"
+echo "Moved this checkout from $LOCAL onto $NAME${HOLDER:+, detaching $HOLDER to free it}."

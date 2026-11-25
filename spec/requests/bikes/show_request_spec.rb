@@ -6,8 +6,12 @@ RSpec.describe "BikesController#show", type: :request do
   let(:ownership) { FactoryBot.create(:ownership) }
   let(:current_user) { ownership.creator }
   let(:bike) { ownership.bike }
-  # This is required by show, if it isn't present it raises ReadOnlyError
-  before { RearGearType.fixed }
+  # RearGearType is required by show, if it isn't present it raises ReadOnlyError.
+  # The redesign is the default, so opting out is what keeps this page reachable
+  before do
+    RearGearType.fixed
+    post update_legacy_view_registration_path(bike, show_legacy: true)
+  end
 
   context "example bike" do
     it "shows the bike" do
@@ -56,6 +60,15 @@ RSpec.describe "BikesController#show", type: :request do
       get "#{base_url}/#{bike.to_param}?organization_id=#{organization&.to_param}&sign_in_if_not=true"
       expect(response).to redirect_to new_session_path
       expect(flash[:notice]).to be_present
+      expect(session[:return_to]).to eq bike_path(bike.to_param, sign_in_if_not: true, organization_id: organization.to_param)
+    end
+    context "no organization" do
+      it "redirects to sign in" do
+        get "#{base_url}/#{bike.to_param}?sign_in_if_not=1"
+        expect(response).to redirect_to new_session_path
+        expect(flash[:notice]).to be_present
+        expect(session[:return_to]).to eq "/bikes/#{bike.to_param}?sign_in_if_not=1"
+      end
     end
     context "organization doesn't exist" do
       it "redirects to sign in" do
@@ -70,6 +83,7 @@ RSpec.describe "BikesController#show", type: :request do
         get "#{base_url}/#{bike.to_param}?organization_id=#{organization&.to_param}&sign_in_if_not=1"
         expect(flash[:notice]).to be_present
         expect(response).to redirect_to(magic_link_session_path)
+        expect(session[:return_to]).to eq bike_path(bike.to_param, sign_in_if_not: 1, organization_id: organization.to_param)
       end
     end
   end
@@ -213,11 +227,11 @@ RSpec.describe "BikesController#show", type: :request do
         FactoryBot.create(:superuser_ability, user:)
         user
       end
-      let!(:organization) { current_user.default_organization }
+      let!(:organization) { OrganizationRole.default_organization(current_user) }
       let!(:organization2) { FactoryBot.create(:organization) }
       it "responds with success" do
         current_user.reload
-        expect(current_user.default_organization).to be_present
+        expect(OrganizationRole.default_organization(current_user)).to be_present
         expect(current_user.superuser?).to be_truthy
         get "#{base_url}/#{bike.id}"
         expect(response.status).to eq(200)
@@ -231,6 +245,10 @@ RSpec.describe "BikesController#show", type: :request do
         get "#{base_url}/#{bike.id}?organization_id=#{organization2.id}"
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
+        expect(assigns(:current_organization)&.id).to eq organization2.id
+        expect(session[:passive_organization_id]).to eq organization2.id
+
+        get "#{base_url}/#{bike.id}?organization_id=#{organization2.name}"
         expect(assigns(:current_organization)&.id).to eq organization2.id
         expect(session[:passive_organization_id]).to eq organization2.id
         expect(whitespace_normalized_body_text).to match("#{organization2.short_name} Access Panel")
@@ -505,7 +523,7 @@ RSpec.describe "BikesController#show", type: :request do
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           put "#{base_url}/#{bike.id}/resolve_token?token=#{parking_notification.retrieval_link_token}&token_type=appears_abandoned_notification"
-          expect(flash[:success]).to be_present
+          expect(flash[:success]).to eq "Bike marked retrieved!"
         end
         # parking_notification_abandoned was marked retrieved - even though the token was for parking_notification
         expect(parking_notification_abandoned.reload.status).to eq "retrieved"
@@ -532,6 +550,58 @@ RSpec.describe "BikesController#show", type: :request do
       end
     end
   end
+  context "with organized impound_record, viewed by the owner" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.user }
+    let(:organization) { FactoryBot.create(:organization, name: "Brakebills") }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, bike:, organization:) }
+    let(:alert) { Nokogiri::HTML(response.body).at_css("[role=alert]:has(h4)") }
+
+    it "renders the impounded alert" do
+      get "#{base_url}/#{bike.id}"
+      expect(response).to render_template(:show)
+      expect(alert.at_css("h4").text.strip).to eq "Your bike is currently impounded!"
+      expect(alert.text.squish).to match(/Impounded .+ by Brakebills\z/)
+      expect(alert.at_css(".localizeTime")).to be_present
+    end
+
+    context "impounded from a parking notification" do
+      let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, bike:, organization:, impound_record:) }
+
+      it "includes the notification's address" do
+        get "#{base_url}/#{bike.id}"
+        expect(alert.text.squish).to match(/by Brakebills from #{Regexp.escape(parking_notification.formatted_address_string)}\z/)
+      end
+    end
+  end
+
+  context "with organized impound_record held at a location" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.user }
+    let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york) }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, bike:, location:) }
+
+    it "says where it was impounded from, not where it's held" do
+      expect(impound_record.reload.address_record_id).to eq location.address_record_id
+      get "#{base_url}/#{bike.id}"
+      expect(response.body).to match(%r{<strong>\s*from\s*</strong>\s*Chicago, IL 60608\s*</p>})
+    end
+  end
+
+  context "with active parking_notification, viewed by the owner" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+    let(:current_user) { bike.user }
+    let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, bike:) }
+
+    it "renders the notifications alert, with a link to mark it retrieved" do
+      get "#{base_url}/#{bike.id}"
+      alert = Nokogiri::HTML(response.body).at_css("[role=alert]:has(h4)")
+      expect(alert.at_css("h4").text.strip).to eq "1 current notification for this bike!"
+      expect(alert.text.squish).to match "Have you retrieved this bike?"
+      expect(alert.at_css("a[href*='parking_notification_retrieved=#{parking_notification.reload.retrieval_link_token}']").text.strip).to eq "mark retrieved"
+    end
+  end
+
   context "with impound_record" do
     let(:impound_record) { FactoryBot.create(:impound_record, bike: bike) }
     let(:current_user) { FactoryBot.create(:user_confirmed) }
@@ -617,7 +687,7 @@ RSpec.describe "BikesController#show", type: :request do
       expect(assigns(:bike)).to eq bike
       expect(assigns(:show_for_sale)).to be_falsey
       # passed preview
-      get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+      get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
       expect(flash).to be_blank
       expect(assigns(:bike)).to eq bike
       expect(assigns(:show_for_sale)).to be_truthy
@@ -626,7 +696,7 @@ RSpec.describe "BikesController#show", type: :request do
     context "current_user superadmin" do
       let(:current_user) { FactoryBot.create(:superuser) }
       it "doesn't render" do
-        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_truthy
@@ -640,7 +710,7 @@ RSpec.describe "BikesController#show", type: :request do
         expect(marketplace_listing.reload.visible_by?(current_user)).to be_falsey
         expect(marketplace_listing.valid_publishable?).to be_truthy
 
-        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_falsey
@@ -651,7 +721,7 @@ RSpec.describe "BikesController#show", type: :request do
         it "renders" do
           expect(marketplace_listing.reload.visible_by?(current_user)).to be_truthy
           expect(marketplace_listing.visible_by?(nil)).to be_truthy
-          get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+          get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
           expect(flash).to be_blank
           expect(assigns(:bike)).to eq bike
           expect(assigns(:show_for_sale)).to be_truthy
@@ -662,7 +732,7 @@ RSpec.describe "BikesController#show", type: :request do
 
           it "doesn't render" do
             expect(bike.reload.status).to eq "status_stolen"
-            get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+            get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
             expect(flash).to be_blank
             expect(assigns(:bike)).to eq bike
             expect(assigns(:show_for_sale)).to be_falsey
@@ -675,7 +745,7 @@ RSpec.describe "BikesController#show", type: :request do
       let(:status) { :sold }
       it "doesn't render" do
         expect(marketplace_listing.reload.visible_by?(current_user)).to be_truthy
-        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_falsey
@@ -685,53 +755,71 @@ RSpec.describe "BikesController#show", type: :request do
     context "no marketplace_listing present" do
       let!(:marketplace_listing) { nil }
       it "doesn't render" do
-        get "#{base_url}/#{bike.id}?show_marketplace_preview=true"
+        get "#{base_url}/#{bike.id}?view_as=marketplace_preview"
         expect(flash).to be_blank
         expect(assigns(:bike)).to eq bike
         expect(assigns(:show_for_sale)).to be_falsey
       end
     end
   end
-  context "bike_show_redesign_toggle flag" do
-    it "renders the legacy page when the flag is disabled" do
+  context "not opted out of the redesign" do
+    before { post update_legacy_view_registration_path(bike, show_legacy: false) }
+
+    it "redirects the html page but still renders the qr code png" do
       get "#{base_url}/#{bike.id}"
-      expect(response).to render_template(:show)
+      expect(response).to redirect_to(registration_path(bike))
+
+      get "#{base_url}/#{bike.id}.png"
+      expect(response.status).to eq(200)
     end
 
-    context "flag enabled for the current user" do
-      before { Flipper.enable_actor(:bike_show_redesign_toggle, current_user) }
+    it "redirects with the query params, so scanned stickers aren't lost" do
+      get "#{base_url}/#{bike.id}?scanned_id=XD8888&organization_id=cool-org"
+      expect(response).to redirect_to(registration_path(bike, scanned_id: "XD8888", organization_id: "cool-org"))
+    end
 
-      it "redirects the html page but still renders the qr code png" do
+    it "redirects a Turbo submission, which asks for a turbo_stream" do
+      get "#{base_url}/#{bike.id}", headers: {"Accept" => "text/vnd.turbo-stream.html, text/html, application/xhtml+xml"}
+      expect(response).to redirect_to(registration_path(bike))
+    end
+
+    it "normalizes the id, rather than passing it along" do
+      get "#{base_url}/r/#{bike.id}"
+      expect(response).to redirect_to(registration_path(bike))
+
+      get "#{base_url}/embed"
+      expect(response).to redirect_to(registration_path("embed".to_i(36)))
+      follow_redirect!
+      expect(response.status).to eq 404
+
+      get "#{base_url}/r"
+      expect(response.status).to eq 404
+    end
+
+    it "lets a scanned sticker id through to its redirect" do
+      get "#{base_url}/scannedUC123?organization_id=cool-org"
+      expect(response).to redirect_to(scanned_bike_path("UC123", organization_id: "cool-org"))
+    end
+
+    context "signed out" do
+      let(:current_user) { nil }
+
+      it "redirects" do
         get "#{base_url}/#{bike.id}"
         expect(response).to redirect_to(registration_path(bike))
-
-        get "#{base_url}/#{bike.id}.png"
-        expect(response.status).to eq(200)
       end
 
-      it "redirects with the query params, so scanned stickers aren't lost" do
-        get "#{base_url}/#{bike.id}?scanned_id=XD8888&organization_id=cool-org"
-        expect(response).to redirect_to(registration_path(bike, scanned_id: "XD8888", organization_id: "cool-org"))
-      end
-
-      it "renders the legacy page when no_redesign is passed" do
-        get "#{base_url}/#{bike.id}?no_redesign=true"
-        expect(response).to render_template(:show)
-      end
-
-      context "user opted into the legacy view" do
-        before { current_user.update(feature_registration_show_legacy: true) }
-
+      context "session opted into the legacy view" do
         it "renders the legacy page" do
+          post update_legacy_view_registration_path(bike, show_legacy: true)
           get "#{base_url}/#{bike.id}"
           expect(response).to render_template(:show)
         end
       end
     end
 
-    context "flag enabled only for another user" do
-      let(:other_user) { FactoryBot.create(:user_confirmed) }
-      before { Flipper.enable_actor(:bike_show_redesign_toggle, other_user) }
+    context "user opted into the legacy view" do
+      before { current_user.update(feature_registration_show_legacy: true) }
 
       it "renders the legacy page" do
         get "#{base_url}/#{bike.id}"
@@ -752,6 +840,134 @@ RSpec.describe "BikesController#show", type: :request do
         get "#{base_url}/#{bike.id}/spokecard"
         expect(response.status).to eq(200)
         expect(response).to render_template(:spokecard)
+      end
+    end
+  end
+
+  context "passive_organization the user is no longer a member of" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+
+    it "renders, resetting passive_organization_id" do
+      get "/my_account"
+      expect(session[:passive_organization_id]).to eq organization.id
+      current_user.organization_roles.destroy_all
+      current_user.reload
+
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+      expect(assigns(:bike)).to be_present
+      expect(flash).to_not be_present
+      expect(assigns[:current_organization]).to be_nil
+      expect(assigns[:passive_organization]).to be_nil
+      expect(session[:passive_organization_id]).to eq "0"
+
+      get "#{base_url}/#{bike.id}", params: {sign_in_if_not: true, organization_id: organization.id}
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+      expect(assigns[:current_organization]).to be_nil
+      expect(assigns[:passive_organization]).to be_nil
+      expect(session[:passive_organization_id]).to eq "0"
+    end
+  end
+
+  context "organized user viewing a bike" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+
+    shared_examples "renders with the organization" do
+      it "renders, setting passive_organization_id" do
+        expect(bike.send(:editable_organization_ids)).to eq(editable_organization_ids)
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(flash).to_not be_present
+        expect(session[:passive_organization_id]).to eq organization.id
+      end
+    end
+
+    context "organization has no claim on it" do
+      let(:editable_organization_ids) { [] }
+      include_examples "renders with the organization"
+    end
+
+    context "bike created by the organization" do
+      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+      let(:editable_organization_ids) { [organization.id] }
+      include_examples "renders with the organization"
+    end
+
+    context "bike claimed by its owner" do
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization) }
+      let(:editable_organization_ids) { [organization.id] }
+      include_examples "renders with the organization"
+    end
+
+    context "bike claimed by its owner, without can_edit_claimed" do
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, can_edit_claimed: false, creation_organization: organization) }
+      let(:editable_organization_ids) { [] }
+      include_examples "renders with the organization"
+    end
+  end
+
+  context "scanned sticker on the bike page" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let!(:bike_sticker) { FactoryBot.create(:bike_sticker, organization:, bike:, code: "ED09999") }
+
+    it "assigns the sticker, and the viewer is authorized for it" do
+      expect(bike_sticker.claimable_by?(current_user)).to be_truthy
+      expect(current_user.authorized?(bike_sticker)).to be_truthy
+      get "#{base_url}/#{bike.id}", params: {scanned_id: "ED009999", organization_id: organization.id}
+      expect(response.status).to eq(200)
+      expect(response).to render_template(:show)
+      expect(flash).to_not be_present
+      expect(assigns(:bike_sticker)).to eq bike_sticker
+      expect(current_user.authorized?(assigns(:bike_sticker))).to be_truthy
+      alert = Capybara.string(response.body).find("[role=alert]", text: "You scanned")
+      expect(alert).to have_text("assigned to this bike")
+      expect(alert).to have_css("form[action^='/bike_stickers/#{bike_sticker.code}'] input[name='bike_id']", visible: :all)
+    end
+
+    context "viewer isn't the bike owner" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      it "assigns the sticker, but the viewer isn't authorized for it" do
+        expect(current_user.authorized?(bike_sticker)).to be_falsey
+        get "#{base_url}/#{bike.id}", params: {scanned_id: "ED009999", organization_id: organization.id}
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
+        expect(flash).to_not be_present
+        expect(assigns(:bike_sticker)).to eq bike_sticker
+        expect(current_user.authorized?(assigns(:bike_sticker))).to be_falsey
+        alert = Capybara.string(response.body).find("[role=alert]", text: "You scanned")
+        expect(alert).to have_no_css("form", visible: :all)
+      end
+    end
+  end
+
+  context "bike_id too large for the column" do
+    it "responds with not found" do
+      get "#{base_url}/57549641769762268311552"
+      expect(response.status).to eq 404
+    end
+  end
+
+  context "bike is soft deleted" do
+    before { bike.destroy }
+
+    it "responds with not found" do
+      expect(bike.reload.deleted?).to be_truthy
+      get "#{base_url}/#{bike.id}"
+      expect(response.status).to eq 404
+    end
+
+    context "superuser" do
+      let(:current_user) { FactoryBot.create(:superuser) }
+      it "shows the bike" do
+        expect(bike.reload.deleted?).to be_truthy
+        get "#{base_url}/#{bike.id}"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:show)
       end
     end
   end

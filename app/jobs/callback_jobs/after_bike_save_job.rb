@@ -61,17 +61,12 @@ module CallbackJobs
     def update_matching_partial_registrations(bike)
       return true unless bike.created_at > Time.current - 5.minutes # skip unless new bike
 
-      matches = BParam.partial_registrations.without_bike.where("email ilike ?", "%#{bike.owner_email}%")
-        .reorder(:created_at)
-      if matches.count > 1
-        # Try to make it a little more accurate lookup
-        best_matches = matches.select { |b_param| b_param.manufacturer_id == bike.manufacturer_id }
-        matches = best_matches if matches.any?
-      end
-      matching_b_param = matches.last # Because we want the last created
-      return true unless matching_b_param.present?
+      matches = BikeServices::Register.matching_partial_registrations(bike)
+      return true if matches.none?
 
-      matching_b_param.update(created_bike_id: bike.id)
+      matches.each { it.update(created_bike_id: bike.id) }
+      # An organization to attribute the bike to beats a newer registration without one
+      matching_b_param = matches.max_by { [it.organization_id ? 1 : 0, it.created_at] }
       # Only set ownership
       ownership = bike.current_ownership
       if ownership.present? && ownership.origin == "web" && ownership.organization_id.blank?

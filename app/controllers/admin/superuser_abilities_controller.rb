@@ -2,11 +2,12 @@ module Admin
   class SuperuserAbilitiesController < Admin::BaseController
     include Binxtils::SortableTable
 
-    before_action :find_superuser_ability, only: %i[edit update]
+    before_action :require_universal_superuser!, except: :index
+    before_action :find_superuser_ability, only: %i[edit update destroy]
 
     def index
       @per_page = permitted_per_page(default: 50)
-      @pagy, @collection = pagy(:countish, searched_superuser_abilities.reorder("superuser_abilities.#{sort_column} #{sort_direction}")
+      @pagy, @collection = pagy(:countish, searched_superuser_abilities.reorder(sortable_order(SuperuserAbility))
         .includes(:user), limit: @per_page, page: permitted_page)
     end
 
@@ -20,7 +21,7 @@ module Admin
         flash[:success] = "Superuser Ability created!"
         redirect_to edit_admin_superuser_ability_path(@superuser_ability)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 
@@ -32,16 +33,30 @@ module Admin
         flash[:success] = "Superuser Ability saved!"
         redirect_to edit_admin_superuser_ability_path(@superuser_ability)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
+    end
+
+    def destroy
+      @superuser_ability.destroy
+      flash[:success] = "Superuser Ability deleted"
+      redirect_to admin_superuser_abilities_path
     end
 
     helper_method :searched_superuser_abilities, :permitted_kinds
 
     private
 
+    # An ability can grant any section, so managing them takes universal access
+    def require_universal_superuser!
+      return if current_user.superuser?
+
+      flash[:error] = "Only a universal superuser can manage superuser abilities"
+      redirect_to admin_superuser_abilities_path
+    end
+
     def find_superuser_ability
-      @superuser_ability = SuperuserAbility.find(params[:id])
+      @superuser_ability = SuperuserAbility.with_deleted.find(params[:id])
     end
 
     def sortable_columns

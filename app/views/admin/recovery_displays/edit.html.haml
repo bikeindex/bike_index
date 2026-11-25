@@ -1,9 +1,7 @@
-= render partial: "/admin/bikes/bike_tabs", locals: { bike: @bike, active_tab: "recovery_displays", stolen_record: @stolen_record, display_recovery: true }
+= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :recovery_displays, stolen_record: @stolen_record, display_recovery: true, user: current_user, display_dev_info: display_dev_info?)
 
-.admin-subnav.midpage-subnav
-  .col-12
-    %h1 Edit Recovery Display
+= render(UI::Header::Component.new(text: "Edit Recovery Display", tag: :h2))
 
 = render partial: "form"
 
-= link_to "Delete recovery display", admin_recovery_display_url(@recovery_display), method: :delete, data: { confirm: "Are you sure?" }, class: "btn btn-danger"
+= render(UI::ButtonLink::Component.new(text: "Delete recovery display", href: admin_recovery_display_url(@recovery_display), method: :delete, color: :error, confirm: "Are you sure?"))

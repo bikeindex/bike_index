@@ -1,0 +1,67 @@
+<% case @active_tab %>
+<% when :bikes %>
+  <%= render(Pages::Admin::Users::Show::Bikes::Component.new(user: @user)) %>
+<% when :payments %>
+  <%= render(Pages::Admin::Users::Show::Payments::Component.new(user: @user)) %>
+<% when :messages %>
+  <%= render(Pages::Admin::Users::Show::Messages::Component.new(user: @user)) %>
+<% when :organization_roles %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Organizations
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: records.count, parenthetical: registration_organizations_link)) %>
+  <% end %>
+
+  <%= render partial: "/admin/organization_roles/table", locals: {organization_roles: records.reorder(id: :desc)} %>
+<% when :emails %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Emails
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: records.count)) %>
+  <% end %>
+
+  <%= render(UI::Table::Base::Component.new(records: records.reorder(id: :desc))) do |table| %>
+    <% table.column(label: "Created", lower_right: ->(user_email) { user_email.id }) do |user_email| %>
+      <%= render UI::Time::Component.new(time: user_email.created_at) %>
+    <% end %>
+
+    <% table.column(label: "") do |user_email| %>
+      <%= user_email.email %>
+    <% end %>
+
+    <% table.column(label: "Confirmed") do |user_email| %>
+      <% if user_email.confirmed? %>
+        <%= check_mark %>
+      <% else %>
+        <small class="less-strong">false</small>
+      <% end %>
+    <% end %>
+
+    <% table.column(label: "Primary") do |user_email| %>
+      <% if user_email.primary? %>
+        <%= check_mark %>
+      <% else %>
+        <small class="less-strong">false</small>
+      <% end %>
+    <% end %>
+
+    <% table.column(label: "Old User Id") do |user_email| %>
+      <%= user_email.old_user_id %>
+    <% end %>
+  <% end %>
+<% when :ambassador_tasks %>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Ambassador tasks
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: records.count, parenthetical: ambassador_progress)) %>
+  <% end %>
+
+  <%= render(UI::Table::Base::Component.new(records: records.task_ordered)) do |table| %>
+    <% table.column(label: "Task") do |assignment| %>
+      <strong><%= assignment.title %></strong>
+    <% end %>
+
+    <% table.column(label: "Completed at") do |assignment| %>
+      <% if assignment.completed_at.present? %>
+        <%= render UI::Time::Component.new(time: assignment.completed_at) %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

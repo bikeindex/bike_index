@@ -99,11 +99,28 @@ RSpec.describe Organized::ExportsController, type: :request do
     end
 
     describe "show" do
-      it "renders" do
+      let(:reloads) { "data-controller=\"org--export-progress\"" }
+
+      it "renders, reloading while the export runs" do
         get "#{base_url}/#{export.id}"
         expect(response.code).to eq("200")
         expect(response).to render_template(:show)
         expect(flash).to_not be_present
+        expect(response.body).to include(reloads)
+      end
+      context "errored" do
+        before { export.update(progress: "errored") }
+        it "doesn't reload" do
+          get "#{base_url}/#{export.id}"
+          expect(response.body).to_not include(reloads)
+        end
+      end
+      context "pending for more than 10 minutes" do
+        let(:export) { FactoryBot.create(:export_organization, organization: current_organization, created_at: 11.minutes.ago) }
+        it "doesn't reload" do
+          get "#{base_url}/#{export.id}"
+          expect(response.body).to_not include(reloads)
+        end
       end
       context "with assigned bike stickers" do
         let(:export) { FactoryBot.create(:export_avery, organization: current_organization, bike_code_start: "a1111") }
@@ -207,6 +224,15 @@ RSpec.describe Organized::ExportsController, type: :request do
         expect(response).to render_template(:new)
         expect(flash).to_not be_present
       end
+
+      it "expands the time field that has a value, not the other one" do
+        get "#{base_url}/new?end_at=2016-03-08T02:00"
+        expect(response.code).to eq("200")
+        page = Nokogiri::HTML(response.body)
+        expect(page.at_css("[name='export[end_at]']").parent["class"]).to be_blank
+        expect(page.at_css("[name='export[start_at]']").parent["class"]).to eq("tw:hidden")
+      end
+
       context "organization has all feature slugs" do
         let(:enabled_feature_slugs) { ["csv_exports"] + OrganizationFeature::REG_FIELDS }
         it "renders still" do
@@ -216,6 +242,15 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(flash).to_not be_present
         end
       end
+      context "organization with registration_notes" do
+        let(:enabled_feature_slugs) { %w[csv_exports registration_notes] }
+        it "offers the notes column" do
+          get "#{base_url}/new"
+          expect(response.code).to eq("200")
+          expect(response.body).to include("export_headers_organization_notes")
+          expect(response.body).to include("Registration Notes")
+        end
+      end
       context "passed properties" do
         let(:export_properties) do
           {
@@ -223,7 +258,7 @@ RSpec.describe Organized::ExportsController, type: :request do
             organization_id: current_organization.id,
             custom_bike_ids: "123_12_44444",
             only_custom_bike_ids: true,
-            headers: %w[link registered_at manufacturer model color serial is_stolen],
+            headers: %w[link registered_at manufacturer model color serial status],
             user_id: current_user.id
           }
         end
@@ -233,7 +268,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           expect(response).to render_template(:new)
           expect(flash).to_not be_present
           export = assigns(:export)
-          expect(export.headers).to eq(%w[link registered_at manufacturer model color serial is_stolen])
+          expect(export.headers).to eq(%w[link registered_at manufacturer model color serial status])
           expect(export.only_custom_bike_ids).to be_truthy
           expect(export.custom_bike_ids).to eq([123, 12, 44444])
         end
@@ -293,7 +328,7 @@ RSpec.describe Organized::ExportsController, type: :request do
           end_at: nil,
           file_format: "xlsx",
           timezone: "America/Los Angeles",
-          headers: %w[link registered_at manufacturer model registered_by]
+          headers: %w[link registered_at manufacturer model status]
         }
       end
       let(:avery_params) { valid_attrs.merge(end_at: "2016-03-08 02:00:00", avery_export: true, bike_code_start: "a221 ") }
@@ -383,17 +418,19 @@ RSpec.describe Organized::ExportsController, type: :request do
         end
       end
       context "with impounded_bikes" do
-        let(:enabled_feature_slugs) { %w[csv_exports impound_bikes] }
-        it "creates with impounded_bikes" do
+        let(:enabled_feature_slugs) { %w[csv_exports impound_bikes show_partial_registrations] }
+        it "creates with impounded_bikes, without partial registrations" do
           expect {
             post base_url, params: {
               export: valid_attrs,
-              include_impounded_bikes: "true"
+              include_impounded_bikes: "true",
+              include_partial_registrations: "true"
             }
           }.to change(Export, :count).by 1
           export = Export.last
           expect(export.impounded_bikes).to be_truthy
           expect(export.options["impounded_bikes"]).to be_truthy
+          expect(export.options["partial_registrations"]).to be_falsey
         end
       end
 

@@ -25,6 +25,11 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:render_results)).to be_falsey
+      get base_url, headers: {"Turbo-Frame" => Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s}
+      expect(response.status).to eq(200)
+      expect(response.body).to include(Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s)
+      expect(response.body).to include("Current search")
+      expect(assigns(:graduated_notifications)).to be_nil
 
       get "#{base_url}?search_no_js=true"
       expect(response.status).to eq(200)
@@ -58,6 +63,8 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(assigns(:render_results)).to be_falsey
+      expect(response.body).to include("Not delivering graduated notifications")
+      expect(response.body).to include("role=\"alert\"")
     end
   end
 
@@ -68,6 +75,28 @@ RSpec.describe Organized::GraduatedNotificationsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
       expect(assigns(:graduated_notification)).to eq graduated_notification
+    end
+    context "custom email content edited after the notification sent" do
+      let!(:mail_snippet) { FactoryBot.create(:mail_snippet, kind: "graduated_notification", organization: current_organization) }
+      it "renders the stale-content alert" do
+        graduated_notification.update(processed_at: Time.current - 1.week)
+        expect(graduated_notification.reload.send_email?).to be_truthy
+        get "#{base_url}/#{graduated_notification.id}"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("has changed since this graduated notification was sent")
+        expect(response.body).to include("role=\"alert\"")
+      end
+    end
+    context "organization no longer delivering" do
+      it "renders the no-email-sent alert" do
+        current_organization.update(graduated_notification_interval: nil)
+        expect(graduated_notification.reload.send_email?).to be_falsey
+        expect(graduated_notification.primary_notification?).to be_truthy
+        get "#{base_url}/#{graduated_notification.id}"
+        expect(response.status).to eq(200)
+        expect(response.body).to include("No email will be sent for unknown reason")
+        expect(response.body).to include("role=\"alert\"")
+      end
     end
     context "different organization's" do
       let!(:graduated_notification) { FactoryBot.create(:graduated_notification_bike_graduated) }

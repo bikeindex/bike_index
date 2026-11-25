@@ -21,7 +21,7 @@ RSpec.describe "emailed token routes", type: :request do
        get_path: "/users/1/unsubscribe", get_endpoint: "users#unsubscribe",
        post_path: "/users/1/unsubscribe_update", post_endpoint: "users#unsubscribe_update",
        shared_component: true},
-      {interstitial: "app/components/register/step_confirm/component.html.erb",
+      {interstitial: "app/components/pages/register/views/confirm/component.html.erb",
        get_path: "/register/confirm", get_endpoint: "register#confirm",
        post_path: "/register/confirm_email", post_endpoint: "register#confirm_email",
        shared_component: false}
@@ -39,12 +39,12 @@ RSpec.describe "emailed token routes", type: :request do
     flows.select { |flow| flow[key] }.map { |flow| flow[:interstitial] }
   end
 
-  # Includes .rb, so a component that renders from `call` or a controller counts. The shared
-  # component's own files name it without being a flow, so they're not callers
+  # Includes .rb, so a component rendering from `call` counts. The shared component's own
+  # files name it without being callers
   let(:app_sources) do
     Dir.glob(Rails.root.join("app/**/*.{rb,haml,erb}"))
       .to_h { |file| [Pathname.new(file).relative_path_from(Rails.root).to_s, File.read(file)] }
-      .reject { |path, _| path.start_with?("app/components/sessions/sign_in_interstitial/") }
+      .reject { |path, _| path.start_with?("app/components/pages/sessions/sign_in_interstitial/") }
   end
 
   def templates_matching(pattern)
@@ -52,11 +52,11 @@ RSpec.describe "emailed token routes", type: :request do
   end
 
   # What actually renders an emailed link's form: each flow's own template, plus the shared
-  # component it delegates to. Other forms submit themselves for good reasons - a search box
-  # reacting to a filter - so only these are held to waiting for a click.
+  # component it delegates to. Other forms submit themselves for good reasons, so only these
+  # are held to waiting for a click
   def emailed_form_sources
     paths = flows.map { |flow| flow[:interstitial] } +
-      Dir.glob(Rails.root.join("app/components/sessions/sign_in_interstitial/*.{rb,erb}"))
+      Dir.glob(Rails.root.join("app/components/pages/sessions/sign_in_interstitial/*.{rb,erb}"))
         .map { |file| Pathname.new(file).relative_path_from(Rails.root).to_s }
     paths.uniq.reject { |path| path.end_with?("component_preview.rb") }
   end
@@ -73,12 +73,11 @@ RSpec.describe "emailed token routes", type: :request do
 
   # Separate, so a routing regression doesn't mask these
   it "knows every template rendering the shared interstitial" do
-    expect(templates_matching(/Sessions::SignInInterstitial::Component/))
+    expect(templates_matching(/Pages::Sessions::SignInInterstitial::Component/))
       .to match_array interstitials_where(:shared_component)
   end
 
-  # A scanner following an emailed link runs the page's JS too, so submitting on render hands
-  # it the action: spending the token, or unsubscribing someone who never asked to be
+  # Scanners run the page's JS, so submitting on render hands them the action
   it "leaves every emailed-link form for the reader to submit" do
     submitting = emailed_form_sources.select do |path|
       File.read(Rails.root.join(path)).match?(/auto.submit|requestSubmit|data-controller/)

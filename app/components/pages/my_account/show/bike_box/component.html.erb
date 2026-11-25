@@ -1,0 +1,104 @@
+<li class="tw:@container tw:flex tw:flex-col tw:gap-2">
+  <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: @unfinished_b_param, current_user: @current_user, kind: :error, margin_classes: "tw:mb-0")) %>
+
+  <% cache(cache_key) do %>
+    <%= render(UI::Card::Component.new(additional_classes: class_names("tw:relative tw:z-10 tw:grid tw:grid-cols-[auto_1fr] tw:gap-3 tw:border-l-[5px] tw:@xl:grid-cols-[auto_1fr_auto] tw:@xl:grid-rows-[auto_1fr] tw:@xl:gap-x-[18px] tw:@xl:gap-y-2.5", accent_classes))) do %>
+      <%= photo_frame do %>
+        <% if thumb_image_url %>
+          <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:size-full tw:object-cover") %>
+        <% else %>
+          <%= helpers.bike_placeholder_image_tag(alt: @bike.title_string, class: "tw:size-full tw:object-contain tw:p-4") %>
+        <% end %>
+
+        <% if @bike.thumb_path.blank? %>
+          <%= render(UI::ButtonLink::Component.new(text: translation(".add_a_photo"), href: edit_bike_path(@bike, edit_template: "photos"), size: :sm, html_class: "tw:absolute tw:bottom-2 tw:left-2")) %>
+        <% end %>
+      <% end %>
+
+      <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-2.5">
+        <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
+          <%# Pulled left and sized to the title so it lines up %>
+          <span class="tw:has-[*]:-ml-[calc(0.5rem+1px)]"><%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :inherit, time: Atoms::RegistrationStatusBadge::Component.event_time(@bike))) %></span>
+
+          <%= link_to bike_path(@bike), class: "tw:twtext-color tw:hover:underline" do %>
+            <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
+            <%= @bike.frame_model_truncated %>
+          <% end %>
+        </h3>
+
+        <div
+          class="
+            tw:flex tw:flex-wrap tw:items-center tw:gap-x-3 tw:gap-y-1.5
+            tw:text-sm tw:text-gray-500
+          "
+        >
+          <%= render(Atoms::FrameColors::Component.new(bike: @bike)) %>
+
+          <% if location.present? %>
+            <span><%= location %></span>
+          <% end %>
+
+          <span class="tw:inline-flex tw:items-center tw:gap-1.5">
+            <%= render(Atoms::VehicleTypeBadges::Component.new(bike: @bike)) %>
+          </span>
+
+          <% if @bike.user_hidden %>
+            <%= render(UI::Badge::Component.new(text: translation(".user_hidden"), color: :warning)) %>
+          <% end %>
+
+          <%= strava_gear_link %>
+        </div>
+      </div>
+
+      <%# Narrow: full width under the photo. Wide: under the details %>
+      <div
+        class="
+          tw:col-span-2 tw:flex tw:flex-col tw:gap-2.5 tw:@xl:col-span-1
+          tw:@xl:col-start-2
+        "
+      >
+        <div
+          class="
+            tw:@container tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-3
+            tw:gap-y-1 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400
+          "
+        >
+          <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :serial_tooltip)) %>
+
+          <%= render(Atoms::RegistrationDates::Component.new(bike: @bike)) %>
+        </div>
+
+        <% if bike_sticker_codes.any? %>
+          <div class="tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
+            <%= translation(".bike_sticker").pluralize(bike_sticker_codes.size) %>:
+            <%= safe_join(bike_sticker_codes.map { render(Atoms::Sticker::Component.new(pretty_code: it)) }, ", ") %>
+          </div>
+        <% end %>
+
+        <%= impound_claim_note %>
+      </div>
+
+      <%# Narrow: a row across the bottom, divided. Wide: a column at the right %>
+      <div
+        class="
+          tw:col-span-2 tw:flex tw:flex-wrap tw:items-center tw:divide-x
+          tw:divide-gray-300 tw:text-[15px] tw:font-semibold
+          tw:@xl:col-span-1 tw:@xl:col-start-3 tw:@xl:row-span-2
+          tw:@xl:row-start-1 tw:@xl:flex-col tw:@xl:items-start tw:@xl:gap-2
+          tw:@xl:divide-x-0 tw:@xl:px-2 tw:dark:divide-gray-600
+          tw:[&>a]:px-3 tw:[&>a]:py-1 tw:[&>a]:leading-tight
+          tw:@xl:[&>a]:px-0 tw:[&>a:first-child]:pl-0
+        "
+      >
+        <%= link_to translation(".edit_registration", bike_type: @bike.type), edit_bike_path(@bike, edit_template: @bike.default_edit_template), class: "twlink" %>
+
+        <% if @bike.status_with_owner? %>
+          <%= link_to sale_link_text, edit_bike_path(@bike, edit_template: "marketplace"), class: "tw:text-purple-600 tw:dark:text-purple-300" %>
+          <%= link_to translation(".report_stolen"), edit_bike_path(@bike, edit_template: "report_stolen"), class: "tw:text-red-600 tw:dark:text-red-400" %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+
+  <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(user_alerts: @user_alerts)) %>
+</li>

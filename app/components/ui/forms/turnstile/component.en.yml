@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    ui:
+      forms:
+        turnstile:
+          enable_javascript: >-
+            Verifying this email address requires JavaScript. Turn it on and submit
+            again, or use a different email address.

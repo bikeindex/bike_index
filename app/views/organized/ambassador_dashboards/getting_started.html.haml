@@ -1,5 +1,4 @@
-%h2.header-font-uncap
-  = t(".10_tips_for_getting_started_in_your_town")
+= render(UI::Header::Component.new(text: t(".10_tips_for_getting_started_in_your_town"), tag: :h2, html_class: "header-font-uncap"))
 
 %ol{class: "tw:list-decimal tw:ml-4"}
   %li= t(".be_a_part_of_your_local_cycling_culture")

@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    ui:
+      forms:
+        files:
+          upload_multiple:
+            upload_failed: upload failed
+            uploading: uploading

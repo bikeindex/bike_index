@@ -1,0 +1,19 @@
+<div class="twwiderow tw:items-start">
+  <p class="tw:mb-4">
+    <%= link_to "Custom layouts version history", version_history_url, class: "twlink" %>
+  </p>
+
+  <%= render(UI::Table::List::Component.new) do |list| %>
+    <% list.with_row(label: "Invoiced") do %>
+      <strong><%= @organization.is_invoiced? %></strong>
+    <% end %>
+  <% end %>
+</div>
+
+<%= render(Pages::Admin::Organizations::CustomLayouts::Table::Component.new(organization: @organization)) %>
+
+<div class="tw:mt-6">
+  <strong>Note:</strong> Custom Layouts (other than landing pages), are
+  <%= link_to "Mail Snippets", admin_mail_snippets_path, class: "twlink" %>. You
+  can view and edit all the active ones there.
+</div>

@@ -31,12 +31,15 @@ bin/kamal_review accessory reboot db --app 0
 
 Alongside the per-PR apps, `main` is continuously deployed to **[sandbox.review.bikeindex.org](https://sandbox.review.bikeindex.org)** — think of it as a review app that never gets a PR number and is never destroyed. It shares `config/deploy.review.yml`: with no `REVIEW_APP_PR_NUMBER` set, the ERB resolves the `sandbox` slug and omits the `accessories:` block (so a sandbox deploy can't touch the shared infra the PR apps depend on). It differs only in using Redis logical DB `0` (the one the PR mod-1023 allocation never hands out).
 
-For `bin/kamal_review`, with no `--app` given it defaults to sandbox - but you can also use `--app sandbox` to target it. This works for passthrough commands only, since sandbox is deployed by its own workflow, not the `deploy`/`destroy`/`reload_database` lifecycle:
+For `bin/kamal_review`, with no `--app` given it defaults to sandbox - but you can also use `--app sandbox` to target it. That covers every passthrough command, plus `reload_database` — the one lifecycle command sandbox accepts, since it deploys from its own workflow and is never destroyed:
 
 ```bash
 bin/kamal_review shell        --app sandbox   # bash on sandbox
 bin/kamal_review console                      # rails console, also on sandbox
+bin/kamal_review reload_database --app sandbox
 ```
+
+The accessory commands `reload_database` needs (`shared-db`, `shared-redis`) aren't in sandbox's config, so it borrows `pr-0`'s — the same trick as `--app 0` above. From CI, run the **Review App** workflow with `pr_number: sandbox` and `reload_database`; it joins `sandbox-deploy`'s concurrency group, so it can't run mid-deploy.
 
 ## What about production?
 
@@ -72,8 +75,9 @@ Four jobs: `resolve` (PR number + action, and labels on deploy), `op` (calls the
 |---|---|---|
 | `workflow_dispatch` → deploy (operator, or auto-dispatched by ci.yml on push to a labeled PR) | `deploy` | add `review-app` label, build image, deploy |
 | `workflow_dispatch` → destroy | `destroy` | tear down, remove label, delete PR images from GHCR |
-| `workflow_dispatch` → reload_database | `reload_database` | drop both databases, then create + seed them again ([below](#reloading-the-database)) |
+| `workflow_dispatch` → reload_database (a PR, or `pr_number: sandbox`) | `reload_database` | drop both databases, then create + seed them again ([below](#reloading-the-database)) |
 | `pull_request: closed` (any PR) | `destroy` | tear down, remove label, delete PR images from GHCR |
+| `schedule` (nightly, 10:00 UTC — 3am PDT / 2am PST) | `reload_database` | reseed sandbox ([below](#reloading-the-database)) |
 
 Fork PRs are filtered by `resolve`'s same-repo check (`proceed=false`). On **deploy**:
 
@@ -89,7 +93,11 @@ Destroy reverses it: purge the PR's ActiveStorage objects from the shared R2 buc
 
 ### Reloading the database
 
-`reload_database` resets a running app's data to a freshly seeded state without redeploying — for when seeds change, or a demo leaves the data in a mess. Containers, image, volumes and the Postgres role are untouched; only the two databases are rebuilt, by `bin/kamal_review reload_database --app <pr>` (which also purges the PR's R2 objects and flushes its redis DB first — see the comments there for why the order matters). It runs the same `db:prepare` the entrypoint runs at boot, so it's as slow as a first deploy, and the app serves partly-seeded data while it runs.
+`reload_database` resets a running app's data to a freshly seeded state without redeploying — for when seeds change, or a demo leaves the data in a mess. The image, volumes and the Postgres role are untouched; only the two databases are rebuilt, by `bin/kamal_review reload_database --app <pr>` (which also purges the app's R2 objects and flushes its redis DB first — see the comments there for why the order matters). It runs the same `db:prepare` the entrypoint runs at boot, so it's as slow as a first deploy.
+
+The app is in `kamal app maintenance` (a 503) and `worker` and `cron` stop for the duration and start again afterwards, succeed or fail — otherwise every job firing while the databases are gone raises `ActiveRecord::NoDatabaseError` into the *production* Honeybadger project, which review apps report to because `HONEYBADGER_API_KEY` is a value on the `Kamal/BikeIndex Review` 1Password item; their own project is a value swap, not a code change.
+
+It's the one action that also takes `--app sandbox` / `pr_number: sandbox` ([above](#sandbox-persistent-main-deploy)), and it runs against sandbox nightly on a `schedule` trigger. With no PR behind it, the workflow skips everything PR-side — labels, the deployment link, the failure comment — so a sandbox failure shows up only in the run.
 
 **Failures comment on the PR.** These runs are `workflow_dispatch`-triggered, so their check runs never hit the PR's rollup. The `report` job comments the failure (edited in place on repeats); the next successful deploy deletes it.
 
@@ -121,7 +129,7 @@ Each app gets a `cron` container (a Kamal [`servers` role](https://kamal-deploy.
 | `.github/workflows/review-app.yml` | `resolve` + `op` (calls `kamal-deploy.yml`) + `post` + `report` jobs handling all triggers (see [How a deploy works](#how-a-deploy-works)) |
 | `.github/workflows/ci.yml` (`dispatch` job) | Auto-dispatches a deploy on every push to a labeled PR — the auto-redeploy half of the label gate |
 | `.kamal/provisioning/` | Ansible playbook for one-time host hardening |
-| `app/components/page_block/review_app_banner/` | ViewComponent shown in the layout when `ENV["REVIEW_APP"]` is set |
+| `app/components/shared_blocks/review_app_banner/` | ViewComponent shown in the layout when `ENV["REVIEW_APP"]` is set |
 
 ## Known limits
 
@@ -153,7 +161,24 @@ POSTGRES_PASSWORD            SECRET_KEY_BASE              SESSION_SECRET
 VERIFICATION_SECRET          GOOGLE_MAPS                  GOOGLE_MAPS_STATIC
 GOOGLE_GEOCODER              MAPBOX_GEOCODER              MAPBOX_MAPPING
 R2_DEV_ENDPOINT              R2_DEV_ACCESS_KEY            R2_DEV_ACCESS_KEY_SECRET
-HONEYBADGER_API_KEY
+HONEYBADGER_API_KEY          HONEYBADGER_FRONTEND_API_KEY
+```
+
+Those come from one `kamal secrets fetch`, so a field missing from the item fails every kamal
+command, not just deploy. Two more are read separately and are **optional** — without them a
+review app deploys normally, and only the SSO metadata and `sp.crt` endpoints 404:
+
+```
+SAML_SP_CERTIFICATE          SAML_SP_PRIVATE_KEY
+```
+
+Both hold a **base64-encoded** PEM, not the PEM itself — kamal writes
+each secret to the host as one `KEY=value` line, so the newlines have to go. Mint a throwaway
+pair (never production's); the task prints the one-line form under "One-line form, for a
+deploy environment":
+
+```bash
+BASE_URL=https://sandbox.review.bikeindex.org bundle exec rails saml:generate_sp_keypair
 ```
 
 These are the same values as the `REVIEW_APP_*` GitHub Environment secrets ([Initial host setup step 6](#6-ssh-key--github-config)) — keep them in sync. Then:
@@ -161,6 +186,7 @@ These are the same values as the `REVIEW_APP_*` GitHub Environment secrets ([Ini
 ```bash
 bin/kamal_review deploy --app <pr_number> --version <image_tag>
 bin/kamal_review reload_database --app <pr_number>   # drop + reseed, no redeploy
+bin/kamal_review reload_database --app sandbox       # same, for the sandbox app
 ```
 
 `REVIEW_APP_HOST` defaults to `host.review.bikeindex.org`; export it only to target a different host under the `*.review.bikeindex.org` wildcard.

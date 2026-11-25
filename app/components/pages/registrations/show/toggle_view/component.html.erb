@@ -1,0 +1,9 @@
+<%= render(UI::Alerts::Base::Component.new(kind: :purple)) do %>
+  <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-3">
+    <span class="tw:font-semibold">
+      <%= translation(".try_new_view", bike_type: @bike.type) %>
+    </span>
+
+    <%= render(UI::ButtonLink::Component.new(text: translation(".switch_to_new"), href: update_legacy_view_registration_path(@bike, request.query_parameters.merge(show_legacy: false)), method: :post, color: :secondary, size: :sm)) %>
+  </div>
+<% end %>

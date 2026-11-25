@@ -126,7 +126,7 @@ RSpec.describe UpdateMailchimpDatumJob, type: :job do
             organization.update(updated_at: Time.current)
             expect(organization.default_location&.id).to eq location.id
             expect(organization_role.reload.organization_creator?).to be_falsey
-            expect(organization.reload.paid?).to be_falsey
+            expect(organization.reload.is_invoiced?).to be_falsey
             mailchimp_datum.data["tags"] += ["weird other tag"]
             mailchimp_datum.update(updated_at: Time.current, mailchimp_updated_at: Time.current)
             expect(mailchimp_datum).to be_valid

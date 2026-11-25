@@ -8,7 +8,7 @@ module Organized
     def show
       @current = params[:day].blank?
       @day = @current ? nil : params[:day].to_date
-      @hot_sheet = HotSheet.for(current_organization, @day)
+      @hot_sheet = HotSheet.for(current_organization, @day).first
     end
 
     def edit
@@ -30,11 +30,13 @@ module Organized
     private
 
     def ensure_valid_hot_sheet_configuration!
-      return true if @hot_sheet_configuration&.is_on? || current_organization.search_coordinates_set?
+      return true if current_organization.hot_sheet_viewable?
+
+      # The edit page renders its own missing location alert, so skip the flash there
+      return redirect_to(edit_organization_hot_sheet_path(current_organization)) if current_user&.admin_of?(current_organization)
 
       flash[:error] = HotSheetConfiguration::MISSING_LOCATION_ERROR
-      url_to_redirect_to = current_user&.admin_of?(current_organization) ? edit_organization_hot_sheet_path(current_organization) : organization_root_url(current_organization)
-      redirect_to(url_to_redirect_to) && return
+      redirect_to(organization_root_url(current_organization))
     end
 
     def ensure_access_to_hot_sheet!

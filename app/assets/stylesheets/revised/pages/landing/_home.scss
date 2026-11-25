@@ -89,7 +89,8 @@
   }
 }
 
-@media screen and (min-width: 991px) {
+// Below $grid-breakpoint-lg the menu's own signup link is still behind the hamburgler
+@media screen and (min-width: $grid-breakpoint-lg) {
   .center-navbar-signup-link-container {
     display: none;
   }

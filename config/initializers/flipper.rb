@@ -13,5 +13,5 @@ Flipper.register(:superusers) do |actor|
 end
 
 Flipper.register(:paid_organization_users) do |actor|
-  actor.respond_to?(:paid_org?) && actor.paid_org?
+  actor.respond_to?(:invoiced_org?) && actor.invoiced_org?
 end

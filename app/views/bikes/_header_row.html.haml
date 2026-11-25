@@ -17,7 +17,7 @@
               %small.text-danger= t(".test_registration")
       - if show_credibility_badges
         .col-md-5.text-right
-          = render partial: "/bikes/credibility_score", locals: {bike: @bike}
+          = render(Atoms::CredibilityScore::Component.new(bike: @bike))
 
 
 

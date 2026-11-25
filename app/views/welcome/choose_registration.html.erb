@@ -3,14 +3,16 @@
     <div class="row choose-registration-items">
       <div class="choose-links col-sm-6">
         <ul>
-          <% if current_user.organization_roles.any? %>
-            <% current_user.organization_roles.each do |organization_role| %>
+          <% organization_roles = OrganizationRole.ordered_for(current_user).includes(:organization).to_a %>
+
+          <% if organization_roles.any? %>
+            <% organization_roles.each do |organization_role| %>
               <li>
                 <a
                   class="organization-choice choose-type"
                   href="<%= new_bike_url(organization_id: organization_role.organization.id) %>"
                 >
-                  <span class="add-selected"> &#10004 </span>
+                  <span class="add-selected"> &#10004; </span>
                   <%= t(".add_a_bike_through") %>
                   <em><%= organization_role.organization.name %></em>
                 </a>
@@ -20,14 +22,14 @@
 
           <li>
             <a class="purchase-choice choose-type" href="<%= new_bike_url %>">
-              <span class="add-selected"> &#10004 </span>
+              <span class="add-selected"> &#10004; </span>
               <%= t(".add_your_own_bike") %>
             </a>
           </li>
 
           <li>
             <a class="choose-type" href="<%= new_bike_url(status: "stolen") %>">
-              <span class="add-selected"> &#10004 </span>
+              <span class="add-selected"> &#10004; </span>
               <%= t(".add_a_stolen_bike") %>
             </a>
           </li>
@@ -37,7 +39,7 @@
               class="choose-type"
               href="<%= new_bike_url(status: "impounded") %>"
             >
-              <span class="add-selected"> &#10004 </span>
+              <span class="add-selected"> &#10004; </span>
               <%= t(".add_abandoned_bike_you_found") %>
             </a>
           </li>

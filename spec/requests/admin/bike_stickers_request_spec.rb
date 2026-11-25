@@ -160,6 +160,7 @@ RSpec.describe Admin::BikeStickersController, type: :request do
         expect(response).to render_template(:reassign)
         expect(assigns(:bike_stickers).count).to eq 3
         expect(assigns(:valid_selection)).to be_truthy
+        expect(response.body).to match(/<button[^>]*type="submit"[^>]*name="reassign_now"[^>]*value="true"/)
         Sidekiq::Job.clear_all
         get "#{base_url}/reassign", params: selection_params.merge(reassign_now: true)
         expect(AdminReassignBikeStickerCodesJob.jobs.count).to eq 1

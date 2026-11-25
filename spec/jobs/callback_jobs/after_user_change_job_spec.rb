@@ -178,50 +178,50 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:bike1) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: user) }
     let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: user) }
-    it "does not add alert" do
-      expect(organization.reload.paid?).to be_truthy
+    it "adds alerts for unassigned bikes" do
+      expect(organization.reload.is_invoiced?).to be_truthy
       expect(organization.enabled?("no_address")).to be_truthy
-      expect(organization.paid_money?).to be_falsey
+      expect(organization.paid_money?).to be_falsey # an invoice is enough, paying isn't required
       expect(organization.bikes.pluck(:id)).to match_array([bike1.id])
       expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
       expect(user.reload.bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
       expect(user.user_alerts.pluck(:kind)).to eq([])
-      expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
       instance.perform(user.id)
       user.reload
-      expect(user.user_alerts.count).to eq 0
-      expect(user.alert_slugs).to eq([])
+      expect(user.alert_slugs).to eq(["unassigned_bike_org"])
+      expect(user.user_alerts.count).to eq 1
       expect(user.no_address?).to be_truthy
+      user_alert = user.user_alerts.last
+      expect(user_alert.kind).to eq "unassigned_bike_org"
+      expect(user_alert.active?).to be_truthy
+      expect(user_alert.organization_id).to eq organization.id
+      expect(user_alert.bike_id).to eq bike2.id
     end
-    context "paid money org" do
-      let(:feature_slugs) { ["regional_bike_counts"] }
-      let!(:invoice) { FactoryBot.create(:invoice_with_payment, organization: organization) }
-      it "adds alerts for unassigned bikes" do
-        expect(organization.reload.paid?).to be_truthy
-        expect(organization.paid_money?).to be_truthy
-        expect(organization.bikes.pluck(:id)).to match_array([bike1.id])
-        expect(user.user_alerts.pluck(:kind)).to eq([])
+    context "organization without an invoice" do
+      let(:organization) { FactoryBot.create(:organization) }
+      it "does not add alert" do
+        expect(organization.reload.is_invoiced?).to be_falsey
+        expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
+        expect(user.reload.bikes.pluck(:id)).to match_array([bike1.id, bike2.id])
         instance.perform(user.id)
         user.reload
-        expect(user.alert_slugs).to eq(["unassigned_bike_org"])
-        expect(user.user_alerts.count).to eq 1
-        expect(user.bike_organizations.pluck(:id)).to eq([organization.id])
+        expect(user.user_alerts.count).to eq 0
+        expect(user.alert_slugs).to eq([])
         expect(user.no_address?).to be_falsey
-        user_alert = user.user_alerts.last
-        expect(user_alert.kind).to eq "unassigned_bike_org"
-        expect(user_alert.active?).to be_truthy
-        expect(user_alert.organization_id).to eq organization.id
-        expect(user_alert.bike_id).to eq bike2.id
       end
     end
   end
 
   describe "user_address" do
+    def registration_address_hash(bike)
+      bike.reload.registration_address_record.address_hash(visible_attribute: :street, render_country: true)
+    end
+
     let(:user) { FactoryBot.create(:user) }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_address_record, address_in: :vancouver, user:) }
     let(:target_address) { {street: "278 W Broadway", postal_code: "V5Y 1P5", city: "Vancouver", country: "Canada", region: "BC", latitude: 49.253992, longitude: -123.241084, street_2: nil} }
     it "sets based on bikes" do
-      expect(GeocodeableLegacy.new_address_hash(bike.reload.registration_address(true))).to eq target_address
+      expect(registration_address_hash(bike)).to eq target_address
       expect(bike.address_set_manually).to be_truthy
       expect(user.address_present?).to be_falsey
       expect(user.address_set_manually).to be_falsey
@@ -235,7 +235,7 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       expect(user.latitude).to be_within(0.01).of(49.253992)
       expect(user.longitude).to be_within(0.01).of(-123.241084)
 
-      expect(GeocodeableLegacy.new_address_hash(bike.reload.registration_address(true))).to eq target_address
+      expect(registration_address_hash(bike)).to eq target_address
       expect(bike.address_set_manually).to be_falsey # It's switched to being set by user :shrug:
     end
     context "address_set_manually" do
@@ -243,14 +243,14 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       let(:user) { FactoryBot.create(:user, address_record:, address_set_manually: true) }
       let(:target_address) { {street: "100 W 1st St", city: "Los Angeles", region: "CA", postal_code: "90021", country: "United States", latitude: 34.05223, longitude: -118.24368, street_2: nil} }
       it "updates bike to be users address" do
-        expect(GeocodeableLegacy.new_address_hash(bike.reload.registration_address(true))).to eq target_address
+        expect(registration_address_hash(bike)).to eq target_address
         expect(user.reload.address_hash(render_country: true, visible_attribute: :street)).to eq target_address
         # Inline so it processes the bikes
         Sidekiq::Job.clear_all
         Sidekiq::Testing.inline! do
           instance.perform(user.id)
         end
-        expect(GeocodeableLegacy.new_address_hash(bike.reload.registration_address(true))).to eq target_address
+        expect(registration_address_hash(bike)).to eq target_address
         expect(bike.address_set_manually).to be_falsey
         expect(bike.latitude).to be_within(0.01).of(34.05223)
         expect(bike.longitude).to be_within(0.01).of(-118.24368)
@@ -259,13 +259,13 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       context "user not backfilled" do
         let(:user) { FactoryBot.create(:user, :with_address_record, address_in: :los_angeles, address_set_manually: true) }
         it "updates bike to be users address" do
-          expect(GeocodeableLegacy.new_address_hash(bike.reload.registration_address(true))).to eq target_address
+          expect(registration_address_hash(bike)).to eq target_address
           # Inline so it processes the bikes
           Sidekiq::Job.clear_all
           Sidekiq::Testing.inline! do
             instance.perform(user.id)
           end
-          expect(GeocodeableLegacy.new_address_hash(bike.reload.registration_address(true))).to eq target_address
+          expect(registration_address_hash(bike)).to eq target_address
           expect(bike.address_set_manually).to be_falsey
           expect(bike.latitude).to be_within(0.01).of(34.05223)
           expect(bike.longitude).to be_within(0.01).of(-118.24368)
@@ -325,6 +325,53 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       instance.perform(user.id)
       user.reload
       expect(user.alert_slugs).to eq([])
+    end
+  end
+
+  describe "bikes deleted or transferred away" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:, street: " ") }
+    let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record:, user:) }
+    let(:bike_registered) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    let(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: user, created_bike_id: bike_registered.id) }
+    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment_pending, b_param:, bike: bike_registered) }
+
+    it "resolves their alerts" do
+      bike.update(updated_at: Time.current)
+      instance.perform(user.id)
+      expect(user.reload.alert_slugs).to eq %w[stolen_bike_without_location theft_alert_without_photo unfinished_registration]
+
+      superuser = FactoryBot.create(:superuser)
+      Sidekiq::Job.clear_all
+      BikeServices::OwnershipTransferer.find_or_create(bike, updator: superuser,
+        new_owner_email: "new-owner@example.com")
+      expect(described_class.jobs.map { it["args"].first }).to eq [user.id]
+      BikeJobs::BikeDeleterJob.new.perform(bike_registered.id)
+
+      instance.perform(user.id)
+      expect(user.reload.alert_slugs).to eq []
+      # Isn't recreated for the theft alert, which stays the user's
+      instance.perform(user.id)
+      expect(user.user_alerts.active.count).to eq 0
+      expect(user.user_alerts.resolved.pluck(:kind)).to match_array %w[stolen_bike_without_location
+        theft_alert_without_photo unfinished_registration]
+    end
+
+    context "with a theft alert bought by an organization member" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization:) }
+      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+
+      it "alerts until the bike is deleted" do
+        expect(bike.reload.authorized?(user)).to be_truthy
+        instance.perform(user.id)
+        expect(user.reload.alert_slugs).to eq %w[theft_alert_without_photo unfinished_registration]
+
+        bike.destroy
+        instance.perform(user.id)
+        expect(user.reload.alert_slugs).to eq %w[unfinished_registration]
+      end
     end
   end
 

@@ -2,16 +2,19 @@
 
 <html lang="<%= I18n.locale %>" style="background: none;">
   <head>
-    <%= render(PageBlock::HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options)) %>
     <%= csrf_meta_tags %>
-    <%= stylesheet_link_tag 'registrations', media: 'all' %>
+    <%= stylesheet_link_tag 'tailwind', 'registrations', media: 'all' %>
     <%= javascript_include_tag 'registrations' %>
     <%= javascript_importmap_tags %>
   </head>
 
   <body
+    class="<%= class_names(dark: embed_color_scheme == "dark") %>"
     style="background: none; width: 100%; max-width: 500px; margin: 0 auto;"
   >
+    <%= render(SharedBlocks::SystemColorScheme::Component.new(color_scheme: embed_color_scheme)) %>
+
     <div
       class="registration-widget <%= current_organization&.slug %>"
       id="binx_registration_widget"

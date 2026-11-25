@@ -1,5 +1,5 @@
 <% if @bike_sticker.claimed? %>
-  <h2>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
     <a
       href="<%= edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_sticker.code) %>"
     >
@@ -8,13 +8,13 @@
     </a>
 
     <%= t(".is_currently_linked") %>
-  </h2>
+  <% end %>
   <p>
     <% bike_link = link_to(@bike_sticker.bike&.title_string, bike_path(@bike_sticker.bike_id)) %>
     <%= t(".connected_to_bike_html", bike_link:) %>
   </p>
 <% else %>
-  <h2>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
     <a
       href="<%= edit_organization_sticker_path(organization_id: current_organization.to_param, id: @bike_sticker.code) %>"
     >
@@ -23,7 +23,7 @@
     </a>
 
     <%= t(".isnt_linked_to_a_bike") %>
-  </h2>
+  <% end %>
 <% end %>
 
 <p>

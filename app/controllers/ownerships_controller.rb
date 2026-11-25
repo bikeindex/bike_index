@@ -12,11 +12,11 @@ class OwnershipsController < ApplicationController
         redirect_to edit_bike_url(bike)
       else
         flash[:error] = translation(:no_longer_your_bike, bike_type: bike.type)
-        redirect_to bike_url(bike)
+        redirect_to RegistrationView.path(bike, user: current_user, session:)
       end
     else
       flash[:error] = translation(:not_your_bike, bike_type: bike.type)
-      redirect_to bike_url(bike)
+      redirect_to RegistrationView.path(bike, user: current_user, session:)
     end
   end
 
@@ -29,7 +29,7 @@ class OwnershipsController < ApplicationController
       authenticate_user(translation_key: :owner_already_has_account,
         translation_args: {bike_type: @ownership.bike.type})
     else
-      authenticate_user(translation_key: :create_account_to_claim,
+      authenticate_user(translation_key: :create_account_to_claim, sign_up_not_in: true,
         translation_args: {bike_type: @ownership.bike.type})
     end
   end

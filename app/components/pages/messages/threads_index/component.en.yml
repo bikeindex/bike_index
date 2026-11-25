@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    pages:
+      messages:
+        threads_index:
+          from: From
+          me: me
+          to: To

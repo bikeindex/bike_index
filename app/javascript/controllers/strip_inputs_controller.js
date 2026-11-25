@@ -11,20 +11,14 @@ export default class extends Controller {
 
   connect () {
     // Strip all inputs when any input loses focus
-    this.element.addEventListener('focusout', this.stripAllInputs.bind(this))
+    this.element.addEventListener('focusout', this.stripAllInputs)
   }
 
   disconnect () {
-    this.element.removeEventListener('focusout', this.stripAllInputs.bind(this))
+    this.element.removeEventListener('focusout', this.stripAllInputs)
   }
 
-  handleFocusout (event) {
-    if (event.target.matches(this.constructor.inputSelector)) {
-      this.stripAllInputs()
-    }
-  }
-
-  stripAllInputs () {
+  stripAllInputs = () => {
     const textInputs = this.element.querySelectorAll(this.constructor.inputSelector)
     textInputs.forEach(input => {
       input.value = input.value.trim()
@@ -32,6 +26,10 @@ export default class extends Controller {
   }
 
   submit (event) {
+    // The embed forms submit from the valid event below, so without this a submit
+    // something else already cancelled would go through anyway
+    if (event.defaultPrevented) return
+
     this.stripAllInputs()
 
     // Find first invalid field after stripping

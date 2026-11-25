@@ -48,10 +48,6 @@ class ApplicationUploader < CarrierWave::Uploader::Base
     true # nothing, the dir is not empty
   end
 
-  def cache_dir
-    Rails.root.join("tmp", "cache")
-  end
-
   private
 
   def model_abbr

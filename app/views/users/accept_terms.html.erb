@@ -1,0 +1,4 @@
+<%= render(Pages::Users::AcceptTerms::Component.new(user: @user, attribute: :terms_of_service,
+  label: t(".i_agree_to_tos_html"), submit_text: t(".submit"))) do %>
+  <%= render partial: "/info/terms_text" %>
+<% end %>

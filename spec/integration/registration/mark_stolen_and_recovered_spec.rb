@@ -7,16 +7,6 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
   let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: owner) }
   let!(:united_states) { Country.united_states }
 
-  # Picks an option from a selectize-enhanced control found within the given scope
-  def pick_within_selectize(control, text)
-    control.find(".selectize-input").click
-    control.find(".selectize-dropdown-content .option", text:, wait: 5).click
-  end
-
-  def selectize_for(css)
-    find(css, visible: :all).find(:xpath, "./following-sibling::div[contains(@class, 'selectize-control')][1]")
-  end
-
   def save_bike
     find(".edit-form-well-submit-wrapper input[type=submit]").click
     expect(page).to have_content("Bike successfully updated!", wait: 10)
@@ -35,17 +25,10 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
   end
 
   it "reports the bike stolen with theft details, then marks it recovered" do
-    # Sign in
-    visit new_session_path
-    fill_in "Email", with: owner.email
-    click_button "Continue"
-    fill_in "Password", with: "testthisthing7$"
-    click_button "Log in"
-    expect(page).to have_content("Logged in", wait: 5)
+    sign_in(owner)
+    expect(page).to have_content("Logged in")
 
-    # Dismiss the donation modal that greets logged-in users
-    find("#donationModal .close").click
-    expect(page).to have_no_css("#donationModal.in", wait: 5)
+    dismiss_donation_modal
 
     # ---- Report the bike stolen ----
     expect(bike.status_stolen?).to be_falsey
@@ -60,11 +43,19 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
 
     expect(bike.reload.status_stolen?).to be_truthy
 
-    # ---- Fill the required theft details (country, street, city) plus useful extras ----
+    # ---- Fill the required theft details plus useful extras ----
+    %w[date_stolen theft_description].each do |attribute|
+      expect(find("[name='bike[stolen_records_attributes][0][#{attribute}]']")[:required]).to be_present
+    end
+    # A local wall-clock time, so the browser is what can compare it to now
+    expect(page.evaluate_script("new Date(document.querySelector('.dateInputUpdateZone').max) <= new Date()")).to be true
     pick_within_selectize(selectize_for("select.country-select-input"), "United States")
     fill_in "Address or intersection", with: "100 Main St"
     fill_in "City", with: "New York"
+    # Whitespace alone doesn't satisfy the required description
+    fill_in "Description of the incident", with: "   "
     fill_in "Postal code", with: "10001"
+    expect(page).to have_field("Description of the incident", with: "")
     fill_in "Phone", with: "3125551234"
     fill_in "Description of the incident", with: "Cut lock outside the cafe"
     save_bike
@@ -81,13 +72,15 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
 
     # ---- Send a message through the stolen bike's contact-owner form. The owner
     # doesn't see that card (they don't contact themselves), so view the public
-    # perspective. The form is fragment-cached (Registrations::Show::Wrapper), so its
+    # perspective. The form is fragment-cached (Pages::Registrations::Show::Wrapper), so its
     # session-scoped CSRF token is reissued client-side by the csrf-refresh controller.
     # The stale-token failure itself can't be reproduced here (it needs production
     # fragment caching + forgery protection, both off in test), so this exercises the
     # form end-to-end; the component spec guards the csrf-refresh hook. ----
     RearGearType.fixed # bike-details render creates this lazily, which is read-only mid-request
     visit registration_path(bike, view_as: "public")
+    # The form stays hidden until ui--collapse's lazily loaded module connects
+    wait_for_stimulus("ui--collapse")
     within("[data-controller~='ui--collapse']") do
       click_on "Contact the owner"
       fill_in "stolen_notification[message]", with: "Saw this locked up outside the library"
@@ -103,6 +96,7 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
 
     within("#toggle-stolen") do
       expect(page).to have_css(".modal-body", visible: true, wait: 5)
+      expect(page).to have_no_content("Not enough information!")
       fill_in "mark_recovered_reason", with: "Found it locked up around the corner"
       click_button "Mark recovered"
     end

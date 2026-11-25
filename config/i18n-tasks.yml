@@ -1,4 +1,6 @@
 # i18n-tasks finds and manages missing and unused translations: https://github.com/glebm/i18n-tasks
+<% require File.join(Dir.pwd, "lib", "i18n_tasks", "component_scanner") %>
+<% require File.join(Dir.pwd, "lib", "i18n_tasks", "component_router") %>
 
 # The "main" locale.
 base_locale: en
@@ -19,28 +21,11 @@ data:
     - app/components/**/*.%{locale}.yml
     - config/locales/%{locale}.yml
 
-  # Locale files to write new keys to, based on a list of key pattern => file rules. Matched from top to bottom:
-  # `i18n-tasks normalize -p` will force move the keys according to these rules
+  # Locale files to write new keys to, based on a list of key pattern => file rules. Matched from top to bottom.
+  # `normalize -p` forces these rules in place of the router below, which files every
+  # component key in config/locales - plain `normalize` is what prepare_translations runs.
   write:
     - ["{doorkeeper}.*", 'config/locales/\1.%{locale}.yml']
-    # Deeply-namespaced components (namespace/sub-namespace/name) route to their
-    # own sidecar. These must precede the generic rules below, which can't tell a
-    # sub-namespace segment from a nested/plural key and would otherwise land
-    # these in the parent namespace's directory. Add a line here per sub-namespace.
-    - ['components.admin.badges.{:}.*', 'app/components/admin/badges/\1/component.%{locale}.yml']
-    - ['components.emails.partials.{:}.*', 'app/components/emails/partials/\1/component.%{locale}.yml']
-    - ['components.org.registration_sequence.{:}.*', 'app/components/org/registration_sequence/\1/component.%{locale}.yml']
-    - ['components.page_block.user_alerts.{:}.*', 'app/components/page_block/user_alerts/\1/component.%{locale}.yml']
-    - ['components.registrations.show.current_alerts.{:}.*', 'app/components/registrations/show/current_alerts/\1/component.%{locale}.yml']
-    - ['components.registrations.show.org_top_actions.{:}.*', 'app/components/registrations/show/org_top_actions/\1/component.%{locale}.yml']
-    - ['components.registrations.show.{:}.*', 'app/components/registrations/show/\1/component.%{locale}.yml']
-    - ['components.ui.alerts.{:}.*', 'app/components/ui/alerts/\1/component.%{locale}.yml']
-    - ['components.ui.definition_list.{:}.*', 'app/components/ui/definition_list/\1/component.%{locale}.yml']
-    - ['components.ui.forms.legacy_form_well.{:}.*', 'app/components/ui/forms/legacy_form_well/\1/component.%{locale}.yml']
-    - ['components.ui.forms.{:}.*', 'app/components/ui/forms/\1/component.%{locale}.yml']
-    # namespace/name components. `*` (not `:`) so nested/plural keys stay in the sidecar too.
-    - ['components.{:}.{:}.*', 'app/components/\1/\2/component.%{locale}.yml']
-    - ['components.{:}.*', 'app/components/\1/component.%{locale}.yml']
     ## Catch-all default:
     - config/locales/%{locale}.yml
 
@@ -51,8 +36,7 @@ data:
     # - "<%#= %x[bundle info vagrant --path].chomp %>/templates/locales/%{locale}.yml"
 
   ## Specify the router (see Readme for details). Valid values: conservative_router, pattern_router, or a custom class.
-  # router: I18n::Tasks::BikeIndexRouter
-  router: pattern_router
+  router: I18nTasks::ComponentRouter
 
   yaml:
     write:
@@ -73,6 +57,16 @@ search:
   # paths:
   #   # - app/views
   #   # - app/components
+
+  # Listing any scanner replaces the defaults, so the three stock ones are repeated here.
+  # The fourth reads components' own `translation(".key")` helper - see its class comment.
+  scanners:
+    - ["::I18n::Tasks::Scanners::RubyScanner", {only: ["*.rb"]}]
+    - ["::I18n::Tasks::Scanners::ErbAstScanner", {only: ["*.erb"]}]
+    - ["::I18n::Tasks::Scanners::PatternWithScopeScanner", {exclude: ["*.erb", "*.rb"]}]
+    - ["::I18nTasks::ComponentScanner",
+       {paths: ["app/components"], only: ["*.rb", "*.erb"], translate_call: "(?<![\\p{L}_'\\-.])translation",
+        scope_overrides: {"pages/search/everything_combobox_options": "components.pages.search.everything_combobox"}}]
 
   ## Root directories for relative keys resolution.
   relative_roots:
@@ -171,9 +165,11 @@ ignore_unused:
   - "activerecord.errors.*"
   - "activerecord.models.*"
   - "controllers.*" # our translation helper component blocks detection
-  - "components.*" # our translation helper component blocks detection
-  - "shared.organized_menu_items.*" # used dynamically by OrganizedServices::UserMenuItems
+  - "components.pages.org.search.column_settings.*" # used dynamically by ComponentStructs::OrgSearchSettings
+  - "shared.menu_items_account.*" # used dynamically by UserServices::MenuItemsAccount
+  - "shared.menu_items_org.*" # used dynamically by UserServices::MenuItemsOrg
   - "shared.register_flow.*" # used dynamically by BikeServices::Register
+  - "shared.organization_signup.*" # used dynamically by OrgServices::Signup
   - "*_mailer.*"
   - "date.*"
   - "datetime.*"

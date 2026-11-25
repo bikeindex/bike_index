@@ -1,19 +1,25 @@
 <%= stylesheet_link_tag "kelsey_styles", "data-turbo-track" => "reload" %>
 
 <div class="root-landing-page">
-  <% cache("redesigned_homepage-#{@recovery_displays.maximum(:updated_at)}", skip_digest: true) do %>
-    <%= render(PageBlock::HomepageTop::Component.new(recoveries_value: Counts.recoveries_value,
-      organization_count: Organization.count,
+  <%#
+    skip_digest keeps edits to the rest of this template out of the key, so the hero's
+    own digest is what covers its markup
+  %>
+
+  <% cache(["redesigned_homepage", Pages::Homepage::Top::Component.cache_digest,
+    @recovery_displays.maximum(:updated_at)], skip_digest: true) do %>
+    <%= render(Pages::Homepage::Top::Component.new(recoveries_value: Counts.recoveries_value,
+      organization_count: Counts.organizations,
       recovery_displays: @recovery_displays)) %>
   <% end %>
 
   <% cache("root_who_and_numbers", expires_in: 1.hour) do %>
-    <div class="root-landing-who scrolled">
+    <div class="root-landing-who scrolled tw:dark:isolate tw:dark:bg-gray-900">
       <div class="container">
         <h3 class="landing-container-label"><%= t(".used_by") %></h3>
 
         <%# These images have a color overlay (aka fill) of #676767 %>
-        <div class="root-landing-who-wrap">
+        <div class="root-landing-who-wrap tw:dark:invert tw:dark:mix-blend-screen">
           <div class="root-landing-who-square">
             <%= image_tag "landing_pages/partners/UMD.png", alt: "University of Maryland" %>
           </div>
@@ -118,7 +124,7 @@
                 }
               } %>
 
-            <%= column_chart Counts.week_creation_chart, thousands: ",", library: chartkick_library_props %>
+            <%= render(UI::Chart::Component.new(series: Counts.week_creation_chart, library: chartkick_library_props)) %>
 
             <h4 class="chart-label"><%= t(".bikes_registered_this_week") %></h4>
           </div>

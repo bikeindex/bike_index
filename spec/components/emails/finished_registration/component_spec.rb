@@ -28,6 +28,9 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
       expect(component).to have_content("Use a U-Lock")
       expect(component).to_not have_content("thieves are jerks")
       expect(component).to have_content("tempo-snippet")
+      # Below the bike details, and again in the promo callout
+      expect(component.css("a.binx-button").map { |a| a.text.strip }).to eq(["View your bike", "View your bike"])
+      expect(component.css(".finished-registration-bike-box a.binx-button").count).to eq 1
     end
     context "tempo_snippet not is_enabled" do
       let(:tempo_snippet_is_enabled) { false }
@@ -40,6 +43,20 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
         expect(component).to_not have_content("thieves are jerks")
         expect(component).to_not have_content("tempo-snippet")
       end
+    end
+  end
+
+  context "non-bike cycle type" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, cycle_type: "personal-mobility") }
+    let(:ownership) { bike.current_ownership }
+
+    it "names the cycle type rather than bike" do
+      expect(component).to have_content("Your e-personal mobility device is now part of the world's most effective bike registry")
+      expect(component).to have_content("You are protecting your e-personal mobility device and helping prevent theft in your community")
+      expect(component).to have_content("e-Personal Mobility Device details")
+      expect(component).to have_content("What if my e-personal mobility device gets stolen?")
+      expect(component.css("a.binx-button").map { |a| a.text.strip })
+        .to eq(["View your e-personal mobility device", "View your e-personal mobility device"])
     end
   end
 
@@ -58,6 +75,7 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
       expect(component).to have_content("donating")
       expect(component).to_not have_content("What's next?")
       expect(component).to_not have_content("tempo-snippet")
+      expect(component.css(".finished-registration-bike-box a.binx-button").map { |a| a.text.strip }).to eq(["View your bike"])
     end
   end
 
@@ -81,7 +99,11 @@ RSpec.describe Emails::FinishedRegistration::Component, type: :component do
       expect(component).to_not have_content("Registration complete")
       expect(component).to_not have_content("Confirm your registration")
       expect(component).to have_content("Claim your bike")
-      expect(component).to have_link("Confirm this #{bike.type}")
+      expect(component).to_not have_link("View your bike")
+      # Above the bike details, and again in the promo callout
+      expect(component.css("a.binx-button").map { |a| a.text.strip })
+        .to eq(["Confirm this #{bike.type}", "Confirm this #{bike.type}"])
+      expect(component.css(".finished-registration-intro a.binx-button").count).to eq 1
       expect(component).to_not have_content("What's next?")
     end
   end

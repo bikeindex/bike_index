@@ -10,7 +10,7 @@ end
 # identifiable as dev/sandbox/a PR. after_initialize because component
 # translations aren't on the I18n load path while initializers run.
 Rails.application.config.after_initialize do
-  title = PageBlock::ReviewAppBanner::Component.from_env.lookbook_navbar_title
+  title = SharedBlocks::ReviewAppBanner::Component.from_env.lookbook_navbar_title
   Lookbook.config.project_name = ["Bike Index", title].compact.join(" · ")
 end
 

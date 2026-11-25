@@ -8,9 +8,11 @@ RSpec.describe Admin::OwnershipsController, type: :request do
     let(:og_creator) { ownership.creator }
     describe "index" do
       it "renders" do
+        ownership
         get base_url
         expect(response.status).to eq 200
         expect(response).to render_template(:index)
+        expect(response.body).to include(edit_admin_ownership_path(ownership.id))
       end
     end
 

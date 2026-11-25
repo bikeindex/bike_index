@@ -25,7 +25,7 @@ module BikeJobs
         theft_alert.notifications.theft_alert_posted.none?
 
       # Perform inline rather than re-querying for objects
-      Email::TheftAlertNotificationJob.new.perform(theft_alert_id, "theft_alert_posted", theft_alert)
+      EmailJobs::TheftAlertNotificationJob.new.perform(theft_alert_id, "theft_alert_posted", theft_alert)
     end
 
     def enqueue_workers

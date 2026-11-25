@@ -13,8 +13,8 @@ listing_locations = [
 ].map { |location| location.merge(kind: :marketplace_listing, country: Country.united_states, skip_geocoding: true) }
 
 def seed_marketplace_seller(email:, name:)
-  user = User.create!(name:, email:, password: "pleaseplease12",
-    password_confirmation: "pleaseplease12", terms_of_service: true)
+  user = User.create!(name:, email:, password: SeedHelpers::PASSWORD,
+    password_confirmation: SeedHelpers::PASSWORD, terms_of_service: true)
   user.confirm(user.confirmation_token)
   user
 end
@@ -42,6 +42,7 @@ conditions = MarketplaceListing::CONDITION_ENUM.keys
 
 # --- 6 standard listings + 4 promoted (seller has an active membership) ---
 listings = 10.times.map do |i|
+  SeedHelpers.tick
   promoted = i >= 6
   prefix = promoted ? "member" : "seller"
   seller = seed_marketplace_seller(email: "marketplace-#{prefix}-#{i}@bikeindex.org", name: "Marketplace #{prefix.capitalize} #{i + 1}")

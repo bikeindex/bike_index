@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          current_alerts:
+            sent_to_new_owner:
+              you_sent_this_bike_html: >-
+                You sent this %{bike_type} to %{owner_email} and it hasn't been claimed
+                yet. You can update it.

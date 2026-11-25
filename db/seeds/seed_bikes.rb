@@ -8,43 +8,47 @@ ca_state = State.find_by_abbreviation("CA")
 
 creator = BikeServices::Creator.new
 
-def bike_params(owner_email:, manufacturer_id: nil)
-  manufacturer_id ||= SeedHelpers.weighted_frame_maker_id
-  {
-    cycle_type: "bike",
-    propulsion_type: "foot-pedal",
-    serial_number: (0...10).map { rand(65..90).chr }.join,
-    manufacturer_id:,
-    primary_frame_color_id: Color.pluck(:id).sample,
-    rear_tire_narrow: "true",
-    handlebar_type: HandlebarType.slugs.first,
-    owner_email:
-  }
-end
+# Builds the recovery display the homepage showcase renders. Latitude and longitude aren't
+# among StolenRecordUpdator's permitted attributes, so they have to be written after the fact.
+def seed_recovery_display(bike:, location:, photo_filename:, recovered_at:, recovered_description:, quote_by:, location_string:, quote:)
+  stolen_record = bike.current_stolen_record
+  stolen_record.update_columns(location.slice(:latitude, :longitude))
 
-def seed_bike(creator:, user:, params:, origin: nil, label: "bike")
-  b_param = BParam.create!(creator: user, params:)
-  b_param.origin = origin if origin
-  bike = creator.create_bike(b_param)
-  if bike.errors.any?
-    puts "\n #{label} error \n #{b_param.bike_errors}"
+  photo_path = Rails.root.join("db/seeds/images", photo_filename)
+  public_image = PublicImage.new(imageable: bike, listing_order: 1)
+  File.open(photo_path) { |file| public_image.image = file }
+  public_image.save!
+
+  stolen_record.add_recovery_information(recovered_at:, recovered_description:,
+    index_helped_recovery: true, can_share_recovery: true)
+
+  # skip_callback_job because the job runs inline below instead - photo_url has to exist
+  # without sidekiq, since the homepage filters on it
+  recovery_display = RecoveryDisplay.create!(stolen_record:, recovered_at:, quote_by:, location_string:, quote:,
+    skip_callback_job: true)
+  SeedHelpers.without_clock do
+    File.open(photo_path) { |file| recovery_display.photo.attach(io: file, filename: photo_filename) }
+    ImageJobs::ProcessRecoveryDisplayPhotoJob.new.perform(recovery_display.id)
   end
-  bike
+  recovery_display
 end
 
 # --- 25 registered bikes ---
 25.times do |i|
-  bike = seed_bike(
+  bike = SeedHelpers.seed_bike(
     creator:, user:, origin: "organization_form", label: "Bike",
-    params: {bike: bike_params(owner_email: "testuser+#{i}@bikeindex.org")}
+    params: {bike: SeedHelpers.bike_params(owner_email: "testuser+#{i}@bikeindex.org")}
   )
   puts "New bike made by #{bike.manufacturer.name}" unless bike.errors.any?
 end
 
 # --- 10 stolen bikes in San Francisco and Oakland ---
+# phone_visibility puts both ends of Bike#phoneable_by? in dev — police-only and public
 stolen_locations = [
-  {latitude: 37.7749, longitude: -122.4194, street: "50 Fremont St", city: "San Francisco", zipcode: "94105"},
-  {latitude: 37.7833, longitude: -122.4167, street: "200 Kearny St", city: "San Francisco", zipcode: "94108"},
+  {latitude: 37.7749, longitude: -122.4194, street: "50 Fremont St", city: "San Francisco", zipcode: "94105",
+   phone_visibility: {phone_for_users: false, phone_for_shops: false}},
+  {latitude: 37.7833, longitude: -122.4167, street: "200 Kearny St", city: "San Francisco", zipcode: "94108",
+   phone_visibility: {phone_for_everyone: true}},
   {latitude: 37.7599, longitude: -122.4148, street: "2800 Mission St", city: "San Francisco", zipcode: "94110"},
   {latitude: 37.7694, longitude: -122.4862, street: "800 Great Hwy", city: "San Francisco", zipcode: "94121"},
   {latitude: 37.7956, longitude: -122.3933, street: "55 The Embarcadero", city: "San Francisco", zipcode: "94105"},
@@ -58,11 +62,11 @@ stolen_locations = [
 puts "Creating 10 stolen bikes in San Francisco and Oakland..."
 
 stolen_locations.each_with_index do |loc, i|
-  bike = seed_bike(
+  bike = SeedHelpers.seed_bike(
     creator:, user:, label: "Stolen bike",
     params: {
-      bike: bike_params(owner_email: "testuser+#{i + 50}@bikeindex.org")
-        .merge(status: "status_stolen", date_stolen: (Time.current - rand(1..30).days).to_s),
+      bike: SeedHelpers.bike_params(owner_email: "testuser+#{i + 50}@bikeindex.org")
+        .merge(status: "status_stolen", date_stolen: (Time.current - rand(4..24).hours).to_s),
       stolen_record: {
         latitude: loc[:latitude].to_s,
         longitude: loc[:longitude].to_s,
@@ -72,10 +76,11 @@ stolen_locations.each_with_index do |loc, i|
         state_id: ca_state&.id.to_s,
         country_id: us&.id.to_s,
         skip_geocoding: true,
+        phone: "111 222 3333",
         theft_description: "Bike was locked on #{loc[:street]} and stolen overnight",
         locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
         lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
-      }
+      }.merge(loc[:phone_visibility].to_h)
     }
   )
   unless bike.errors.any?
@@ -93,10 +98,10 @@ found_locations = [
 puts "Creating 2 found bikes (1 San Francisco, 1 Oakland)..."
 
 found_locations.each_with_index do |loc, i|
-  bike = seed_bike(
+  bike = SeedHelpers.seed_bike(
     creator:, user:, label: "Found bike",
     params: {
-      bike: bike_params(owner_email: "testuser+#{i + 60}@bikeindex.org")
+      bike: SeedHelpers.bike_params(owner_email: "testuser+#{i + 60}@bikeindex.org")
         .merge(status: "status_impounded"),
       impound_record: {
         address_record_attributes: {
@@ -124,10 +129,10 @@ puts "Creating found bike reported by user@bikeindex.org..."
 found_bike_location = {latitude: 37.7691, longitude: -122.4449, street: "1000 Stanyan St", city: "San Francisco", zipcode: "94117"}
 specialized_manufacturer = Manufacturer.friendly_find("Specialized")
 
-user_found_bike = seed_bike(
+user_found_bike = SeedHelpers.seed_bike(
   creator:, user:, label: "Found bike",
   params: {
-    bike: bike_params(owner_email: user.email, manufacturer_id: specialized_manufacturer&.id).merge(
+    bike: SeedHelpers.bike_params(owner_email: user.email, manufacturer_id: specialized_manufacturer&.id).merge(
       frame_model: "Sirrus",
       description: "Found unlocked near the Golden Gate Park tennis courts",
       status: "status_impounded"
@@ -158,9 +163,9 @@ cannondale_manufacturer = Manufacturer.friendly_find("Cannondale")
 
 puts "Creating 3 Cannondale bikes registered to Cannondale org..."
 3.times do |i|
-  bike = seed_bike(
+  bike = SeedHelpers.seed_bike(
     creator:, user:, origin: "organization_form", label: "Cannondale bike",
-    params: {bike: bike_params(
+    params: {bike: SeedHelpers.bike_params(
       owner_email: "testuser+cannondale#{i}@bikeindex.org",
       manufacturer_id: cannondale_manufacturer.id
     ).merge(creation_organization_id: cannondale_org.id.to_s)}
@@ -173,9 +178,9 @@ puts "Creating 1975 Viner Special Professional with photos..."
 viner_manufacturer = Manufacturer.friendly_find("Viner")
 orange = Color.friendly_find("Orange")
 
-viner_bike = seed_bike(
+viner_bike = SeedHelpers.seed_bike(
   creator:, user:, label: "Viner bike",
-  params: {bike: bike_params(owner_email: "user1@gmail.com", manufacturer_id: viner_manufacturer.id).merge(
+  params: {bike: SeedHelpers.bike_params(owner_email: "user1@gmail.com", manufacturer_id: viner_manufacturer.id).merge(
     primary_frame_color_id: orange&.id,
     year: 1975,
     frame_model: "Special Professional",
@@ -218,10 +223,10 @@ trek_components = [
   {ctype: "pedals", manufacturer: "Shimano", model: "XTR XC PD-M9200"}
 ]
 
-trek_bike = seed_bike(
+trek_bike = SeedHelpers.seed_bike(
   creator:, user:, label: "Stolen Trek bike",
   params: {
-    bike: bike_params(owner_email: "user_2@gmail.com", manufacturer_id: trek_manufacturer.id).merge(
+    bike: SeedHelpers.bike_params(owner_email: "user_2@gmail.com", manufacturer_id: trek_manufacturer.id).merge(
       primary_frame_color_id: black&.id,
       year: 2024,
       frame_model: "Top Fuel 9.9 XX AXS T-Type",
@@ -238,7 +243,7 @@ trek_bike = seed_bike(
       rear_wheel_size_id: seven_hundred_c_id,
       description: "OCLV Mountain Carbon, 120mm travel, RockShox Pike Ultimate fork and Deluxe Ultimate shock, SRAM XX SL Eagle AXS T-Type, Bontrager Line Pro 30 carbon wheels.",
       status: "status_stolen",
-      date_stolen: (Time.current - 14.days).to_s
+      date_stolen: (Time.current - rand(4..24).hours).to_s
     ),
     stolen_record: {
       latitude: trek_location[:latitude].to_s,
@@ -277,14 +282,161 @@ trek_components.each do |component|
 end
 puts "  Created stolen Trek at #{trek_location[:street]}, #{trek_location[:city]} with #{trek_bike.components.count} components"
 
-# --- Specific real bike: Riese & Müller Load4 75 rohloff cargo e-bike (child carrying) ---
-puts "Creating Riese & Müller Load4 75 rohloff cargo bike..."
+# --- Specific recovered bike: Trek Marlin stolen and recovered in Calgary ---
+# Its recovery display is what the homepage showcase renders
+puts "Creating recovered Trek Marlin in Calgary..."
+silver = Color.friendly_find("Silver, gray or bare metal")
+calgary_location = {latitude: 51.0512, longitude: -114.0631, street: "917 Centre Ave NE", city: "Calgary", zipcode: "T2E 0C6"}
+
+recovered_bike = SeedHelpers.seed_bike(
+  creator:, user:, label: "Recovered Trek bike",
+  params: {
+    bike: SeedHelpers.bike_params(owner_email: "user_3@gmail.com", manufacturer_id: trek_manufacturer.id).merge(
+      primary_frame_color_id: silver&.id,
+      year: 2019,
+      frame_model: "Marlin 6",
+      frame_material_slug: "aluminum",
+      handlebar_type: "flat",
+      frame_size: "l",
+      frame_size_unit: "ordinal",
+      rear_tire_narrow: "false",
+      front_tire_narrow: "false",
+      front_wheel_size_id: seven_hundred_c_id,
+      rear_wheel_size_id: seven_hundred_c_id,
+      description: "Matte quicksilver with blue decals, Bontrager XR2 tires and blue platform pedals.",
+      status: "status_stolen",
+      date_stolen: (Time.current - 3.weeks).to_s
+    ),
+    stolen_record: {
+      street: calgary_location[:street],
+      city: calgary_location[:city],
+      zipcode: calgary_location[:zipcode],
+      country_id: Country.canada_id.to_s,
+      skip_geocoding: true,
+      estimated_value: "750",
+      theft_description: "Cut out of the garage behind our place in Bridgeland while we were away for the weekend",
+      locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
+      lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
+    }
+  }
+)
+
+recovery_display = seed_recovery_display(
+  bike: recovered_bike,
+  location: calgary_location,
+  photo_filename: "trek_marlin_recovery.jpg",
+  recovered_at: Time.current - 4.days,
+  recovered_description: "A rider recognized it from the Bike Index listing and messaged me the same night.",
+  quote_by: "Kara",
+  location_string: "Calgary, AB",
+  quote: "My Trek went missing out of the garage and I assumed that was the end of it. Someone matched the serial to my Bike Index listing, messaged me that night, and a few days later I was riding it home along the Bow River."
+)
+puts "  Created recovered Trek in #{calgary_location[:city]} with recovery display ##{recovery_display.id}"
+
+# --- Specific recovered bike: Riese & Müller Load4 cargo e-bike recovered in Portland ---
+puts "Creating recovered Riese & Müller Load4 in Portland..."
 rm_manufacturer = Manufacturer.friendly_find("Riese & Müller")
-brakebills_org = Organization.friendly_find("Brakebills")
-grey = Color.friendly_find("Silver, gray or bare metal")
-child_carrying_activity = PrimaryActivity.friendly_find("Child Carrying")
 twenty_inch_id = WheelSize.id_for_bsd(406) # front "20 inch"
 twenty_six_inch_id = WheelSize.id_for_bsd(559) # rear "26 inch"
+or_state = State.find_by_abbreviation("OR")
+portland_location = {latitude: 45.5231, longitude: -122.6765, street: "1120 SW 5th Ave", city: "Portland", zipcode: "97204"}
+
+recovered_cargo_bike = SeedHelpers.seed_bike(
+  creator:, user:, label: "Recovered Riese & Müller bike",
+  params: {
+    bike: SeedHelpers.bike_params(owner_email: "user_4@gmail.com", manufacturer_id: rm_manufacturer&.id).merge(
+      cycle_type: "cargo",
+      propulsion_type: "pedal-assist",
+      primary_frame_color_id: silver&.id,
+      year: 2023,
+      frame_model: "Load4 75 rohloff",
+      frame_material_slug: "aluminum",
+      handlebar_type: "flat",
+      rear_tire_narrow: "false",
+      front_tire_narrow: "false",
+      front_wheel_size_id: twenty_inch_id,
+      rear_wheel_size_id: twenty_six_inch_id,
+      description: "Bosch Cargo Line mid-drive with a 725Wh PowerPack, Rohloff Speedhub and a Gates belt drive. Blue rain canopy over the front box.",
+      status: "status_stolen",
+      date_stolen: (Time.current - 9.days).to_s
+    ),
+    stolen_record: {
+      street: portland_location[:street],
+      city: portland_location[:city],
+      zipcode: portland_location[:zipcode],
+      state_id: or_state&.id.to_s,
+      country_id: us&.id.to_s,
+      skip_geocoding: true,
+      estimated_value: "7500",
+      theft_description: "Taken out of the bike room of our building downtown - it's too big to carry upstairs, so it lives on the ground floor",
+      locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
+      lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
+    }
+  }
+)
+
+cargo_recovery_display = seed_recovery_display(
+  bike: recovered_cargo_bike,
+  location: portland_location,
+  photo_filename: "riese_muller_load4_with_passenger.jpg",
+  recovered_at: Time.current - 2.days,
+  recovered_description: "A shop ran the serial when someone brought it in for a tune-up and found our listing.",
+  quote_by: "Devon",
+  location_string: "Portland, OR",
+  quote: "It is how both kids get to school, so losing it upended every morning. A shop ran the serial when it came in for a tune-up, found our Bike Index listing, and called us that afternoon."
+)
+puts "  Created recovered Riese & Müller in #{portland_location[:city]} with recovery display ##{cargo_recovery_display.id}"
+
+# --- Specific recovered bike: 1975 Viner Special Professional recovered in Chicago ---
+puts "Creating recovered Viner Special Professional in Chicago..."
+il_state = State.find_by_abbreviation("IL")
+chicago_location = {latitude: 41.9103, longitude: -87.6773, street: "1800 N Milwaukee Ave", city: "Chicago", zipcode: "60647"}
+
+recovered_viner_bike = SeedHelpers.seed_bike(
+  creator:, user:, label: "Recovered Viner bike",
+  params: {
+    bike: SeedHelpers.bike_params(owner_email: "user_5@gmail.com", manufacturer_id: viner_manufacturer.id).merge(
+      primary_frame_color_id: orange&.id,
+      year: 1975,
+      frame_model: "Special Professional",
+      frame_material_slug: "steel",
+      frame_size: "54cm",
+      description: "Campagnolo Nuovo Record throughout, orange with chrome lugs and a Brooks Professional saddle.",
+      status: "status_stolen",
+      date_stolen: (Time.current - 7.weeks).to_s
+    ),
+    stolen_record: {
+      street: chicago_location[:street],
+      city: chicago_location[:city],
+      zipcode: chicago_location[:zipcode],
+      state_id: il_state&.id.to_s,
+      country_id: us&.id.to_s,
+      skip_geocoding: true,
+      estimated_value: "2200",
+      theft_description: "Locked to a rack outside the Blue Line stop at Damen and gone by the time I came back up",
+      locking_description: StolenRecord::LOCKING_DESCRIPTIONS.sample,
+      lock_defeat_description: StolenRecord::LOCKING_DEFEAT_DESCRIPTIONS.sample
+    }
+  }
+)
+
+viner_recovery_display = seed_recovery_display(
+  bike: recovered_viner_bike,
+  location: chicago_location,
+  photo_filename: "viner_108243_2.jpg",
+  recovered_at: Time.current - 11.days,
+  recovered_description: "Spotted in a swap meet listing by another rider, who matched the frame number to Bike Index.",
+  quote_by: "Marisol",
+  location_string: "Chicago, IL",
+  quote: "I had owned that frame for twenty years and figured a bike that old was gone for good. Someone browsing a swap meet listing matched the number to my Bike Index page and got in touch."
+)
+puts "  Created recovered Viner in #{chicago_location[:city]} with recovery display ##{viner_recovery_display.id}"
+
+# --- Specific real bike: Riese & Müller Load4 75 rohloff cargo e-bike (child carrying) ---
+puts "Creating Riese & Müller Load4 75 rohloff cargo bike..."
+rm_owner = User.find_by_email("user@fakegmail.com")
+brakebills_org = Organization.friendly_find("Brakebills")
+child_carrying_activity = PrimaryActivity.friendly_find("Child Carrying")
 
 # Stock build spec from Riese & Müller's Load4 75 rohloff (2023, universal size)
 rm_components = [
@@ -327,13 +479,14 @@ rm_components = [
   {ctype: "unknown", description: "RX Chip (für RX Services)"}
 ]
 
-rm_bike = seed_bike(
+rm_bike = SeedHelpers.seed_bike(
   creator:, user:, origin: "organization_form", label: "Riese & Müller bike",
-  params: {bike: bike_params(owner_email: "user_3@gmail.com", manufacturer_id: rm_manufacturer.id).merge(
+  params: {bike: SeedHelpers.bike_params(owner_email: rm_owner.email, manufacturer_id: rm_manufacturer.id).merge(
+    serial_number: "LOAD4ROHLOFF01",
     creation_organization_id: brakebills_org.id.to_s,
     cycle_type: "cargo",
     propulsion_type: "pedal-assist",
-    primary_frame_color_id: grey&.id,
+    primary_frame_color_id: silver&.id,
     year: 2023,
     frame_model: "Load4 75 rohloff",
     frame_material_slug: "aluminum",
@@ -348,6 +501,7 @@ rm_bike = seed_bike(
     description: "Bosch Cargo Line mid-drive (Class 1) with 725Wh PowerPack, Rohloff Speedhub E14 14-speed internal hub and Gates CDX belt drive. Aluminum frame with front box cargo area, 200kg max total weight, SKS fenders, Supernova lights."
   )}
 )
+rm_bike.current_ownership.mark_claimed
 
 ["riese_muller_load4_with_passenger.jpg", "riese_muller_load4.jpg"].each_with_index do |filename, i|
   public_image = PublicImage.new(imageable: rm_bike, listing_order: i + 1)

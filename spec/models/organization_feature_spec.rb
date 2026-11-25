@@ -4,12 +4,19 @@ RSpec.describe OrganizationFeature, type: :model do
   it_behaves_like "amountable"
   it_behaves_like "currencyable"
 
-  describe "constant ordering" do
+  describe "constants" do
     it "is ordered" do
       expect(OrganizationFeature::REG_FIELDS.sort).to eq OrganizationFeature::REG_FIELDS
+      expect(OrganizationFeature::REG_FIELDS_REQUIRED.sort).to eq OrganizationFeature::REG_FIELDS_REQUIRED
       expect(OrganizationFeature::BIKE_ACTIONS.sort).to eq OrganizationFeature::BIKE_ACTIONS
-      expected_slugs = OrganizationFeature::EXPECTED_SLUGS - OrganizationFeature::REG_FIELDS - OrganizationFeature::BIKE_ACTIONS
+      expected_slugs = OrganizationFeature::EXPECTED_SLUGS - OrganizationFeature::REG_FIELDS -
+        OrganizationFeature::REG_FIELDS_REQUIRED - OrganizationFeature::BIKE_ACTIONS
       expect(expected_slugs.sort).to eq expected_slugs
+    end
+
+    it "requires only fields that are asked for" do
+      reg_fields = OrganizationFeature::REG_FIELDS_REQUIRED.map { it.delete_prefix("require_") }
+      expect(reg_fields - OrganizationFeature::REG_FIELDS).to eq([])
     end
   end
 
@@ -26,7 +33,7 @@ RSpec.describe OrganizationFeature, type: :model do
   describe "child organization" do
     let(:organization) { FactoryBot.create(:organization_with_organization_features, kind: "law_enforcement", enabled_feature_slugs: %w[child_organizations bike_stickers]) }
     let(:invoice) { organization.current_invoices.first }
-    let!(:organization_child) { FactoryBot.create(:organization_with_organization_features, parent_organization: organization, kind: "bike_shop", enabled_feature_slugs: "bike_search") }
+    let!(:organization_child) { FactoryBot.create(:organization_with_organization_features, parent_organization: organization, kind: "bike_shop", enabled_feature_slugs: "csv_exports") }
     context "without child_enabled_feature_slugs" do
       it "does not inherit from the parent" do
         Sidekiq::Testing.inline! do
@@ -37,7 +44,7 @@ RSpec.describe OrganizationFeature, type: :model do
           expect(organization_child.kind).to eq "bike_shop"
           expect(organization.enabled_feature_slugs).to eq %w[bike_stickers child_organizations reg_bike_sticker]
           expect(organization.reload.child_ids).to eq([organization_child.id])
-          expect(organization_child.enabled_feature_slugs).to eq %w[bike_search]
+          expect(organization_child.enabled_feature_slugs).to eq %w[csv_exports]
         end
       end
     end
@@ -53,7 +60,7 @@ RSpec.describe OrganizationFeature, type: :model do
           expect(organization.enabled_feature_slugs).to eq %w[bike_stickers child_organizations reg_bike_sticker]
 
           expect(organization.reload.child_ids).to eq([organization_child.id])
-          expect(organization_child.reload.enabled_feature_slugs).to match_array(%w[bike_search bike_stickers reg_bike_sticker])
+          expect(organization_child.reload.enabled_feature_slugs).to match_array(%w[bike_stickers csv_exports reg_bike_sticker])
         end
       end
     end
@@ -82,8 +89,8 @@ RSpec.describe OrganizationFeature, type: :model do
     let(:organization) { FactoryBot.build(:organization) }
     it "includes expected" do
       labeled_fields = OrganizationFeature.reg_fields_with_customizable_labels
-      expect(labeled_fields.count).to eq OrganizationFeature::REG_FIELDS.count
       expect(labeled_fields).to include("owner_email")
+      expect(labeled_fields).to include("email_placeholder")
       expect(labeled_fields).to_not include("reg_bike_sticker")
     end
   end
@@ -92,7 +99,8 @@ RSpec.describe OrganizationFeature, type: :model do
     let(:target_kinds) do
       %w[regional_bike_counts passwordless_users graduated_notifications
         organization_stolen_message saml_sso reg_extra_registration_number
-        reg_organization_affiliation reg_address reg_phone reg_student_id owner_email]
+        reg_organization_affiliation reg_address reg_phone reg_student_id owner_email
+        email_placeholder]
     end
     it "is expected" do
       expect(OrganizationFeature.with_admin_organization_attributes).to match_array target_kinds

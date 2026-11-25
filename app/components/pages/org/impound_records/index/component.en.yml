@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    pages:
+      org:
+        impound_records:
+          index:
+            cannot_update_with_kind: This record can't be updated with '{kind}'
+            hide_update: Hide update
+            update_multiple_records: Update multiple records

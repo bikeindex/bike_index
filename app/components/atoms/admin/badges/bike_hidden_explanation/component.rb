@@ -1,0 +1,62 @@
+# frozen_string_literal: true
+
+module Atoms
+  module Admin
+    module Badges
+      module BikeHiddenExplanation
+        class Component < ApplicationComponent
+          # Template Dependency: UI::Alerts::Base::Component
+          def initialize(bike:)
+            @bike = bike
+          end
+
+          def render?
+            @bike.present? && !@bike.current?
+          end
+
+          def call
+            safe_join(
+              [deleted_content, user_hidden_content, likely_spam_content, example_content].compact,
+              " & "
+            )
+          end
+
+          private
+
+          def user_hidden_content
+            return unless @bike.user_hidden?
+
+            content_tag(:small, "user hidden", class: UI::Alerts::Base::Component::TEXT_CLASSES[:notice])
+          end
+
+          # BikeVersion can't be example
+          def example_content
+            return unless @bike.is_a?(Bike) && @bike.example?
+
+            content_tag(:small, "test", title: "example (aka test)", class: error_class)
+          end
+
+          # BikeVersion can't be likey spam
+          def likely_spam_content
+            return unless @bike.is_a?(Bike) && @bike.likely_spam?
+
+            content_tag(:small, "spam", title: "LIKELY spam", class: error_class)
+          end
+
+          def deleted_content
+            return unless @bike.deleted?
+
+            content_tag(:small,
+              content_tag(:span, "deleted: ") +
+                render(UI::Time::Component.new(time: @bike.deleted_at)),
+              class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning])
+          end
+
+          def error_class
+            UI::Alerts::Base::Component::TEXT_CLASSES[:error]
+          end
+        end
+      end
+    end
+  end
+end

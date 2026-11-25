@@ -3,10 +3,11 @@ module Admin
     include Binxtils::SortableTable
 
     before_action :find_snippet, except: [:index, :new, :create]
+    before_action :find_organizations, only: [:new, :edit, :create, :update]
 
     def index
       @per_page = permitted_per_page
-      @pagy, @mail_snippets = pagy(:countish, matching_mail_snippets.reorder("mail_snippets.#{sort_column} #{sort_direction}")
+      @pagy, @mail_snippets = pagy(:countish, matching_mail_snippets.reorder(sortable_order(MailSnippet))
         .includes(:organization), limit: @per_page, page: permitted_page)
     end
 
@@ -15,7 +16,6 @@ module Admin
     end
 
     def edit
-      @organizations = Organization.all
     end
 
     def update
@@ -23,22 +23,21 @@ module Admin
         flash[:success] = "Snippet Saved!"
         redirect_to edit_admin_mail_snippet_url(@mail_snippet)
       else
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 
     def new
       @mail_snippet = MailSnippet.new
-      @organizations = Organization.all
     end
 
     def create
-      @mail_snippet = MailSnippet.create(permitted_parameters)
-      if @mail_snippet.save
+      @mail_snippet = MailSnippet.new(permitted_parameters)
+      if @mail_snippet.save(context: :admin_create)
         flash[:success] = "Snippet Created!"
         redirect_to edit_admin_mail_snippet_url(@mail_snippet)
       else
-        render action: :new
+        render action: :new, status: :unprocessable_entity
       end
     end
 
@@ -77,6 +76,10 @@ module Admin
 
     def find_snippet
       @mail_snippet = MailSnippet.find(params[:id])
+    end
+
+    def find_organizations
+      @organizations = Organization.all
     end
   end
 end

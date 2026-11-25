@@ -7,24 +7,24 @@ RSpec.describe OrganizedHelper, type: :helper do
     it "renders" do
       expect(organized_bike_text).to be_nil
       result = organized_bike_text(bike)
-      expect(result).to start_with("#{target_prefix}web ") # origin_display label
-      expect(result).to include("Registered with self registration process") # origin_display tooltip
+      expect(result).to start_with("#{target_prefix}<span class=\"keep-together tw:whitespace-nowrap\">web ") # origin_display label
+      expect(result).to include("registered with self registration process") # origin_display tooltip
       expect(organized_bike_text(bike, skip_creation: true)).to eq "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong></span>"
     end
     context "unregistered" do
-      let(:target_text) do
-        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><small> cargo bike</small><em class=\"small text-warning\"> unregistered</em></span>"
-      end
-      it "renders with unregistered" do
+      it "renders the unregistered badge, not the origin" do
         bike.cycle_type = "cargo"
         bike.status = "unregistered_parking_notification"
-        expect(organized_bike_text(bike)).to eq target_text
+        result = organized_bike_text(bike)
+        expect(result).to start_with "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><small> cargo bike</small> "
+        expect(result).to include("Unregistered")
+        expect(result).not_to include("less-strong")
       end
     end
     context "deleted" do
       let!(:bike) { FactoryBot.create(:bike, deleted_at: Time.current) }
       let(:target_text) do
-        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><em class=\"small text-danger\"> removed from Bike Index</em></span>"
+        "<span>#{bike.frame_colors.first} <strong>#{bike.mnfg_name}</strong><em class=\"tw:text-sm #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}\"> removed from Bike Index</em></span>"
       end
       it "renders with deleted" do
         expect(bike.deleted?).to be_truthy
@@ -34,21 +34,23 @@ RSpec.describe OrganizedHelper, type: :helper do
   end
 
   describe "status_display" do
-    it "renders text-success" do
-      expect(status_display("current")).to eq "<span class=\"text-success\">current</span>"
-      expect(status_display("Current")).to eq "<span class=\"text-success\">Current</span>"
-      expect(status_display_class("Current")).to eq "text-success"
+    let(:text_classes) { UI::Alerts::Base::Component::TEXT_CLASSES }
+
+    it "renders success" do
+      expect(status_display("current")).to eq "<span class=\"#{text_classes[:success]}\">current</span>"
+      expect(status_display("Current")).to eq "<span class=\"#{text_classes[:success]}\">Current</span>"
+      expect(status_display_class("Current")).to eq text_classes[:success]
     end
-    it "renders text-warning" do
-      expect(status_display("stolen")).to eq "<span class=\"text-warning\">stolen</span>"
-      expect(status_display("uncertified_by_trusted_org")).to eq "<span class=\"text-warning\">uncertified by trusted org</span>"
+    it "renders warning" do
+      expect(status_display("stolen")).to eq "<span class=\"#{text_classes[:warning]}\">stolen</span>"
+      expect(status_display("uncertified_by_trusted_org")).to eq "<span class=\"#{text_classes[:warning]}\">uncertified by trusted org</span>"
     end
-    context "text-info" do
+    context "notice" do
       it "is expected" do
-        expect(status_display("retrieved_by_owner")).to eq "<span class=\"text-info\">retrieved by owner</span>"
-        expect(status_display("Retrieved")).to eq "<span class=\"text-info\">Retrieved</span>"
-        expect(status_display("resolved_otherwise")).to eq "<span class=\"text-info\">resolved</span>"
-        expect(status_display("certified_by_trusted_org")).to eq "<span class=\"text-info\">certified by trusted org</span>"
+        expect(status_display("retrieved_by_owner")).to eq "<span class=\"#{text_classes[:notice]}\">retrieved by owner</span>"
+        expect(status_display("Retrieved")).to eq "<span class=\"#{text_classes[:notice]}\">Retrieved</span>"
+        expect(status_display("resolved_otherwise")).to eq "<span class=\"#{text_classes[:notice]}\">resolved</span>"
+        expect(status_display("certified_by_trusted_org")).to eq "<span class=\"#{text_classes[:notice]}\">certified by trusted org</span>"
       end
     end
     context "removed_from_bike_index, trashed or Removed from Bike Index" do
@@ -68,8 +70,8 @@ RSpec.describe OrganizedHelper, type: :helper do
     context "impound_claim" do
       let(:error_class) { UI::Alerts::Base::Component::TEXT_CLASSES[:error] }
       it "info for approved, red for denied" do
-        expect(status_display("approved")).to eq "<span class=\"text-info\">approved</span>"
-        expect(status_display("claim_approved")).to eq "<span class=\"text-info\">claim approved</span>"
+        expect(status_display("approved")).to eq "<span class=\"#{text_classes[:notice]}\">approved</span>"
+        expect(status_display("claim_approved")).to eq "<span class=\"#{text_classes[:notice]}\">claim approved</span>"
         expect(status_display("denied")).to eq "<span class=\"#{error_class}\">denied</span>"
         expect(status_display("claim_denied")).to eq "<span class=\"#{error_class}\">claim denied</span>"
       end
@@ -78,148 +80,8 @@ RSpec.describe OrganizedHelper, type: :helper do
       it "info for approved, red for denied" do
         expect(status_display("remains registered")).to eq "<span class=\"less-strong\">remains registered</span>"
         expect(status_display("REMAINS registered")).to eq "<span class=\"less-strong\">REMAINS registered</span>"
-        expect(status_display("bike Graduated")).to eq "<span class=\"text-info\">bike Graduated</span>"
-        expect(status_display_class("bike Graduated")).to eq "text-info"
-      end
-    end
-  end
-
-  describe "organized_container" do
-    before do
-      allow(view).to receive(:controller_name) { controller_name }
-      allow(view).to receive(:action_name) { action_name }
-    end
-    let(:action_name) { "index" }
-    context "locations" do
-      let(:controller_name) { "manage" }
-      let(:action_name) { "locations" }
-      it "is container" do
-        expect(organized_container).to eq "container"
-      end
-    end
-    context "users" do
-      let(:controller_name) { "users" }
-      it "is container" do
-        expect(organized_container).to eq "container"
-      end
-    end
-    context "registrations index" do
-      let(:controller_name) { "registrations" }
-      it "is container-fluid" do
-        expect(organized_container).to eq "container-fluid"
-      end
-    end
-    context "bulk_imports index" do
-      let(:controller_name) { "bulk_imports" }
-      it "is container-fluid" do
-        expect(organized_container).to eq "container"
-      end
-      context "action_name: show" do
-        let(:action_name) { "show" }
-        it "is container-fluid" do
-          expect(organized_container).to eq "container-fluid"
-        end
-      end
-    end
-    context "exports index" do
-      let(:controller_name) { "exports" }
-      it "is container-fluid" do
-        expect(organized_container).to eq "container"
-      end
-    end
-    context "parking_notifications" do
-      let(:controller_name) { "parking_notifications" }
-      it "is container-fluid" do
-        expect(organized_container).to eq "container-fluid"
-      end
-    end
-  end
-
-  describe "include_javascript_pack?" do
-    before do
-      allow(view).to receive(:controller_name) { controller_name }
-      allow(view).to receive(:action_name) { action_name }
-    end
-    let(:controller_name) { "users" }
-    let(:action_name) { "index" }
-    it "is falsey" do
-      expect(organized_include_javascript_pack?).to be_falsey
-    end
-    context "registrations" do
-      let(:controller_name) { "registrations" }
-      it "is truthy" do
-        expect(organized_include_javascript_pack?).to be_truthy
-      end
-    end
-    context "bikes recoveries" do
-      let(:controller_name) { "bikes" }
-      let(:action_name) { "recoveries" }
-      it "is truthy" do
-        expect(organized_container).to eq "container"
-        expect(organized_include_javascript_pack?).to be_truthy
-      end
-    end
-  end
-
-  describe "retrieval_link_url" do
-    let(:graduated_notification) { FactoryBot.create(:graduated_notification) }
-    it "is present" do
-      expect(graduated_notification.marked_remaining_link_token).to be_present
-      expect(retrieval_link_url(graduated_notification)).to match(graduated_notification.marked_remaining_link_token)
-    end
-    context "parking_notification" do
-      let(:parking_notification) { FactoryBot.create(:parking_notification) }
-      it "is present" do
-        expect(parking_notification.retrieval_link_token).to be_present
-        expect(retrieval_link_url(parking_notification)).to match(parking_notification.retrieval_link_token)
-      end
-      context "unregistered" do
-        let(:parking_notification) { FactoryBot.create(:parking_notification_unregistered) }
-        it "is nil" do
-          expect(parking_notification.retrieval_link_token).to be_blank
-          expect(retrieval_link_url(parking_notification)).to be_nil
-        end
-      end
-    end
-  end
-
-  describe "registration_field_label" do
-    let(:organization) { Organization.new }
-
-    it "is nil with or without an organization" do
-      expect(registration_field_label(organization, "extra_registration_number")).to be_nil
-      expect(registration_field_label(organization, "reg_address")).to be_nil
-      expect(registration_field_label(nil, "reg_phone")).to be_nil
-      expect(registration_field_label(nil, "organization_affiliation")).to be_nil
-      expect(registration_field_label(nil, "reg_student_id")).to be_nil
-      expect(registration_field_label(organization, "reg_bike_sticker")).to be_nil
-      expect(registration_field_label(organization, "owner_email")).to be_nil
-    end
-
-    context "with labels" do
-      let(:labels) { {reg_phone: "You have to put this in, jerk", reg_extra_registration_number: "XXXZZZZ", reg_student_id: "PUT in student ID!"}.as_json }
-      let(:feature_slugs) { %w[reg_extra_registration_number reg_address reg_phone reg_organization_affiliation reg_student_id reg_bike_sticker] }
-      let(:organization) { Organization.new(enabled_feature_slugs: feature_slugs, registration_field_labels: labels) }
-
-      it "is the organization's own wording, for the fields it named" do
-        expect(registration_field_label(organization, "reg_extra_registration_number")).to eq "XXXZZZZ"
-        expect(registration_field_label(organization, "reg_address")).to be_nil
-        expect(registration_field_label(organization, "reg_phone")).to eq labels["reg_phone"]
-        expect(registration_field_label(organization, "reg_organization_affiliation")).to be_nil
-        expect(registration_field_label(organization, "reg_student_id")).to eq "PUT in student ID!"
-        expect(registration_field_label(organization, "reg_bike_sticker")).to be_nil
-        expect(registration_field_label(organization, "owner_email")).to be_nil
-      end
-
-      context "owner_email with tags" do
-        let(:labels) { {reg_address: "ADDY!!", owner_email: "<code>bikeindex.org</code> email"}.as_json }
-
-        it "keeps them, stripping when asked" do
-          expect(registration_field_label(organization, "reg_address")).to eq "ADDY!!"
-          expect(registration_field_label(organization, "reg_phone")).to be_nil
-          expect(registration_field_label(organization, "owner_email")).to eq "<code>bikeindex.org</code> email"
-          expect(registration_field_label(organization, "owner_email", strip_tags: true)).to eq "bikeindex.org email"
-        end
+        expect(status_display("bike Graduated")).to eq "<span class=\"#{text_classes[:notice]}\">bike Graduated</span>"
+        expect(status_display_class("bike Graduated")).to eq text_classes[:notice]
       end
     end
   end

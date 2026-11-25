@@ -1,0 +1,36 @@
+---
+en:
+  components:
+    pages:
+      donate:
+        form:
+          already_member: >-
+            You're already a Bike Index member - thank you! You can change your tier
+            or payment details from your membership settings.
+          cadence: How often to give
+          fine_print: >-
+            Bike Index is a 501(c)(3) nonprofit, EIN 81-4296194. Your donation is
+            tax-deductible in the US. Cancel a monthly gift any time.
+          fine_print_short: 501(c)(3) nonprofit, EIN 81-4296194. Tax-deductible in
+            the US.
+          manage_membership: Manage your membership
+          membership_link: What membership includes
+          membership_note: >-
+            Monthly support makes you a Bike Index member: marketplace listings, a
+            member badge, and perks that grow as we build them. Tiers are %{amounts}
+            a month.
+          monthly: Monthly
+          monthly_submit: Become a member — %{amount}/month
+          one_time: One-time
+          one_time_submit: Donate %{amount}
+          other_amount: Other amount
+          tier_basic: Basic membership
+          tier_basic_benefit: List bikes in the marketplace, a member badge, and faster
+            support
+          tier_patron: Patron membership
+          tier_patron_benefit: Everything in Plus, top marketplace placement, Patron
+            shirt and badge
+          tier_plus: Plus membership
+          tier_plus_benefit: >-
+            Everything in Basic, a free promoted alert if your bike is stolen, and
+            a member cap

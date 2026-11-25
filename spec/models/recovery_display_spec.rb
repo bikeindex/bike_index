@@ -9,6 +9,40 @@ RSpec.describe RecoveryDisplay, type: :model do
     end
   end
 
+  describe "with_photo" do
+    let!(:recovery_display) { FactoryBot.create(:recovery_display_with_photo) }
+    let!(:recovery_display_unprocessed) { FactoryBot.create(:recovery_display) }
+    before do
+      recovery_display_unprocessed.photo.attach(io: StringIO.new("fake image"), filename: "test.jpg",
+        content_type: "image/jpeg")
+    end
+
+    it "includes only displays with a processed photo" do
+      expect(RecoveryDisplay.with_photo.pluck(:id)).to eq([recovery_display.id])
+    end
+
+    context "with two processed photo attachments" do
+      before do
+        ActiveStorage::Attachment.create!(record: recovery_display, name: "photo_processed",
+          blob: ActiveStorage::Blob.create_and_upload!(io: StringIO.new("reprocessed"), filename: "processed.jpg"))
+      end
+
+      it "includes the display once" do
+        expect(RecoveryDisplay.with_photo.limit(10).map(&:id)).to eq([recovery_display.id])
+      end
+    end
+  end
+
+  describe "quote length" do
+    let(:recovery_display) { FactoryBot.build(:recovery_display, quote: "a" * 400) }
+    it "allows 400 characters, not 401" do
+      expect(recovery_display).to be_valid
+      recovery_display.quote += "a"
+      expect(recovery_display).not_to be_valid
+      expect(recovery_display.errors.full_messages).to eq(["Quote is too long (maximum is 400 characters)"])
+    end
+  end
+
   describe "photo_processed? and image_processing" do
     let(:recovery_display) { RecoveryDisplay.new }
     it "is false by default" do
@@ -58,6 +92,34 @@ RSpec.describe RecoveryDisplay, type: :model do
       recovery_display = RecoveryDisplay.new
       recovery_display.set_calculated_attributes
       expect(recovery_display.recovered_at).to be > Time.current - 5.seconds
+    end
+  end
+
+  describe "quote_by" do
+    it "keeps the whole name" do
+      recovery_display = FactoryBot.create(:recovery_display, quote_by: "  Portland Police Bureau ")
+      expect(recovery_display.quote_by).to eq "Portland Police Bureau"
+      recovery_display.update(quote_by: " ")
+      expect(recovery_display.quote_by).to be_nil
+    end
+  end
+
+  describe "first_name" do
+    it "skips a title" do
+      expect(RecoveryDisplay.first_name("Dr. Alex Chen")).to eq "Alex"
+      expect(RecoveryDisplay.first_name("mrs Pat Smith")).to eq "Pat"
+      expect(RecoveryDisplay.first_name("Prof.")).to be_nil
+      expect(RecoveryDisplay.first_name("Drew Chen")).to eq "Drew"
+    end
+  end
+
+  describe "calculated_owner_name" do
+    it "is the owner's, not the creator's of an unclaimed bike" do
+      bike = FactoryBot.create(:bike, :with_ownership, creator: FactoryBot.create(:user, name: "Shop Staff"))
+      expect(bike.owner.name).to eq "Shop Staff"
+      expect(RecoveryDisplay.calculated_owner_name(bike)).to be_nil
+      ownership = FactoryBot.create(:ownership, creator: bike.creator, registration_info: {user_name: "Pat Smith"})
+      expect(RecoveryDisplay.calculated_owner_name(ownership.bike)).to eq "Pat Smith"
     end
   end
 

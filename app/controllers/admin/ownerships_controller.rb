@@ -6,7 +6,7 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 50)
-      @pagy, @ownerships = pagy(:countish, matching_ownerships.reorder("ownerships.#{sort_column} #{sort_direction}")
+      @pagy, @ownerships = pagy(:countish, matching_ownerships.reorder(sortable_order(Ownership))
         .includes(:bike, :organization, :creator, :user), limit: @per_page, page: permitted_page)
     end
 
@@ -38,7 +38,7 @@ module Admin
         else
           flash[:notice] = "No information updated"
         end
-        render action: :edit
+        render action: :edit, status: :unprocessable_entity
       end
     end
 

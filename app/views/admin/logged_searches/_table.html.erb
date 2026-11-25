@@ -1,131 +1,88 @@
-<div class="full-screen-table">
-  <table class="table table-striped table-bordered table-sm without-exterior-border">
-    <thead class="small-header">
-      <th><%= sortable "request_at" %></th>
+<%# locals: (logged_searches:) %>
 
-      <% if sort_column == "created_at" %>
-        <th class="small"><%= sortable "created_at" %></th>
+<%# Locals: each gates a column, so each keys the rows %>
+<% render_created_at = sort_state.sort == "created_at" %>
+<% render_serial = sort_state.sort == "serial_normalized" %>
+
+<div
+  data-controller="update-cached-sortable-links"
+  data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
+>
+  <%= render(UI::Table::Base::Component.new(records: logged_searches, render_sortable: true, sort_state:,
+        cache_key: cache_fragment_name(["admin_logged_searches", render_created_at, render_serial]),
+        cache_records: ->(logged_search) { [logged_search.user, logged_search.organization] })) do |table| %>
+    <% table.column(sortable: "request_at") do |logged_search| %>
+      <%= render UI::Time::Component.new(time: logged_search.request_at, format: :localize_time_precise_seconds) %>
+    <% end %>
+
+    <% if render_created_at %>
+      <% table.column(sortable: "created_at", classes: "tw:text-xs") do |logged_search| %>
+        <%= render UI::Time::Component.new(time: logged_search.created_at) %>
       <% end %>
+    <% end %>
 
-      <th><%= sortable "endpoint" %></th>
-      <th><%= sortable "ip_address" %></th>
-      <th><small><%= sortable "city", "IP Location" %></small></th>
-      <th>Query</th>
-      <th><%= sortable "organization_id" %></th>
-      <th><%= sortable "user_id" %></th>
-      <th><%= sortable "stolenness" %></th>
-      <th><%= sortable "page" %></th>
+    <% table.column(sortable: "endpoint") do |logged_search| %>
+      <%= render(UI::Code::Inline::Component.new(text: logged_search.endpoint, word_break: false)) %>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_endpoint: logged_search.endpoint)), class: "display-sortable-link tw:text-sm" %>
+    <% end %>
 
-      <% if sort_column == "serial_normalized" %>
-        <th><%= sortable "serial_normalized", "Serial" %></th>
+    <% table.column(sortable: "ip_address") do |logged_search| %>
+      <%= render(UI::Code::Inline::Component.new(text: logged_search.ip_address)) %>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_ip_address: logged_search.ip_address)), class: "display-sortable-link tw:text-sm" %>
+    <% end %>
+
+    <% table.column(sortable: "city", label: "IP Location", classes: "tw:text-xs") do |logged_search| %>
+      <%= logged_search.formatted_address_string %>
+    <% end %>
+
+    <% table.column(label: "Query") do |logged_search| %>
+      <%= render UI::Code::Json::Component.new(data: logged_search.query_items, small: true, max_width: :table_cell) %>
+
+      <% if logged_search.log_line.present? %>
+        <div data-controller="ui--collapse">
+          <%= render(UI::Collapse::Component.new(text: "↔️", color: :link, aria: {label: "Toggle the full log line"})) %>
+
+          <span class="tw:hidden" data-ui--collapse-target="content">
+            <%= render(UI::Code::Inline::Component.new(text: logged_search.log_line)) %>
+          </span>
+        </div>
       <% end %>
+    <% end %>
 
-      <th title="Duration in seconds">
-        <%= sortable "duration_ms", "Duration s" %>
-      </th>
-    </thead>
+    <% table.column(sortable: "organization_id") do |logged_search| %>
+      <%= render Atoms::Admin::TableCells::Organization::Component.new(organization: logged_search.organization, organization_id: logged_search.organization_id, search_url: url_for(sort_state.search_params.merge(organization_id: logged_search.organization_id)), render_search: true, short_name: true) %>
+    <% end %>
 
-    <tbody>
-      <% logged_searches.each do |logged_search| %>
-        <tr>
-          <td>
-            <span class="localizeTime preciseTimeSeconds">
-              <%= l logged_search.request_at, format: :convert_time %>
-            </span>
-          </td>
-
-          <% if sort_column == "created_at" %>
-            <td class="small">
-              <span class="localizeTime">
-                <%= l logged_search.created_at, format: :convert_time %>
-              </span>
-            </td>
-          <% end %>
-
-          <td>
-            <code class="small" style="word-break: keep-all;">
-              <%= logged_search.endpoint %>
-              <%= link_to search_emoji, url_for(sortable_search_params.merge(search_endpoint: logged_search.endpoint)), class: "display-sortable-link small" %>
-            </code>
-          </td>
-
-          <td>
-            <code class="small"><%= logged_search.ip_address %></code>
-            <%= link_to search_emoji, url_for(sortable_search_params.merge(search_ip_address: logged_search.ip_address)), class: "display-sortable-link small" %>
-          </td>
-
-          <td>
-            <small>
-              <%= logged_search.address(country: [:name, :skip_default]) %>
-            </small>
-          </td>
-
-          <td class="data-cell only-data small">
-            <div class="wrapper" style="position: relative">
-              <% if logged_search.query_items.present? %>
-                <%= pretty_print_json(logged_search.query_items) %>
-              <% end %>
-
-              <% if logged_search.log_line.present? %>
-                <% full_line_id = "fullLine-#{logged_search.id}" %>
-                <a
-                  class="less-strong"
-                  href="#"
-                  data-toggle="collapse"
-                  data-target="#<%= full_line_id %>"
-                  style="position: absolute;right: 0.5rem; top: 0.5rem;"
-                >
-                  &#x2194;&#xFE0F;
-                </a>
-                <code class="collapse" id="<%= full_line_id %>">
-                  <%= logged_search.log_line %>
-                </code>
-              <% end %>
-            </div>
-          </td>
-
-          <td>
-            <% if logged_search.organization_id.present? %>
-              <%= link_to logged_search.organization&.short_name || "##{logged_search.organization_id}", admin_organization_path(logged_search.organization_id), class: "text-link" %>
-              <%= link_to search_emoji, url_for(sortable_search_params.merge(organization_id: logged_search.organization_id)), class: "display-sortable-link small" %>
-            <% end %>
-          </td>
-
-          <td>
-            <% if logged_search.user_id.present? %>
-              <%= cache(logged_search.user) do %>
-                <%= render Admin::UserCell::Component.new(user: logged_search.user, render_search: true, user_id: logged_search.user_id) %>
-              <% end %>
-            <% end %>
-          </td>
-
-          <td>
-            <% unless logged_search.stolenness_all? %>
-              <small><%= logged_search.stolenness %></small>
-            <% end %>
-          </td>
-
-          <td class="small">
-            <%= number_display(logged_search.page) %>
-          </td>
-
-          <% if sort_column == "serial_normalized" %>
-            <td class="small">
-              <% if logged_search.serial_normalized.present? %>
-                <code><%= logged_search.serial_normalized %></code>
-              <% end %>
-            </td>
-          <% end %>
-
-          <td>
-            <% if logged_search.duration_ms.present? %>
-              <span title="<%= logged_search.duration_ms %> ms">
-                <%= number_display((logged_search.duration_ms * 0.001).round(2)) %>
-              </span>
-            <% end %>
-          </td>
-        </tr>
+    <% table.column(sortable: "user_id") do |logged_search| %>
+      <% if logged_search.user_id.present? %>
+        <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: logged_search.user, render_search: true, user_id: logged_search.user_id) %>
       <% end %>
-    </tbody>
-  </table>
+    <% end %>
+
+    <% table.column(sortable: "stolenness") do |logged_search| %>
+      <% unless logged_search.stolenness_all? %>
+        <small><%= logged_search.stolenness %></small>
+      <% end %>
+    <% end %>
+
+    <% table.column(sortable: "page") do |logged_search| %>
+      <small><%= number_display(logged_search.page) %></small>
+    <% end %>
+
+    <% if render_serial %>
+      <% table.column(sortable: "serial_normalized", label: "Serial") do |logged_search| %>
+        <% if logged_search.serial_normalized.present? %>
+          <%= render(UI::Code::Inline::Component.new(text: logged_search.serial_normalized, small: true)) %>
+        <% end %>
+      <% end %>
+    <% end %>
+
+    <% table.column(sortable: "duration_ms", label: tag.span("Duration s", title: "Duration in seconds")) do |logged_search| %>
+      <% if logged_search.duration_ms.present? %>
+        <span title="<%= logged_search.duration_ms %> ms">
+          <%= number_display((logged_search.duration_ms * 0.001).round(2)) %>
+        </span>
+      <% end %>
+    <% end %>
+  <% end %>
 </div>

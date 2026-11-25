@@ -13,10 +13,26 @@ RSpec.describe UI::Dropdown::Component, type: :component do
     expect(component).to have_css("[data-ui--dropdown-target='menu'].tw\\:w-max.tw\\:max-w-\\[75vw\\]", visible: :all)
   end
 
-  # The current entry fills like an active UI::Button, whose trigger sits right above it
-  it "fills the current entry with the button's active color" do
-    fill = UI::Button::Component::ACTIVE_COLORS[:secondary][/bg-purple-\d+/]
-    expect(fill).to be_present
-    expect(described_class::ACTIVE_COLORS).to include(fill)
+  # Which entry is current is UI::ActiveLink's, on the link -- the li carries neither the
+  # state nor the styling for it
+  it "leaves the entry unflagged" do
+    expect(component.css("li[role='menuitem']").first.attributes.keys).to eq(["role"])
+  end
+
+  context "with button_color: :link" do
+    let(:component) do
+      render_inline(described_class.new(name: "Menu", button_color: :link, active: true)) do |dropdown|
+        dropdown.with_entry_item { "Profile" }
+      end
+    end
+    let(:trigger) { component.css("button#menu").first }
+
+    # Only the label is underlined, so the chevron beside it isn't. .twlink underlines the
+    # trigger on hover and active alike, which is what the utility holds off
+    it "underlines the label rather than the trigger" do
+      expect(trigger["class"].split).to include("twlink", "tw:no-underline")
+      expect(trigger["data-active"]).to eq "true"
+      expect(component.css("button#menu span.tw\\:underline").text).to eq "Menu"
+    end
   end
 end

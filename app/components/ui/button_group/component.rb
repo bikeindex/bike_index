@@ -3,40 +3,71 @@
 module UI
   module ButtonGroup
     # A row of chips that navigate or act — the link/button counterpart of
-    # UI::Forms::RadioButtonGroup, which chips off RESTING_CHIP_CLASSES too.
+    # UI::Forms::RadioButtonGroup, which builds on CHIP_CLASSES and SEGMENT_CLASSES.
+    #
+    # kind: :toggle renders them as a segmented control instead — one track, with the
+    # active entry raised out of it. Where they don't fit on a line, ui--toggle stacks them all.
     class Component < ApplicationComponent
-      # Mirrors UI::Button color: :secondary, so retuning it reaches the chips
-      RESTING_CHIP_CLASSES = [
-        "tw:cursor-pointer tw:select-none tw:inline-flex tw:items-center tw:justify-center tw:rounded tw:px-3 tw:py-1 tw:text-sm tw:leading-snug tw:transition-colors",
-        UI::Button::Component::COLORS[:secondary]
-      ].join(" ").freeze
+      # Template Dependency: UI::Button::Component
+      KINDS = %i[button toggle].freeze
 
-      # The radio group stops at the resting half, restating the rest off its checked input
-      CHIP_CLASSES = [
-        RESTING_CHIP_CLASSES,
-        "tw:no-underline",
-        UI::Button::Component::ACTIVE_COLORS[:secondary],
+      CHIP_CLASSES = UI::Button::Component.build_classes(color: :secondary, size: :md).freeze
+
+      # UI::PeriodSelect lays its own buttons out with these, so a period row and a chip
+      # group line up where they're stacked
+      ROW_CLASSES = "tw:flex tw:flex-wrap tw:gap-1"
+
+      # auto-fit needs a definite minimum to count repetitions
+      FULL_WIDTH_ROW_CLASSES = "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2"
+
+      # Track and segment sizes come from kelsey_redesign/new-org-search/, not the type scale
+      TRACK_CLASSES = "tw:inline-flex tw:flex-wrap tw:gap-[3px] tw:rounded-[10px] tw:border tw:border-gray-200 " \
+        "tw:bg-gray-100 tw:p-[3px] tw:dark:border-gray-700 tw:dark:bg-gray-800"
+
+      # Only what the segment doesn't share with a button — the rest is UI::Button's
+      SEGMENT_CLASSES = [
+        UI::Button::Component::BASE_CLASSES,
         UI::Button::Component::FOCUS_CLASSES,
-        UI::Button::Component::DISABLED_CLASSES
+        UI::Button::Component::DISABLED_CLASSES,
+        # The line height is part of the size: an arbitrary font size pairs none of its own,
+        # so the page's inherited 30px made a 24px segment 40px tall
+        "tw:rounded-lg tw:px-3 tw:py-[5px] tw:text-[11.5px]/[1.2] tw:font-extrabold tw:whitespace-nowrap tw:transition-colors",
+        "tw:justify-start!", # over BASE_CLASSES' centering, once stacked segments are as wide as their track
+        "tw:no-underline tw:hover:no-underline tw:text-gray-600 tw:dark:text-gray-400",
+        "tw:not-disabled:not-aria-disabled:hover:text-gray-900 tw:dark:not-disabled:not-aria-disabled:hover:text-gray-100",
+        "tw:focus:ring-purple-500/40",
+        "tw:is-active:bg-white tw:is-active:text-gray-900 tw:is-active:shadow-sm",
+        "tw:is-active:dark:bg-gray-900 tw:is-active:dark:text-gray-100"
       ].join(" ").freeze
 
       # full_width lays the chips out as equal columns that wrap, staying the same width
-      # on every line — flex would size each line independently. auto-fit needs a
-      # definite minimum to count repetitions.
-      def self.layout_classes(full_width:)
-        full_width ? "tw:grid tw:grid-cols-[repeat(auto-fit,minmax(4rem,1fr))] tw:gap-2" : "tw:flex tw:flex-wrap tw:gap-2"
+      # on every line — flex would size each line independently
+      def self.group_classes(kind:, full_width:)
+        case kind
+        when :button
+          full_width ? FULL_WIDTH_ROW_CLASSES : ROW_CLASSES
+        when :toggle
+          # The track sizes itself to its segments, so there's no column layout to widen
+          raise ArgumentError, "full_width is not supported for the toggle kind" if full_width
+
+          TRACK_CLASSES
+        else
+          raise ArgumentError, "unknown kind #{kind.inspect}, expected one of: #{KINDS.join(", ")}"
+        end
       end
 
-      # entries: [{label:, href:, active:, disabled:}, …] — an entry without an href
-      # renders a <button>, and anything else in it (data:, title:, target:) becomes
-      # an attribute
-      def initialize(entries:, full_width: false)
+      def self.group_data(kind:) = (kind == :toggle) ? {controller: "ui--toggle"} : nil
+
+      # entries: ComponentStructs::Shapes' entries
+      def initialize(entries:, full_width: false, kind: :button)
+        @group_classes = self.class.group_classes(kind:, full_width:)
+        @group_data = self.class.group_data(kind:)
+        @chip_classes = (kind == :toggle) ? SEGMENT_CLASSES : CHIP_CLASSES
         @entries = entries
-        @full_width = full_width
       end
 
       def call
-        tag.div(class: self.class.layout_classes(full_width: @full_width)) do
+        tag.div(class: @group_classes, data: @group_data) do
           safe_join(@entries.map { |entry| chip(entry) })
         end
       end
@@ -49,7 +80,7 @@ module UI
         # takes no disabled attribute, so a link would stay live
         href = entry[:disabled] ? nil : entry[:href].presence
         attributes = entry.except(:label, :href, :active).deep_merge(
-          class: CHIP_CLASSES,
+          class: @chip_classes,
           data: {active:},
           aria: href ? {current: active} : {pressed: active}
         )

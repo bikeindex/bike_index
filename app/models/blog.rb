@@ -79,7 +79,8 @@ class Blog < ApplicationRecord
 
       slug = slugify_title(str)
       find_by_title_slug(slug) || find_by_old_title_slug(slug) ||
-        find_by_title_slug(str) || find_by_title(str) || find_by_secondary_title(str)
+        find_by_title_slug(str) || find_by_old_title_slug(str) || find_by_title(str) ||
+        find_by_secondary_title(str)
     end
 
     def theft_rings_id
@@ -98,19 +99,23 @@ class Blog < ApplicationRecord
       "bike-index-membership"
     end
 
+    def store_slug
+      "bike-index-store"
+    end
+
     def e_vehicle_acknowledgment_faq
       "e-vehicle-acknowledgment-faq"
     end
 
     def top_level_routed
-      [membership_slug, why_donate_slug].freeze
+      [membership_slug, why_donate_slug, store_slug].freeze
     end
 
     # matches ALL content tag ids
     def with_tag_ids(content_tag_ids)
       content_tag_ids = Array(content_tag_ids)
-      joins(:blog_content_tags).where(blog_content_tags: {content_tag_id: content_tag_ids})
-        .group("blogs.id").having("count(distinct blog_content_tags.id) = ?", content_tag_ids.count)
+      where(id: BlogContentTag.where(content_tag_id: content_tag_ids).group(:blog_id)
+        .having("count(*) = ?", content_tag_ids.count).select(:blog_id))
     end
 
     def with_any_of_tag_ids(content_tag_ids)
@@ -163,7 +168,7 @@ class Blog < ApplicationRecord
   def pretty_canonical
     return nil unless canonical_url?
 
-    canonical_url.gsub(/https?:\/\//i, "").truncate(90)
+    Urlifyer.display(canonical_url, length: 90)
   end
 
   def set_calculated_attributes
@@ -238,11 +243,12 @@ class Blog < ApplicationRecord
   end
 
   def set_index_image
-    self.index_image_id = nil unless PublicImage.where(id: index_image_id).present?
+    # 0 is "No primary image"
+    return self.index_image = self.index_image_lg = nil if index_image_id == 0
+
+    self.index_image_id = nil unless PublicImage.where(id: index_image_id).exists?
     if index_image_id.present?
-      if index_image_id == 0
-        self.index_image = nil
-      elsif is_listicle
+      if is_listicle
         li = listicles.find(index_image_id)
       else
         pi = public_images.find(index_image_id)

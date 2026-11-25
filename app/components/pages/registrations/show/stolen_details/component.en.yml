@@ -1,0 +1,15 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          stolen_details:
+            department_city: Department & city
+            description_of_incident: Description of incident
+            location: Location
+            locking_circumvented: Locking circumvented
+            locking_description: Locking description
+            police_report: 'Police report #'
+            stolen_at: Stolen at
+            stolen_details: Theft Details

@@ -104,5 +104,19 @@ RSpec.describe ProcessGraduatedNotificationJob, type: :lib do
         expect(graduated_notification).to be_processed
       end
     end
+
+    context "with an email_banned user" do
+      let(:graduated_notification) { FactoryBot.create(:graduated_notification, :with_user, organization:) }
+      let!(:email_ban) { FactoryBot.create(:email_ban, user: graduated_notification.user, reason: :honeypot) }
+      it "doesn't send, and marks the graduated_notification delivery_failure" do
+        instance.perform(graduated_notification.id)
+
+        expect(graduated_notification.notifications.first.delivery_status).to eq "delivery_banned"
+        expect(ActionMailer::Base.deliveries.count).to eq 0
+        graduated_notification.reload
+        expect(graduated_notification.email_success?).to be_falsey
+        expect(graduated_notification.status).to eq "delivery_failure"
+      end
+    end
   end
 end

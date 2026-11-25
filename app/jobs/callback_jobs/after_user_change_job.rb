@@ -35,7 +35,7 @@ module CallbackJobs
 
       user.user_ban.delete if user.user_ban.present? && !user.banned?
 
-      Users::SeoSpamCheckJob.new.perform(user.id, user) if user.show_bikes? && !user.banned?
+      UserJobs::SeoSpamCheckJob.new.perform(user.id, user) if user.show_bikes? && !user.banned?
 
       # Update current Marketplace Listings that don't match the user's membership status
       user.marketplace_listings.current.where.not(seller_member: user.member?)
@@ -52,6 +52,8 @@ module CallbackJobs
 
       # Above the returns below - anyone can walk away mid-registration
       UserAlert.update_unfinished_registrations(user)
+      bike_ids = UserAlert.alert_bike_ids(user)
+      UserAlert.resolve_without_bike(user, bike_ids:)
 
       # Ignore alerts below for superusers
       if user.superuser?
@@ -59,7 +61,7 @@ module CallbackJobs
         return
       end
 
-      user.theft_alerts.each do |theft_alert|
+      user.theft_alerts.where(bike_id: bike_ids).each do |theft_alert|
         UserAlert.update_theft_alert_without_photo(user: user, theft_alert: theft_alert)
       end
 
@@ -69,7 +71,7 @@ module CallbackJobs
         return
       end
 
-      user.bike_organizations.select { |o| o.paid_money? }.each do |organization|
+      user.bike_organizations.invoiced.each do |organization|
         user.bikes.each do |bike|
           UserAlert.update_unassigned_bike_org(user: user, organization: organization, bike: bike)
         end

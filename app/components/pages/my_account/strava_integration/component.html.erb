@@ -1,0 +1,67 @@
+<%= render(Pages::MyAccount::Show::PromptBar::Component.new(icon_classes: "tw:bg-orange-50 tw:text-[#fc4c02] tw:dark:bg-orange-950")) do |bar| %>
+  <% bar.with_icon do %>
+    <%= helpers.inline_svg_tag("logos/strava-symbol.svg", class: "tw:size-5", aria_hidden: true) %>
+  <% end %>
+
+  <% bar.with_title do %>
+    Strava
+    <% if error? %>
+      <%= render(UI::Badge::Component.new(text: translation(".sync_error"), color: :error)) %>
+    <% elsif in_progress? %>
+      <%= render(UI::Badge::Component.new(text: translation(".syncing"), color: :notice)) %>
+    <% elsif synced? %>
+      <%= render(UI::Badge::Component.new(text: translation(".connected"), color: :success)) %>
+    <% end %>
+  <% end %>
+
+  <% bar.with_subtext do %>
+    <% if in_progress? %>
+      <% if pending? %>
+        <span id="strava-pending-message"><%= translation(".strava_connected_pending") %></span>
+      <% end %>
+      <span class="<%= "tw:hidden" if pending? %>" id="strava-syncing-message">
+        <%= translation(".syncing_activities") %>
+
+        <span id="strava-download-count">
+          <%= progress_percent %>% (<%= number_display(downloaded_count) %> /
+          <%= number_display(total_count) %>) <%= translation(".downloaded") %>
+        </span>
+
+        <span class="tw:block tw:text-sm"><%= translation(".sync_running_in_background") %></span>
+      </span>
+      <% if @strava_integration.persisted? %>
+        <span
+          data-controller="strava-sync-status"
+          data-strava-sync-status-url-value="<%= sync_status_strava_integration_path %>"
+          data-strava-sync-status-is-pending-value="<%= pending? %>"
+        ></span>
+      <% end %>
+    <% elsif synced? %>
+      <%= number_display(downloaded_count) %> <%= translation(".activities_synced", count: downloaded_count) %>
+      <% if strava_bikes.any? %>
+        ·
+        <strong><%= number_display(strava_bikes.count { it.item_id.present? }) %></strong>
+        / <%= number_display(strava_bikes.size) %>
+        <%= translation(".strava_bikes_connected") %>
+      <% end %>
+    <% elsif error? %>
+      <%= translation(".sync_error_description") %>
+    <% else %>
+      <%= translation(".integrate_your_bikes_with_strava") %>
+    <% end %>
+  <% end %>
+
+  <% bar.with_action do %>
+    <% if connected? %>
+      <% if link_bikes? %>
+        <%= link_to translation(".link_bikes"), @link_bikes_path, class: "twlink tw:py-1" %>
+      <% end %>
+      <%= render(UI::ButtonLink::Component.new(text: translation(".disconnect"), href: strava_integration_path,
+            method: :delete, color: :error, size: :sm, confirm: translation(".disconnect_confirm"))) %>
+    <% else %>
+      <%= link_to new_strava_integration_path do %>
+        <%= helpers.image_tag("logos/btn_strava_connect.svg", alt: translation(".connect_with_strava"), style: "height: 32px; width: auto;") %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

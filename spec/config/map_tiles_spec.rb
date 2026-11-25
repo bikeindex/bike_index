@@ -2,9 +2,9 @@ require "rails_helper"
 require "net/http"
 
 # Guards basemap freshness: the geography under bike-location markers changes
-# slowly, so the tiles must have been refreshed within the last quarter. The
-# cassette re-records itself on that interval, so CI checks the recorded
-# Last-Modified offline and re-hits the live tiles once it expires.
+# slowly, so the tiles must have been refreshed within the last quarter. CI
+# checks the recorded Last-Modified offline; the cassette re-records monthly,
+# since one recorded just before an upload would otherwise outlive the tiles.
 #
 # Re-record: delete spec/vcr_cassettes/maps_tiles_head.yml and run this spec
 # against the live tiles.
@@ -24,13 +24,13 @@ RSpec.describe "basemap" do
 
   it "has tiles refreshed within the last quarter" do
     uri = URI.parse("#{maps_host}/basemap/tiles.pmtiles")
-    response = VCR.use_cassette("maps_tiles_head", match_requests_on: [:method], re_record_interval: max_age) do
+    response = VCR.use_cassette("maps_tiles_head", match_requests_on: [:method], re_record_interval: 1.month) do
       Net::HTTP.start(uri.host, uri.port, use_ssl: uri.scheme == "https") { |http| http.head(uri.request_uri) }
     end
 
     last_modified = Time.zone.parse(response["last-modified"])
     expect(last_modified).to be > max_age.ago,
       "Basemap tiles are stale (last refreshed #{last_modified}). " \
-      "Go to GitHub Actions and run the Upload basemap workflow."
+      "The scheduled Upload basemap workflow hasn't succeeded since - check its runs in GitHub Actions."
   end
 end

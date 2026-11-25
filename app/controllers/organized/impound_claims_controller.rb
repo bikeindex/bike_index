@@ -7,7 +7,7 @@ module Organized
     def index
       @per_page = permitted_per_page
 
-      @pagy, @impound_claims = pagy(:countish, available_impound_claims.reorder("impound_claims.#{sort_column} #{sort_direction}")
+      @pagy, @impound_claims = pagy(:countish, available_impound_claims.reorder(sortable_order(ImpoundClaim))
         .includes(:user, :stolen_record, :impound_record), limit: @per_page, page: permitted_page)
     end
 

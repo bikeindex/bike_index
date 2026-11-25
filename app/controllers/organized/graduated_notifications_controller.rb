@@ -14,9 +14,9 @@ module Organized
       @selected_query_items_options = BikeSearchable.selected_query_items_options(@interpreted_params)
 
       if chart_only?
-        render UI::ChartAsyncFrame::Component.new(id: :graduated_notifications_chart_frame, chart: graduated_notifications_chart), layout: false
+        render Pages::Org::Search::ChartCard::Component.new(scope: "search", chart: graduated_notifications_chart), layout: false
       elsif @render_results
-        @pagy, @graduated_notifications = pagy(:countish, available_graduated_notifications.reorder("graduated_notifications.#{sort_column} #{sort_direction}")
+        @pagy, @graduated_notifications = pagy(:countish, available_graduated_notifications.reorder(sortable_order(GraduatedNotification))
           .includes(:user, :bike, :secondary_notifications), limit: @per_page, page: permitted_page)
         respond_to do |format|
           format.html
@@ -50,7 +50,8 @@ module Organized
           column: "graduated_notifications.created_at"
         ),
         time_range: @time_range,
-        stacked: true
+        stacked: true,
+        height: Pages::Org::Search::ChartCard::Component::CHART_HEIGHT
       )
     end
 

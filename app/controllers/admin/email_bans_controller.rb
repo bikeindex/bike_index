@@ -5,7 +5,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
-        matching_email_bans.includes(:user).reorder("email_bans.#{sort_column} #{sort_direction}"),
+        matching_email_bans.includes(:user).reorder(sortable_order(EmailBan)),
         limit: @per_page,
         page: permitted_page)
     end

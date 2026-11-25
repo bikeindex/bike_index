@@ -1,0 +1,19 @@
+<div class="<%= wrapper_classes %>">
+  <%# A wrapper, so a heading and its subtitle are one flex item rather than two %>
+  <div class="tw:mr-auto">
+    <%= render(UI::Header::Component.new(text: @title, subtitle: @subtitle)) %>
+  </div>
+
+  <% if rendered_items.any? %>
+    <ul
+      class="
+        tw:mb-6 tw:flex tw:flex-row tw:flex-wrap tw:items-baseline tw:gap-1
+        tw:text-sm
+      "
+    >
+      <% rendered_items.each do |item| %>
+        <li class="tw:contents"><%= item %></li>
+      <% end %>
+    </ul>
+  <% end %>
+</div>

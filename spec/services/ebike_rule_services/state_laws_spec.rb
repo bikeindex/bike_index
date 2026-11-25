@@ -1,0 +1,279 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe EbikeRuleServices::StateLaws do
+  include ActiveSupport::Testing::TimeHelpers
+
+  before { stub_bikebook_catalog }
+
+  describe "version" do
+    let(:vocabulary_url) { "#{Integrations::Bikebook::Catalog::URL}vocabulary.json" }
+
+    it "is the vocabulary file once the laws are in, without reading them again" do
+      expect(described_class.version).to eq "vocabulary.json"
+      Rails.cache.delete(["bikebook_catalog/state_laws_with_rule_categories", 3, "vocabulary.json"])
+      Integrations::Bikebook::Catalog::Reads.reset
+      WebMock.stub_request(:get, vocabulary_url).to_return(status: 503)
+
+      expect(described_class.version).to eq "vocabulary.json"
+    end
+
+    it "moves to the new vocabulary within 5 minutes of a catalog update" do
+      expect(described_class.version).to eq "vocabulary.json"
+      stub_bikebook_catalog_update
+
+      travel(5.minutes + 1.second) do
+        Integrations::Bikebook::Catalog::Reads.reset
+        expect(described_class.version).to eq "vocabulary.v2.json"
+      end
+    end
+
+    it "is nil once a read of the laws fails, for the rest of the request and after" do
+      expect(described_class.version).to eq "vocabulary.json"
+      Rails.cache.delete(["bikebook_catalog/state_laws_with_rule_categories", 3, "vocabulary.json"])
+      Rails.cache.delete(["bikebook_catalog/file", 2, "vocabulary.json", "e_vehicle_classifications"])
+      WebMock.stub_request(:get, vocabulary_url).to_return(status: 503)
+      Integrations::Bikebook::Catalog::Reads.reset
+      expect(described_class.version).to eq "vocabulary.json"
+
+      expect(described_class.find("CO")).to be_nil
+      expect(described_class.version).to be_nil
+      Integrations::Bikebook::Catalog::Reads.reset
+      expect(described_class.version).to be_nil
+    end
+
+    context "while the laws can't be read" do
+      before { WebMock.stub_request(:get, vocabulary_url).to_return(status: 503) }
+
+      it "is nil" do
+        expect(described_class.version).to be_nil
+      end
+    end
+  end
+
+  describe "find" do
+    it "reads a state's e-bike law from the catalog" do
+      expect(described_class.find("CO")).to include(id: "evc/us/co/electric-bicycle", name: "Electrical Assisted Bicycle",
+        classes: [1, 2, 3], watt_cap: 750, mph: 28, throttle: true)
+      expect(described_class.find("CO")[:restrictions])
+        .to include({rule: "Class 3 riders must be 16 or older; a younger passenger may ride on one designed to carry passengers",
+          citation: "Colorado Revised Statutes §42-4-1412", categories: ["rider_rule", "top_rule_1"], sources: ["https://olls.info/crs/crs2026-title-42.pdf#page=981"],
+          starts_on: nil, ends_on: nil})
+      expect(described_class.find("CO")[:sources]).to include("https://leg.colorado.gov/bills/hb17-1151")
+    end
+
+    it "reads the parsed laws once a request" do
+      expect(described_class.find("CO")).to include(watt_cap: 750)
+      Rails.cache.clear
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(status: 503)
+
+      expect(described_class.find("CO")).to include(watt_cap: 750)
+      Integrations::Bikebook::Catalog::Reads.reset
+      expect(described_class.find("CO")).to be_nil
+    end
+
+    it "has no classes for a law that names none of the three" do
+      expect(described_class.find("PA")).to include(classes: [], mph: 20)
+    end
+
+    it "is nil for a state without an e-bike law in the catalog" do
+      expect(described_class.find("WY")).to be_nil
+    end
+
+    it "takes Alaska's e-bike law, though it's for state parks rather than roads" do
+      expect(described_class.find("AK")).to include(classes: [], watt_cap: 750, throttle: true)
+    end
+
+    it "drops a rule once it ends, and keeps a rule's start date until it starts" do
+      san_mateo = "Cities in San Mateo County may bar riders under 12 from Class 1 and Class 2 electric bicycles"
+      sidewalks = /\AA 10 mph prima facie speed limit on sidewalks/
+
+      expect(described_class.find("CA", today: Date.new(2026, 10, 8))[:restrictions])
+        .to include(a_hash_including(rule: san_mateo, starts_on: Date.new(2027, 1, 1), ends_on: Date.new(2031, 1, 1)),
+          a_hash_including(rule: sidewalks, starts_on: Date.new(2027, 1, 1), ends_on: nil))
+      expect(described_class.find("CA", today: Date.new(2027, 1, 1))[:restrictions])
+        .to include(a_hash_including(rule: san_mateo, starts_on: nil, ends_on: Date.new(2031, 1, 1)),
+          a_hash_including(rule: sidewalks, starts_on: nil, ends_on: nil))
+      after_san_mateo = described_class.find("CA", today: Date.new(2031, 1, 1))[:restrictions].pluck(:rule)
+      expect(after_san_mateo).to include(sidewalks)
+      expect(after_san_mateo).not_to include(san_mateo)
+    end
+
+    it "keeps a law's limits_start_on only until its limits are in force" do
+      motor_alone = "Its top speed on motor power alone on level ground is 20 mph"
+
+      before_the_law = described_class.find("NC", today: Date.new(2026, 11, 30))
+      expect(before_the_law).to include(limits_start_on: Date.new(2026, 12, 1), classes: [1, 2, 3])
+      expect(before_the_law[:restrictions]).to include(a_hash_including(rule: motor_alone, starts_on: nil, ends_on: Date.new(2026, 12, 1)))
+
+      in_force = described_class.find("NC", today: Date.new(2026, 12, 1))
+      expect(in_force).to include(limits_start_on: nil)
+      expect(in_force[:restrictions].pluck(:rule)).not_to include(motor_alone)
+    end
+
+    it "goes by a state's electric_bicycle law when it has another, whichever comes first" do
+      vocabulary = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
+      classifications = vocabulary["e_vehicle_classifications"]
+      vocabulary["e_vehicle_classifications"] = {"evc/us/co/bicycle" => {"name" => "Bicycle"}, **classifications,
+                                                 "evc/us/co/low-speed-electric-bicycle" => {"name" => "Low-Speed Electric Bicycle"}}
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(body: vocabulary.to_json)
+
+      expect(described_class.find("CO")).to include(id: "evc/us/co/electric-bicycle")
+    end
+
+    context "when the catalog is down" do
+      before { WebMock.stub_request(:get, %r{bikebook-catalog\.bikeindex\.org}).to_return(status: 503) }
+
+      it "is empty" do
+        expect(described_class.laws).to eq({})
+      end
+    end
+  end
+
+  describe "classes" do
+    it "is a state's own where its e-bike law isn't the three US classes: the law, then slowest first and off-highway last" do
+      vocabulary = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("vocabulary.json").read)
+      vocabulary["e_vehicle_classifications"] = {
+        "evc/us/nj/electric-motorized-bicycle" => {"name" => "Electric Motorized Bicycle", "throttle" => true, "power_min" => 750},
+        "evc/us/nj/motorcycle" => {"name" => "Motorcycle", "throttle" => true, "groups" => ["evc/motorcycle"]},
+        "evc/us/nj/motorized-bicycle" => {"name" => "Motorized Bicycle", "throttle" => true, "max_speed" => 45.06},
+        **vocabulary["e_vehicle_classifications"]
+      }
+      WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(body: vocabulary.to_json)
+
+      # New Jersey's motorcycles, its electric motorized bicycle and dirt bike among them, are the one e-moto, last
+      expect(described_class.classes("NJ").pluck(:id))
+        .to eq ["evc/us/nj/electric-bicycle", "evc/us/nj/motorized-bicycle", "evc/out-of-class"]
+      expect(described_class.classes("NJ").first).to include(name: "Low-Speed Electric Bicycle", throttle: false, mph: 20, watt_cap: nil)
+      expect(described_class.classes("NJ").second).to include(mph: 28, either: true)
+      expect(described_class.classes("NJ").third).to eq(id: "evc/out-of-class", not_an_ebike: true)
+      expect(described_class.classes("CO")).to be_nil
+      expect(described_class.classes("WY")).to be_nil
+    end
+  end
+
+  describe "places" do
+    it "has each place outside the US's e-bike laws in km/h, or its country's without its own, and its other classes" do
+      places = described_class.places
+      expect(places.keys).to match_array %w[CA EU CA-NB CA-ON]
+      expect(places["EU"][:laws]).to match [include(id: "evc/eu/epac", kmh: 25, mph: 16, watt_cap: 250, throttle: true, metric: true,
+        restrictions: have_attributes(size: 11) & include(include(rule: a_string_starting_with("No EU driving licence category covers it"))))]
+      expect(places["EU"][:classes]).to eq []
+      expect(places["CA-NB"][:laws]).to match [include(id: "evc/ca/power-assisted-bicycle", kmh: 32)]
+      expect(places["CA-NB"][:classes]).to match [include(id: "evc/ca/nb/motor-driven-cycle", kmh: 50),
+        include(id: "evc/ca/nb/motorcycle", name: "Motorcycle", throttle: true)]
+      expect(described_class.find("CO")).to include(metric: false)
+    end
+  end
+
+  describe "place_law" do
+    it "is the place's own e-bike law, or without one, the motor vehicle its country's e-bike falls in with" do
+      expect(described_class.place_law("CA-ON")).to include(name: "Power-Assisted Bicycle", kmh: 32, watt_cap: 500, metric: true)
+      expect(described_class.place_law("CA-ON")).not_to include(:motor_vehicle)
+      expect(described_class.place_law("CA-NB")).to include(name: "Motor Driven Cycle", kmh: 50, motor_vehicle: true,
+        restrictions: include(include(rule: a_string_starting_with("Registered with one plate"))))
+      expect(described_class.place_law("CA")).to include(id: "evc/ca/power-assisted-bicycle")
+      expect(described_class.place_law("CA-QC")).to be_nil
+    end
+  end
+
+  describe "e_bike_top_rules" do
+    it "is the top rules of the state's e-bike law for the class, without those only about others" do
+      expect(described_class.e_bike_top_rules("CO", e_bike_class: 3).pluck(:rule)).to match [a_string_starting_with("Class 3 is kept off bike and pedestrian paths"),
+        a_string_starting_with("Class 3 riders must be 16 or older"), a_string_starting_with("In state wildlife areas")]
+      expect(described_class.e_bike_top_rules("CO", e_bike_class: 1).pluck(:rule)).to match [a_string_starting_with("In state wildlife areas")]
+      expect(described_class.e_bike_top_rules("WY", e_bike_class: 1)).to eq []
+    end
+
+    it "keeps a rule that only one class is allowed, for the others it bars" do
+      expect(described_class.e_bike_top_rules("AK", e_bike_class: 2).pluck(:rule)).to include(a_string_starting_with("In state parks, only Class 1"))
+    end
+  end
+
+  describe "non_e_bike_classifications" do
+    it "is each of the state's classifications but its e-bike law, ready to list" do
+      classifications = described_class.non_e_bike_classifications("CA")
+      expect(classifications.pluck(:name)).to include("Moped", "Off-Highway Electric Motorcycle")
+      expect(classifications.pluck(:name)).not_to include("Electric Bicycle")
+      expect(classifications.first[:rule_groups]).to be_present
+      expect(described_class.non_e_bike_classifications("WY")).to eq []
+    end
+
+    it "is lowest speed cap first, then power cap, and off-highway last" do
+      expect(described_class.non_e_bike_classifications("CA").pluck(:name)).to eq ["Moped", "Motor-Driven Cycle", "Motorcycle",
+        "Off-Highway Motor Vehicle", "Off-Highway Electric Motorcycle"]
+      expect(described_class.non_e_bike_classifications("NJ").pluck(:name)).to eq ["Motorized Bicycle", "Motorcycle", "Dirt Bike"]
+    end
+  end
+
+  describe "emoto_rules" do
+    it "is the top rules for the state's motorcycle" do
+      expect(described_class.emoto_rules("NJ").pluck(:rule)).to match [a_string_starting_with("Riders need a motorcycle endorsement"),
+        "Titled, registered and insured with the Motor Vehicle Commission"]
+      expect(described_class.emoto_rules("CA")).to eq []
+      expect(described_class.emoto_rules("WY")).to eq []
+    end
+  end
+
+  describe "other_classification" do
+    let(:ids) { ["evc/us/ca/off-highway-electric-motorcycle"] }
+
+    it "is the state's own classification, or the one sharing its group, with its restrictions" do
+      expect(described_class.other_classification("CA", ids)).to include(name: "Off-Highway Electric Motorcycle")
+      expect(described_class.other_classification("TX", ids)).to include(name: "Off-Highway Motorcycle")
+      expect(described_class.other_classification("NY", ids)).to be_nil
+      expect(described_class.other_classification("TX", [])).to be_nil
+      # not the state's e-bike law, which a Class 3 shares a group with
+      expect(described_class.other_classification("TX", ["evc/us/class-3"])).to be_nil
+      expect(described_class.other_classification("NJ", ["evc/us/class-3"]))
+        .to include(name: "Motorized Bicycle", restrictions: include(a_hash_including(rule: /moped \(class F\) license/, citation: "N.J.S.A. 39:4-14.3")))
+    end
+
+    it "groups its rules by category, each rule once, its top rules leading, and keeps those in force as top_rules" do
+      classification = described_class.other_classification("CA", ["evc/moped"], today: Date.new(2026, 11, 4))
+      groups = classification[:rule_groups].transform_values { it.pluck(:rule) }
+
+      expect(classification[:top_rules].pluck(:rule)).to match [a_string_starting_with("Kept off bike paths and trails"), a_string_starting_with("Riders need a driver's license"),
+        a_string_starting_with("Registered with the DMV")]
+      expect(groups.keys).to eq %w[rider_rule enforcement seller_rule vehicle_definition]
+      expect(groups.values.sum(&:size)).to eq classification[:restrictions].size
+      expect(groups["rider_rule"].first(3)).to eq classification[:top_rules].pluck(:rule)
+      # a seller's duty that also defines the vehicle goes under the first of the two
+      expect(groups["seller_rule"]).to include(a_string_starting_with("Built for highway use"), a_string_starting_with("Its maker"))
+      expect(groups["vehicle_definition"]).to_not include(a_string_starting_with("Built for highway use"))
+    end
+
+    it "keeps a rule's start date until it starts, and drops one once it's ended" do
+      rules = ->(today) { described_class.other_classification("CA", ["evc/moped"], today:)[:restrictions] }
+
+      expect(rules.call(Date.new(2026, 11, 4))).to include(a_hash_including(citation: /§28191/, starts_on: Date.new(2027, 1, 1)))
+        .and include(a_hash_including(citation: /§22651\.08/, starts_on: nil))
+        .and include(a_hash_including(rule: /automatic transmission/))
+      expect(rules.call(Date.new(2027, 1, 1))).to include(a_hash_including(citation: /§28191/, starts_on: nil))
+      expect(rules.call(Date.new(2027, 1, 1)).pluck(:rule)).to_not include(a_string_matching(/automatic transmission/))
+    end
+  end
+
+  describe "classification_by_limits" do
+    def name_for(abbreviation = "CA", **) = described_class.classification_by_limits(abbreviation, **)&.dig(:name)
+
+    it "is the lightest road class the speed and power fit, and says it's by limits" do
+      expect(name_for(mph: 28, watts: 750)).to eq "Moped"
+      expect(described_class.classification_by_limits("CA", mph: 28, watts: 750)).to include(by_limits: true)
+      # past the moped's 30 mph and its 3,000W
+      expect(name_for(mph: 35, watts: 2_000)).to eq "Motor-Driven Cycle"
+      expect(name_for(mph: 28, watts: 3_500)).to eq "Motor-Driven Cycle"
+      expect(name_for(mph: 60, watts: 12_500)).to eq "Motorcycle"
+    end
+
+    it "fits any power that's unknown, and no speed cap with a speed that is" do
+      expect(name_for(mph: 28, watts: nil)).to eq "Moped"
+      expect(name_for(mph: nil, watts: nil)).to eq "Motor-Driven Cycle"
+    end
+
+    it "is nil for a state with no road class on file" do
+      expect(name_for("WY", mph: 28, watts: 750)).to be_nil
+    end
+  end
+end

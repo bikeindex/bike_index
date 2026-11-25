@@ -10,7 +10,7 @@
 #  email_invitation_sent_at :datetime
 #  hot_sheet_notification   :integer          default("notification_never")
 #  invited_email            :string(255)
-#  receive_hot_sheet        :boolean          default(FALSE)
+#  priority                 :integer          default(0), not null
 #  role                     :integer
 #  created_at               :datetime         not null
 #  updated_at               :datetime         not null
@@ -55,6 +55,19 @@ class OrganizationRole < ApplicationRecord
     ROLE_TYPES
   end
 
+  # Every listing of a user's roles goes through here, so they're in the order the user put them in
+  def self.ordered_for(user)
+    where(user_id: user.id).order(:priority, :id)
+  end
+
+  # The organization the user views Bike Index as, which is their first role when it's on by
+  # default. Nil when they've chosen to view without an organization, or hold no role at all
+  def self.default_organization(user)
+    return nil if user.blank?
+
+    ordered_for(user).where(priority: 0).eager_load(:organization).first&.organization
+  end
+
   # The role an organization grants to anyone on its user_email_domain. Nobody invited them, so
   # stamp email_invitation_sent_at to suppress the invitation - it would otherwise arrive
   # alongside whatever email the signup itself is already sending them.
@@ -69,7 +82,7 @@ class OrganizationRole < ApplicationRecord
     end
     organization_role = create!(default_attrs.merge(create_attrs))
     # Process inline so the caller gets back a role already linked to its user
-    Users::ProcessOrganizationRoleJob.new.perform(organization_role.id)
+    UserJobs::ProcessOrganizationRoleJob.new.perform(organization_role.id)
     organization_role.reload
     organization_role
   end
@@ -87,6 +100,7 @@ class OrganizationRole < ApplicationRecord
 
   def send_invitation_email?
     return false if created_by_magic_link # Don't send an email if they're already being emailed
+    return false if user_id.present? && user_id == sender_id # They added themselves, e.g. creating the organization
     return false if email_invitation_sent_at.present?
 
     invited_email.present?
@@ -100,6 +114,11 @@ class OrganizationRole < ApplicationRecord
     organization.ambassador?
   end
 
+  # The organization's permanent API token creates bikes, so it goes to the roles that can
+  def organization_access_token
+    organization.access_token unless member_no_bike_edit?
+  end
+
   def organization_creator?
     organization.organization_roles.minimum(:id) == id
   end
@@ -107,12 +126,37 @@ class OrganizationRole < ApplicationRecord
   def enqueue_processing_worker
     return true if skip_processing
 
-    # We manually update the user, because Users::ProcessOrganizationRoleJob won't find this organization_role
+    # We manually update the user, because UserJobs::ProcessOrganizationRoleJob won't find this organization_role
     if deleted? && user_id.present?
       CallbackJobs::AfterUserChangeJob.perform_async(user_id)
     else
-      Users::ProcessOrganizationRoleJob.perform_async(id)
+      UserJobs::ProcessOrganizationRoleJob.perform_async(id)
     end
+  end
+
+  # Priority 0 is the organization the user has on by default - without one, their list starts at 1
+  def on_by_default?
+    priority.zero?
+  end
+
+  # An admin leaving could strand the organization, and a role the organization grants by email
+  # domain would only come back
+  def leavable?
+    return false if admin?
+
+    !organization.enabled?("user_role_for_user_email_domain")
+  end
+
+  # Reorders the user's roles to put this one at position, counting from the first
+  def reorder_to!(position)
+    others = self.class.ordered_for(user).where.not(id:).to_a
+    ordered = others.insert(position.clamp(0, others.length), self)
+    renumber(ordered, ordered.map(&:priority).min.clamp(0, 1))
+  end
+
+  # The whole list renumbers, because on by default is the first organization being priority 0
+  def update_on_by_default!(on_by_default)
+    renumber(self.class.ordered_for(user).to_a, on_by_default ? 0 : 1)
   end
 
   def set_calculated_attributes
@@ -122,5 +166,23 @@ class OrganizationRole < ApplicationRecord
       user&.email # Basically, just for auto_user in orgs
     end
     self.claimed_at ||= Time.current if user_id.present?
+    self.priority = calculated_priority if user_id_changed? && !priority_changed?
+  end
+
+  private
+
+  # A newly joined organization goes to the end of the user's list
+  def calculated_priority
+    return 0 if user_id.blank?
+
+    (self.class.where(user_id:).where.not(id:).maximum(:priority) || -1) + 1
+  end
+
+  def renumber(organization_roles, offset)
+    organization_roles.each_with_index do |organization_role, index|
+      next if organization_role.priority == index + offset
+
+      self.class.where(id: organization_role.id).update_all(priority: index + offset)
+    end
   end
 end

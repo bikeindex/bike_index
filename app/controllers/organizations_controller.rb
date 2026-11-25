@@ -3,9 +3,7 @@ class OrganizationsController < ApplicationController
   before_action :allow_x_frame, only: %i[embed embed_extended embed_create_success]
 
   def new
-    session[:return_to] ||= new_organization_url unless current_user.present?
-    @organization = Organization.new
-    @active_section = "contact"
+    redirect_to new_organization_signup_path(kind: params[:kind])
   end
 
   def lightspeed_interface
@@ -13,32 +11,16 @@ class OrganizationsController < ApplicationController
       redirect_to("https://posintegration.bikeindex.org?organization_id=#{params[:organization_id]}", allow_other_host: true) && return
     end
 
-    session[:return_to] = lightspeed_interface_path
+    return_to = lightspeed_interface_path(organization_id: params[:organization_id])
+    # Signing up makes the account too, so it's where everyone without an organization goes -
+    # but a signed out admin of one signs in from there, and comes back here
     if current_user.present?
       flash[:notice] = translation(:must_create_an_organization_first)
-      redirect_to new_organization_path
     else
-      flash[:notice] = translation(:must_create_an_account_first)
-      redirect_to(new_user_path) && return
+      store_return_to(return_to)
+      flash[:notice] = translation(:sign_in_or_add_organization)
     end
-  end
-
-  def create
-    if current_user.blank?
-      flash[:error] = translation(:must_create_an_account_first)
-      redirect_to(new_user_path) && return
-    end
-    @organization = Organization.new(permitted_create_params)
-    if @organization.save
-      OrganizationRole.create(user_id: current_user.id, role: "admin", organization_id: @organization.id)
-      notify_admins("organization_created")
-      flash[:success] = translation(:organization_created)
-      if current_user.present?
-        redirect_to organization_manage_path(organization_id: @organization.to_param)
-      end
-    else
-      render(action: :new) && return
-    end
+    redirect_to new_organization_signup_path(return_to:)
   end
 
   # Additional parameter included in shop printouts: shop_display=true
@@ -65,18 +47,6 @@ class OrganizationsController < ApplicationController
     find_organization
     @bike = Bike.find_id(params[:bike_id])
     render layout: "embed_layout"
-  end
-
-  def qr
-    return unless find_organization.present?
-    @qr_url = case params[:target]
-    when "shop_display" then embed_organization_url(@organization, non_stolen: true, shop_display: true)
-    when "landing" then "#{root_url}#{@organization.to_param}" # not routed unless in LandingPages::ORGANIZATIONS
-    else new_register_url(organization_id: @organization.to_param)
-    end
-
-    qrcode = RQRCode::QRCode.new(@qr_url)
-    send_data qrcode.as_png(size: 1200, border_modules: 0).to_s, type: "image/png", disposition: "inline"
   end
 
   protected
@@ -109,27 +79,11 @@ class OrganizationsController < ApplicationController
     Time.current
   end
 
-  def permitted_create_params
-    approved_kind = params.dig(:organization, :kind)
-    approved_kind = "other" unless Organization.user_creatable_kinds.include?(approved_kind)
-    params.require(:organization)
-      .permit(:name, :website, locations_attributes:)
-      .merge(auto_user_id: current_user.id, kind: approved_kind)
-  end
-
-  def locations_attributes
-    %i[name phone publicly_visible] + [address_record_attributes: AddressRecord.permitted_params + [:id]]
-  end
-
   def find_organization
     @organization = Organization.friendly_find(params[:id])
     return @organization if @organization.present?
 
     flash[:error] = translation(:not_found)
     redirect_to(root_url) && return
-  end
-
-  def notify_admins(type)
-    AdminNotifier.new.for_organization(organization: @organization, user: current_user, type: type)
   end
 end

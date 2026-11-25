@@ -33,27 +33,7 @@ class Export < ApplicationRecord
     manufacturer: 2
   }.freeze
   VALID_FILE_FORMATS = %i[csv xlsx].freeze
-  DEFAULT_HEADERS = %w[
-    color
-    is_stolen
-    link
-    manufacturer
-    model
-    registered_at
-    serial
-  ].freeze
-  EXTRA_HEADERS = %w[
-    extra_registration_number
-    motorized
-    owner_email
-    owner_name
-    registered_by
-    status
-    thumbnail
-    vehicle_type
-  ].freeze
-  PERMITTED_HEADERS = (DEFAULT_HEADERS + EXTRA_HEADERS).sort.freeze
-  FEATURE_HEADERS = %w[partial_registration is_impounded impounded_at].freeze
+  HEADERS = (ComponentStructs::OrgSearchSettings::EXPORT_HEADERS.values + %w[partial_registration]).freeze
   HEADERS_FOR_AVERY_EXPORT = %w[address owner_name].freeze
 
   acts_as_paranoid
@@ -68,7 +48,6 @@ class Export < ApplicationRecord
   belongs_to :user # Creator of export
 
   attr_accessor :timezone # permit assignment
-  attr_reader :avery_export
 
   before_validation :set_calculated_attributes, on: :create
   before_validation :set_progress
@@ -91,12 +70,9 @@ class Export < ApplicationRecord
   scope :impounded, -> { where("(options -> 'impounded_bikes')::text = 'true'") }
 
   class << self
-    def default_headers
-      DEFAULT_HEADERS
-    end
-
-    def default_options(kind)
-      {"headers" => default_headers}.merge(default_kind_options[kind.to_s])
+    def default_options(kind, organization = nil)
+      headers = ComponentStructs::OrgSearchSettings.new(organization: organization || Organization.new).default_export_headers
+      {"headers" => headers}.merge(default_kind_options[kind.to_s])
     end
 
     def default_kind_options
@@ -116,30 +92,12 @@ class Export < ApplicationRecord
       }.as_json.freeze
     end
 
-    def permitted_headers(organization_or_overide = nil)
-      return PERMITTED_HEADERS unless organization_or_overide.present?
-
-      if organization_or_overide == :include_all # passing include_all overrides
-        additional_headers = reg_field_headers(OrganizationFeature::REG_FIELDS) + FEATURE_HEADERS
-      elsif organization_or_overide.is_a?(Organization)
-        additional_headers = reg_field_headers(organization_or_overide.additional_registration_fields)
-        additional_headers += %w[partial_registration] if organization_or_overide.enabled?("show_partial_registrations")
-        additional_headers += %w[is_impounded impounded_at] if organization_or_overide.enabled?("impound_bikes")
-      end
-      additional_headers ||= []
-      # We always give the option to export extra_registration_number, don't double up if org can add too
-      (PERMITTED_HEADERS + additional_headers).uniq
+    def permitted_headers(organization)
+      ComponentStructs::OrgSearchSettings.new(organization:).export_headers
     end
 
     def with_bike_sticker_code(bike_sticker_code)
       where("options->'bike_codes_assigned' @> ?", [bike_sticker_code].to_json)
-    end
-
-    private
-
-    def reg_field_headers(arr)
-      # skip the reg_ prefix, we don't want to display it
-      arr.map { |h| h.gsub("reg_", "") }
     end
   end
 
@@ -154,6 +112,8 @@ class Export < ApplicationRecord
   def avery_export?
     option?("avery_export")
   end
+
+  def avery_export = avery_export?
 
   def bike_code_start
     options["bike_code_start"]
@@ -193,6 +153,8 @@ class Export < ApplicationRecord
   end
 
   def partial_registrations
+    return false if impounded_bikes
+
     options["partial_registrations"].blank? ? false : options["partial_registrations"]
   end
 
@@ -201,10 +163,11 @@ class Export < ApplicationRecord
   end
 
   def matching_kinds
+    return [:impounded] if impounded_bikes
+
     kinds = []
-    kinds << :impounded if impounded_bikes
-    kinds << :incomplete if partial_registrations.present? && !partial_registrations.in?([false, "none"])
-    kinds << :registered unless partial_registrations == "only" || partial_registrations == "none"
+    kinds << :incomplete if partial_registrations.present?
+    kinds << :registered unless partial_registrations == "only"
     kinds
   end
 
@@ -326,11 +289,14 @@ class Export < ApplicationRecord
 
   def bikes_scoped
     raise "#{kind} scoping not set up" unless kind == "organization"
-    return Bike.none if partial_registrations.in?(["only", "none"])
+    return Bike.none if partial_registrations == "only"
     return organization.bikes.where(id: custom_bike_ids) if only_custom_bike_ids
-    return bikes_within_time(organization.bikes) unless custom_bike_ids.present?
 
-    bikes_within_time(organization.bikes).or(organization.bikes.where(id: custom_bike_ids))
+    # Not the org's impound records: a bike registered elsewhere isn't the org's to export
+    bikes = impounded_bikes ? organization.bikes.status_impounded_with_user_hidden : organization.bikes
+    return bikes_within_time(bikes) unless custom_bike_ids.present?
+
+    bikes_within_time(bikes).or(bikes.where(id: custom_bike_ids))
   end
 
   def incompletes_scoped
@@ -378,10 +344,10 @@ class Export < ApplicationRecord
   end
 
   def validated_options(opts)
-    opts = self.class.default_options(kind).merge(opts)
+    opts = self.class.default_options(kind, organization).merge(opts)
     # Permit setting any header - we'll block organizations setting those headers via show and also via controller
     # but if we want to manually create an export, we should be able to do so
-    opts["headers"] = opts["headers"] & self.class.permitted_headers(:include_all)
+    opts["headers"] = opts["headers"] & HEADERS
     opts
   end
 

@@ -40,6 +40,15 @@ class StripePrice < ApplicationRecord
     "monthly"
   end
 
+  # Falls back to the default currency unless this one has a price for every level and interval
+  def self.active_for(currency)
+    stripe_prices = active.where(currency_enum: currency.slug).to_a
+    pairs = stripe_prices.map { [it.membership_level, it.interval] }.uniq
+    return stripe_prices if pairs.size == Membership::LEVEL_ENUM.size * INTERVAL_ENUM.size
+
+    active.where(currency_enum: Currency.default.slug).to_a
+  end
+
   def test?
     !live?
   end

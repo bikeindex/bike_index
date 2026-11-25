@@ -9,7 +9,7 @@ module Organized
     def index
       @per_page = permitted_per_page
       @pagy, @bike_stickers = pagy(:countish, searched.includes(:bike)
-        .reorder("bike_stickers.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
+        .reorder(sortable_order(BikeSticker)), limit: @per_page, page: permitted_page)
     end
 
     def show
@@ -28,7 +28,7 @@ module Organized
       else
         flash[:success] = "#{@bike_sticker.kind.titleize} #{@bike_sticker.code} - #{@bike_sticker.claimed? ? "claimed" : "unclaimed"}"
         if @bike_sticker.bike.present?
-          redirect_to(bike_path(@bike_sticker.bike_id)) && return
+          redirect_to(RegistrationView.path(@bike_sticker.bike_id, user: current_user, session:)) && return
         end
       end
       redirect_back(

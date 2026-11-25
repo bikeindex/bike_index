@@ -3,6 +3,32 @@ require "rails_helper"
 RSpec.describe Organized::ManagesController, type: :request do
   let(:base_url) { "/o/#{current_organization.to_param}/manage" }
 
+  context "not signed in" do
+    let(:current_organization) { FactoryBot.create(:organization) }
+
+    it "stores return_to and the organization, then redirects to sign in" do
+      get base_url
+      expect(session[:return_to]).to eq base_url
+      expect(session[:passive_organization_id]).to eq current_organization.id
+      expect(flash[:notice]).to be_present
+      expect(response).to redirect_to(new_session_path)
+
+      follow_redirect!
+      expect(session[:passive_organization_id]).to eq current_organization.id
+    end
+
+    context "organization has passwordless_users" do
+      let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["passwordless_users"]) }
+      it "redirects to magic link" do
+        get base_url
+        expect(session[:return_to]).to eq base_url
+        expect(session[:passive_organization_id]).to eq current_organization.id
+        expect(flash[:notice]).to be_present
+        expect(response).to redirect_to(magic_link_session_path)
+      end
+    end
+  end
+
   context "given an authenticated ambassador" do
     include_context :request_spec_logged_in_as_ambassador
 
@@ -44,6 +70,21 @@ RSpec.describe Organized::ManagesController, type: :request do
     end
   end
 
+  context "logged_in_as_superuser" do
+    include_context :request_spec_logged_in_as_superuser
+    let(:current_organization) { FactoryBot.create(:organization) }
+
+    describe "show" do
+      it "renders for an organization with no claimed members" do
+        expect(current_organization.users).to be_empty
+        get base_url
+        expect(response.status).to eq(200)
+        expect(response).to render_template :show
+        expect(current_organization.reload.auto_user_id).to be_blank
+      end
+    end
+  end
+
   context "logged_in_as_organization_admin" do
     include_context :request_spec_logged_in_as_organization_admin
     describe "show" do
@@ -53,8 +94,23 @@ RSpec.describe Organized::ManagesController, type: :request do
         expect(response).to render_template :show
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:passive_organization)).to eq current_organization
+        expect(session[:passive_organization_id]).to eq current_organization.id
         expect(assigns(:controller_namespace)).to eq "organized"
         expect(assigns(:page_id)).to eq "organized_manage_show"
+        expect(Capybara.string(response.body)).to have_css("label code", text: current_organization.reload.auto_user.email)
+        expect(response.body).to include 'name="organization[send_self_registration_email]"'
+        expect(response.body).to include "owner email of #{current_organization.auto_user.email}"
+        expect(response.body).not_to include "This includes unregistered notifications"
+      end
+
+      context "with parking_notifications" do
+        let(:current_organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: %w[parking_notifications]) }
+
+        it "includes unregistered notifications" do
+          get base_url
+          expect(response.status).to eq(200)
+          expect(response.body).to include "This includes unregistered notifications"
+        end
       end
     end
 
@@ -80,6 +136,15 @@ RSpec.describe Organized::ManagesController, type: :request do
     end
 
     describe "update" do
+      context "invalid" do
+        it "shows the errors in one alert, not a flash besides" do
+          put base_url, params: {organization_id: current_organization.to_param, id: current_organization.to_param, organization: {name: "Help"}}
+          expect(response).to render_template(:show)
+          expect(response.body).to include "Invalid name"
+          expect(flash[:error]).to be_blank
+        end
+      end
+
       context "dissallowed attributes" do
         let(:org_attributes) do
           {
@@ -91,13 +156,14 @@ RSpec.describe Organized::ManagesController, type: :request do
             approved: false,
             access_token: "stuff7",
             lock_show_on_map: true,
-            is_paid: false
+            is_invoiced: false
           }
         end
         let(:user2) { FactoryBot.create(:organization_user, organization: current_organization) }
         let(:update) do
           {
             direct_unclaimed_notifications: true,
+            send_self_registration_email: true,
             # slug: 'short_name',
             slug: "cool name and stuffffff",
             available_invitation_count: "20",
@@ -109,7 +175,7 @@ RSpec.describe Organized::ManagesController, type: :request do
             website: " www.drseuss.org",
             name: "some new name",
             kind: "bike_shop",
-            is_paid: true,
+            is_invoiced: true,
             lock_show_on_map: false,
             show_on_map: true,
             locations_attributes: []
@@ -127,7 +193,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(flash[:success]).to be_present
           current_organization.reload
           # Ensure we can update what we think we can (not that much)
-          expect(current_organization).to have_attributes update.slice(:name, :direct_unclaimed_notifications)
+          expect(current_organization).to have_attributes update.slice(:name, :direct_unclaimed_notifications, :send_self_registration_email)
           # Test that the website and auto_user_id are set correctly
           expect(current_organization.auto_user_id).to eq user2.id
           expect(current_organization.website).to eq("http://www.drseuss.org")
@@ -314,7 +380,7 @@ RSpec.describe Organized::ManagesController, type: :request do
                 organization: {kind: "property_management", short_name: "cool short name"}
               }
 
-            expect(assigns[:page_errors]).to be_present
+            expect(response.body).to include "1 error prevented this Organization from being saved"
             current_organization.reload
             expect(current_organization.short_name).to_not eq "cool short name"
             expect(current_organization.kind).to_not eq "property_management"
@@ -403,6 +469,7 @@ RSpec.describe Organized::ManagesController, type: :request do
           it "still updates the organization" do
             expect(current_organization.locations.count).to eq 0
             expect(current_organization.search_coordinates_set?).to be_falsey
+            initial_cache_key = current_organization.cache_key_with_version
 
             VCR.use_cassette("organized_manages-create-location", match_requests_on: [:path]) do
               Sidekiq::Job.clear_all
@@ -433,6 +500,7 @@ RSpec.describe Organized::ManagesController, type: :request do
 
             expect(current_organization.to_coordinates).to eq [location.latitude, location.longitude]
             expect(current_organization.search_coordinates_set?).to be_truthy
+            expect(current_organization.cache_key_with_version).to_not eq initial_cache_key
           end
         end
       end
@@ -449,9 +517,9 @@ RSpec.describe Organized::ManagesController, type: :request do
           expect(flash[:notice]).to be_present
         end
       end
-      context "paid organization" do
+      context "organization with an invoice" do
         it "does not destroy" do
-          current_organization.update_attribute :is_paid, true
+          current_organization.update_attribute :is_invoiced, true
           expect {
             delete base_url
           }.to change(Organization, :count).by(0)

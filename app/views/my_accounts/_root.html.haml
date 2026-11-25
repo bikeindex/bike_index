@@ -9,6 +9,8 @@
     .form-well-input
       = f.text_field :name, class: "form-control"
 
+  = render("color_scheme", color_scheme: @user.color_scheme)
+
   .related-fields.my-account-checks
     .form-group.row
       %label.form-well-label
@@ -46,7 +48,7 @@
     .form-well-input
       -# if the user was just updated, they might not have the user_phone assigned
       -# in which case, show the phone number to reduce confusion
-      - phone_value = @user.user_phones.where(phone: @user.phone).any? ? "" : phone_display(@user.phone)
+      - phone_value = @user.user_phones.where(phone: @user.phone).any? ? "" : Phonifyer.display(@user.phone)
       = f.text_field :phone, value: phone_value, placeholder: t(".add_new_phone_number"), class: "form-control"
     - if @user.user_phones.any?
       .form-well-input-static-full-width.ml-auto
@@ -54,7 +56,7 @@
           - @user.user_phones.each do |user_phone|
             %li.row
               .col-sm-8
-                = phone_display(user_phone.phone)
+                = render Atoms::Phone::Component.new(phone: user_phone.phone, skip_link: true)
                 - if Flipper.enabled?(:phone_verification)
                   - if user_phone.confirmed?
                     %small.less-strong= t(".verified")
@@ -79,6 +81,14 @@
           options_for_select(language_choices, selected: current_user.preferred_language),
           {prompt: t(".choose_language"), include_blank: true},
           {class: "language-select-input form-control"} )
+    .form-group.row.fancy-select.unfancy
+      = f.label :preferred_unit_system, class: "form-well-label" do
+        = t(".preferred_unit_system")
+      .form-well-input
+        = f.select(:preferred_unit_system,
+          [[t(".unit_system_metric"), "metric"], [t(".unit_system_imperial"), "imperial"]],
+          {include_blank: t(".unit_system_automatic")},
+          {class: "form-control"})
     .form-group.row.mt-3
       %label.form-well-label
       %label.form-well-input.form-well-input-checks
@@ -111,7 +121,7 @@
               = user_email.email
             .right-input-help.right-text-help.mt-2
               = link_to t(".make_primary_email"), make_primary_user_email_path(user_email.id), method: :post, class: "d-block"
-              = link_to t(".remove_email"), user_email_path(user_email.id), method: :delete, data: {confirm: "Are you sure you want to remove #{user_email.email}?"}, class: 'delete-email'
+              = render("remove_email_button", user_email:)
     - if @user.user_emails.unconfirmed.count > 0
       .related-fields.no-divider-row
         - labeled = false
@@ -125,7 +135,7 @@
               = user_email.email
             .right-input-help.right-text-help.mt-2
               = link_to t(".resend_confirmation"), resend_confirmation_user_email_path(user_email.id), method: :post, class: "d-block"
-              = link_to t(".remove_email"), user_email_path(user_email.id), method: :delete, data: {confirm: "Are you sure you want to remove #{user_email.email}?"}, class: 'delete-email'
+              = render("remove_email_button", user_email:)
 
   .related-fields#additional_email_fields
     = f.hidden_field :additional_emails, value: nil

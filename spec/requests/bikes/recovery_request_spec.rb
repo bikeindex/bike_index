@@ -10,16 +10,23 @@ RSpec.describe Bikes::RecoveryController, type: :request do
     context "nonmatching recovery token" do
       it "redirects" do
         get "#{base_url}/edit?token=XXXXXXXX"
-        expect(response).to redirect_to bike_url(bike)
+        expect(response).to redirect_to registration_url(bike)
         expect(flash[:error]).to be_present
         expect(session[:recovery_link_token]).to be_blank
       end
     end
     context "matching recovery token" do
-      it "renders" do
+      # bikes#show reads it, and raises ReadOnlyError creating it under set_reading_role
+      before { RearGearType.fixed }
+
+      it "renders, and the registration page spends the token on a mark-recovered modal" do
         get "#{base_url}/edit?token=#{recovery_link_token}"
-        expect(response).to redirect_to bike_path(bike)
+        expect(response).to redirect_to registration_path(bike)
         expect(session[:recovery_link_token]).to eq recovery_link_token
+
+        follow_redirect!
+        expect(response.body).to match(recovery_link_token)
+        expect(session[:recovery_link_token]).to be_nil
       end
     end
     context "already recovered bike" do
@@ -28,7 +35,7 @@ RSpec.describe Bikes::RecoveryController, type: :request do
         bike.reload
         expect(bike.status_stolen?).to be_falsey
         get "#{base_url}/edit?token=#{recovery_link_token}"
-        expect(response).to redirect_to bike_url(bike)
+        expect(response).to redirect_to registration_url(bike)
         expect(flash[:notice]).to match(/already/)
         expect(session[:recovery_link_token]).to be_blank
       end
@@ -55,7 +62,7 @@ RSpec.describe Bikes::RecoveryController, type: :request do
               token: recovery_link_token,
               stolen_record: recovery_info
             }
-        }.to change(Email::RecoveredFromLinkJob.jobs, :size).by(1)
+        }.to change(EmailJobs::RecoveredFromLinkJob.jobs, :size).by(1)
         stolen_record.reload
         bike.reload
         expect(bike.status_stolen?).to be_falsey
@@ -74,7 +81,7 @@ RSpec.describe Bikes::RecoveryController, type: :request do
         it "updates and assigns recovering_user" do
           expect {
             put base_url, params: {bike_id: bike.id, token: recovery_link_token, stolen_record: recovery_info}
-          }.to change(Email::RecoveredFromLinkJob.jobs, :size).by(1)
+          }.to change(EmailJobs::RecoveredFromLinkJob.jobs, :size).by(1)
           stolen_record.reload
           bike.reload
 
@@ -94,11 +101,11 @@ RSpec.describe Bikes::RecoveryController, type: :request do
       it "does not update" do
         expect {
           put base_url, params: {bike_id: bike.id, token: "XDSFCVVVVVVVVVSD888", stolen_record: recovery_info}
-        }.to change(Email::RecoveredFromLinkJob.jobs, :size).by(0)
+        }.to change(EmailJobs::RecoveredFromLinkJob.jobs, :size).by(0)
         stolen_record.reload
         bike.reload
 
-        expect(response).to redirect_to bike_url(bike)
+        expect(response).to redirect_to registration_url(bike)
         expect(flash[:error]).to be_present
         expect(bike.status_stolen?).to be_truthy
         expect(stolen_record.recovered?).to be_falsey

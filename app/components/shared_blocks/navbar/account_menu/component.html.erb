@@ -1,0 +1,18 @@
+<%= render UI::Dropdown::Component.new(name:, button_class: @button_class) do |dropdown| %>
+  <% dropdown.with_button { content } %>
+
+  <% items.each do |item| %>
+    <% case item[:type] %>
+    <% when :divider %>
+      <% dropdown.with_entry_divider %>
+    <% when :link %>
+      <% dropdown.with_entry_item do %>
+        <%= render entry(item) %>
+      <% end %>
+    <% when :disabled %>
+      <% dropdown.with_entry_item do %>
+        <span data-active="true"><%= item[:label] %></span>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

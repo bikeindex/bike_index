@@ -8,7 +8,7 @@ module Admin
       @per_page = permitted_per_page(default: 50)
       @pagy, @impound_claims = pagy(:countish,
         matching_impound_claims.includes(:user, :organization, :impound_record, :bike_claimed, :bike_submitting)
-          .order(sort_column + " " + sort_direction),
+          .order(sortable_order(ImpoundClaim)),
         limit: @per_page,
         page: permitted_page)
     end
@@ -21,11 +21,11 @@ module Admin
     protected
 
     def available_statuses
-      %w[all current resolved] + (ImpoundClaim.statuses - ["current"]) # current ordered the way we want to display
+      %w[all current stalled resolved] + (ImpoundClaim.statuses - ["current"]) # current ordered the way we want to display
     end
 
     def sortable_columns
-      %w[created_at organization_id updated_at status user_id impound_record resolved_at]
+      %w[created_at organization_id updated_at status user_id impound_record_id resolved_at]
     end
 
     def earliest_period_date
@@ -41,6 +41,8 @@ module Admin
         @search_status = available_statuses.include?(params[:search_status]) ? params[:search_status] : available_statuses.first
         impound_claims = if ImpoundClaim.statuses.include?(@search_status)
           impound_claims.where(status: @search_status)
+        elsif @search_status == "current"
+          impound_claims.active
         else
           impound_claims.public_send(@search_status)
         end

@@ -15,6 +15,10 @@ class ApplicationController < ActionController::Base
   rescue_from Pagy::RangeError, with: :redirect_to_last_page
   # A "null" Origin raises from Rails' origin check rather than calling handle_unverified_request
   rescue_from ActionController::InvalidAuthenticityToken, with: :handle_unverified_request
+  # IpSpoofAttackFilter returns the same 403, but only after the request log records the raise as a 500
+  rescue_from ActionDispatch::RemoteIp::IpSpoofAttackError, with: :forbid_ip_spoof
+  # An explicit render raises this where an implicit one raises the UnknownFormat Honeybadger ignores
+  rescue_from ActionView::MissingTemplate, with: :not_acceptable_in_other_format
 
   def allow_x_frame
     SecureHeaders.opt_out_of_header(request, :x_frame_options)
@@ -25,8 +29,7 @@ class ApplicationController < ActionController::Base
     redirect_to user_root_url
   end
 
-  # Overrides hand back the form they were given rather than redirecting, so they share the
-  # copy from here - one scope literal instead of one per controller
+  # Shared with the controllers that override handle_unverified_request to re-render
   def invalid_authenticity_token_message
     translation(:invalid_authenticity_token, scope: [:controllers, :application, :handle_unverified_request])
   end
@@ -65,6 +68,16 @@ class ApplicationController < ActionController::Base
     params.delete(:page) if page.present? && !page.is_a?(String) && !page.is_a?(Integer)
   end
 
+  def forbid_ip_spoof
+    render plain: "Forbidden", status: :forbidden
+  end
+
+  def not_acceptable_in_other_format(exception)
+    raise exception if lookup_context.formats.include?(:html) || !lookup_context.any?(exception.path, exception.prefixes)
+
+    head :not_acceptable
+  end
+
   def user_for_paper_trail
     current_user&.id
   end
@@ -73,11 +86,6 @@ class ApplicationController < ActionController::Base
     @stolenness ||= params["stolenness"].present? ? params["stolenness"] : "all"
     params.permit(*Bike.permitted_search_params).merge(stolenness: @stolenness)
       .to_h # Use to_h here to prevent unpermitted params logs over and over
-  end
-
-  def default_url_options(options = {})
-    # forward locale param when provided
-    params.permit(:locale).merge(options)
   end
 
   def locale_from_request_header
@@ -89,19 +97,25 @@ class ApplicationController < ActionController::Base
   end
 
   def requested_locale
-    return @requested_locale if defined?(@requested_locale)
+    @requested_locale ||= available_locale(locale_from_request_params.presence || implicit_locale)
+  end
 
-    requested_locale =
-      locale_from_request_params.presence ||
-      current_user&.preferred_language.presence ||
-      locale_from_request_header.presence
+  # The locale the request would render in without its locale param, which is what makes the
+  # param redundant -- default_url_options drops one rather than trailing it across every link
+  def implicit_locale
+    @implicit_locale ||= available_locale(current_user&.preferred_language.presence ||
+      locale_from_request_header.presence)
+  end
 
-    @requested_locale =
-      if I18n.available_locales.include?(requested_locale.to_s.to_sym)
-        requested_locale
-      else
-        I18n.default_locale
-      end
+  def available_locale(locale)
+    I18n.available_locales.include?(locale.to_s.to_sym) ? locale : I18n.default_locale
+  end
+
+  def default_url_options(options = {})
+    return options if locale_from_request_params == implicit_locale.to_s ||
+      I18n.available_locales.exclude?(locale_from_request_params.to_sym)
+
+    {locale: locale_from_request_params}.merge(options)
   end
 
   # Around filter to ensure locale (language and timezone) are set only per request

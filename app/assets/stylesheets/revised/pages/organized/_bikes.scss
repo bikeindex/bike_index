@@ -6,7 +6,9 @@
     }
   }
   .container > iframe {
-    min-height: 1400px;
+    // org--embed-iframe overwrites this; a min-height would floor the ~850px parking
+    // notification form
+    height: 1400px;
     width: 100%;
     border: none;
   }

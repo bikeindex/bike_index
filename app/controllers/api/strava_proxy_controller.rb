@@ -44,7 +44,7 @@ module API
 
     # returns {user:, strava_integration:} if valid, otherwise {error:, status:}
     def authorize_user_and_strava_integration
-      auth = authorize_user(doorkeeper_token)
+      auth = authorize_user
       return auth if auth[:error]
 
       strava_integration = auth[:user].strava_integration

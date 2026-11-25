@@ -28,7 +28,8 @@ class CycleType
     "non-e-skateboard": 20,
     "e-motorcycle": 21,
     elliptical: 22,
-    "balance-bike": 23
+    "balance-bike": 23,
+    "e-atv": 24
   }.freeze
 
   DEFAULT = "Bike"
@@ -50,21 +51,23 @@ class CycleType
     "trail-behind": "Trail behind (half bike)",
     "pedi-cab": "Pedi Cab (rickshaw)",
     "e-scooter": "e-Scooter",
-    "personal-mobility": "e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)",
+    "personal-mobility": "e-Personal Mobility Device (EPAMD, e-Skateboard, Segway, e-Unicycle, etc)",
     "non-e-scooter": "Scooter (not electric)",
     "non-e-skateboard": "Skateboard (not electric)",
     "e-motorcycle": "e-Motorcycle (e-Dirt bike, e-bike with no pedals)",
     elliptical: "Elliptical bike",
-    "balance-bike": "Balance Bike"
+    "balance-bike": "Balance Bike",
+    "e-atv": "e-ATV (e-Quad, electric all-terrain vehicle)"
   }.freeze
 
   MODEST_PRIORITY = %i[personal-mobility recumbent tandem tricycle].freeze
 
   PEDAL = %i[bike cargo cargo-rear cargo-trike cargo-trike-rear pedi-cab penny-farthing
     recumbent tall-bike tandem trail-behind tricycle unicycle].freeze
-  ALWAYS_MOTORIZED = %i[e-scooter personal-mobility e-motorcycle].freeze
+  ALWAYS_MOTORIZED = %i[e-scooter personal-mobility e-motorcycle e-atv].freeze
   NEVER_MOTORIZED = %i[non-e-scooter non-e-skateboard trail-behind balance-bike].freeze
-  NOT_CYCLE_TYPE = %i[e-scooter non-e-skateboard personal-mobility stroller wheelchair e-motorcycle].freeze
+  # Bike Book copies this in its catalog slugs: bikebook/hydrate.js and Pages::EbikeRules::BikeSummary
+  NOT_CYCLE_TYPE = %i[e-scooter non-e-skateboard personal-mobility stroller wheelchair e-motorcycle e-atv].freeze
 
   class << self
     def slug_translation_short(slug)
@@ -92,7 +95,7 @@ class CycleType
     end
 
     def front_and_rear_wheels?(slug)
-      (PEDAL - %i[unicycle trail-behind trailer] + %i[e-scooter non-e-scooter e-motorcycle])
+      (PEDAL - %i[unicycle trail-behind trailer] + %i[e-scooter non-e-scooter e-motorcycle e-atv])
         .include?(slug&.to_sym)
     end
 

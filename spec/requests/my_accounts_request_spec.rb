@@ -8,6 +8,13 @@ RSpec.describe MyAccountsController, type: :request do
       it "redirects" do
         get base_url
         expect(response).to redirect_to(/session\/new/) # weird subdomain issue matching url directly otherwise
+        expect(session[:return_to]).to eq base_url
+      end
+
+      it "doesn't store a return_to too long for the session cookie" do
+        get base_url, params: {q: "x" * 4_000}
+        expect(response).to redirect_to(/session\/new/)
+        expect(session[:return_to]).to be_blank
       end
     end
 
@@ -61,6 +68,19 @@ RSpec.describe MyAccountsController, type: :request do
             expect(assigns[:passive_organization]).to eq organization
           end
         end
+        context "with an organization, viewing without one" do
+          let(:organization) { FactoryBot.create(:organization) }
+          let(:current_user) { FactoryBot.create(:organization_user, organization:) }
+
+          it "leaves passive_organization nil" do
+            OrganizationRole.ordered_for(current_user).first.update_on_by_default!(false)
+            expect(OrganizationRole.default_organization(current_user)).to be_nil
+            get base_url
+            expect(response.status).to eq(200)
+            expect(session[:passive_organization_id]).to eq "0"
+            expect(assigns[:passive_organization]).to be_nil
+          end
+        end
         context "with stuff" do
           let!(:bike1) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
           let!(:bike2) { FactoryBot.create(:bike, :with_ownership_claimed, user: current_user) }
@@ -83,6 +103,16 @@ RSpec.describe MyAccountsController, type: :request do
               expect(response.status).to eq(200)
               expect(response).to render_template("show")
             end
+          end
+        end
+        context "paged" do
+          before { FactoryBot.create_list(:bike, 2, :with_ownership_claimed, user: current_user) }
+
+          it "keeps the per_page in the pagination, and nothing else from the URL" do
+            get base_url, params: {page: 1, per_page: 1, host: "attacker.test"}
+            expect(response.status).to eq(200)
+            expect(response.body).to include("/my_account?page=2&amp;per_page=1")
+            expect(response.body).not_to include("attacker.test")
           end
         end
         context "with lock with deleted manufacturer" do
@@ -124,6 +154,66 @@ RSpec.describe MyAccountsController, type: :request do
         end
       end
     end
+
+    context "with a claimed registration" do
+      include_context :request_spec_logged_in_as_user
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: current_user) }
+
+      it "renders the donation modal" do
+        get base_url
+        expect(response.body).to match("donationModal")
+      end
+
+      context "registered by an organization that pays" do
+        before { organization.update_column :paid_money, true }
+
+        it "doesn't render the donation modal" do
+          get base_url
+          expect(response.body).to_not match("donationModal")
+        end
+      end
+    end
+
+    # Signing a law enforcement organization's user in is what raises the donation
+    # request, and the general alert is what gives way to it
+    context "with a donation request and a general alert" do
+      let(:password) { "example_password2" }
+      let(:organization) { FactoryBot.create(:organization, kind: "law_enforcement") }
+      let(:user) do
+        FactoryBot.create(:organization_user, organization:, password:, password_confirmation: password)
+      end
+      let!(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: user) }
+
+      it "shows the donation modal rather than the alert, and the alert once it's spent" do
+        post "/session", params: {session: {email: user.email, password:}}
+        expect(session[:render_donation_request]).to eq "law_enforcement"
+        expect(user.reload.alert_slugs).to eq ["unfinished_registration"]
+
+        get base_url
+        expect(whitespace_normalized_body_text).to match("Thanks for using Bike Index")
+        expect(whitespace_normalized_body_text).to_not match("isn't registered yet!")
+
+        # The session only carries it once, so the alert has the spot back
+        get base_url
+        expect(whitespace_normalized_body_text).to_not match("Thanks for using Bike Index")
+        expect(whitespace_normalized_body_text).to match("isn't registered yet!")
+      end
+    end
+  end
+
+  # The organized nav already links an organization's own registrations, so the footer
+  # is a member's only way to the whole registry
+  describe "the footer's Search link" do
+    include_context :request_spec_logged_in_as_organization_user
+
+    it "points at every registration" do
+      get base_url
+      expect(assigns[:passive_organization]).to eq current_organization
+      footer_search_href = Nokogiri::HTML(response.body).css("footer.primary-footer a")
+        .find { |link| link.text.strip == "Search" }&.attr("href")
+      expect(footer_search_href).to eq search_registrations_path(stolenness: "all")
+    end
   end
 
   describe "/edit" do
@@ -146,6 +236,12 @@ RSpec.describe MyAccountsController, type: :request do
         expect(response).to render_template("edit")
         expect(response).to render_template(partial: "_root")
         expect(response).to render_template("layouts/application")
+        expect(Capybara.string(response.body)).to have_select("user_preferred_unit_system",
+          options: ["Automatic, from your location", "Metric (kilometers, millimeters)", "Imperial (miles, inches)"])
+        radios = Nokogiri::HTML(response.body).css("input[type=radio][name='user[color_scheme]']")
+        # The account form's picker, then the footer's
+        expect(radios.map { it["value"] }).to eq %w[light dark system] * 2
+        expect(radios.select { it["checked"] }.map { it["value"] }).to eq %w[system] * 2
       end
     end
     context "application layout" do
@@ -162,6 +258,20 @@ RSpec.describe MyAccountsController, type: :request do
         end
       end
     end
+    context "with organization_role" do
+      let(:target_templates) { default_edit_templates.merge(organization_roles: "Organization Roles") }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: current_user) }
+
+      it "includes the organization_roles template" do
+        get "#{base_url}/edit/organization_roles"
+        expect(response).to be_ok
+        expect(assigns(:edit_template)).to eq("organization_roles")
+        expect(assigns(:edit_templates)).to eq target_templates.as_json
+        expect(assigns(:organization_roles)).to eq([organization_role])
+        expect(response).to render_template(partial: "_organization_roles")
+      end
+    end
+
     context "with user_registration_organization" do
       let(:target_templates) { default_edit_templates.merge(registration_organizations: "Registration Organizations") }
       let!(:user_registration_organization) { FactoryBot.create(:user_registration_organization, user: current_user) }
@@ -188,6 +298,19 @@ RSpec.describe MyAccountsController, type: :request do
     # force skip_update to be false, like it is in reality (unblocks updating)
     before { current_user.skip_update = false }
 
+    context "on_by_default" do
+      let!(:organization_roles) { Array.new(2) { FactoryBot.create(:organization_role_claimed, user: current_user) } }
+
+      it "renumbers the user's roles from 1, and back from 0" do
+        patch base_url, params: {on_by_default: "0", edit_template: "organization_roles"}
+        expect(response).to redirect_to edit_my_account_url(edit_template: "organization_roles")
+        expect(OrganizationRole.ordered_for(current_user).pluck(:priority)).to eq([1, 2])
+
+        patch base_url, params: {on_by_default: "1", edit_template: "organization_roles"}
+        expect(OrganizationRole.ordered_for(current_user).pluck(:priority)).to eq([0, 1])
+      end
+    end
+
     context "reserved username" do
       it "doesn't update username" do
         current_user.reload
@@ -195,6 +318,10 @@ RSpec.describe MyAccountsController, type: :request do
         patch base_url, params: {id: current_user.username, user: {username: "confirm"}, edit_template: "sharing"}
         expect(response).to render_template(:edit)
         expect(assigns(:page_errors)).to include("Username is reserved")
+        page = Nokogiri::HTML(response.body)
+        expect(page.at_css("[role=alert] li").text).to eq "Username is reserved"
+        # BikeIndexAlerts hides .primary-alert-block whenever it holds no .alert
+        expect(page.at_css(".primary-alert-block [role=alert]")).to be_blank
         current_user.reload
         expect(current_user.username).to eq("something")
       end
@@ -247,6 +374,32 @@ RSpec.describe MyAccountsController, type: :request do
       }
       expect(current_user.reload.authenticate("new_password")).to be_falsey
       expect(current_user.name).not_to eq("Mr. Slick")
+    end
+
+    context "passwordless user" do
+      let!(:current_user) { FactoryBot.create(:user_confirmed, passwordless_user: true) }
+      let(:password_params) { {password: "new_password", password_confirmation: "new_password"} }
+
+      it "sets a first password without a current one" do
+        get "#{base_url}/edit/password"
+        expect(Capybara.string(response.body)).to have_no_field("user_current_password")
+
+        patch base_url, params: {user: password_params, edit_template: "password"}
+        expect(response).to redirect_to edit_my_account_url(edit_template: "password")
+        current_user.reload
+        expect(current_user.passwordless_user?).to be_falsey
+        expect(current_user.authenticate("new_password")).to be_truthy
+
+        get "#{base_url}/edit/password"
+        expect(Capybara.string(response.body)).to have_field("user_current_password")
+      end
+
+      it "stays passwordless when the confirmation doesn't match" do
+        patch base_url, params: {user: password_params.merge(password_confirmation: "new_passwordd"), edit_template: "password"}
+        expect(response).to render_template(:edit)
+        expect(Capybara.string(response.body)).to have_no_field("user_current_password")
+        expect(current_user.reload.passwordless_user?).to be_truthy
+      end
     end
 
     context "setting address" do
@@ -613,11 +766,11 @@ RSpec.describe MyAccountsController, type: :request do
         context "with multiple user_registration_organizations" do
           let(:organization2) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["reg_organization_affiliation"]) }
           let(:user_registration_organization2) { FactoryBot.create(:user_registration_organization, all_bikes: true, user: current_user, organization: organization2) }
-          let(:bike3_information) { {bike_sticker: "vvvv"}.merge(default_location_registration_address).as_json }
+          let(:bike3_information) { {bike_sticker: "vvvv"}.merge(default_location_registration_info).as_json }
           let(:bike3) { FactoryBot.create(:bike, :with_ownership_claimed, :with_address_record, address_in: :new_york, user: current_user, creation_registration_info: bike3_information) }
           let(:target_extra_info) do
             target_info.merge("organization_affiliation_#{organization2.id}" => "employee")
-              .merge(default_location_registration_address).as_json
+              .merge(default_location_registration_info).as_json
           end
           it "updates" do
             expect_bike1_initiated
@@ -636,7 +789,7 @@ RSpec.describe MyAccountsController, type: :request do
             bike1_organization2.destroy
 
             expect(bike3.reload.registration_info).to eq(bike3_information)
-            expect(bike3.address_hash_legacy).to eq default_location_registration_address.merge(country: "United States", street_2: nil).as_json
+            expect(bike3.address_record).to have_attributes default_location_address_record_attrs
 
             Sidekiq::Job.clear_all
             put base_url, params: {
@@ -671,18 +824,15 @@ RSpec.describe MyAccountsController, type: :request do
             expect(bike_organization1.overridden_by_user_registration?).to be_truthy
 
             expect(bike2.reload.bike_organizations.pluck(:organization_id)).to match_array([organization1.id, organization2.id])
-            expect(bike2.registration_info).to eq target_extra_info.merge(default_location_registration_address).as_json
+            expect(bike2.registration_info).to eq target_extra_info.merge(default_location_registration_info).as_json
             expect(bike2_organization1.can_edit_claimed).to be_falsey
             expect(bike2_organization1.overridden_by_user_registration?).to be_truthy
 
             expect(bike3.reload.organizations.pluck(:id)).to match_array([organization1.id])
-            target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_address).as_json
+            target_bike3_info = bike3_information.merge(target_extra_info).merge(default_location_registration_info).as_json
             expect(bike3.registration_info).to eq target_bike3_info
 
             expect(current_user.reload.address_record).to have_attributes default_location_address_record_attrs.merge(kind: "user")
-
-            expect(current_user.address_hash_legacy)
-              .to eq default_location_registration_address.merge("country" => "United States", "street_2" => nil)
           end
         end
       end
@@ -712,6 +862,50 @@ RSpec.describe MyAccountsController, type: :request do
         expect(flash[:success]).to be_blank
         expect(response).to render_template(:edit)
         expect(current_user.reload.preferred_language).to eq(nil)
+      end
+    end
+
+    describe "color_scheme" do
+      it "updates, and rejects an unknown value" do
+        patch base_url, params: {id: current_user.username, user: {color_scheme: "system"}}
+        expect(flash[:success]).to be_present
+        expect(current_user.reload.color_scheme).to eq "system"
+
+        patch base_url, params: {id: current_user.username, user: {color_scheme: "dark"}}
+        expect(current_user.reload.color_scheme).to eq "dark"
+
+        patch base_url, params: {id: current_user.username, user: {color_scheme: "plaid"}}
+        expect(flash[:success]).to be_blank
+        expect(response).to render_template(:edit)
+        expect(current_user.reload.color_scheme).to eq "dark"
+      end
+
+      it "answers the switcher's json save without a redirect or the after-change job" do
+        Sidekiq::Job.clear_all
+        patch base_url, params: {user: {color_scheme: "light"}}, as: :json
+        expect(response.status).to eq 204
+        expect(CallbackJobs::AfterUserChangeJob.jobs.count).to eq 0
+        expect(current_user.reload.color_scheme).to eq "light"
+
+        patch base_url, params: {user: {color_scheme: "plaid"}}, as: :json
+        expect(response.status).to eq 422
+        expect(current_user.reload.color_scheme).to eq "light"
+      end
+    end
+
+    describe "preferred_unit_system" do
+      it "updates, and blank leaves it to the location" do
+        patch base_url, params: {id: current_user.username, user: {preferred_unit_system: "imperial"}}
+        expect(flash[:success]).to be_present
+        expect(current_user.reload.preferred_unit_system).to eq "imperial"
+
+        patch base_url, params: {id: current_user.username, user: {preferred_unit_system: ""}}
+        expect(current_user.reload.preferred_unit_system).to be_nil
+
+        patch base_url, params: {id: current_user.username, user: {preferred_unit_system: "furlongs"}}
+        expect(flash[:success]).to be_blank
+        expect(response).to render_template(:edit)
+        expect(current_user.reload.preferred_unit_system).to be_nil
       end
     end
   end
@@ -744,45 +938,6 @@ RSpec.describe MyAccountsController, type: :request do
         end.to change(User, :count).by(0)
         expect(Bike.count).to eq 1
         expect(flash[:error]).to eq "Organization admins cannot delete their accounts. Email support@bikeindex.org for help"
-      end
-    end
-  end
-
-  describe "toggle_show_redesign" do
-    let(:bike) { FactoryBot.create(:bike) }
-    context "user not logged in" do
-      it "redirects to sign in without toggling" do
-        post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-        expect(response).to redirect_to(/session\/new/)
-      end
-    end
-    context "user logged in" do
-      include_context :request_spec_logged_in_as_user
-      let(:current_user) { FactoryBot.create(:user_confirmed) }
-
-      it "opts into the legacy view and redirects to the legacy page" do
-        post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-        expect(response).to redirect_to(bike_path(bike))
-        expect(current_user.reload.feature_registration_show_legacy).to be_truthy
-      end
-
-      context "user opted into the legacy view" do
-        let(:current_user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
-        it "opts back out and redirects to the redesign" do
-          post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-          expect(response).to redirect_to(registration_path(bike))
-          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
-        end
-      end
-
-      context "user invalid for an unrelated reason" do
-        before { current_user.update_column(:preferred_language, "xx") }
-        it "flashes an error and returns to the view they came from" do
-          post "#{base_url}/toggle_show_redesign", params: {bike_id: bike.id}
-          expect(response).to redirect_to(registration_path(bike))
-          expect(flash[:error]).to match(/unable to update/i)
-          expect(current_user.reload.feature_registration_show_legacy).to be_falsey
-        end
       end
     end
   end

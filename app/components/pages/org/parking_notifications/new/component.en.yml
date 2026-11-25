@@ -1,0 +1,19 @@
+---
+en:
+  components:
+    pages:
+      org:
+        parking_notifications:
+          new:
+            create_parking_notification: Create parking notification
+            internal_notes: "%{org_name} internal notes"
+            model: Model
+            new_unregistered_notification: New unregistered notification
+            not_shown_to_user: not shown to user
+            notification_because: Notification because
+            parking_notification: Parking notification
+            photo: Photo
+            registration_form_settings: Registration form settings
+            serial_number: Serial number
+            vehicle_info: Vehicle info
+            vehicle_type: Vehicle type

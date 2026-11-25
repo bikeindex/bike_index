@@ -1,5 +1,4 @@
 import { Controller } from '@hotwired/stimulus'
-import TimeLocalizer from '@bikeindex/time-localizer'
 
 /* global window */
 
@@ -28,13 +27,13 @@ export default class extends Controller {
     // submit here - just reconcile a restored snapshot with the address bar.
     this.refreshResults()
 
-    // Add timeLocalizer and watch for turbo-frame renders
-    if (!window.timeLocalizer) window.timeLocalizer = new TimeLocalizer()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     document.addEventListener('turbo:load', this.handleTurboLoad)
+    document.addEventListener('turbo:before-visit', this.handleBeforeVisit)
     // Surface throttling: the eager results frame and the kind-count fetch can
     // both come back 429 during active searching. Catch the frame's response
     // here; the count fetch signals via the search:rate-limited window event.
+    document.addEventListener('turbo:before-fetch-request', this.handleFetchRequest)
     document.addEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.addEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.addEventListener('search:rate-limited', this.showRateLimited)
@@ -47,6 +46,8 @@ export default class extends Controller {
   disconnect () {
     document.removeEventListener('turbo:frame-render', this.handleFrameRender)
     document.removeEventListener('turbo:load', this.handleTurboLoad)
+    document.removeEventListener('turbo:before-visit', this.handleBeforeVisit)
+    document.removeEventListener('turbo:before-fetch-request', this.handleFetchRequest)
     document.removeEventListener('turbo:before-fetch-response', this.handleFetchResponse)
     document.removeEventListener('turbo:fetch-request-error', this.handleFetchError)
     window.removeEventListener('search:rate-limited', this.showRateLimited)
@@ -56,6 +57,18 @@ export default class extends Controller {
 
   handleTurboLoad = () => {
     this.refreshResults()
+  }
+
+  // A frame navigation pushes its history entry, renders, then starts a visit to the entry, which
+  // cancels any running visit - so a back/forward landing before that loses its restoration, the
+  // one thing that re-renders the form. That visit renders nothing, so nothing's lost without it.
+  handleBeforeVisit = (event) => {
+    const { url } = event.detail
+    if (url === this.frameElement?.src && this.differentSearchOnSamePage(url, window.location.href)) event.preventDefault()
+  }
+
+  submit () {
+    this.formTarget.requestSubmit()
   }
 
   // Clear any stale loading state, then bring the results frame in line with the
@@ -74,11 +87,20 @@ export default class extends Controller {
   // server instead, so missing those (the controller reconnects after the
   // popstate) is harmless.
   handlePopstate = () => {
+    // Whatever the frame last asked for belongs to the entry we just left, so from
+    // here it can't mean the frame is ahead of the address bar
+    this.requestedURL = null
     const params = new URLSearchParams(window.location.search)
-    ;['search_email', 'serial', 'search_notes'].forEach(name => {
-      const input = this.formTarget.querySelector(`input[name="${name}"]`)
-      if (input) input.value = params.get(name) || ''
-    })
+    // Opted in, where the server renders no default for a URL without the param. elements,
+    // not querySelectorAll: the settings panel's radios reach the form with form=
+    ;[...this.formTarget.elements]
+      .filter(input => input.matches('input[name=search_email], input[name=serial], input[name=search_notes], input[data-restores-from-url]'))
+      .forEach(input => {
+        if (input.type !== 'radio') return (input.value = params.get(input.name) || '')
+        // A radio group the URL doesn't name is on its first, which isn't filtering
+        const group = this.formTarget.elements.namedItem(input.name)
+        group.value = params.get(input.name) ?? group[0].value
+      })
   }
 
   // A back/forward restoration can leave the results frame showing a snapshot for
@@ -88,6 +110,10 @@ export default class extends Controller {
   reloadFrameIfUrlStale () {
     const frame = this.frameElement
     if (!this.differentSearchOnSamePage(frame?.getAttribute('src'), window.location.href)) return
+    // Turbo advances the address bar only once a frame navigation has rendered, so a
+    // frame already asking for a different search is ahead of the URL rather than
+    // stale, and a turbo:load landing in that window would throw the rider's search away.
+    if (this.differentSearchOnSamePage(this.requestedURL, window.location.href)) return
 
     frame.setAttribute('src', window.location.href)
   }
@@ -103,7 +129,16 @@ export default class extends Controller {
     const first = new URL(url, window.location.origin)
     const second = new URL(otherUrl, window.location.origin)
 
-    return first.pathname === second.pathname && first.search !== second.search
+    return first.pathname === second.pathname && this.resultsSearch(first) !== this.resultsSearch(second)
+  }
+
+  // The org chart's scope and open state ride in the address bar so a reload keeps them,
+  // but the results are the same under either - moving them mustn't re-run the search.
+  resultsSearch (url) {
+    const params = new URLSearchParams(url.search)
+    ;['chart_scope', 'chart_open'].forEach(name => params.delete(name))
+
+    return params.toString()
   }
 
   // Turbo's [busy]/[aria-busy] loading state is transient, but a back/forward
@@ -121,10 +156,6 @@ export default class extends Controller {
   handleFrameRender = () => {
     // A frame render means results came back, so clear any failure notice
     this.hideNotices()
-    // Run the time localization command on frame render
-    if (window.timeLocalizer && typeof window.timeLocalizer.localize === 'function') {
-      window.timeLocalizer.localize()
-    }
     this.syncHiddenFieldsFromUrl()
   }
 
@@ -140,29 +171,48 @@ export default class extends Controller {
     } else if (event.target === this.frameElement && this.frameResponseSuperseded(response?.url)) {
       event.preventDefault()
     }
+    // What's outside the frame follows the results, so it waits on this rather than watching
+    if (!response?.ok && this.ownsFetch(event)) this.announceFailure()
+  }
+
+  announceFailure () {
+    window.dispatchEvent(new CustomEvent('search:results-failed'))
   }
 
   // The frame's eager src fetch and a search submitted while it's still in flight
   // race each other. Turbo renders whichever lands last and rewrites history from
   // the frame, so the older response would drag the address bar back to the query
-  // the rider searched away from. A submit repoints src before its own response
-  // returns, so src names the search the frame should be showing.
+  // the rider searched away from.
   frameResponseSuperseded (url) {
-    return this.differentSearchOnSamePage(url, this.frameElement?.getAttribute('src'))
+    return this.differentSearchOnSamePage(url, this.requestedURL)
+  }
+
+  // What the frame is currently after. The frame's own src can't answer that: Turbo
+  // assigns it before a src fetch, but for a form submit only once the response
+  // arrives, so a submit in flight leaves src on the query being searched away from.
+  handleFetchRequest = (event) => {
+    if (!this.ownsFetch(event)) return
+
+    this.requestedURL = event.detail?.url?.toString()
+  }
+
+  // Turbo targets the frame for its eager src fetch and the form for a submit;
+  // anything else (the combobox raises these too) isn't ours.
+  ownsFetch (event) {
+    return event.target === this.frameElement || event.target === this.formTarget
   }
 
   // A fetch that rejects outright when the network drops never comes back with a
   // status, so handleFetchResponse never sees it and the spinner runs forever.
-  // Turbo targets the frame for its eager src fetch and the form for a submit;
-  // anything else (the combobox raises this too) isn't ours.
   handleFetchError = (event) => {
-    if (event.target !== this.frameElement && event.target !== this.formTarget) return
+    if (!this.ownsFetch(event)) return
 
     // A failed submit has to be retried by re-submitting: the frame's src still
     // points at the previous query, so reloading it would show the old results.
     this.failedSubmit = event.target === this.formTarget
     this.hideLoading()
     this.showNotice('fetch-failed')
+    this.announceFailure()
   }
 
   handleRetryClick = (event) => {
@@ -172,7 +222,7 @@ export default class extends Controller {
   retryResults = () => {
     this.hideNotices()
     this.showLoading()
-    if (this.failedSubmit) this.formTarget.requestSubmit()
+    if (this.failedSubmit) this.submit()
     else this.frameElement?.reload()
   }
 
@@ -200,9 +250,9 @@ export default class extends Controller {
 
   showRateLimited = () => this.showNotice('rate-limited')
 
-  // The form sits outside the results frame, so frame-nav period clicks advance
-  // the URL but leave its hidden fields stale. Sync from the URL so the next
-  // submit doesn't drop the period the user just chose.
+  // The form sits outside the results frame, so a frame-nav period click or a collapse
+  // toggle advances the URL but leaves its hidden fields stale. Sync from the URL - on
+  // every frame render, and on the submit itself, which Turbo serializes after this runs.
   syncHiddenFieldsFromUrl () {
     const params = new URLSearchParams(window.location.search)
     this.formTarget.querySelectorAll('input[type="hidden"]').forEach(input => {

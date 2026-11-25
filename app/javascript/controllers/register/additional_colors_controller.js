@@ -13,6 +13,7 @@ export default class extends Controller {
   connect () {
     this.boundReveal = this.revealFilledRows.bind(this)
     window.addEventListener('form-persist:restored', this.boundReveal)
+    this.revealFilledRows()
   }
 
   disconnect () {

@@ -27,7 +27,6 @@ class window.BikeIndex
 # This file initializes scripts for the application
 class BikeIndex.Init extends BikeIndex
   constructor: ->
-    new BikeIndex.NavHeader
     @loadFancySelects()
     @initializeNoTabLinks()
     @initializeScrollToRef()
@@ -55,9 +54,7 @@ class BikeIndex.Init extends BikeIndex
     pageClasses =
       welcome_index: BikeIndex.WelcomeIndex
       news_show: BikeIndex.WelcomeIndex # only used by get_your_stolen_bike back, this is a gross hack
-      welcome_recovery_stories: BikeIndex.WelcomeRecoveryStories
       info_where: BikeIndex.InfoWhere
-      info_donate: BikeIndex.Payments
       payments_new: BikeIndex.Payments
       bikes_new: BikeIndex.BikesNew
       bikes_edits_show: BikeIndex.BikesEdit
@@ -80,7 +77,6 @@ class BikeIndex.Init extends BikeIndex
       my_accounts_edit: BikeIndex.UsersEdit
       my_account_show: BikeIndex.UserHome
       welcome_choose_registration: BikeIndex.ChooseRegistration
-      stolen_index: BikeIndex.LegacyStolenIndex
       organized_manage_locations: BikeIndex.OrganizedManageLocations
       organizations_new: BikeIndex.OrganizedManageLocations # Because it has location fields
       organized_manage_show: BikeIndex.OrganizedManageLocations # it CAN location fields

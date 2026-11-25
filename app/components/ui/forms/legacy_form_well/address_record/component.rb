@@ -7,7 +7,7 @@ module UI
         class Component < ApplicationComponent
           STATIC_FIELDS_OPTIONS = %i[shown hidden]
 
-          # NOTE: Keep in mind this renders for the embed and embed_extended views (which don't have tailwind styles)
+          # NOTE: Keep in mind this renders for the embed and embed_extended views
           def initialize(form_builder:,
             organization: nil,
             not_related_fields: false,
@@ -56,12 +56,6 @@ module UI
             (@static_fields == :shown) ? "tw:hidden!" : ""
           end
 
-          def static_field_class
-            return "" unless @static_fields
-
-            (@static_fields == :hidden) ? "tw:hidden!" : ""
-          end
-
           def initial_state_class
             (@initial_country_id == Country.united_states_id) ? "" : "tw:hidden!" # Should check if address_object.country_id == Country.united_states_id
           end
@@ -83,7 +77,7 @@ module UI
             if @bike_status.present?
               translation(:address_or_intersection)
             else
-              translation(@organization&.school? ? :address_school : :address)
+              @organization&.school? ? translation(:address_school) : translation(:address)
             end
           end
 

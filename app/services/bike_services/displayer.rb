@@ -7,6 +7,7 @@ module BikeServices
 
     REG_FIELDS = %w[address bike_sticker extra_registration_number organization_affiliation
       phone student_id].freeze
+    LEGACY_STOCK_PHOTO_HOST = "https://bikebook.s3.amazonaws.com/"
 
     # Whether a registration form should ask for one of the organization's additional
     # fields. Pass the user only when the registration is their own - what their account
@@ -25,16 +26,6 @@ module BikeServices
         user.blank? || user.user_registration_organizations.with_student_id(organization.id).none?
       else true # extra_registration_number, which nothing on the account can answer
       end
-    end
-
-    # This is just a quick hack, will improve
-    def vehicle_search?(params_and_interpreted_params)
-      return true if (%i[propulsion_type cycle_type] & params_and_interpreted_params.keys).any? ||
-        params_and_interpreted_params[:search_model_audit_id].present?
-
-      # Vehicle or propulsion type query items
-      (params_and_interpreted_params[:query_items] || [])
-        .any? { it.start_with?("v_", "p_") }
     end
 
     # user arg because all methods have it
@@ -56,8 +47,7 @@ module BikeServices
       end
       return false if user.blank?
 
-      bike.impound_claims_submitting.active.where(user_id: user.id).any? ||
-        bike.impound_claims_claimed.active.where(user_id: user.id).any?
+      bike.impound_claims_claimed.active.where(user_id: user.id).any?
     end
 
     def display_marketplace_message?(bike, _user = nil)
@@ -102,11 +92,10 @@ module BikeServices
 
     def thumb_image_url(bike)
       return bike.thumb_path if bike.thumb_path.present?
-      return nil if bike.stock_photo_url.blank?
+      # Only the legacy bucket has small_ versions; the Bike Book catalog's photos are a single size
+      return bike.stock_photo_url.presence unless bike.stock_photo_url&.start_with?(LEGACY_STOCK_PHOTO_HOST)
 
-      small = bike.stock_photo_url.split("/")
-      ext = "/small_" + small.pop
-      small.join("/") + ext
+      bike.stock_photo_url.sub(%r{/(?=[^/]+\z)}, "/small_")
     end
 
     def header_image_urls(bike)
@@ -134,7 +123,7 @@ module BikeServices
           }
         end
       end
-      single_image_hash(bike.public_images.limit(1)&.first&.image_url(:large))
+      single_image_hash(bike.public_images.first&.image_url(:large))
     end
 
     #

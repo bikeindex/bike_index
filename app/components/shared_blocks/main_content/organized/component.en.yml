@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    shared_blocks:
+      main_content:
+        organized:
+          additional_features_html: >-
+            Bike Index provides additional features for verified Law Enforcement organizations.
+            Please contact %{email_link} to get them enabled.
+          subscription_expired_html: >-
+            Your subscription to Bike Index has expired. Please contact %{email_link}
+            to get it re-enabled.

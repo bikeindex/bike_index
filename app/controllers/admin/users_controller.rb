@@ -3,26 +3,26 @@ module Admin
     include Binxtils::SortableTable
 
     before_action :find_user, only: %i[show edit update destroy]
+    before_action :ensure_can_change_user!, only: %i[update destroy]
     helper_method :invalid_user_options
 
     def index
       @per_page = permitted_per_page
-      @pagy, @collection = pagy(:countish, matching_users.reorder("users.#{sort_column} #{sort_direction}")
+      @pagy, @collection = pagy(:countish, matching_users.reorder(sortable_order(User))
         .includes(:ownerships, :superuser_abilities, :payments, :user_emails, :organization_roles, :ambassador_tasks, :email_bans_active),
         limit: @per_page, page: permitted_page)
     end
 
     def show
-      redirect_to edit_admin_user_url(params[:id])
+      @active_tab = Pages::Admin::Users::Show::Component::TABS.find { it.to_s == params[:active_tab] }
+      return redirect_to(edit_admin_user_url(params[:id])) unless @active_tab
+
+      @page_title = "#{Pages::Admin::Users::Tabs::Component::TABS[@active_tab]}: #{@user.display_name}"
     end
 
     def edit
       # urls with user IDs rather than usernames are more helpful in superadmin
-      if params[:id] == @user.username
-        redirect_to edit_admin_user_path(@user.id)
-        return
-      end
-      calculate_user_bikes
+      redirect_to edit_admin_user_path(@user.id) if params[:id] == @user.username
     end
 
     def update
@@ -31,10 +31,13 @@ module Admin
       else
         @user.name = params[:user][:name]
         @user.email = params[:user][:email]
-        if Binxtils::InputNormalizer.boolean(params[:user][:superuser])
-          @user.superuser_abilities.find_or_create_by(controller_name: nil, action_name: nil)
-        else
-          @user.superuser_abilities.universal.destroy_all
+        # Only a universal superuser can grant or revoke universal access
+        if current_user.superuser?
+          if Binxtils::InputNormalizer.boolean(params[:user][:superuser])
+            @user.superuser_abilities.find_or_create_by(controller_name: nil, action_name: nil)
+          else
+            @user.superuser_abilities.universal.destroy_all
+          end
         end
         @user.developer = params[:user][:developer] if current_user.developer? && params[:user].key?(:developer)
         ban_params = permitted_ban_parameters
@@ -54,12 +57,11 @@ module Admin
           elsif ban_params[:reason].present?
             @user.user_ban&.update(ban_params.slice(:reason, :description))
           end
-          @user.confirm(@user.confirmation_token) if params[:user][:confirmed]
+          @user.confirm(@user.confirmation_token) if Binxtils::InputNormalizer.boolean(params[:user][:confirmed])
           CallbackJobs::AfterUserChangeJob.perform_async(@user.id)
           redirect_to admin_users_url, notice: "User Updated"
         else
-          calculate_user_bikes
-          render action: :edit
+          render action: :edit, status: :unprocessable_entity
         end
       end
     end
@@ -90,6 +92,14 @@ module Admin
       raise ActiveRecord::RecordNotFound unless @user.present?
     end
 
+    # Changing another superuser's email would let a limited superuser take over their access
+    def ensure_can_change_user!
+      return if current_user.superuser? || @user == current_user || @user.superuser_abilities.none?
+
+      flash[:error] = "Only a universal superuser can change another superuser"
+      redirect_to edit_admin_user_path(@user.id)
+    end
+
     def permitted_ban_parameters
       ban_attributes = params.require(:user).permit(user_ban_attributes: %i[reason description]).dig(:user_ban_attributes)
       (ban_attributes || {}).merge(creator_id: current_user.id, user_id: @user.id)
@@ -109,7 +119,7 @@ module Admin
         # Manually confirm the user
         user_email.update(confirmation_token: nil) if user_email&.unconfirmed?
         user_email ||= @user.user_emails.create(email: email)
-        if Users::MergeAdditionalEmailJob.new.perform(user_email.id)
+        if UserJobs::MergeAdditionalEmailJob.new.perform(user_email.id)
           flash[:success] = "User #{@user.display_name} merged with '#{email}'"
         else
           flash[:error] = "Unable to merge users!"
@@ -125,6 +135,7 @@ module Admin
       @search_superusers = Binxtils::InputNormalizer.boolean(params[:search_superusers])
       @search_developers = Binxtils::InputNormalizer.boolean(params[:search_developers])
       @search_with_organization = Binxtils::InputNormalizer.boolean(params[:search_with_organization])
+      @search_legacy_viewer = Binxtils::InputNormalizer.boolean(params[:search_legacy_viewer])
       @updated_at = Binxtils::InputNormalizer.boolean(params[:search_updated_at])
       @search_unconfirmed = Binxtils::InputNormalizer.boolean(params[:search_unconfirmed])
       @search_confirmed = @search_unconfirmed ? false : Binxtils::InputNormalizer.boolean(params[:search_confirmed])
@@ -143,6 +154,7 @@ module Admin
       users = users.admins if @search_superusers
       users = users.where(developer: true) if @search_developers
       users = users.where(id: OrganizationRole.select(:user_id)) if @search_with_organization
+      users = users.where(feature_registration_show_legacy: true) if @search_legacy_viewer
       users = users.unconfirmed if @search_unconfirmed
       users = users.confirmed if @search_confirmed
 
@@ -172,13 +184,6 @@ module Admin
       else
         :valid_only
       end
-    end
-
-    def calculate_user_bikes
-      # If the user has a bunch of bikes, it can cause timeouts. In those cases, use rough approximation
-      bikes = @user.bikes
-      @bikescount = @user.bikes.count
-      @bikes = bikes.reorder(created_at: :desc).limit(10)
     end
   end
 end

@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    pages:
+      register:
+        parts:
+          shell:
+            retry_failed: >-
+              We couldn't save that just now — nothing you entered is lost. Please
+              try again in a moment.

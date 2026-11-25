@@ -7,10 +7,8 @@ RSpec.describe GraphingHelper, type: :helper do
     let(:start_time) { Time.at(1568052985) }
     let(:payment_time) { start_time + 1.minute }
     let!(:payment) { FactoryBot.create(:payment, created_at: payment_time, amount_cents: 1001) }
-    before do
-      Time.zone = "America/Chicago"
-      @time_range = start_time..(start_time + 3.minutes)
-    end
+    around { |example| Time.use_zone("America/Chicago") { example.run } }
+    before { @time_range = start_time..(start_time + 3.minutes) }
     describe "time_range_counts" do
       let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 1, " 1:18 PM" => 0, " 1:19 PM" => 0} }
       it "buckets in the current Time.zone" do
@@ -21,10 +19,18 @@ RSpec.describe GraphingHelper, type: :helper do
           .to eq({"11:16 AM" => 0, "11:17 AM" => 1, "11:18 AM" => 0, "11:19 AM" => 0})
       end
     end
-    describe "time_range_counts" do
+    describe "time_range_amounts" do
       let(:target_counts) { {" 1:16 PM" => 0, " 1:17 PM" => 10.01, " 1:18 PM" => 0, " 1:19 PM" => 0} }
-      it "returns the thing with want" do
+      it "converts to dollars, or leaves the cents alone" do
         expect(time_range_amounts(collection: Payment.all, convert_to_dollars: true)).to eq target_counts
+        expect(time_range_amounts(collection: Payment.all))
+          .to eq({" 1:16 PM" => 0, " 1:17 PM" => 1001, " 1:18 PM" => 0, " 1:19 PM" => 0})
+      end
+    end
+    describe "empty_time_range_counts" do
+      it "matches the buckets a collection with no rows counts into" do
+        expect(empty_time_range_counts).to eq({" 1:16 PM" => 0, " 1:17 PM" => 0, " 1:18 PM" => 0, " 1:19 PM" => 0})
+        expect(empty_time_range_counts).to eq time_range_counts(collection: Payment.none)
       end
     end
   end
@@ -100,112 +106,6 @@ RSpec.describe GraphingHelper, type: :helper do
       let(:start_time) { end_time - 13.months }
       it "is year-month" do
         expect(end_time.strftime(group_by_format(time_range))).to eq "2020-1"
-      end
-    end
-  end
-
-  describe "humanized_time_range_column" do
-    it "humanizes created_at" do
-      expect(humanized_time_range_column("created_at")).to eq "created"
-      @period = "all"
-      expect(humanized_time_range_column("created_at")).to be_blank
-      expect(humanized_time_range_column("created_at", return_value_for_all: true)).to eq "created"
-    end
-    it "humanizes start_at and end_at" do
-      expect(humanized_time_range_column("start_at")).to eq "starts"
-      expect(humanized_time_range_column("end_at")).to eq "ends"
-      expect(humanized_time_range_column("subscription_start_at")).to eq "subscription starts"
-      expect(humanized_time_range_column("subscription_end_at")).to eq "subscription ends"
-    end
-    it "humanizes needs_renewal_at" do
-      expect(humanized_time_range_column("needs_renewal_at")).to eq "need renewal"
-    end
-    it "humanizes request_at" do
-      expect(humanized_time_range_column("request_at")).to eq "requested"
-    end
-  end
-
-  describe "humanized_time_range" do
-    context "standard time range" do
-      it "returns period" do
-        @period = "week"
-        expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the past week"
-      end
-      context "all" do
-        it "returns period" do
-          @period = "all"
-          expect(humanized_time_range((Time.current - 1.week)..Time.current)).to be_blank
-        end
-      end
-      context "next_week" do
-        it "returns period" do
-          @period = "next_week"
-          expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the next week"
-        end
-      end
-      context "next_month" do
-        it "returns period" do
-          @period = "next_month"
-          expect(humanized_time_range((Time.current - 1.week)..Time.current)).to eq "in the next month"
-        end
-      end
-    end
-
-    context "custom time period" do
-      let(:end_time) { Time.at(1578268910) } # 2020-01-06 00:01:38 UTC
-      let(:time_range) { start_time..end_time }
-      before { @period = "custom" }
-
-      context "45 minute long period" do
-        let(:start_time) { end_time - 45.minutes }
-        let(:target_html) do
-          [
-            'from <em class="localizeTime preciseTimeSeconds">',
-            start_time.strftime("%FT%T%z"),
-            '</em> to <em class="localizeTime preciseTimeSeconds">',
-            end_time.strftime("%FT%T%z") + "</em>"
-          ]
-        end
-        it "returns with preciseTimeSeconds" do
-          expect(humanized_time_range(time_range)).to eq "<span>" + target_html.join + "</span>"
-        end
-      end
-
-      context "2 hour long period" do
-        let(:start_time) { end_time - 2.hours }
-        let(:target_html) do
-          [
-            'from <em class="localizeTime preciseTime">',
-            start_time.strftime("%FT%T%z"),
-            '</em> to <em class="localizeTime preciseTime">',
-            end_time.strftime("%FT%T%z") + "</em>"
-          ]
-        end
-        it "returns time in precise time" do
-          expect(humanized_time_range(time_range)).to eq "<span>" + target_html.join + "</span>"
-        end
-        context "ending now" do
-          let(:end_time) { Time.current - 1.minute } # Because we send time by minute
-          let(:current_target_html) { target_html.slice(0, 2) + ["</em> to <em>now</em>"] }
-          it "returns time in precise time" do
-            expect(humanized_time_range(time_range)).to eq "<span>" + current_target_html.join + "</span>"
-          end
-        end
-      end
-
-      context "week long period" do
-        let(:start_time) { end_time - 7.days }
-        let(:target_html) do
-          [
-            'from <em class="localizeTime ">',
-            start_time.strftime("%FT%T%z"),
-            '</em> to <em class="localizeTime ">',
-            end_time.strftime("%FT%T%z") + "</em>"
-          ]
-        end
-        it "returns with preciseTimeSeconds" do
-          expect(humanized_time_range(time_range)).to eq "<span>" + target_html.join + "</span>"
-        end
       end
     end
   end

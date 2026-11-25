@@ -1,45 +1,32 @@
 -# TODO: translations
 .organized-page-header
-  %h1
+  = render(UI::Header::Component.new) do
     %em
       Stolen Bike Hot Sheet
     Configuration
 
 .row
   .col-md-6
-    %table.table-list
-      %tbody
-        %tr
-          %td Enabled?
-          %td
-            - if @hot_sheet_configuration.on?
-              = check_mark
-            - else
-              %small.less-strong false
+    - unless current_organization.search_coordinates_set?
+      = render UI::Alerts::Base::Component.new(kind: :error, header: "Organization does not have a base location", margin_classes: "tw:mb-8") do
+        = link_to "Add a location", locations_organization_manage_path(organization_id: current_organization.to_param), class: "twlink-underlined"
+        to be able to enable Hot Sheet
+
+    = render(UI::Table::List::Component.new) do |list|
+      - list.with_row(label: "Enabled?") do
         - if @hot_sheet_configuration.on?
-          %tr
-            %td
-              Generates at
-            %td
-              %span.localizeTime.preciseTime
-                = l(@hot_sheet_configuration.send_today_at, format: :convert_time)
-              %span.localizeTimezone
-          %tr
-            %td
-              Recipients
-            %td.hot-sheet-recipient-emails
-              %ul.small
-                - @hot_sheet_configuration.current_recipients.pluck(:email).each do |email|
-                  %li= email
+          = check_mark
+        - else
+          %small.less-strong false
+      - if @hot_sheet_configuration.on?
+        - list.with_row(label: "Generates at") do
+          = render(UI::Time::Component.new(time: @hot_sheet_configuration.send_today_at, format: :localize_time_precise))
+          %span.localizeTimezone
+        - list.with_row(label: "Recipients") do
+          %ul{class: "small tw:mb-0 tw:max-h-[250px] tw:overflow-y-auto"}
+            - @hot_sheet_configuration.current_recipients.pluck(:email).each do |email|
+              %li= email
 
-
-- unless current_organization.search_coordinates.reject(&:blank?).count == 2
-  .alert.alert-warning
-    %h3.uncap
-      Organization does not have a base location
-    %p
-      = link_to "Add a location", locations_organization_manage_path(organization_id: current_organization.to_param), class: "text-underline"
-      to be able to enable Hot Sheet
 .row
   .col-md-6
     = form_for @hot_sheet_configuration, url: organization_hot_sheet_path(organization_id: current_organization), action: "update", method: :patch do |f|

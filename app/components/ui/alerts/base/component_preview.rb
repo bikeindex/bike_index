@@ -13,7 +13,8 @@ module UI
         end
 
         def notice_with_header
-          alert(kind: :notice, header: "Profile hidden", text: "Only you and superusers can see this profile.")
+          alert(kind: :notice, header: "Profile hidden",
+            text: text_with_link("Only you and superusers can see this profile.", "Make it public"))
         end
 
         def error
@@ -21,7 +22,8 @@ module UI
         end
 
         def error_with_header
-          alert(kind: :error, header: "Banned user", text: "This profile is only visible to superusers.")
+          alert(kind: :error, header: "Banned user",
+            text: text_with_link("This profile is only visible to superusers.", "Review the ban"))
         end
 
         def warning
@@ -29,7 +31,8 @@ module UI
         end
 
         def warning_with_header
-          alert(kind: :warning, header: "Registration incomplete", text: CONFIRMATION_TEXT)
+          alert(kind: :warning, header: "Registration incomplete",
+            text: text_with_link(CONFIRMATION_TEXT, "Resend the confirmation"))
         end
 
         def success
@@ -38,8 +41,7 @@ module UI
 
         def success_with_header
           text = ActionController::Base.helpers.safe_join([
-            "You can ",
-            ActionController::Base.helpers.link_to("set a password to sign in", "#", class: "twlink"),
+            "You can ", link("set a password to sign in"),
             " if you prefer not to sign in via an emailed link."
           ])
           alert(kind: :success, header: "You're signed in", text:)
@@ -50,7 +52,8 @@ module UI
         end
 
         def purple_with_header
-          alert(kind: :purple, header: "Check your email", text: CONFIRMATION_TEXT, icon: envelope_icon)
+          alert(kind: :purple, header: "Check your email", icon: envelope_icon,
+            text: text_with_link(CONFIRMATION_TEXT, "Resend the confirmation"))
         end
         # @!endgroup
 
@@ -84,6 +87,14 @@ module UI
 
         def alert(**)
           render(UI::Alerts::Base::Component.new(**))
+        end
+
+        def text_with_link(text, link_text)
+          ActionController::Base.helpers.safe_join([text, " ", link(link_text)])
+        end
+
+        def link(link_text)
+          ActionController::Base.helpers.link_to(link_text, "#", class: "twlink-underlined")
         end
 
         def envelope_icon

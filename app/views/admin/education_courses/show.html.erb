@@ -1,0 +1,16 @@
+<% if @education_course.organization.present? %>
+  <%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @education_course.organization, active: :education_courses, display_dev_info: display_dev_info?)) %>
+<% end %>
+
+<div class="tw:mx-auto tw:max-w-3xl tw:py-4">
+  <%= render Pages::Admin::EducationCourse::Header::Component.new(education_course: @education_course, mode: :view) %>
+
+  <h2 class="tw:mb-3 tw:text-xl tw:font-normal tw:text-gray-500">
+    <%= number_display(@education_course.education_course_pages.size) %>
+    <%= "page".pluralize(@education_course.education_course_pages.size) %>
+  </h2>
+
+  <%= render Pages::Org::EducationCourse::PageList::Component.new(education_course: @education_course, admin: true, editable: false) %>
+
+  <%= render Pages::Admin::EducationCourse::DiscardDraft::Component.new(education_course: @education_course) %>
+</div>

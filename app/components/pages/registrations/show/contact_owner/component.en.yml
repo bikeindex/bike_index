@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          contact_owner:
+            contact_the_owner: Contact the owner
+            know_something_about_this_bike_type: Know something about this %{bike_type}?

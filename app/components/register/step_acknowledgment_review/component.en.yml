@@ -1,6 +1,0 @@
----
-en:
-  components:
-    register:
-      step_acknowledgment_review:
-        complete_registration: Complete %{cycle_type} Registration

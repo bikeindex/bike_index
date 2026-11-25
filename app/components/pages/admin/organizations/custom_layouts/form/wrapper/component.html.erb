@@ -1,0 +1,7 @@
+<%= render(Pages::Admin::Organizations::Tabs::Component.new(organization: @organization, active: :custom_layouts,
+      display_dev_info: @display_dev_info,
+      subtitle:, additional_link:)) %>
+
+<%= version_history_link %>
+
+<%= render(layout_form) %>

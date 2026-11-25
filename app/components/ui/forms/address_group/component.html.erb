@@ -1,6 +1,7 @@
 <div
   data-controller="ui--forms--address-group"
   data-ui--forms--address-group-us-id-value="<%= us_country_id %>"
+  data-ui--forms--address-group-required-value="<%= @required %>"
 >
   <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :street, kind: :text_field, label_text: street_label, required: @required)) %>
 
@@ -8,7 +9,7 @@
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :street_2, kind: :text_field, label_text: translation(".street_2"))) %>
   <% end %>
 
-  <div class="tw:grid tw:grid-cols-2 tw:gap-x-2">
+  <div class="twfieldrow">
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :city, kind: :text_field, label_text: translation(".city"), required: @required)) %>
 
     <div
@@ -16,7 +17,8 @@
       class="<%= state_hidden_class %>"
     >
       <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :region_record_id, label_text: translation(".state"), required: @required)) do %>
-        <%= @form.collection_select(:region_record_id, State.united_states, :id, :name, {include_blank: true}, {class: "twinput tw:w-full", required: state_required?}) %>
+        <%= render(UI::Forms::ComboboxState::Component.new(name: :region_record_id, ids: true,
+          html_options: {form: @form, required: state_required?})) %>
       <% end %>
     </div>
 
@@ -31,7 +33,7 @@
     </div>
   </div>
 
-  <div class="tw:grid tw:grid-cols-2 tw:gap-x-2">
+  <div class="twfieldrow">
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :postal_code, kind: :text_field, label_text: translation(".postal_code"), required: @required)) %>
 
     <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :country_id, label_text: translation(".country"), required: @required)) do %>

@@ -70,276 +70,22 @@ RSpec.describe ApplicationHelper, type: :helper do
     end
   end
 
-  describe "active_link" do
-    context "without a class" do
-      it "returns the link active if it ought to be" do
-        allow(view).to receive(:current_page?).and_return(true)
-        generated = '<a class=" active" href="http://bikeindex.org">Bike Index about</a>'
-        expect(helper.active_link("Bike Index about", "http://bikeindex.org")).to eq generated
-      end
-    end
-    context "match controller true" do
-      let(:request) { double("request", url: new_bike_url) }
-      before { allow(helper).to receive(:request).and_return(request) }
-      it "returns the link active if it is a bikes page" do
-        generated = '<a class="seeeeeeee active" id="" href="' + new_bike_url + '">Bike Index bikes page</a>'
-        result = helper.active_link("Bike Index bikes page", new_bike_url, match_controller: true, class: "seeeeeeee", id: "")
-        expect(result).to eq generated
-      end
-    end
-    context "current with a class" do
-      it "returns the link active if it ought to be" do
-        allow(view).to receive(:current_page?).and_return(true)
-        generated = '<a class="nav-party-link active" id="XXX" href="http://bikeindex.org">Bike Index about</a>'
-        result = helper.active_link("Bike Index about", "http://bikeindex.org", class: "nav-party-link", id: "XXX")
-        expect(result).to eq generated
-      end
-    end
-  end
-
-  describe "current_page_skeleton" do
-    let(:controller_namespace) { nil }
-
-    before do
-      helper.extend(ControllerHelpers)
-      helper.extend(Binxtils::ControllerNamespace)
-      allow(view).to receive(:controller_namespace) { controller_namespace }
-    end
-
-    describe "landing_pages controller" do
-      before { allow(view).to receive(:controller_name) { "landing_pages" } }
-      context "show (organization landing page)" do
-        it "returns nil" do
-          allow(view).to receive(:action_name) { "show" }
-          expect(helper.current_page_skeleton).to be_nil
-        end
-      end
-      %w[for_law_enfocement for_schools].each do |action|
-        context action do
-          it "returns nil" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to be_nil
-          end
-        end
-      end
-    end
-    describe "bikes controller" do
-      before { allow(view).to receive(:controller_name) { "bikes" } }
-      %w[new create].each do |action|
-        context action do
-          it "returns nil" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to be_nil
-          end
-        end
-      end
-      context "update" do
-        it "returns edit_bike_skeleton" do
-          allow(view).to receive(:action_name) { "update" }
-          expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
-        end
-      end
-    end
-    describe "registrations controller" do
-      before { allow(view).to receive(:controller_name) { "registrations" } }
-      %w[new].each do |action|
-        context action do
-          it "returns content_skeleton" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to eq "content_skeleton"
-          end
-        end
-      end
-    end
-    describe "search registrations controller" do
-      let(:controller_namespace) { "search" }
-      before { allow(view).to receive(:controller_name) { "registrations" } }
-      it "returns nil" do
-        allow(view).to receive(:action_name) { "index" }
-        expect(helper.current_page_skeleton).to be_nil
-      end
-    end
-    describe "info controller" do
-      before { allow(view).to receive(:controller_name) { "info" } }
-      %w[about protect_your_bike where serials].each do |action|
-        context action do
-          it "returns content_skeleton" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to eq "content_skeleton"
-          end
-        end
-      end
-      context "support_the_index" do
-        it "returns nil" do
-          allow(view).to receive(:action_name) { "support_the_index" }
-          expect(helper.current_page_skeleton).to be_nil
-        end
-      end
-      %w[terms vendor_terms security privacy resources].each do |action|
-        context action do
-          it "returns nil" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to be_nil
-          end
-        end
-      end
-    end
-    describe "bike edit pages" do
-      context "bikes edit" do
-        it "returns edit_bike_skeleton" do
-          allow(view).to receive(:controller_name) { "edits" }
-          allow(view).to receive(:action_name) { "show" }
-          expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
-        end
-      end
-      context "theft_alerts" do
-        before { allow(view).to receive(:controller_name) { "theft_alerts" } }
-        it "new returns edit_bike_skeleton" do
-          allow(view).to receive(:action_name) { "new" }
-          expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
-        end
-        it "show returns edit_bike_skeleton" do
-          allow(view).to receive(:action_name) { "show" }
-          expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
-        end
-      end
-      context "recovery" do
-        it "new returns edit_bike_skeleton" do
-          allow(view).to receive(:controller_name) { "recovery" }
-          allow(view).to receive(:action_name) { "edit" }
-          expect(helper.current_page_skeleton).to eq "edit_bike_skeleton"
-        end
-      end
-    end
-    describe "news controller" do
-      before { allow(view).to receive(:controller_name) { "news" } }
-      %w[index show].each do |action|
-        context action do
-          it "returns content_skeleton" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to eq "content_skeleton"
-          end
-        end
-      end
-    end
-    describe "payments controller" do
-      before { allow(view).to receive(:controller_name) { "payments" } }
-      %w[new create].each do |action|
-        context action do
-          it "returns nil" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to be_nil
-          end
-        end
-      end
-    end
-    describe "feedbacks controller" do
-      before { allow(view).to receive(:controller_name) { "feedbacks" } }
-      %w[index].each do |action|
-        context action do
-          it "returns content_skeleton" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to eq "content_skeleton"
-          end
-        end
-      end
-    end
-    describe "manufacturers controller" do
-      before { allow(view).to receive(:controller_name) { "manufacturers" } }
-      %w[index].each do |action|
-        context action do
-          it "returns nil" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to eq "content_skeleton"
-          end
-        end
-      end
-    end
-    describe "welcome controller" do
-      before { allow(view).to receive(:controller_name) { "welcome" } }
-      %w[goodbye].each do |action|
-        context action do
-          it "returns content_skeleton" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to eq "content_skeleton"
-          end
-        end
-      end
-    end
-    describe "organizations controller" do
-      before { allow(view).to receive(:controller_name) { "organizations" } }
-      context "lightspeed_integration" do
-        it "returns content_skeleton" do
-          allow(view).to receive(:action_name) { "lightspeed_integration" }
-          expect(helper.current_page_skeleton).to eq "content_skeleton"
-        end
-      end
-      context "new" do
-        it "returns no skeleton" do
-          allow(view).to receive(:action_name) { "new" }
-          expect(helper.current_page_skeleton).to be_nil
-        end
-      end
-    end
-    describe "organized subrouting" do
-      let(:controller_namespace) { "organized" }
-      context "manage" do
-        before { allow(view).to receive(:controller_name) { "manage" } }
-        it "returns organized for index" do
-          allow(view).to receive(:action_name) { "index" }
-          expect(helper.current_page_skeleton).to eq "organized_skeleton"
-        end
-      end
-      context "bikes" do
-        before { allow(view).to receive(:controller_name) { "bikes" } }
-        it "returns organized for index" do
-          allow(view).to receive(:action_name) { "index" }
-          expect(helper.current_page_skeleton).to eq "organized_skeleton"
-        end
-      end
-      context "users" do
-        before { allow(view).to receive(:controller_name) { "users" } }
-        it "returns organized for index" do
-          allow(view).to receive(:action_name) { "index" }
-          expect(helper.current_page_skeleton).to eq "organized_skeleton"
-        end
-      end
-    end
-    describe "stolen controller" do
-      before { allow(view).to receive(:controller_name) { "stolen" } }
-      %w[index].each do |action|
-        context action do
-          it "returns nil" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to be_nil
-          end
-        end
-      end
-    end
-    describe "errors controller" do
-      before { allow(view).to receive(:controller_name) { "errors" } }
-      %w[bad_request not_found unprocessable_entity server_error unauthorized].each do |action|
-        context action do
-          it "returns content_skeleton" do
-            allow(view).to receive(:action_name) { action }
-            expect(helper.current_page_skeleton).to eq "content_skeleton"
-          end
-        end
-      end
-    end
-  end
-
   describe "body_class" do
-    context "organized_skeleton" do
+    context "organized" do
+      before do
+        helper.extend(ControllerHelpers)
+        helper.extend(Binxtils::ControllerNamespace)
+        allow(view).to receive(:controller_name) { "bikes" }
+        allow(view).to receive(:controller_namespace) { "organized" }
+      end
       it "returns organized-body" do
-        expect(helper).to receive(:current_page_skeleton) { "organized_skeleton" }
-        expect(helper.body_class).to eq "organized-body"
+        expect(helper.send(:body_class)).to eq "organized-body"
       end
     end
     context "landing_page controller" do
       before { allow(view).to receive(:controller_name) { "landing_pages" } }
       it "returns organized-body" do
-        expect(helper.body_class).to eq "landing-page-body"
+        expect(helper.send(:body_class)).to eq "landing-page-body"
       end
     end
     context "bikes controller" do
@@ -350,7 +96,7 @@ RSpec.describe ApplicationHelper, type: :helper do
         allow(view).to receive(:controller_namespace) { nil }
       end
       it "returns nil" do
-        expect(helper.body_class).to be_nil
+        expect(helper.send(:body_class)).to be_nil
       end
     end
     context "info controller resources" do
@@ -359,31 +105,7 @@ RSpec.describe ApplicationHelper, type: :helper do
         allow(view).to receive(:action_name) { "resources" }
       end
       it "returns kelsey_landing-page-body" do
-        expect(helper.body_class).to eq "kelsey_landing-page-body"
-      end
-    end
-  end
-
-  describe "content_page_type" do
-    context "info controller" do
-      it "returns info active_page" do
-        allow(view).to receive(:controller_name).and_return("info")
-        allow(view).to receive(:action_name).and_return("serials")
-        expect(helper.content_page_type).to eq "serials"
-      end
-    end
-    context "news controller" do
-      it "returns news index" do
-        allow(view).to receive(:controller_name).and_return("news")
-        allow(view).to receive(:action_name).and_return("index")
-        expect(helper.content_page_type).to eq "news"
-      end
-    end
-    context "bikes controller" do
-      let(:request) { double("request", url: new_bike_url) }
-      before { allow(helper).to receive(:request).and_return(request) }
-      it "returns nil for non-info pages" do
-        expect(helper.content_page_type).to be_nil
+        expect(helper.send(:body_class)).to eq "kelsey_landing-page-body"
       end
     end
   end

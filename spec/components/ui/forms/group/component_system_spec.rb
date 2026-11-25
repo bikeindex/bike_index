@@ -5,7 +5,7 @@ require "rails_helper"
 RSpec.describe UI::Forms::Group::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/ui/forms/group/component/" }
 
-  # The group labels the input and FileUpload's visible button is a label for the same input,
+  # The group labels the input and UI::Forms::Files::Upload's visible button is a label for the same input,
   # so this is what would catch axe's form-field-multiple-labels
   context "file_upload" do
     it "audits clean with the upload control nested in the group" do

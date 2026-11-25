@@ -14,7 +14,7 @@ RSpec.describe Admin::DashboardController, type: :request do
       it "redirects" do
         get "/admin"
         expect(response.code).to eq("302")
-        expect(response).to redirect_to organization_root_path(organization_id: current_user.default_organization.to_param)
+        expect(response).to redirect_to organization_root_path(organization_id: OrganizationRole.default_organization(current_user).to_param)
       end
     end
   end
@@ -72,6 +72,25 @@ RSpec.describe Admin::DashboardController, type: :request do
       end
     end
 
+    describe "index user counts" do
+      let!(:user_today) { FactoryBot.create(:user) }
+      let!(:user_yesterday) { FactoryBot.create(:user, created_at: Time.current.beginning_of_day - 2.hours) }
+      let!(:user_earlier) { FactoryBot.create(:user, created_at: Time.current - 1.week) }
+      let!(:email_ban) { FactoryBot.create(:email_ban, reason: :honeypot) }
+
+      it "counts the valid users, split by day" do
+        Organization.example && Cgroup.additional_parts # Read replica
+        expect(User.unscoped.pluck(:id)).to match_array([current_user.id, user_today.id,
+          user_yesterday.id, user_earlier.id, email_ban.user_id])
+        get "/admin"
+        expect(response.code).to eq "200"
+        # The email_banned user is in none of the counts
+        expect(assigns(:users_count)).to eq 4
+        expect(assigns(:users_today)).to eq 2 # user_today and current_user
+        expect(assigns(:users_yesterday)).to eq 1
+      end
+    end
+
     describe "credibility_badges" do
       it "renders" do
         get "/admin/credibility_badges"
@@ -95,7 +114,7 @@ RSpec.describe Admin::DashboardController, type: :request do
           get "/admin/scheduled_jobs"
           expect(response.code).to eq "200"
           expect(response.body).to include("Skipped via ENV SIDEKIQ_SKIP")
-          expect(response.body).to match(%r{<code>\s*FetchProject529BikesJob\s*</code>})
+          expect(response.body).to match(%r{<code[^>]*>\s*FetchProject529BikesJob\s*</code>})
         end
       end
     end
@@ -113,9 +132,16 @@ RSpec.describe Admin::DashboardController, type: :request do
         Organization.example && Cgroup.additional_parts && Ctype.other # Read replica
         FactoryBot.create(:manufacturer, name: "other")
         BParam.create(creator_id: current_user.id)
+        # Renders its ctype name, rather than the other-ctype branch
+        FactoryBot.create(:component, manufacturer: Manufacturer.other, ctype: FactoryBot.create(:ctype, name: "Wheel"))
+        component = FactoryBot.create(:component, ctype: Ctype.other, manufacturer: Manufacturer.other, model_name: "Other model")
+        bike = FactoryBot.create(:bike, handlebar_type: "other")
         get "/admin/maintenance"
         expect(response.code).to eq "200"
         expect(response).to render_template(:maintenance)
+        expect(response.body).to include("Wheel")
+        expect(response.body).to include(component.model_name)
+        expect(response.body).to include(admin_bike_path(bike))
       end
     end
 
@@ -130,6 +156,16 @@ RSpec.describe Admin::DashboardController, type: :request do
         expect(response.code).to eq("200")
         # assigns(:tsvs).should eq(tsvs)
         expect(assigns(:blocklist).include?("2")).to be_truthy
+      end
+
+      # The blocklist shares the file info's redis key, so it's set without one
+      context "without a blocklist" do
+        it "renders the tsvs" do
+          FileCacheMaintainer.reset_file_info("current_stolen_bikes.tsv", Time.current)
+          get "/admin/tsvs"
+          expect(response.code).to eq("200")
+          expect(response.body).to include("current_stolen_bikes.tsv")
+        end
       end
     end
 

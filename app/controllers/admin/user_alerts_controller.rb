@@ -4,7 +4,7 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 50)
-      @pagy, @collection = pagy(:countish, matching_user_alerts.order(sort_column => sort_direction), limit: @per_page, page: permitted_page)
+      @pagy, @collection = pagy(:countish, matching_user_alerts.order(sortable_order(UserAlert)), limit: @per_page, page: permitted_page)
       @render_kind_counts = Binxtils::InputNormalizer.boolean(params[:search_kind_counts])
     end
 

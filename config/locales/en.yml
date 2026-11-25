@@ -438,9 +438,8 @@ en:
         deleted_at: Deleted at
         enabled_feature_slugs: Enabled feature slugs
         invoices: Invoices
-        is_paid: Is paid
+        is_invoiced: Is invoiced
         kind: Kind
-        landing_html: Landing html
         locations: Locations
         lock_show_on_map: Lock show on map
         mail_snippets: Mail snippets
@@ -694,7 +693,7 @@ en:
           impounded: impounded
           stolen: stolen
           unregistered: unregistered
-          with_owner: with owner
+          with_owner: registered
     enums:
       currency:
         cad: CAD
@@ -708,6 +707,7 @@ en:
         cargo_rear: Cargo Bike Rear (e.g. longtail)
         cargo_trike: Cargo Tricycle (trike with front storage, e.g. Christiania bike)
         cargo_trike_rear: Cargo Tricycle (trike with rear storage)
+        e_atv: e-ATV (e-Quad, electric all-terrain vehicle)
         e_motorcycle: e-Motorcycle (e-Dirt bike, e-bike with no pedals)
         e_scooter: e-Scooter
         elliptical: Elliptical bike
@@ -715,8 +715,8 @@ en:
         non_e_skateboard: Skateboard (not electric)
         pedi_cab: Pedi Cab (rickshaw)
         penny_farthing: Penny Farthing
-        personal_mobility: e-Personal Mobility (EPAMD, e-Skateboard, Segway, e-Unicycle,
-          etc)
+        personal_mobility: e-Personal Mobility Device (EPAMD, e-Skateboard, Segway,
+          e-Unicycle, etc)
         recumbent: Recumbent
         stroller: Stroller
         tall_bike: Tall Bike (multiple frames fused together)
@@ -735,10 +735,9 @@ en:
         steel: Steel
         titanium: Titanium
       handlebar_type:
-        bmx: BMX style
         drop_bar: Drop bars
-        flat: Flat or riser
         forward: Forward facing
+        horizontal: Flat or riser (horizontal facing)
         other: Not handlebars
         rearward: Rear facing
       marketplace_listing:
@@ -754,6 +753,68 @@ en:
           new_in_box: unridden/with tags
           poor: needs service
           salvage: not working/unrideable
+      ownership:
+        creation_kind:
+          api_v1: api v1
+          api_v2: api v2
+          api_v3: api v3
+          ascend_pos: ascend
+          broken_ascend_pos: ascend (broken)
+          broken_lightspeed_pos: lightspeed (broken)
+          bulk_import: bulk import
+          bulk_import_worker: bulk import worker
+          creator_unregistered_parking_notification: unregistered parking notification
+          embed: embed
+          embed_extended: embed +
+          embed_partial: old landing page
+          impound_import: impound import
+          impound_process: impound process
+          lightspeed_pos: lightspeed
+          organization_form: legacy org form
+          other_pos: point of sale
+          register_flow: new flow
+          register_flow_landing_page: landing page
+          register_flow_organized: new flow organized
+          sticker: sticker
+          transferred_ownership: transferred ownership
+          web: web
+        creation_kind_description:
+          api_v1: registered through the API (v1)
+          api_v2: registered through the API (v2)
+          api_v3: registered through the API (v3)
+          ascend_pos: automatically registered by bike shop point of sale (Ascend
+            POS)
+          broken_ascend_pos: >-
+            automatically registered by bike shop point of sale (Ascend POS), whose
+            integration is marked broken
+          broken_lightspeed_pos: >-
+            automatically registered by bike shop point of sale (Lightspeed POS),
+            whose integration is marked broken
+          bulk_import: registered by spreadsheet import
+          bulk_import_worker: registered by spreadsheet import
+          creator_unregistered_parking_notification: registered via the Unregistered
+            Parking Notification flow
+          embed: registered on an organization's embedded registration form
+          embed_extended: registered on the organization embed form, extended version
+          embed_partial: registration began with incomplete registration, via organization
+            landing page
+          impound_import: registered by impound spreadsheet import
+          impound_process: transferred as part of the impound process
+          lightspeed_pos: automatically registered by bike shop point of sale (Lightspeed
+            POS)
+          organization_form: >-
+            registered by an organization member, on the legacy organization iframe
+            form on Bike Index
+          other_pos: automatically registered by bike shop point of sale
+          register_flow: registered with the multi-step registration flow
+          register_flow_landing_page: >-
+            registration began via an organization landing page, in the multi-step
+            registration flow
+          register_flow_organized: registered by an organization member, in the multi-step
+            registration flow
+          sticker: registration began from a sticker
+          transferred_ownership: transferred to a new owner
+          web: registered with self registration process
       propulsion_type:
         foot_pedal: Pedal
         hand_pedal: Hand Cycle (hand pedal)
@@ -855,9 +916,6 @@ en:
           address_required: "(or location) of this abandoned bike required"
         payment:
           requires_email_or_org: Requires an email address or organization
-        recovery_display:
-          quote_too_long: That quote is too long. Please shorten it to be less than
-            300 characters
         theft_alert:
           must_be_later_than_start_time: must be later than start time
           must_be_present: must be present
@@ -998,6 +1056,7 @@ en:
           community_member: Community Member
           employee: Employee
           graduate_student: Graduate Student
+          postdoc: Postdoc
           student: Undergraduate Student
       stolen_record:
         bike_was_not_locked: Bike was not locked
@@ -1175,6 +1234,25 @@ en:
       report_the_theft_to_the_organization_html: >-
         <span class="text-warning">Report the theft</span> to %{organization} <strong>%{report_link}</strong>
         to get a police report number
+    owner_bike_status_alerts:
+      address: Address
+      by: By
+      created: Created
+      current_notifications:
+        one: "%{count} current notification for this %{bike_type}!"
+        other: "%{count} current notifications for this %{bike_type}!"
+      currently_impounded: Your %{bike_type} is currently impounded!
+      have_you_retrieved: Have you retrieved this %{bike_type}?
+      impounded_by_from_html: Impounded %{time} by <strong>%{organization}</strong>
+        from %{address}
+      impounded_by_html: Impounded %{time} by <strong>%{organization}</strong>
+      kind: Kind
+      kind_by_organization_html: "- <em>%{kind}</em> - by <strong>%{organization}</strong>"
+      let_organization_know: Let %{organization} know
+      mark_retrieved: mark retrieved
+      notification: Notification#
+      notification_number: 'Notification #%{number}'
+      was_this_retrieved: Was this %{bike_type} retrieved?
     pdf:
       bike_description: 'Bike description:'
       bike_serial: Bike Serial
@@ -1231,13 +1309,11 @@ en:
       you_have_claimed_the_maximum_permitted: You have claimed the maximum permitted
         number of Bike Codes.
     show:
-      change_the_bike_sticker_linked_to: Change the bike it links to
       contact_the_owner: Contact the owner
       created_to_record_parking_notification: created by %{organization} to record
         a Parking Notification
       from: from
       in: in
-      is_this_linked_to_incorrect_bike: Is this sticker linked to the incorrect bike?
       know_something_about_this_bike_type: Know something about this %{bike_type}?
       link_url: Link url
       looking_for_correct_owner: Looking for the correct owner of this %{bike_type}!
@@ -1247,9 +1323,7 @@ en:
       send_message: Send message
       share_it: Share it!
       spread_the_word: Spread the word!
-      switch_to_new_bike_id: Switch to a new bike ID
       test_registration: test registration
-      update: Update
       view_public_non_listing: View public registration
       view_users_other_registrations: View user's other registrations
       viewing_listing_preview: This is a preview of your "for sale" listing. It is
@@ -1258,45 +1332,6 @@ en:
         Where did you see this %{bike_type}? If you're contacting about an ad you
         found online, include a link in the field below
       write_them_a_message: Write them a message
-      you_scanned_this_sticker_html: >-
-        You scanned the sticker <strong>%{pretty_code}</strong>, which is assigned
-        to this %{bike_type}.
-    stolen_checklist:
-      a_photo_of_your_bike_type: a photo of your %{bike_type}
-      add: Add
-      add_bike_link_to_your_theft_report_html: Add %{bike_link} to your theft report
-      add_serial_number: Add serial number
-      bike_index_does_this: "(Bike Index does this when you enter your police report
-        number)"
-      contact_seller: CRITICAL - contact who you bought the bike from and find out
-        if they have it
-      facebook_instagram_etc: "(Facebook, Instagram, etc)"
-      leads_online: LEADSonline
-      leads_online_url: https://bikeindex.org/news/bike-index-partners-with-leads-online
-      list_bike_type_on_bike_index: List %{bike_type} on Bike Index
-      location_where_the_theft_occurred: location where the theft occurred
-      nl_digid_required: "(DigiD required)"
-      nl_file_police_report: File a Police report!
-      nl_online: Online
-      nl_person: In Person
-      nl_person_report: Search for the closest police station,
-      nl_phone: By Phone
-      nl_phone_report: >-
-        call 0900-8844. You will usually get a phone call appointment for later, at
-        which point you'll give the information to the Police
-      nl_website_link_text: at this politie.nl webpage
-      promoted_stolen_bike_alerts: Promoted Stolen Bike Alerts
-      push_bike_info_to: Push bike info to
-      push_bike_info_to_law_enforcement: >-
-        Push bike info to law enforcement databases (Bike Index does this when you
-        enter your police report number)
-      report_theft_html: Report theft on Bike Index, including %{edit_bike_link}
-      requires_a_serial_number: requires a serial number
-      share_on_twitter: Share on Twitter (Bike Index will do this once we review your
-        listing)
-      share_widely_on_your_personal_social: Share widely on your personal social media
-      supercharge_sharing_on_facebook: Supercharge sharing on Facebook with Bike Index
-      your_police_report: your Police Report Number
     stolen_map:
       unavailable: The map couldn't be loaded — your browser or device may not support
         it.
@@ -1673,8 +1708,8 @@ en:
         update:
           bike_recovered: Bike marked recovered! Thank you!
       resolve_token:
+        bike_type_marked_retrieved: "%{bike_type} marked retrieved!"
         marked_remaining: "%{bike_type} marked remaining!"
-        marked_retrieved: "%{@bike_type} marked retrieved!"
         notification_already_retrieved: That %{bike_type} has already been marked
           retrieved!
         notification_impounded: That %{bike_type} has been impounded! Contact %{org_name}
@@ -1696,6 +1731,7 @@ en:
           owner_already_has_account: >-
             The owner of this %{bike_type} already has an account on Bike Index. Sign
             in to claim it!
+          sign_in_to_continue_registration: Sign in to continue your registration
           you_have_to_log_in: Sorry, you have to log in.
         ensure_member_of!:
           accept_tos_for_orgs: Please accept the terms of service for organizations.
@@ -1719,8 +1755,21 @@ en:
           user_is_banned: >-
             We're sorry, but it appears that your account has been locked. If you
             are unsure as to the reasons for this, please contact us.
+        sign_in_confirmed_user:
+          unable_to_sign_in: We confirmed your email, but couldn't sign you in to
+            that account
         skip_if_signed_in:
           already_signed_in: You're already signed in!
+        turnstile_verified:
+          verify_not_a_robot: Please confirm you're not a robot
+    ebike_rules:
+      show:
+        state_description: "%{state} e-bike law: %{law}"
+        state_description_in_review: >-
+          We're still reviewing %{state}'s e-bike law. Check your e-bike's class,
+          motor and speed, and see how the e-bike classes work.
+        state_title: "%{state} e-bike laws"
+        title: E-bike rules
     feedbacks:
       block_the_spam:
         please_sign_in: Please sign in to send that message
@@ -1738,16 +1787,13 @@ en:
       find_lock:
         not_your_lock: Whoops, that's not your lock!
     memberships:
-      edit:
-        free_membership: >-
-          Bike Index has given you a free membership. Please email support@bikeindex.org
-          if you have questions.
-        no_active_membership: You don't have an active membership, you'll have to
-          sign up for a new one.
+      create:
+        already_a_member: You already have a membership.
     my_accounts:
       edit:
         delete_account: Delete account
         membership: Membership
+        organization_roles: Organization Roles
         password: Password
         registration_organizations: Registration Organizations
         sharing: Sharing + Personal Page
@@ -1770,6 +1816,27 @@ en:
         show:
           sorry_that_is_you: That's your listing! You can't start a new message to
             yourself.
+      organization_roles:
+        destroy:
+          left_organization: You've left %{org_name}
+          unable_to_leave: 'Unable to leave %{org_name}: contact support@bikeindex.org
+            for help'
+      pos_registration_matches:
+        redirect_by_status:
+          already_combined: These are already combined into one registration.
+          already_kept_separate: You told us these are different, so they're staying
+            separate.
+          cant_combine_here: >-
+            These registrations can't be combined here. Email support@bikeindex.org
+            if you need help.
+          combining: We're combining these into one registration. It takes a minute.
+          combining_thanks: >-
+            Thanks! We're combining your %{bike_type}'s registrations into one. It
+            takes a minute.
+          couldnt_combine: >-
+            We couldn't combine these, so they're still separate. Email support@bikeindex.org
+            if you need help.
+          kept_separate: Thanks, we'll keep them as separate registrations.
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
@@ -1778,23 +1845,52 @@ en:
       applications:
         ensure_app_owner!:
           not_your_application: That isn't your application
+    organization_signup:
+      complete_signup:
+        name_taken_meanwhile: >-
+          Another organization took the name %{name} while you were signing up. Choose
+          another name to finish - everything else is saved.
+        unable_to_complete: >-
+          We couldn't finish setting up your organization (%{errors}). Contact support@bikeindex.org
+          and we'll sort it out.
+      confirm_email:
+        accept_terms: >-
+          Agree to the Terms of Service and the Terms of Service for Organizations
+          to activate the organization
+        link_invalid: >-
+          That link doesn't work anymore. Use the newest email we sent to %{email},
+          or send another below.
+        link_invalid_resent: That link doesn't work anymore, so we've emailed a new
+          one to %{email}.
+        switched_signup: >-
+          You're now finishing %{name}. To finish %{replaced_name} too, open the link
+          in its email.
+      find_signup_for_confirmation:
+        signup_not_found: We couldn't find that signup — start a new one below
+      redirect_to_organization:
+        already_activated: "%{name} is already active"
+      redirect_to_sign_in_for:
+        sign_in_to_manage: "%{name} is active! Sign in as %{email} to manage it."
+      resend:
+        link_recently_sent: >-
+          We sent a link to %{email} in the last few minutes - it can take a little
+          while to arrive, so check your spam folder too.
+        link_resent: We've sent a new link to %{email}.
+        no_more_links: >-
+          We've already sent several links to %{email}, so we can't send another.
+          Check your spam folder, or contact support@bikeindex.org.
     organizations:
-      create:
-        must_create_an_account_first: >-
-          You have to sign up for an account on Bike Index before you can create an
-          organization
-        organization_created: Organization Created successfully!
       find_organization:
         not_found: >-
           We're sorry, that organization isn't on Bike Index yet. Email contact@bikeindex.org
           if this seems like an error.
       lightspeed_interface:
-        must_create_an_account_first: >-
-          You have to sign up for an account on Bike Index before you can connect
-          with Lightspeed
         must_create_an_organization_first: >-
           You have to create an organization on Bike Index before you can connect
           with Lightspeed
+        sign_in_or_add_organization: >-
+          Sign in to connect your organization with Lightspeed - or, if it isn't on
+          Bike Index yet, add it here.
       set_bparam:
         no_user: >-
           We're sorry, that organization doesn't have a user set up to register bikes
@@ -1854,7 +1950,6 @@ en:
             location.
       manage_impoundings:
         update:
-          could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
       manages:
         destroy:
@@ -1862,11 +1957,15 @@ en:
             %{org_name}.
           deleted_org: Deleted %{org_name}.
         update:
-          could_not_update: We're sorry, we had trouble updating %{org_name}.
           updated_successfully: "%{org_name} updated successfully."
+      organization_messages:
+        create:
+          sent: Message sent to the owner
+          unable_to_send: Unable to send - %{errors}
       parking_notifications:
         create:
           successfully_created: Parking Notification for %{bike_type} created
+          successfully_impounded: Impounded this %{bike_type}
           unable_to_create: Unable to create - %{errors}
       stickers:
         ensure_sticker_for_current_organization:
@@ -1920,7 +2019,10 @@ en:
     register:
       acknowledge:
         acknowledge_everything: Check every box to agree to these rules
+        safety_rules_updated: The safety rules have been updated — please review them
+          again
       confirm_email:
+        accept_terms: Agree to the Terms of Service to continue
         confirmation_link_expired: That confirmation link has expired — check your
           email for a new one
         signed_in_as_other: >-
@@ -1929,9 +2031,13 @@ en:
       find_b_param:
         registration_not_found: We couldn't find that registration — start a new one
           below
-      sign_in_confirmed_user:
-        unable_to_sign_in: We confirmed your email, but couldn't sign you in to that
-          account
+      redirect_to_single_page:
+        registered_for_owner: The %{bike_display} is registered - we've emailed %{email}
+          so they can claim it.
+        registered_own: Your %{bike_display} is registered.
+        safety_rules_sent: >-
+          The %{bike_display} is registered - we've emailed %{email} the safety rules
+          to agree to, which finishes the registration.
     search:
       marketplace:
         set_interpreted_params:
@@ -2015,8 +2121,7 @@ en:
       unsubscribe_update:
         successfully_unsubscribed: You have been unsubscribed from Bike Index updates.
       update:
-        accept_tos: You have to accept the Terms of Service if you would like to use
-          Bike Index.
+        accept_tos: You must agree to the terms to use Bike Index
         accept_tos_to_use_as_org: >-
           You have to accept the Terms of Service if you would like to use Bike Index
           through an organization
@@ -2088,12 +2193,14 @@ en:
         whoops_it_appears_you_have_forgotten_your: Whoops! It appears you have forgotten
           your Bike Index password!
       subject: Instructions to reset your password
+    pos_registration_match_email:
+      subject: Is this the same %{bike_type}?
     recovered_from_link:
       html:
         marked_recovered_by: 'Marked recovered by:'
         note_if_you_didnt_recover_html: >-
-          <strong>Note:</strong> If you didn't recover your bike, or marked it recovered
-          accidentally, reply to this email and let us know!
+          <strong>Note:</strong> If you didn't recover your %{bike_type}, or marked
+          it recovered accidentally, reply to this email and let us know!
         the_description_of_the_recovery_was: 'The description of the recovery was:'
         were_so_glad_you_got_your_bike_type_back: We're so glad you got your %{bike_type}
           back!
@@ -2130,7 +2237,7 @@ en:
         no_one_should_be_extorted: >-
           If you think this person is extorting you or abusing the system, email us
           and let us know - you should never be forced to 'reward' or 'repay' someone
-          for your stolen bike
+          for your stolen %{bike_type}
         please_help_sender_html: >-
           Please help %{sender_name} contact the owner of this %{link}, they believe
           it is <span class='stolen-color'>stolen</span>!
@@ -2142,15 +2249,15 @@ en:
           registered on Bike Index on %{date}
         update_organization_direct_message_html: >-
           Update the "Stolen emails" setting in %{link} on Bike Index to have these
-          emails sent directly to the owner of the bike, without having to forward
-          them.
+          emails sent directly to the owner of the %{bike_type}, without having to
+          forward them.
         you_can_just_forward_this_message_to: >-
           You can just forward this message to the owner's email address: %{bikeowner_email}
         you_registered_this_bike_type_on: >-
           You registered this %{bike_type} on %{date}. The owner hasn't claimed it
           yet and it isn't marked stolen, so you have received this email to authorize
           contacting them.
-      subject: Stolen bike contact
+      subject: Stolen %{bike_type} contact
     updated_terms_email:
       html:
         as_always_thanks_for_helping_register_bik: As always, thanks for helping register
@@ -2253,7 +2360,7 @@ en:
     - Saturday
     formats:
       default: "%Y-%m-%d"
-      long: "%B %d, %Y"
+      long: "%B %-d, %Y"
       short: "%b %d"
     month_names:
     -
@@ -2381,6 +2488,8 @@ en:
   feedbacks:
     form:
       email_address: Email address
+      message_template: "Bike serial number (if applicable): \nBike Index registration
+        URL (if applicable): \nWhat I need help with: "
       name: Name
       send_it: Send it!
       subject: Subject
@@ -2390,6 +2499,10 @@ en:
       have_a_question_we_havent_answered: Have a question we haven't answered?
       help_with_bike_index: Help with Bike Index
       log_in_to_send_a_comment: Log in to send a comment!
+      the_more_detail_you_can_share: >-
+        The more detail you can share, the faster we can help. If your question is
+        about a specific bike, include the serial number or your Bike Index registration
+        URL.
       you_can_reach_us_at_contact_html: You can reach us at %{contact_link}, or send
         your message right here.
   gflash:
@@ -2402,11 +2515,6 @@ en:
   helpers:
     bike_helper:
       deleted: Deleted
-      hidden: hidden
-      hidden_because_status: because %{bike_type} is %{status}
-      hidden_for_unauthorized_users: hidden for unauthorized users
-      made_without_serial: made without serial
-      unknown: unknown
     organization_helper:
       address: Street address
       address_school: Campus mailing address
@@ -2442,19 +2550,17 @@ en:
         over the world before realizing other people use bikes as a means of transport.  He
         brings a wide breath of knowledge of the cycling world and works to make sure everything
         keeps running behind the scenes at Bike Index.
-      jan_pecnik_bio_html: |
-        <strong>Jan Pecnik</strong> fell in love with bikes while studying his masters in the
-        Netherlands, focusing on social entrepreneurship. After a couple of
-        years of solo riding, he now helps Bike Index expand across Europe and
-        beyond.
+      kelsey_graywill_bio_html: |
+        <strong>Kelsey Graywill</strong> does graphic design, illustration, and marketing
+        collateral for Bike Index. A tireless advocate for active mobility who has never
+        learned to drive, she got her start in bike advocacy teaching kids to ride at public
+        elementary schools, then moved into communications at a bike coalition before joining
+        Bike Index.
       merging_the_services: >-
         Merging the two services, Seth and Bryan created the universal bike registration
         service they both dreamed of — a database used and searched by individuals,
         bike shops, police departments and other apps. A bike registry that gives
         everyone the ability to register and recover bicycles.
-      mike_oleon_bio_html: |
-        <strong>Mike Oleon</strong> does the graphic design and illustration for the Index. If
-        anything looks good, it's probably his fault.
       nonprofit_status: 501(c)(3) nonprofit
       seth_built: >-
         Seth built Bike Index when he was a bike mechanic because he wanted to be
@@ -2482,6 +2588,7 @@ en:
         created for every bicycle you sell. All you need to do is add the customer's
         email address and the bicycle's serial number during a normal Lightspeed Retail
         checkout.
+      add_your_shop: Add your shop to Bike Index
       all_you_have_to_do_is_html: >-
         All you have to do is go to %{link}, where you'll be asked to authorize Bike
         Index to access your Lightspeed Account. Curious about what we collect? Read
@@ -3501,41 +3608,7 @@ en:
       you_bring_the_ideas_make_the_connections_: >-
         You bring the ideas, make the connections, and we’ll make sure you have the
         resources to get stuff done.
-    ascend:
-      ascend_knowledge_base_article: Ascend's Knowledge base article
-      automatic_bicycle_registration: Automatic Bicycle Registration for Bike Shops
-        using Ascend POS
-      email_shops_security_html: >-
-        Email %{shops_email_link} if you have any questions, or check out the %{security_link}.
-        Thank you for registering bikes in Bike Index!
-      email_us_the_password_to_finish_setting_u: Email us the password to finish setting
-        up!
-      follow_the_setup_instructions_html: Follow the setup instructions on <strong>%{ascend_link}</strong>
-        on Bike Index
-      if_your_shop_uses_lightspeed_html: >-
-        If your shop uses Lightspeed, check out our Lightspeed POS integration <a
-        target="none" href="%{lightspeed_path}">here</a>.
-      link_your_ascend_retail_and_bike_index: Link your Ascend Retail and Bike Index
-        Accounts for free
-      new_bike_shop_org: new bike shop organization
-      once_youve_set_up_the_trek_ascenwd: >-
-        Once you’ve set up the Trek Ascend POS bicycle registration, you’re done!
-        Each day, Bike Index will pull newly-sold bike information from Ascend to
-        create Bike Index accounts for your customers. Their new bikes will be waiting
-        for them upon login. They just have to check their email, and their new bike
-        will be waiting for them.
-      security_link_text: POS integration FAQ
-      sign_up_as_a_new_org_html: Sign up as a %{new_org_link} on Bike Index
-      then_if_a_customers_bike_goes_missing_html: >-
-        Then, if a customer’s bike goes missing, their bike’s information and serial
-        number will be stored for them to access. But don’t worry: <a target="none"
-        href="%{privacy_path}">we will never give out any of your customer data</a>.
-      we_have_a_new_free_bicycle_registration: >-
-        We have a free bicycle registration for bike shops. If you’re a shop that
-        uses Ascend as your POS, our new Ascend point of sale integration will allow
-        you to register each bike you sell automatically. Setup takes about 10 minutes.
     bike_shop_packages:
-      additional: Additional
       bike_index_for_bike_shops: Bike Index for bike shops
       choose_a_package_size: Choose a package size
       compare_plans_and_features: Compare Plans and Features
@@ -3559,128 +3632,6 @@ en:
       get_in_touch_link: Get in touch
       want_qr_stickers: Want QR stickers? Ask us how their cost offsets the price
         of a package.
-    for_bike_shops:
-      5_ways_to_grow_community_for_your_bike_sh: 5 ways to grow community for your
-        bike shop
-      automatic_registration_at_point_of_sale: Automatic registration at point of
-        sale
-      bike_index_for_bike_shops: Bike Index for Bike Shops
-      bike_shops_deck: bike shop partner deck
-      bikes_before_they: >-
-        Unite against bike theft and protect your customers bikes before they're even
-        out there.
-      build_goodwill_with_your_customers_with_a: >-
-        Build goodwill with your customers with a service you can offer at no cost.
-        Recover a stolen bike, and you'll have a customer for life.
-      check_out: Check out our
-      connect_your_ascend_account_html: >-
-        Connect your Ascend account and your Bike Index shop account. Each night,
-        Ascend will export the bikes you've sold, and we'll import them into Bike
-        Index for your customers. Other than setup, you're done! Learn more about
-        the Ascend integration %{ascend_link}.
-      connect_your_lightspeed_account: connect your Lightspeed account
-      curious_what_information_html: Curious what information is collected? Read about
-        the %{security_link}.
-      do_right_by_your_customers: Do right by your customers in just 5 clicks.
-      dont_use_ascend_or_lightspeed_html: Don't use Ascend or Lightspeed POS? Ask
-        us about %{printed_materials}.
-      driving_service_revenues_with_bicycle_reg: Driving service revenues with bicycle
-        registration
-      embed_a_bike_index_registration_form: Embed a bike registration form on your
-        website
-      for_free_we_provide_you_with_t: >-
-        For free we provide you with the tools needed to automatically register each
-        bike you sell in Bike Index through your POS. All it takes is a few minutes
-        of setup, either with your Ascend or Lightspeed Retail account.
-      here: here
-      join_our_network_link_html: Join our %{network_link}.
-      learn_more: Learn more
-      network_of_shop_partners: network of shop partners
-      or: or
-      our_official_lightspeed_integration_provi: >-
-        Our official Lightspeed integration provides entirely automated registration
-        for every bike you sell. All you have to do is make sure you input the serial
-        number and take the customer's email.
-      printed_materials: printed materials
-      register_bikes_for_your_customers: Register bikes for your customers
-      related_articles: 'Related articles:'
-      security_link_text: security and privacy of the integrations here
-      sign_up_for_a_free_bike_index_account_html: Sign up for a free Bike Index account
-        for your shop %{new_org_link}.
-      sign_up_for_free: Sign up for free
-      trusted_by_bike_shops_everywhere: Trusted by bike shops everywhere
-      use_ascend: Use Ascend?
-      use_lightspeed_retail: Use Lightspeed Retail?
-      used_at_bike_shops_everywhere: Used at bike shops everywhere
-    for_cities:
-      actually_get_people_registered_and_do_it_: Actually get people registered. And
-        do it for cheap.
-      bike_index_for_cities: Bike Index for Cities
-      bike_index_is_the_community_registration_: >-
-        Bike Index is the community registration system of choice. We are the bike
-        registration system of %{organization_counts} organizations - communities
-        in every corner of the world. Join the most widely used bike registration
-        network in the world.
-      bike_index_new_dashboard: New Bike Index dashboard useful for fighting bike
-        crime
-      bike_index_organization_impounding: Impounding bikes with Bike Index
-      bike_index_unveils_partnership_with_the_c: Bike Index unveils partnership with
-        the City of Palo Alto
-      bring_together_bike_shops_schools_municip: >-
-        Bring together bike shops, schools, municipal departments, and law enforcement
-        to register bikes in one system. Gone are the days of waiting for people to
-        not come in to register their bikes, or wondering if that other department
-        took care of it. Bike Index consolidates everything in one manageable place.
-      check_out: Check out our
-      cities_deck: cities partner deck
-      embed_a_bike_index_registration_form: Embed a bike registration form on your
-        website
-      engage_your_residents_and_recover_their_b: Engage your residents and recover
-        their bikes, and they will love you forever.
-      mitigate_the_registration_mess: Mitigate the registration mess
-      no_more_index_cards_or_excel_sheets_give_: >-
-        No more index cards or excel sheets. Give your citizens the tools to register
-        from a smartphone, in less than two minutes, and use these registrations to
-        recover and return stolen bikes.
-      our_community_is_your_community: Our community is your community
-      plug_your_city_in_nationally: Plug your city in nationally.
-      related_articles: 'Related articles:'
-      schedule_a_demo: Schedule a demo
-      trusted_by_municipalities_everywhere: Trusted by municipalities everywhere
-      used_by_municipalities_everywhere: Used by municipalities everywhere
-    for_community_groups:
-      bike_index_for_community_groups: Bike Index for Community Groups
-      bike_index_launches_new_ambassadors_progr: Bike Index launches new Ambassadors
-        program
-      bike_index_welcomes_stolen_bikes_nola: Bike Index welcomes Stolen Bikes NOLA
-      embed_a_bike_index_registration_form: Embed a bike registration form on your
-        website
-      gone_are_the_days_where_you_had_to_regist: >-
-        Gone are the days where you had to register your bike in your neighborhood,
-        county, city, state and country. Just register all bikes in Bike Index and
-        a cyclists registration will be valid anywhere. Run registration drives? Host
-        community cycling events? Let us know and we will send you Bike Index materials.
-      help_us_help_you: Help us help you
-      here: here
-      partners_made_in_heaven: Partners made in heaven
-      purchase_a_pack_of_advocacy_html: Purchase a pack of advocacy materials %{link}.
-      registration_drive: Use Bike Index to host a registration drive
-      registrations_are_free_forever_join_bike_: Registrations are free. Forever.
-        Join Bike Index and start registering today.
-      related_articles: 'Related articles:'
-      sign_up_for_free: Sign up for free
-      spread_the_bike_index_word_html: >-
-        Spread the Bike Index word to your constituents to get them riding protected.
-        Create a free organization account %{link}.
-      the_most_widereaching_and_effective_tools: The most wide-reaching and effective
-        tools against bike theft — period.
-      trusted_by_community_groups_everywhere: Trusted by community groups everywhere
-      used_by_community_groups_everywhere: Used by community groups everywhere
-      we_provide_free_and_easy_access_to_our_re: >-
-        We provide free and easy access to our registry for anyone and everyone who
-        rides a bicycle, in any capacity. Bike Index is a community-driven effort
-        in recovering lost and stolen bikes. No matter the type of bike or cyclist,
-        we want to keep all bikes rolling with the owners that need them.
     packages_list:
       forever: Forever
       free: Free
@@ -3691,24 +3642,7 @@ en:
       year: year
   layouts:
     application:
-      blog: Blog
-      donate: Donate
-      help: Help
-      log_in: log in
-      logout: Logout
-      marketplace: Marketplace
-      marketplace_messages: Marketplace messages
-      menu: Menu
-      register_a_new_bike: Register a new bike
-      search: Search
-      settings_menu: Settings
-      sign_up: Sign up
       skip_to_main_content: Skip to main content
-      stolen_bike: Stolen bike?
-      the_nonprofit_bike_registry: the non-profit bike registry
-      user_settings: "%{user_email} settings"
-      view_org: View %{org_name}
-      your_registrations: Your registrations
     application_bikehub:
       accounts_powered_by_bike_index: BikeHub accounts are powered by Bike Index –
         the premier bike registry.
@@ -3730,9 +3664,6 @@ en:
       help_prevent_theft: Help prevent bike theft,
       make_a_donation: make a donation.
       the_bike_index_team: The Bike Index Team
-    embed_layout:
-      error: error
-      please_fix_the_following: Please fix the following
     payments_layout:
       be_a_bike_saver: Be a bike saver.
       support_bike_index_today: Support Bike Index today.
@@ -3807,9 +3738,6 @@ en:
     feedbacks_index: Help using Bike Index. Frequently asked questions and other things.
     feedbacks_new: Contact Bike Index. Your words are our muse, whisper them in our
       ear.
-    feedbacks_vendor_signup: >-
-      Sign up with Bike Index to register your customers' bikes quickly, easily and
-      for free.
     info_about: Why we made Bike Index and who we are
     info_protect_your_bike: >-
       Prevent bike theft. Recommendations and best practices for protecting your bike
@@ -3822,6 +3750,12 @@ en:
     info_stolen_bikes: What to do if your bike is stolen - next steps Bike Index recommends
       taking.
     info_where: Organizations that use Bike Index to search for and register bikes.
+    landing_pages_for_bike_shops: >-
+      Bike Index connects to your POS and registers every bike you sell, automatically.
+      Free for shops and customers, and we never sell or share customer data.
+    landing_pages_for_community_groups: >-
+      Bike Index is the free, nonprofit bike registry. Help your riders register so
+      a stolen bike has a real path home. Free for community groups, forever.
     landing_pages_for_law_enforcement: >-
       Is your agency equipped to fight bike theft? Bike Index can help officers get
       bikes back into the right hands.
@@ -3833,8 +3767,14 @@ en:
     manufacturers_index: >-
       Bicycle related manufacturers listed on Bike Index - all the brands you know
       and then some.
+    marketplace_how_it_works: >-
+      How buying and selling works on the Bike Index Marketplace, where every bike
+      is registered and one reported stolen can't be listed.
     my_accounts_show: Your bikes on Bike Index
     news_index: Read Bike Index news. Also, periodically, learn magic spells.
+    register_landing: >-
+      Register your bike on Bike Index for free. Get proof it's yours, one-click stolen
+      alerts, and a network of shops, police, and riders watching for it.
     registrations_embed: >-
       Embedable %{organization} Bike Index registration form. Register your bike for
       free, right now
@@ -3845,6 +3785,9 @@ en:
       Index
     sessions_create: Log in to Bike Index
     sessions_new: Log in to Bike Index
+    shop_index: >-
+      Bike Index cap and registration stickers. Every purchase helps keep the registry
+      free.
     stolen_index: Bike Index helps recover your stolen bike
     stolen_merging: >-
       StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest
@@ -3861,7 +3804,6 @@ en:
     documentation_api_v1: Bike Index API documentation
     feedbacks_index: Help with Bike Index
     feedbacks_new: Contact Bike Index
-    feedbacks_vendor_signup: Shop sign up - Bike Index
     info_about: About Bike Index
     info_serials: Bike serial numbers
     info_spokecard: Spoke cards - Bike Index
@@ -3877,22 +3819,33 @@ en:
     landing_pages_for_schools: Bike Index for Schools
     landing_pages_show: "%{organization} Bike Registration"
     manufacturers_index: Bike Manufacturers
+    marketplace_how_it_works: How the Bike Index Marketplace works
     my_accounts_show: You on Bike Index
     news_index: Bike Index Blog
+    organization_signup_confirm: Activate your organization
+    organization_signup_create: Add your organization to Bike Index
+    organization_signup_new: Add your organization to Bike Index
+    organization_signup_show: Add your organization to Bike Index
+    organization_signup_update: Add your organization to Bike Index
+    organization_signup_welcome: "%{organization} is active"
     payments_create: Thanks for your support!
     payments_new: Support Bike Index!
-    register_acknowledgment: "%{cycle_type} safety check"
+    register_acknowledgment: Safety check for your %{cycle_type}
     register_confirm: Confirming your email
-    register_create: Register your %{cycle_type}!
+    register_create: Register your vehicle!
+    register_landing: Register your bike for free
+    register_report: Tell us what happened
     register_review: Review your %{cycle_type} safety check
-    register_show: "%{cycle_type} registration"
-    register_step_1: Register your %{cycle_type}!
+    register_show: Your %{cycle_type} registration
+    register_step_1: Register your vehicle!
     register_step_2: Add your %{cycle_type}'s details
+    registration_form_settings: Registration form settings
     registrations_embed: Register a bike with %{organization}
     search_marketplace_index: Bike Index Marketplace
     search_registrations_index: Search results
     sessions_create: Log in
     sessions_new: Log in
+    shop_index: Shop - Bike Index
     stolen_index: Bike registry
     strava_search_index: Bike Index Strava Search
     users_accept_terms: Terms of use - Bike Index
@@ -3912,6 +3865,8 @@ en:
       nb: EUR
       nl: EUR
   my_accounts:
+    color_scheme:
+      appearance: Appearance
     delete_account:
       delete_account: Delete account
       delete_my_account: Delete my account and all my registered bikes
@@ -3981,6 +3936,7 @@ en:
       notifications_email: This is the email we send notifications to
       personal_information_for_user: Personal Information for %{user_name}
       preferred_language: Preferred language
+      preferred_unit_system: Units
       primary_email: Primary email
       receive_the_bike_index_newsletter: Receive the Bike Index newsletter
       remove_email: Remove email
@@ -3991,6 +3947,9 @@ en:
       time_single_format_small: "(not today, yesterday, etc)"
       unconfirmed: unconfirmed!
       unconfirmed_emails: Unconfirmed emails
+      unit_system_automatic: Automatic, from your location
+      unit_system_imperial: Imperial (miles, inches)
+      unit_system_metric: Metric (kilometers, millimeters)
       verified: verified
       why_you_should_text: read why you should
     sharing:
@@ -4025,48 +3984,6 @@ en:
       your_username_is_the_url_for_your_sharing: >-
         Your username is the URL for your sharing page and the bike embed form. Update
         it if you care about those things.
-    show:
-      add_a_bike: Add a bike
-      add_a_lock: Add a lock
-      add_a_photo: Add a photo
-      add_it_now: Add it now!
-      bike_sticker: Bike Sticker
-      bikes: bikes
-      combination: Combination
-      edit: edit
-      edit_registration: Edit %{bike_type}
-      generally_connect_to_org: >-
-        Some of your bikes are associated with %{org_name}, but this one is not. Generally,
-        you should connect all your bikes to %{org_name} -
-      header_title: "%{current_user_name} on Bike Index"
-      ignore: ignore
-      key_serial: Key Serial
-      list_for_sale: List for sale
-      location: Location
-      lock_type: Lock Type
-      locks: locks
-      manufacturer: Manufacturer
-      mark_stolen: Mark %{bike_type} stolen
-      membership_subtitle: Thank you for being a Bike Index %{level} member!
-      next: Next steps
-      primary_colors: Primary colors
-      register_new_items: Register new items
-      registered: Registered
-      serial: Serial
-      sorry_your_bike_was_stolen: >-
-        We're sorry your %{bikes_last_type} was stolen, but hopefully, with everyone
-        able to search for it, you'll get it back!
-      tell_us_more_about_yourself: Tell us more about yourself.
-      thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type}
-        to the Index.
-      to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
-      update_marketplace_listing: Update marketplace listing!
-      update_your_profile: Update your profile
-      updated: Updated
-      user_hidden: Hidden from other users
-      welcome: Welcome
-      you_have_no_registered_bikes: You have no registered bikes
-      you_have_no_registered_locks: You have no registered locks
   news:
     index:
       bike_index_blog: Bike Index Blog
@@ -4203,32 +4120,6 @@ en:
       when_was_it_stolen: When was it stolen?
       where_was_it_stolen: Where was it stolen?
       zipcode: Postal Code
-    new:
-      bike_index_for_organizations: Bike Index for organizations
-    new_form:
-      add_organization: add organization
-      add_your_organization_to_bike_index: 'Add your organization to Bike Index, for
-        free, in three easy steps:'
-      bike_index_account: Bike Index account
-      confirm_your_email: Confirm your email
-      error: error
-      fill_out_the_form_that_will_appear: Fill out the form that will appear on this
-        page once you're signed in.
-      filling_out_this_form_will_create_a_new_org: Filling out this form will create
-        a new, different organization
-      if_you_dont_want_that_to_be_the_case_html: >-
-        If you don't want that to be the case, %{logout_link} and sign up with the
-        email you would like to use instead.
-      log_out: log out
-      new_organization: New organization
-      organization_kind: Organization kind
-      organization_name: Organization name
-      please_fix_the_following_errors: Please fix the following %{errors}
-      sign_up_for_a_new_account_html: Sign up for a %{new_account_link}
-      you_are_already_a_member_of_org_html: You are already a member of %{org_link}.
-      your_current_account_will_be_a_member_html: >-
-        Your current account (<strong>%{user_email}</strong>) will be a member of
-        the organization you create.
   organized:
     ambassador_dashboards:
       getting_started:
@@ -4340,19 +4231,11 @@ en:
         search: Search
         search_emails: Search emails
         sent: Sent
+        step: Step
         through_org: through %{org_name}
         vehicle_type: Type
-      list:
-        added: Added
-        bike: bike
-        color: Color
-        link: Link
-        manufacturer: Manufacturer
-        model: Model
-        num_bikes_registered_html: "<strong>%{num_bikes}</strong> registered"
-        sent_to: Sent to
-        sent_to_a_new_owner: sent to a new owner
-        sticker: Sticker
+      new:
+        registration_form_settings: Registration form settings
       recoveries:
         description: Description
         mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
@@ -4394,6 +4277,13 @@ en:
         choose_file: Choose file...
         correct_actual_image_url_html: '<span class="text-success">Correct</span>:
           actual image url'
+        create_duplicates_enabled_html: >-
+          Create duplicates - add registrations when a row matches an existing registration's
+          serial and owner email <span class="less-strong">(enabled by default to
+          prevent losing stolen/impounded data)</span>
+        create_duplicates_html: >-
+          Create duplicates - add registrations when a row matches an existing registration's
+          serial and owner email <span class="less-strong">(off by default)</span>
         csv_file_with_bikes: CSV File with bikes
         doing_an_import: >-
           Doing an import for the first time? Try importing a sample of your CSV with
@@ -4445,6 +4335,7 @@ en:
         file_removed: file removed
         file_removed_explanation: after a few days, we delete the uploaded file to
           save space
+        matched_count: Rows matching existing registrations
         progress: Progress
     exports:
       index:
@@ -4502,8 +4393,9 @@ en:
         view_avery_labels: View Avery Labels
     impound_records:
       index:
+        find_an_impound_record: Find an impound record
         impound_records: Impound Records
-        render_chart: Render chart
+        search_impound_records: Search impound records
     manage_impoundings:
       edit:
         impound_settings_html: Manage <em>%{org_name}</em> impound settings
@@ -4538,6 +4430,14 @@ en:
           Bike Index?
         select_email: Select email
         send_emails_directly: Send emails directly to unclaimed bike owners.
+        send_self_registration_email_includes_unregistered: This includes unregistered
+          notifications.
+        send_self_registration_email_note: >-
+          By default, Bike Index no longer sends email when a vehicle is registered
+          to your organization registration email. Check this box if you want to receive
+          email for registrations with an owner email of %{email}.
+        send_self_registration_email_to_html: Send email for registrations sent to
+          %{email}
         square_image: Use a square image for best results
         stolen_emails: Stolen emails
         unclaimed_registration_definition: >-
@@ -4550,20 +4450,12 @@ en:
           By default, emails to unclaimed bikes are sent to your organization to review
           and forward to the final user, because those users haven't opted in to Bike
           Index notifications.
-    parking_notifications:
-      index:
-        matches_visible: visible
-        parking_notifications: Parking notifications
-      table:
-        address: Address
-        bike: Bike
-        by: By
-        created: Created
-        notification_number: Notification#
-        resolved: Resolved
     registrations:
-      search:
-        render_chart: Render chart
+      index:
+        find_a_registration: Find a registration
+        search_all_email_disabled: You can only search your organization's registrations
+          with owner email or name
+        search_registrations: Search registrations
     stickers:
       edit:
         bike: Bike
@@ -4670,10 +4562,22 @@ en:
       subject: Confirm your %{organization_name}stolen %{bike_type}on Bike Index
     organization_invitation:
       subject: Join %{organization_name}on Bike Index
+    organization_message:
+      subject: Message from %{organization_name} about your %{bike_type}
+    organization_signup_confirmation:
+      subject: Confirm your email to activate %{name} on Bike Index
     partial_register_confirmation:
       subject: Confirm your email to finish your %{organization_name}registration
+    partial_register_confirmation_abandoned:
+      subject: Finish reporting your abandoned %{cycle_type}
+    partial_register_confirmation_found:
+      subject: Finish reporting your found %{cycle_type}
+    partial_register_confirmation_stolen:
+      subject: Finish reporting your stolen %{cycle_type}
     partial_registration:
       subject: Finish your %{organization_name}Bike Index registration!
+    shop_welcome:
+      subject: Your Bike Index shop dashboard is ready
   payments:
     form:
       donation_header: Help support our efforts!
@@ -4700,8 +4604,6 @@ en:
     form:
       cancel_update: Cancel Update
       do_not_display: Do not display
-      error: Error
-      errors_prevented_photo_from_saving: "%{errors_count} prevented photo from saving"
       image_name: Image name
       no_one_will_be_able_to_see_this_image_exc: "(no one will be able to see this
         image except for you)"
@@ -4780,7 +4682,7 @@ en:
       get_sign_in_link: Get sign in link
       link_already_used: That sign in link has already been used
       link_expired: That sign in link has expired
-      links_work_for: Sign in links work for %{hours} hours after they're sent.
+      links_work_for: Sign in links work for %{duration} after they're sent.
       only_the_newest_link_works: >-
         You may already be signed in somewhere else. If you asked for more than one
         email, only the link in the newest one works.
@@ -4834,22 +4736,6 @@ en:
         email address where you received your registration email. Add photos and details
         of the %{bike_type} to show what makes your ride yours. Hopefully, your %{bike_type}
         won’t be stolen, but if it is, we'll be here when you need us most.
-    content_skeleton:
-      about: About
-      bicycle_serials: Bicycle serials
-      bike_index_news: All Bike Index news
-      bike_index_store: Bike Index Store
-      design_and_developer_resources: Design and developer resources
-      donate: Donate
-      donate_today: Donate today
-      help: Help
-      how_to_get_your_stolen_bike_back: How to get your stolen bike back
-      make_a_difference: Make a difference in bike theft
-      other_pages: Other pages
-      protect_your_bike: Protect your bike
-      related: Related
-      sign_up_your_organization: Sign up your organization
-      where: Where
     donation_form:
       501c3_nonprofit: 501(c)(3) nonprofit
       bike_index_is_a_nonprofit_html: >-
@@ -4862,15 +4748,6 @@ en:
       what_does_your_donation_do: What does your donation do?
     donation_modal:
       donation_header: Help support our efforts!
-    edit_bike_skeleton:
-      edit: Edit
-      edit_pages: 'Edit %{bike_type} pages:'
-      owned_but_hasnt_been_claimed_html: Owned by <em>%{owner_email}</em> but it hasn't
-        been claimed yet
-      owned_with_permission_to_edit_html: Owned by <em>%{owner_email}</em> but %{org_name}
-        has permission to edit
-      view_bike: View %{bike_type}
-      view_bike_version: View %{bike_type} version
     email_bike_box:
       color: Color
       color_may_be_incorrect: Color may be incorrect. Please update it if necessary!
@@ -5009,134 +4886,87 @@ en:
       you: You
       your_bikes: Your bikes
       your_preferences: Your preferences
-    organized_menu_items:
-      add_a_bike: Add a bike
+    menu_items_account:
+      logout: Log out
+      marketplace_messages: Marketplace messages
+      register_a_new_bike: Register a new bike
+      switch_to_org: Switch to %{org_name}
+      user_settings: "%{user_email} settings"
+      view_without_org: View without any organization
+      viewing_org: Viewing %{org_name}
+      viewing_without_org: Viewing without any organization
+      your_registrations: Your registrations
+    menu_items_org:
+      add_a_registration: Add a registration
+      add_an_impounded_vehicle: Add an Impounded Vehicle
       ascend_imports: Ascend Imports
+      bulk_import_and_export: Bulk Import & Export
       bulk_imports: Bulk Imports
-      custom_emails: Custom emails
       discuss: Discuss
+      education_courses: Education courses
       exports: Exports
       getting_started: Getting started
       graduated_notifications: Graduated notifications
-      impounded_bikes: Impounded Bikes
       impounded_claims: Impounded claims
+      impounded_vehicles: Impounded Vehicles
+      impounding: Impounding
+      in_super_admin: "%{org_name} in super admin"
       incomplete_registrations: Incomplete registrations
       lightspeed_integration_panel: Lightspeed Integration Panel
-      manage_impounding: Manage impounding
-      manage_registration_sequences: Manage Registration sequences
       manage_users: Manage users
+      messaging: Messaging
       model_audits: E-Vehicle audits
       multi_search: Multi search
-      org_bikes: "%{org_name} Bikes"
       org_dashboard: "%{org_name} Dashboard"
+      org_information: "%{org_name} Information"
       org_locations: "%{org_name} locations"
       org_profile: "%{org_name} profile"
+      org_registrations: "%{org_name} Registrations"
+      org_settings: "%{org_name} Settings"
       parking_notification_unregistered: New unregistered notification
-      parking_notifications: Parking notifications
+      parking_notifications_group: Parking Notifications
       recoveries: Recoveries
+      registration_form_settings: Registration form settings
       registration_stickers: Registration stickers
+      registrations_index: Organization Registrations
+      reports: Reports
       resources: Resources
+      search_all_registrations: Search all registrations
+      search_impounded_vehicles: Search Impounded Vehicles
+      search_parking_notifications: Search Parking Notifications
+      search_registrations: Search Registrations
       stolen_hot_sheet: Stolen Bike Hot Sheet
-      stolen_hot_sheet_configuration: Stolen Bike Hot Sheet configuration
       stolen_message: Stolen Message
-      super_admin_view: Super Admin for %{org_name}
-    organized_skeleton:
-      additional_features_html: >-
-        Bike Index provides additional features for verified Law Enforcement organizations.
-        Please contact %{email_link} to get them enabled.
-      admin_panel: Admin Panel
-      how_integration_works: how the integration works
-      integrate_bike_index_with_ascend: Integrate Bike Index with Ascend
-      integrate_bike_index_with_lightspeed: Integrate Bike Index with Lightspeed
-      link_to_register_html: >-
-        <strong>%{link}</strong> to automatically register the bikes you sell to your
-        customers.
-      other_point_of_sale_system: Other Point of Sale system?
-      read_a_full_explanation_html: Read a full explanation of %{link}.
-      register_bikes_with_link_html: Register bikes with our <strong>%{link}</strong>
-      streamlined_bike_shop_registration_page: streamlined Bike Shop registration
-        page
-      subscription_expired_html: >-
-        Your subscription to Bike Index has expired. Please contact %{email_link}
-        to get it re-enabled.
-      use_ascend: Use Ascend?
-      use_lightspeed_retail_pos: Use Lightspeed Retail POS?
-      viewing_our_streamlined_page: >-
-        You're currently viewing our streamlined Bike Shop registration page, which
-        is what we recommend using
+    organization_signup:
+      address_required: Please enter the organization's full address
+      email_required: A valid email is required
+      kind_required: Please choose what kind of organization this is
+      name_required: Organization name is required
+      name_reserved: That name is reserved on Bike Index - please choose another
+      name_taken: >-
+        There's already an organization called %{name} on Bike Index. Choose another
+        name, or contact support@bikeindex.org if it's yours
+      name_taken_shortened: >-
+        That's too close to %{name}, which is already on Bike Index - names have to
+        be different within their first 30 characters. Choose another name, or contact
+        support@bikeindex.org if it's yours
+      name_too_short: Organization name needs at least two letters or numbers
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}
       translated_from_english: translated from English
     register_flow:
+      date_found_required: Please tell us when you found it
+      date_stolen_required: Please tell us when it was stolen
+      description_stolen_required: Please tell us what happened
       email_required: Email is required to register
+      location_found_required: Please tell us where you found it
+      location_stolen_required: Please tell us where it was stolen
       manufacturer_required: Manufacturer is required to register
       name_required: Owner name is required to register
       unable_to_save: We're unable to save that registration, please try again
     shops_map:
       map_of_partner_locations: Map of partner locations
-  stolen:
-    index:
-      ambassador: ambassador
-      bike_index: Bike Index
-      bike_index_will_broadcast: >-
-        Bike Index will broadcast your stolen bike to the local Stolen Bike Twitter
-        handle and spread the word via other social channels. Our stolen bike data
-        is linked to LeadsOnline so if your bike ends up in the 'system' it will get
-        flagged and you will be contacted. Our community will be on the look out on
-        various resale channels.
-      check_out_your_local_flea_market: Check out your local flea market for your
-        bike.
-      donation: donation
-      error: error
-      file_a_police_report: >-
-        File a police report. If you can, go into your local precinct and make an
-        officer come and take a report. Get them engaged in your situation!
-      if_you_are_here_your_bike_was_probably_stolen: >-
-        If you are here, your bike was probably stolen. That sucks, but we are here
-        to help. Here is what you should do:
-      keep_an_eye_on_craigslist: >-
-        Keep an eye on Craigslist. Set up a specific alert using ifttt.com to flag
-        listing that matches your bike. Track apps such as OfferUp and LetGo as they
-        are frequently used in fencing bikes.
-      list_recent_stolen_bikes_html: List recent stolen bikes on your site with our
-        %{stolen_widget_link}
-      look_for_local_stolen_bike_groups_on_face: >-
-        Look for local stolen bike groups on Facebook (search 'stolen bike {city name}'
-        Many of these volunteer groups exist across the globe and can support your
-        recovery efforts.
-      make_sure_your_bike_is_registered_html: >-
-        Make sure your bike is registered on %{new_bike_link} and any local registry
-        in your community that might exist. Mark your bike as <strong>stolen</strong>
-        on Bike Index to trigger our community.
-      other_recovery_tools: Other recovery tools
-      please_fix_the_following: Please fix the following %{errors}
-      please_login_to_make_report_html: Please %{login_link} to make this report
-      register_it: register it
-      report_a_bicycle_chop_shop: Report a bicycle chop shop
-      report_bike_theft_issues: 'Report bike theft issues:'
-      report_someone_selling_a_stolen_bike: Report someone selling a stolen bike
-      reporting_your_own_bike_stolen_html: Reporting your own bike stolen? You need
-        to %{register_it_link} first
-      send_alert: Send alert!
-      sign_in: sign in
-      stolen_widget: stolen widget
-      tell_everyone_you_know: >-
-        Tell everyone you know about your stolen bike. Hit all your social networks
-        (Facebook, Instagram, Twitter, etc.) and text/email everyone you know.
-      we_wish_you_the_best_of_luck_html: >-
-        We wish you the best of luck in recovering your bicycle. We'd love to add
-        your story to our %{recoveries_count} recovered bikes. If you wish to support
-        our cause, please consider a %{donations_link} or join our %{ambassadors_link}
-        program.
-      what_happens_next: What happens next?
-      what_to_do_if_your_bike_is_stolen: What to do if your bike is stolen
-      where_is_this_happening: Where is this happening? URL, address - any information
-        you have
-      your_email_address: Your email address
-      your_local_police_department_will_do_what: >-
-        Your local police department will do what it does to help recover your bike.
-        Stay in communication with them.
   support:
     array:
       last_word_connector: ", and "
@@ -5260,8 +5090,6 @@ en:
       total_bikes_registered: Total Bikes Registered
       total_recovery_value: Total Recovery value
       used_by: Used By
-    recovery_stories:
-      recovery_stories: Recovery Stories
     update_browser:
       go_here_to_learn_more: Go here to learn more
       oh_no: Oh No!

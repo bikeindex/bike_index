@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      org:
+        education_course:
+          page_edit_bullet:
+            bullet: bullet

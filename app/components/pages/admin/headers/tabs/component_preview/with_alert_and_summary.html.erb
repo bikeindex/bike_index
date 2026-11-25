@@ -1,0 +1,4 @@
+<%= render(Pages::Admin::Headers::Tabs::Component.new(title: "Brakebills", tabs:, nav_label: "Organization sections")) do |header| %>
+  <% header.with_alert { render(UI::Alerts::Base::Component.new(kind: :error, header: "Organization deleted")) } %>
+  <% header.with_summary { "A school in upstate New York" } %>
+<% end %>

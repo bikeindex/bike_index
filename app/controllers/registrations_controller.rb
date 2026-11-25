@@ -1,17 +1,22 @@
 class RegistrationsController < ApplicationController
-  before_action :allow_x_frame, except: %i[new show]
+  before_action :allow_x_frame, except: %i[new show update_legacy_view]
+  # A component takes its content type from the request, and a Turbo submission
+  # redirected here asks for a turbo_stream - which Turbo then silently discards
+  before_action :force_html_response, only: %i[show]
   skip_before_action :verify_authenticity_token, only: [:create] # Because it was causing issues, and we don't need it here
+  before_action :sign_in_if_not!, only: %i[show]
   before_action :simple_header, except: %i[show edit]
   around_action :set_reading_role, only: %i[show]
   layout "reg_embed"
+  helper_method :embed_color_scheme
 
   def show
     @bike = Bike.unscoped.find_id(params[:id])
-    fail ActiveRecord::RecordNotFound unless @bike.visible_by?(current_user)
+    return redirect_merged_bike_or_not_found(@bike) unless @bike.visible_by?(current_user)
 
     requested_view = view_from_param(params[:view_as])
     available_views = BikeServices::ShowViews.available(bike: @bike, current_user:,
-      organization: current_organization || passive_organization, preview_organization: requested_view&.last)
+      organization: view_organization, preview_organization: requested_view&.last)
 
     view = current_view(available_views, requested_view)
     # So the view_as organization sticks on the next request
@@ -20,8 +25,26 @@ class RegistrationsController < ApplicationController
     bike_sticker = BikeSticker.lookup_with_fallback(params[:scanned_id],
       organization_id: params[:organization_id], user: current_user)
 
-    render(Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view:,
-      available_views:, bike_sticker:, current_alerts:), layout: "application")
+    render(Pages::Registrations::Show::Wrapper::Component.new(bike: @bike, current_user:, view:,
+      available_views:, bike_sticker:, current_alerts:, show_legacy: RegistrationView.show_legacy?(user: current_user, session:),
+      display_dev_info: display_dev_info?), layout: "application")
+  end
+
+  # skip_update because a view preference doesn't warrant AfterUserChangeJob's
+  # mailchimp/address recalculation
+  def update_legacy_view
+    bike = Bike.unscoped.find_id(params[:id])
+    show_legacy = Binxtils::InputNormalizer.boolean(params[:show_legacy])
+    query = request.query_parameters.except(:show_legacy)
+    if current_user.present? && !current_user.update(feature_registration_show_legacy: show_legacy, skip_update: true)
+      # Unrelated validations (e.g. a preferred_language no longer available) can block
+      # the update, so return to the view they came from rather than bouncing them
+      flash[:error] = "Sorry, unable to update. Email contact@bikeindex.org for help fixing this!"
+      return redirect_to(RegistrationView.path(bike, user: current_user, session:, show_legacy: !show_legacy, **query))
+    end
+    # Signed in, the account holds it - a session copy would outlast a change on another device
+    session[:registration_show_legacy] = current_user.blank? && show_legacy
+    redirect_to(RegistrationView.path(bike, user: current_user, session:, show_legacy:, **query))
   end
 
   # The redesign has no edit view of its own; edit still lives on the bike
@@ -40,11 +63,8 @@ class RegistrationsController < ApplicationController
     @owner_email = current_user&.email
     @selectable_child_organizations = find_selectable_child_organizations
     creation_organization_id = @selectable_child_organizations.any? ? nil : @organization&.id
-    if params[:button_and_header].present?
-      @button_and_header = valid_hex(params[:button_and_header])
-    elsif params[:button].present?
-      @button = valid_hex(params[:button])
-    end
+    @button_and_header = HexColor.normalize(params[:button_and_header])
+    @button = HexColor.normalize(params[:button])
     if @b_param.blank?
       bike_params = {creation_organization_id: creation_organization_id, owner_email: @owner_email}
         .merge(BParam.status_hash_from_params(params))
@@ -58,7 +78,7 @@ class RegistrationsController < ApplicationController
     @b_param = BParam.new(permitted_params)
     @b_param.errors.add :owner_email, "required" unless @b_param.owner_email.present?
     if @b_param.errors.blank? && @b_param.save
-      Email::PartialRegistrationJob.perform_async(@b_param.id)
+      EmailJobs::PartialRegistrationJob.perform_async(@b_param.id)
     else
       @page_errors = @b_param.errors
       render action: :new
@@ -66,6 +86,11 @@ class RegistrationsController < ApplicationController
   end
 
   private
+
+  # Partner sites frame the embed without knowing about dark mode, so it's light unless our own page passes a scheme
+  def embed_color_scheme
+    params[:color_scheme].presence_in(User.color_schemes.keys) || "light"
+  end
 
   # Both session touches mirror the legacy bikes#show: the recovery token is spent as
   # it's read, and a matching claim token records the email so signing up can claim
@@ -86,7 +111,14 @@ class RegistrationsController < ApplicationController
       flash.now[:error] = "You're not allowed to view this registration that way"
       requested_view = nil
     end
-    requested_view || BikeServices::ShowViews.default_view_for(bike: @bike, current_user:, organization: current_organization || passive_organization)
+    requested_view || BikeServices::ShowViews.default_view_for(bike: @bike, current_user:, organization: view_organization)
+  end
+
+  # A scanned sticker's organization_id can name an organization the viewer isn't in
+  def view_organization
+    return @view_organization if defined?(@view_organization)
+
+    @view_organization = [current_organization, passive_organization].find { current_user&.member_of?(it) }
   end
 
   # The [kind, organization] view requested via ?view_as, or nil when absent/unknown.
@@ -95,6 +127,7 @@ class RegistrationsController < ApplicationController
     case param
     when "public" then [:public, nil]
     when "owner" then [:owner, nil]
+    when "marketplace_preview" then [:marketplace_preview, nil]
     when nil, "" then nil
     else
       slug, role = param.split(".", 2)
@@ -114,11 +147,6 @@ class RegistrationsController < ApplicationController
     return [] unless @organization.present? && Binxtils::InputNormalizer.boolean(params[:select_child_organization])
 
     @organization.child_organizations
-  end
-
-  # returns up to 6 letters/numbers, for safety
-  def valid_hex(str)
-    "##{str.strip.gsub(/\W/, "")[0..5]}"
   end
 
   def permitted_params

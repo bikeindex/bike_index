@@ -1,2 +1,1 @@
-.form-group
-  = f.text_area :body, placeholder: "Blog post (in markdown)", rows: 20, class: "form-control"
+= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, required: true, html_options: {placeholder: "Blog post (in markdown)", rows: 20}))

@@ -52,6 +52,29 @@ RSpec.describe PublicImage, type: :model do
     end
   end
 
+  describe "image_alt" do
+    it "is the bike title alone - the name is already the bike" do
+      bike = FactoryBot.create(:bike, year: 1969, frame_model: "Hobo", cycle_type: "tandem")
+      public_image = FactoryBot.create(:public_image, imageable: bike)
+      expect(public_image.image_alt).to eq "#{bike.title_string} #{bike.frame_colors.to_sentence}"
+    end
+
+    it "adds what it's from when the name is only a filename" do
+      organization = FactoryBot.create(:organization, name: "Cool Bike Shop")
+      public_image = FactoryBot.create(:public_image, :with_attached_file, imageable: organization)
+      expect(public_image.image_alt).to eq "Bike Photo Landscape - Cool Bike Shop"
+    end
+
+    it "is the name alone for an imageable that doesn't name itself" do
+      public_image = FactoryBot.create(:public_image, :with_attached_file, imageable: FactoryBot.create(:social_post))
+      expect(public_image.image_alt).to eq "Bike Photo Landscape"
+    end
+
+    it "is blank with nothing to go on" do
+      expect(PublicImage.new.image_alt).to eq ""
+    end
+  end
+
   describe "image_size" do
     it "is nil without an image" do
       expect(PublicImage.new.image_size).to be_nil
@@ -169,6 +192,18 @@ RSpec.describe PublicImage, type: :model do
         expect(public_image.file.attached?).to be_falsey
         expect(public_image.image_url).to eq public_image.image.url
         expect(public_image.image_url(:large)).to eq public_image.image.url(:large)
+      end
+
+      context "with REMOTE_IMAGE_FALLBACK_URLS and the file not on this machine" do
+        before { stub_const("PublicImage::REMOTE_IMAGE_FALLBACK_URLS", true) }
+
+        it "returns the production host" do
+          FileUtils.rm(public_image.image.path)
+          public_image.reload # the version url reconstructs from the stored identifier
+          expected_url = public_image.image.url(:small).sub(ENV["BASE_URL"], "https://files.bikeindex.org")
+          expect(expected_url).to start_with("https://files.bikeindex.org/")
+          expect(public_image.image_url(:small)).to eq expected_url
+        end
       end
     end
 

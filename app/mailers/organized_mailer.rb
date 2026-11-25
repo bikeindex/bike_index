@@ -9,22 +9,55 @@ class OrganizedMailer < ApplicationMailer
   helper :money # Required to render currency for bike recoveries
   helper :bike
 
+  # What a registration is reporting, in the word the subject line uses for it -
+  # status_impounded is what "Found/Abandoned" registers as
+  CONFIRMATION_REPORTS = {"status_stolen" => "stolen", "status_abandoned" => "abandoned",
+                          "status_impounded" => "found"}.freeze
+
+  # Whoever a paying organization covers - its emails, members, registrants and email domain - isn't
+  # asked to donate on top of it
+  def self.render_donation?(organization: nil, user: nil, emails: nil)
+    return false if organization&.paid_money?
+    return false if user.present? && (user.organizations.paid_money.exists? || user.paid_organization_registration?)
+
+    domains = Array(emails).filter_map { Organization.email_domain(it) }
+    domains.none? || !Organization.paid_money.where(user_email_domain: domains).exists?
+  end
+
   def partial_registration(b_param)
     b_param_mail(b_param, Emails::PartialRegistration::Component.new(b_param:), tag: __callee__)
   end
 
   def partial_register_confirmation(b_param)
-    b_param_mail(b_param, Emails::PartialRegisterConfirmation::Component.new(b_param:), tag: __callee__)
+    b_param_mail(b_param, Emails::PartialRegisterConfirmation::Component.new(b_param:), tag: __callee__,
+      subject_key: confirmation_subject_key(b_param))
+  end
+
+  def organization_signup_confirmation(organization_signup)
+    mail(reply_to:, to: organization_signup.email,
+      subject: I18n.t("organized_mailer.organization_signup_confirmation.subject", name: organization_signup.name),
+      tag: __callee__) do |format|
+      format.html { render Emails::OrganizationSignupConfirmation::Component.new(organization_signup:) }
+    end
+  end
+
+  def shop_welcome(organization, user)
+    component = Emails::ShopWelcome::Component.new(organization:)
+
+    I18n.with_locale(user.preferred_language) do
+      mail(reply_to:, to: user.email, subject: I18n.t("organized_mailer.shop_welcome.subject"),
+        tag: __callee__) { |format| format.html { render component } }
+    end
   end
 
   def finished_registration(ownership)
     bike = Bike.unscoped.find_id(ownership.bike_id)
     @organization = ownership.organization
     component = Emails::FinishedRegistration::Component.new(ownership:, bike:)
-    subject = I18n.t("organized_mailer.finished#{finished_registration_type(bike, ownership)}_registration.subject", **default_subject_vars(bike:))
     tag = __callee__
     tag = "#{tag}_pos" if ownership.pos? && ownership.new_registration?
     I18n.with_locale(ownership.owner&.preferred_language) do
+      subject = I18n.t("organized_mailer.finished#{finished_registration_type(bike, ownership)}_registration.subject", **default_subject_vars(bike:))
       mail(reply_to: reply_to,
         to: ownership.owner_email,
         subject:,
@@ -49,16 +82,13 @@ class OrganizedMailer < ApplicationMailer
 
   def parking_notification(parking_notification)
     @organization = parking_notification.organization
-    component_args = {parking_notification:, bike: parking_notification.bike}
 
     I18n.with_locale(parking_notification.user&.preferred_language) do
       mail(reply_to: parking_notification.reply_to_email,
         to: parking_notification.email,
         tag: __callee__,
         subject: parking_notification.subject) do |format|
-        # Fresh component per format: ViewComponent locks an instance to the format used on first render
-        format.html { render Emails::ParkingNotification::Component.new(**component_args) }
-        format.text { render Emails::ParkingNotification::Component.new(**component_args) }
+        render_html_and_text(format, Emails::ParkingNotification::Component, parking_notification:, bike: parking_notification.bike)
       end
     end
   end
@@ -68,11 +98,24 @@ class OrganizedMailer < ApplicationMailer
     bike = graduated_notification.bike
     component = Emails::GraduatedNotification::Component.new(graduated_notification:, bike:)
 
-    I18n.with_locale(@user&.preferred_language) do
+    I18n.with_locale(graduated_notification.user&.preferred_language) do
       mail(reply_to: reply_to,
         to: graduated_notification.email,
         subject: graduated_notification.subject,
         tag: __callee__) { |format| format.html { render component } }
+    end
+  end
+
+  def organization_message(organization_message)
+    @organization = organization_message.organization
+
+    I18n.with_locale(organization_message.receiver&.preferred_language) do
+      mail(reply_to: organization_message.sender.email,
+        to: organization_message.receiver_email,
+        subject: default_i18n_subject(organization_name: @organization.short_name, bike_type: organization_message.bike.type),
+        tag: __callee__) do |format|
+        render_html_and_text(format, Emails::OrganizationMessage::Component, organization_message:)
+      end
     end
   end
 
@@ -117,13 +160,27 @@ class OrganizedMailer < ApplicationMailer
 
   private
 
+  # Fresh component per format: ViewComponent locks an instance to the format used on first render
+  def render_html_and_text(format, component_class, **args)
+    format.html { render component_class.new(**args) }
+    format.text { render component_class.new(**args) }
+  end
+
   # Addressed to whoever entered the registration, and subjected by the caller's own name
-  def b_param_mail(b_param, component, tag:)
+  def b_param_mail(b_param, component, tag:, subject_key: tag)
     @organization = b_param.creation_organization
     mail(reply_to: reply_to,
       to: b_param.owner_email,
-      subject: default_i18n_subject(default_subject_vars),
+      subject: I18n.t("organized_mailer.#{subject_key}.subject",
+        **default_subject_vars, cycle_type: b_param.type),
       tag:) { |format| format.html { render component } }
+  end
+
+  # A registration that reports something says what, rather than asking for an email
+  # confirmation - clicking the link is what finishes the report
+  def confirmation_subject_key(b_param)
+    report = CONFIRMATION_REPORTS[b_param.status]
+    ["partial_register_confirmation", report].compact.join("_")
   end
 
   def finished_registration_type(bike, ownership)

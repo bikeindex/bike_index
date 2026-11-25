@@ -40,6 +40,14 @@ module UI
         def helper_text
           {template: "ui/forms/group/component_preview/helper_text"}
         end
+
+        def label_note
+          {template: "ui/forms/group/component_preview/label_note"}
+        end
+
+        def prefix
+          {template: "ui/forms/group/component_preview/prefix"}
+        end
         # @!endgroup
       end
     end

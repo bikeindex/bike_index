@@ -41,8 +41,9 @@
 #  index_ownerships_on_creator_id         (creator_id)
 #  index_ownerships_on_doorkeeper_app_id  (doorkeeper_app_id)
 #  index_ownerships_on_organization_id    (organization_id)
+#  index_ownerships_on_owner_email_trgm   (owner_email) USING gin
 #  index_ownerships_on_sale_id            (sale_id)
-#  index_ownerships_on_user_id            (user_id)
+#  index_ownerships_on_user_id_and_id     (user_id,id) WHERE (user_id IS NOT NULL)
 #
 class Ownership < ApplicationRecord
   include RegistrationInfoable
@@ -63,8 +64,14 @@ class Ownership < ApplicationRecord
     impound_process: 11,
     transferred_ownership: 10,
     sticker: 13,
-    register_flow: 14
+    register_flow: 14,
+    register_flow_organized: 15,
+    register_flow_landing_page: 16
   }.freeze
+  # BParam#origin takes the same strings
+  ORIGIN_REG_FLOW = %w[register_flow register_flow_organized register_flow_landing_page].freeze
+  # Registered on bikeindex.org - not an embed form, the API, an import or a transfer
+  ORIGIN_WEBSITE_REG = (ORIGIN_REG_FLOW + %w[web organization_form sticker]).freeze
 
   enum :status, Bike::STATUS_ENUM
   enum :pos_kind, Organization::POS_KIND_ENUM
@@ -111,18 +118,30 @@ class Ownership < ApplicationRecord
       ORIGIN_ENUM.keys.map(&:to_s)
     end
 
-    def origin_humanized(str)
-      return nil unless str.present?
+    # Every value creation_kind can return. It restates that method's branching, so
+    # ownership_spec checks it against what instantiating each enum value produces
+    def creation_kinds
+      (Organization.pos_kinds.select { Organization.pos?(it) } + %w[bulk_import] + origins).map(&:to_sym)
+    end
 
-      str.titleize.downcase
+    def creation_kind_humanized(creation_kind)
+      return nil unless creation_kinds.include?(creation_kind&.to_sym)
+
+      I18n.t(creation_kind, scope: %i[activerecord enums ownership creation_kind])
+    end
+
+    def creation_kind_description(creation_kind)
+      return nil unless creation_kinds.include?(creation_kind&.to_sym)
+
+      I18n.t(creation_kind, scope: %i[activerecord enums ownership creation_kind_description])
     end
 
     def current_at(time)
-      where("created_at < ?", time).order(created_at: :desc).first
+      where("created_at < ?", time).reorder(created_at: :desc).first
     end
 
     def claimed_at(time)
-      where("claimed_at < ?", time).order(created_at: :desc).first
+      where("claimed_at <= ?", time).reorder(created_at: :desc).first
     end
   end
 
@@ -182,18 +201,11 @@ class Ownership < ApplicationRecord
     organization.present? && organization.direct_unclaimed_notifications?
   end
 
-  def creation_description
-    if pos?
-      pos_kind.to_s.gsub("_pos", "").humanize
-    elsif bulk?
-      "bulk import"
-    elsif origin.present?
-      return "org reg" if %w[embed_extended organization_form].include?(origin)
-      return "landing page" if origin == "embed_partial"
-      return "parking notification" if origin == "creator_unregistered_parking_notification"
+  def creation_kind
+    return pos_kind.to_sym if pos?
+    return :bulk_import if bulk?
 
-      self.class.origin_humanized(origin)
-    end
+    origin&.to_sym
   end
 
   def owner
@@ -239,7 +251,8 @@ class Ownership < ApplicationRecord
 
   def calculated_send_email
     return false if skip_email || bike.blank? || phone_registration? || bike.example? || bike.likely_spam?
-    return false if spam_risky_email? || user&.no_non_theft_notification
+    return false if owner_email == ApplicationMailer::CONTACT_EMAIL || spam_risky_email? || user&.no_non_theft_notification
+    return false if organization&.skip_email_to?(owner_email)
 
     # Unless this is the first ownership for a bike with a creation organization, it's good to send!
     true unless organization.present? && organization.enabled?("skip_ownership_email")
@@ -280,8 +293,8 @@ class Ownership < ApplicationRecord
     self.owner_name ||= user&.name.presence || fallback_owner_name
     if claimed?
       self.claimed_at ||= Time.current
-      # Update owner name always! Keep it in track
-      self.owner_name = user.name if user.present?
+      # Track the account's name - but a nameless account (SSO, emailed link) keeps the one typed at registration
+      self.owner_name = user.name if user&.name.present?
     end
     self.address_record ||= address_record_from_registration_info
   end
@@ -295,11 +308,16 @@ class Ownership < ApplicationRecord
     # TODO: post #2110 doing this - I'm not sure if it's a good idea...
     if current && id.present?
       bike&.update_column :current_ownership_id, id
-      prior_ownerships.current.each { |o| o.update(current: false) }
+      prior_ownerships.current.each do |ownership|
+        ownership.update(current: false)
+        # AfterBikeSaveJob updates whoever made the transfer, which isn't always the
+        # previous owner. Skipping their bikes, since only the alerts need it
+        CallbackJobs::AfterUserChangeJob.perform_async(ownership.user_id, nil, true) if ownership.user_id.present?
+      end
     end
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeServices::Creator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted
-    Email::OwnershipInvitationJob.perform_in(2.seconds, id)
+    EmailJobs::OwnershipInvitationJob.perform_in(2.seconds, id)
   end
 
   def create_user_registration_for_phone_registration!(user)
@@ -351,8 +369,7 @@ class Ownership < ApplicationRecord
   end
 
   def spam_risky_email?
-    risky_domains = ["@yahoo.co", "@hotmail.co"]
-    return false unless owner_email.present? && risky_domains.any? { |d| owner_email.match?(d) }
+    return false unless EmailDomain.risky_email?(owner_email)
     return true if pos?
 
     embed? && organization&.spam_registrations?

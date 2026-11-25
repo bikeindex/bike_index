@@ -151,7 +151,7 @@ class CredibilityScorer
   # This badge is displayed on the organization show page
   def self.organization_trusted?(organization)
     return false unless organization.present?
-    return true if organization.paid?
+    return true if organization.is_invoiced?
 
     %w[other_pos lightspeed_pos ascend_pos does_not_need_pos].include?(organization.manual_pos_kind)
   end
@@ -190,6 +190,15 @@ class CredibilityScorer
         [ownership.creator, ownership.user]
       end
     end.flatten.reject(&:blank?).uniq
+  end
+
+  def self.low?(score) = score < 31
+
+  def self.color(score)
+    return "#dc3545" if low?(score)
+    return "#ffc107" if score < 70
+
+    "#28a745"
   end
 
   def self.humanize_badge(badge)

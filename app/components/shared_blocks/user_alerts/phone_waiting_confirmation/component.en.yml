@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    shared_blocks:
+      user_alerts:
+        phone_waiting_confirmation:
+          confirm_your_phone_number: Confirm your phone number
+          verification_code: Verification code
+          verify_number: Verify %{phone_number}

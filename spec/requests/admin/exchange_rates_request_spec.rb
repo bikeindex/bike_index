@@ -10,11 +10,13 @@ RSpec.describe Admin::ExchangeRatesController, type: :request do
   end
 
   describe "#index" do
+    let!(:exchange_rate) { FactoryBot.create(:exchange_rate) }
     it "responds with ok" do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
       expect(flash).to_not be_present
+      expect(response.body).to include(edit_admin_exchange_rate_path(exchange_rate))
     end
   end
 

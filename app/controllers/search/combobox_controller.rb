@@ -2,7 +2,7 @@
 
 module Search
   # Backs the comboboxes that autocomplete from the Autocomplete index: the search
-  # query items (Search::EverythingCombobox::Component) - options and selection chips -
+  # query items (Pages::Search::EverythingCombobox::Component) - options and selection chips -
   # and the manufacturer picker (UI::Forms::ComboboxManufacturer::Component).
   class ComboboxController < ApplicationController
     PER_PAGE = 15
@@ -13,11 +13,12 @@ module Search
     def options
       matches = Autocomplete::Matcher.search(autocomplete_params)
 
-      render turbo_stream: view_context.render(
-        Search::EverythingComboboxOptions::Component.new(
+      render(
+        Pages::Search::EverythingComboboxOptions::Component.new(
           matches:,
           search_obj_name: params[:search_obj_name].presence || "Registrations",
           next_page: next_page_for(matches),
+          first_page: helpers.hw_first_page?,
           q: params[:q]
         )
       )
@@ -26,10 +27,11 @@ module Search
     def manufacturers
       matches = Autocomplete::Matcher.search(manufacturer_params)
 
-      render turbo_stream: view_context.render(
+      render(
         UI::Forms::ComboboxManufacturerOptions::Component.new(
           matches:,
           next_page: next_page_for(matches),
+          first_page: helpers.hw_first_page?,
           q: params[:q],
           no_manufacturer_other: Binxtils::InputNormalizer.boolean(params[:no_manufacturer_other])
         )

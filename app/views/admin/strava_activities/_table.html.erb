@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false, searched_activity_type: nil) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |strava_activity| %>
     <%= render UI::Time::Component.new(time: strava_activity.created_at) %>
   <% end %>
@@ -15,7 +15,7 @@
     <%= render UI::Time::Component.new(time: strava_activity.start_date) %>
   <% end %>
 
-  <% table.column(label: "Title", header_classes: "tw:font-normal") do |strava_activity| %>
+  <% table.column(label: "Title") do |strava_activity| %>
     <% if strava_activity.photos&.dig("photo_url").present? %>
       📷
     <% end %>
@@ -26,7 +26,7 @@
 
     <% if strava_activity.description.present? %>
       <span
-        class="small less-strong tw:block"
+        class="less-strong tw:block tw:text-sm"
         title="<%= strava_activity.description %>"
       >
         <%= strava_activity.description&.truncate(120) %>
@@ -44,7 +44,7 @@
     <% end %>
 
     <% unless searched_activity_type.present? %>
-      <%= link_to search_emoji, url_for(sortable_search_params.merge(search_activity_type: strava_activity.activity_type)), class: "display-sortable-link small" %>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_activity_type: strava_activity.activity_type)), class: "display-sortable-link tw:text-sm" %>
     <% end %>
   <% end %>
 
@@ -52,18 +52,18 @@
     <%= number_display(strava_activity.distance_miles&.round) %>
   <% end %>
 
-  <% table.column(label: "Gear", header_classes: "tw:font-normal") do |strava_activity| %>
+  <% table.column(label: "Gear") do |strava_activity| %>
     <% if strava_activity.gear_id.present? %>
       <small><%= strava_activity.calculated_gear_name %></small>
       <% gear_assoc = strava_activity.strava_integration.strava_gears.find { |ga| ga.strava_id == strava_activity.gear_id } %>
       <% if gear_assoc&.item.present? %>
-        <%= link_to "BI", bike_path(gear_assoc.item), class: "small #{UI::Alerts::Base::Component::TEXT_CLASSES[:success]}", title: gear_assoc.item.title_string %>
+        <%= link_to "BI", bike_path(gear_assoc.item), class: "tw:text-sm #{UI::Alerts::Base::Component::TEXT_CLASSES[:success]}", title: gear_assoc.item.title_string %>
       <% end %>
     <% end %>
   <% end %>
 
-  <% table.column(label: "User", header_classes: "tw:font-normal") do |strava_activity| %>
-    <%= render Admin::UserCell::Component.new(user: strava_activity.strava_integration.user, user_id: strava_activity.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_activity.strava_integration_id), search_url: url_for(sortable_search_params.merge(search_strava_integration_id: strava_activity.strava_integration_id))) %>
+  <% table.column(label: "User") do |strava_activity| %>
+    <%= render Atoms::Admin::TableCells::User::Component.new(user: strava_activity.strava_integration.user, user_id: strava_activity.strava_integration.user_id, render_search: render_sortable, user_link_path: admin_strava_integration_path(strava_activity.strava_integration_id), search_url: url_for(sort_state.search_params.merge(search_strava_integration_id: strava_activity.strava_integration_id))) %>
   <% end %>
 
   <% if display_dev_info? %>

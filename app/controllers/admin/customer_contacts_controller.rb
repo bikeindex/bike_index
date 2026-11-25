@@ -8,7 +8,7 @@ module Admin
       @customer_contact = CustomerContact.new(permitted_parameters)
       if @customer_contact.save
         flash[:success] = "Email sent successfully!"
-        Email::AdminContactStolenJob.perform_async(@customer_contact.id)
+        EmailJobs::AdminContactStolenJob.perform_async(@customer_contact.id)
       else
         flash[:error] = "Email send error!\n#{@customer_contact.errors.full_messages.to_sentence}"
       end

@@ -8,6 +8,7 @@ end
 
 module Bikes
   class BaseController < ApplicationController
+    before_action :redirect_scanned_id
     before_action :find_bike
     before_action :assign_current_organization
     before_action :ensure_user_allowed_to_edit
@@ -23,10 +24,11 @@ module Bikes
 
       # If there was an organization_id passed, and the user isn't authorized for that org, reset passive_organization to something they can access
       # ... Particularly relevant for scanned stickers, which may be scanned by child orgs - but I think it's the behavior users expect regardless
-      if current_user.default_organization.present? && params[:organization_id].present?
+      default_organization = OrganizationRole.default_organization(current_user) if params[:organization_id].present?
+      if default_organization.present?
         return true if org.present? && current_user.authorized?(org)
 
-        set_passive_organization(current_user.default_organization)
+        set_passive_organization(default_organization)
       else
         # If current_user isn't authorized for the organization, force assign nil
         return true if org.blank? || org.present? && current_user.authorized?(org)
@@ -35,22 +37,20 @@ module Bikes
       end
     end
 
+    # Fix issue with sticker batches #35 & #38
+    def redirect_scanned_id
+      return unless params[:id].present? && params[:id].match?(/scanned(uc|ui)\d+/i)
+
+      permitted_params = params.except(:action, :controller, :id).as_json
+        .merge(id: params[:id].gsub("scanned", ""))
+      redirect_to(scanned_bike_path(permitted_params))
+    end
+
     def find_bike
-      # Fix issue with sticker batches #35 & #38
-      if params[:id].present? && params[:id].match?(/scanned(uc|ui)\d+/i)
-        permitted_params = params.except(:action, :controller, :id).as_json
-          .merge(id: params[:id].gsub("scanned", ""))
-        redirect_to(scanned_bike_path(permitted_params))
-        return
-      end
-      begin
-        @bike = Bike.unscoped.find_id(params[:bike_id] || params[:id])
-      rescue ActiveRecord::StatementInvalid => e
-        raise e.to_s.match?(/PG..NumericValueOutOfRange/) ? ActiveRecord::RecordNotFound : e
-      end
+      @bike = Bike.unscoped.find_id(params[:bike_id] || params[:id])
       return @bike if @bike.visible_by?(current_user)
 
-      fail ActiveRecord::RecordNotFound
+      redirect_merged_bike_or_not_found(@bike)
     end
 
     def find_or_new_b_param
@@ -91,7 +91,7 @@ module Bikes
       return true unless error.present? # Can't assign directly to flash here, sometimes kick out of edit because other flash error
 
       flash[:error] = error
-      redirect_to(bike_path(@bike)) && return
+      redirect_to(RegistrationView.path(@bike, user: current_user, session:)) && return
     end
 
     def update_organizations_can_edit_claimed(bike, organization_ids)

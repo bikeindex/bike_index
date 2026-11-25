@@ -1,0 +1,99 @@
+# frozen_string_literal: true
+
+require "rails_helper"
+
+RSpec.describe Pages::MyAccount::StravaIntegration::Component, type: :component do
+  let(:instance) { described_class.new(user: user) }
+  let(:component) { render_inline(instance) }
+  let(:user) { FactoryBot.create(:user_confirmed) }
+
+  context "not connected" do
+    it "renders connect button" do
+      expect(component).to have_text("Integrate your bikes with Strava")
+      expect(component).to have_css("img[src*='btn_strava_connect']")
+    end
+
+    it "does not render disconnect button" do
+      expect(component).not_to have_link("Disconnect")
+    end
+  end
+
+  context "connected - pending" do
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, user: user) }
+
+    it "renders pending message" do
+      expect(component).to have_text("Sync will begin shortly")
+      expect(component).to have_link("Disconnect")
+    end
+  end
+
+  context "connected - syncing" do
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, :syncing, user: user) }
+
+    it "renders progress bar and download count" do
+      expect(component).to have_text("Syncing activities")
+      expect(component).to have_css("#strava-download-count")
+      expect(component).to have_text("Syncing")
+    end
+
+    it "renders stimulus controller for polling" do
+      expect(component).to have_css("[data-controller='strava-sync-status']")
+    end
+
+    it "renders disconnect button" do
+      expect(component).to have_link("Disconnect")
+    end
+  end
+
+  context "with a link_bikes_path" do
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: user) }
+    let!(:strava_gear) { FactoryBot.create(:strava_gear, strava_integration:, strava_id: "b1234") }
+    let(:instance) { described_class.new(user:, link_bikes_path: "/bikes/1/edit/versions") }
+
+    it "links to it" do
+      expect(component).to have_link("Link bikes", href: "/bikes/1/edit/versions")
+    end
+  end
+
+  context "connected - synced" do
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, :synced, user: user) }
+
+    it "renders connected status and activity count" do
+      expect(component).to have_text("Connected")
+      expect(component).to have_text(/150\s+activities synced/)
+    end
+
+    context "with gear" do
+      let!(:strava_gear) do
+        FactoryBot.create(:strava_gear, strava_integration:,
+          strava_id: "b1234", name: "My Road Bike")
+      end
+
+      it "renders gear list" do
+        expect(component).to have_text(%r{0\s+/ 1\s+Strava bikes connected to Bike Index bikes})
+      end
+    end
+
+    it "does not render gear section without gear" do
+      expect(component).to have_text("Connected")
+      expect(component).not_to have_text("Strava bikes connected")
+    end
+
+    it "renders disconnect button" do
+      expect(component).to have_link("Disconnect")
+    end
+  end
+
+  context "connected - error" do
+    let!(:strava_integration) { FactoryBot.create(:strava_integration, :error, user: user) }
+
+    it "renders error message" do
+      expect(component).to have_text("Sync error")
+      expect(component).to have_text("disconnecting and reconnecting")
+    end
+
+    it "renders disconnect button" do
+      expect(component).to have_link("Disconnect")
+    end
+  end
+end

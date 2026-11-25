@@ -61,9 +61,9 @@ module Organized
 
     def sort_ordered
       if %w[mnfg_name frame_model].include?(sort_column)
-        ModelAudit.arel_table[sort_column].lower.send(sort_direction)
+        sortable_order(ModelAudit.arel_table[sort_column].lower)
       else
-        "organization_model_audits.#{sort_column} #{sort_direction}"
+        sortable_order(OrganizationModelAudit)
       end
     end
 

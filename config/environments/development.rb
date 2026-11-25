@@ -43,6 +43,9 @@ Rails.application.configure do
   routes.default_url_options = config.action_mailer.default_url_options
   config.action_mailer.perform_deliveries = true
   config.action_mailer.delivery_method = :letter_opener_web
+  # letter_opener_web sets this per delivery and restores it in an ensure, so two Sidekiq
+  # threads delivering at once clear it mid-launch and Launchy opens the letter in a browser
+  ENV["LAUNCHY_DRY_RUN"] = "true"
 
   # Print deprecation notices to the Rails logger.
   config.active_support.deprecation = :log
@@ -88,7 +91,8 @@ Rails.application.configure do
       {
         remote_ip: event.payload[:ip],
         u_id: event.payload[:u_id],
-        params: event.payload[:params]&.except("controller", "action", "format", "id")
+        params: event.payload[:params]&.except("controller", "action", "format", "id"),
+        **event.payload.slice(:logged_search)
       }
     end
   end

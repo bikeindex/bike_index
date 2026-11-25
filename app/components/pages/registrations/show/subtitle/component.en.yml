@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          subtitle:
+            nickname: 'nickname: %{name}'

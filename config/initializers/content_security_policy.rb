@@ -4,6 +4,12 @@
 # See the Securing Rails Applications Guide for more information:
 # https://guides.rubyonrails.org/security.html#content-security-policy-header
 
+# GA4 shards the /g/collect beacon across regional hosts and falls back to an image when it
+# can't fetch, so every host belongs in both img_src and connect_src. `*.` never matches the
+# bare domain, hence each pair
+GOOGLE_ANALYTICS_HOSTS = ["https://*.google-analytics.com", "https://analytics.google.com",
+  "https://*.analytics.google.com", "https://stats.g.doubleclick.net"].freeze
+
 Rails.application.configure do
   config.content_security_policy do |policy|
     policy.default_src :self
@@ -16,6 +22,7 @@ Rails.application.configure do
       ENV.fetch("ACTIVE_STORAGE_HOST_TEST", "https://test-uploads.bikeindex.org"),
       "https://maps.bikeindex.org",
       "https://bikebook.s3.amazonaws.com",
+      "https://bikebook.bikeindex.org", # /bikebook's stock photos
       "https://www.googletagmanager.com",
       "https://maps.googleapis.com",
       "https://maps.gstatic.com",
@@ -26,7 +33,7 @@ Rails.application.configure do
       "https://connect.facebook.net",
       "https://pbs.twimg.com",
       "https://www.googleadservices.com",
-      "https://syndication.twitter.com", :data, :blob
+      "https://syndication.twitter.com", *GOOGLE_ANALYTICS_HOSTS, :data, :blob
     policy.object_src :none
     # unsafe_eval is required for application_revised.js jQuery - remove it when possible!
     policy.script_src :self, :unsafe_inline, :unsafe_eval,
@@ -39,22 +46,19 @@ Rails.application.configure do
       "https://platform.twitter.com",
       "https://api.mapbox.com",
       "https://cdn.jsdelivr.net",
-      "https://js.stripe.com"
+      "https://js.stripe.com",
+      "https://challenges.cloudflare.com"
     policy.style_src :self, :unsafe_inline,
       "https://fonts.googleapis.com",
       "https://www.gstatic.com", # Google Translate styles
       "https://cdn.jsdelivr.net",
       "https://api.mapbox.com"
-    policy.connect_src :self,
-      "https://*.google-analytics.com",
+    policy.connect_src :self, *GOOGLE_ANALYTICS_HOSTS,
       "https://*.tiles.mapbox.com",
-      # GA4 also routes /g/collect beacons to analytics.google.com and (region-redirected) www.google.com
-      "https://analytics.google.com",
-      # GA4 ad-personalization beacons to DoubleClick (/g/collect)
-      "https://stats.g.doubleclick.net",
       "https://api.honeybadger.io",
       "https://api.mapbox.com",
       "https://bikebook.herokuapp.com",
+      "https://bikebook-catalog.bikeindex.org", # the catalog /bikebook searches
       "https://cdn.jsdelivr.net",
       "https://events.mapbox.com",
       # Our own image CDNs — third-party scripts (Facebook Pixel) fetch bike photos, not just <img> them
@@ -68,11 +72,11 @@ Rails.application.configure do
       "https://translate.googleapis.com", # Google Translate API
       "https://uploads.bikeindex.org",
       "https://www.facebook.com",
-      "https://www.google-analytics.com",
-      "https://www.google.com",
+      "https://www.google.com", # GA4 region-redirects some /g/collect beacons here
       "https://www.googletagmanager.com"
     policy.worker_src :self, :blob
     policy.frame_src :self,
+      "https://challenges.cloudflare.com",
       "https://www.google.com",
       # Google Ads conversion tracking iframes use country-specific Google domains
       "https://www.google.ca",

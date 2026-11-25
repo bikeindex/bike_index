@@ -1,0 +1,9 @@
+---
+en:
+  components:
+    pages:
+      ebike_rules:
+        bike_summary:
+          classification: E-%{vehicle_type} classification
+          electric_certification: Electric Certification
+          not_provided: Not provided

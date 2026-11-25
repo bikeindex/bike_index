@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      search:
+        everything_combobox:
+          made_by: made by
+          query_items_description: Search descriptions combobox
+          search_descriptions: Search descriptions
+          search_for: Search for
+          search_only_for: Search only for
+          that_are: that are

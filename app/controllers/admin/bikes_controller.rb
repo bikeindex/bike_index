@@ -1,22 +1,36 @@
 module Admin
   class BikesController < Admin::BaseController
     include Binxtils::SortableTable
+    include Admin::TokenAccessible
 
-    before_action :find_bike, only: %i[edit update show]
+    token_accessible :missing_manufacturer
+
+    # The Pages::Admin::Bikes::Tabs tabs show renders; the rest are other controllers' screens
+    SHOW_TABS = %w[duplicates messages ownerships stickers recoveries impound].freeze
+
+    before_action :find_bike, only: %i[edit update show undelete]
     before_action :set_period, only: %i[index missing_manufacturer]
-    around_action :set_reading_role, only: %i[index show]
+    around_action :set_reading_role, only: %i[index show missing_manufacturer]
 
     def index
       @per_page = permitted_per_page(default: 100)
 
-      @pagy, @bikes = pagy(:countish, available_bikes.includes(:creation_organization, :current_ownership, :paint)
-        .reorder("bikes.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
+      @pagy, @bikes = pagy(:countish, available_bikes.includes(:creation_organization, :current_ownership, :current_impound_record, :paint)
+        .reorder(sortable_order(Bike)), limit: @per_page, page: permitted_page)
     end
 
     def missing_manufacturer
+      if request.format.json?
+        created_at = Bike.arel_table[:created_at]
+        rows = missing_manufacturer_bikes.reorder(Arel.star.count.desc).group(:manufacturer_other)
+          .limit(permitted_per_page(default: 1_000, max: 10_000))
+          .pluck(:manufacturer_other, Arel.star.count, created_at.minimum, created_at.maximum)
+        return render(json: {missing_manufacturers: rows.map { %i[manufacturer_other count first_created_at last_created_at].zip(it).to_h }})
+      end
+
       @per_page = permitted_per_page(default: 100)
       @pagy, @bikes = pagy(:countish,
-        missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :paint),
+        missing_manufacturer_bikes.includes(:creation_organization, :current_ownership, :current_impound_record, :paint),
         limit: @per_page,
         page: permitted_page)
     end
@@ -38,17 +52,6 @@ module Admin
       redirect_back(fallback_location: root_url)
     end
 
-    def duplicates
-      duplicate_groups = if params[:show_ignored]
-        DuplicateBikeGroup.order("created_at desc")
-      else
-        DuplicateBikeGroup.unignored.order("created_at desc")
-      end
-      @per_page = permitted_per_page
-      @duplicate_groups_count = duplicate_groups.size
-      @pagy, @duplicate_groups = pagy(:countish, duplicate_groups, limit: @per_page, page: permitted_page)
-    end
-
     def ignore_duplicate_toggle
       duplicate_bike_group = DuplicateBikeGroup.find(params[:id])
       duplicate_bike_group.ignore = !duplicate_bike_group.ignore
@@ -63,7 +66,7 @@ module Admin
 
     def get_destroy
       if params[:id] == "multi_delete"
-        bike_ids = params[:bikes_selected].respond_to?(:keys) ? params[:bikes_selected].keys : Array(params[:bikes_selected])
+        bike_ids = selected_ids(:bikes_selected)
         if bike_ids.any?
           bike_ids.each { |id| BikeJobs::BikeDeleterJob.perform_async(id.to_i, false, current_user.id) }
           flash[:success] = "#{bike_ids.count} #{"bike".pluralize(bike_ids.count)} deleted!"
@@ -76,13 +79,19 @@ module Admin
       end
     end
 
+    def undelete
+      # restore writes with update_columns, skipping the save callbacks
+      @bike.restore
+      CallbackJobs::AfterBikeSaveJob.perform_async(@bike.id)
+      flash[:success] = "#{@bike.type_titleize} un-deleted!"
+      redirect_to edit_admin_bike_url(@bike)
+    end
+
     def show
       @active_tab = params[:active_tab]
-      if @active_tab.present?
-        @page_title = "#{@active_tab.titleize}: #{@bike.title_string}"
-      else
-        redirect_to edit_admin_bike_path and return
-      end
+      return redirect_to(edit_admin_bike_path) unless SHOW_TABS.include?(@active_tab)
+
+      @page_title = "#{@active_tab.titleize}: #{@bike.title_string}"
     end
 
     def edit
@@ -113,8 +122,22 @@ module Admin
         flash[:success] = "Bike was successfully updated."
         redirect_to(edit_admin_bike_url(@bike)) && return
       else
-        render action: "edit"
+        render action: "edit", status: :unprocessable_entity
       end
+    end
+
+    # The organizations picker is a multiselect combobox, which renders its selections
+    # through this rather than holding them itself
+    def organization_chips
+      organizations = Organization.unscoped.where(id: combobox_values).index_by { it.id.to_s }
+
+      chips = combobox_values.filter_map do |value|
+        next if organizations[value].blank?
+
+        helpers.hw_combobox_selection_chip(display: organizations[value].name, value:, for_id: params[:for_id])
+      end
+
+      render turbo_stream: helpers.safe_join(chips)
     end
 
     def unrecover
@@ -133,8 +156,13 @@ module Admin
 
     protected
 
+    # Selection order, so adding an organization appends its chip
+    def combobox_values
+      @combobox_values ||= params[:combobox_values].to_s.split(",")
+    end
+
     def sortable_columns
-      %w[id owner_email manufacturer_id updated_by_user_at]
+      %w[id owner_email manufacturer_id updated_by_user_at occurred_at propulsion_type]
     end
 
     def permitted_parameters
@@ -167,7 +195,7 @@ module Admin
 
     def matching_bikes
       bikes = if params[:user_id].present?
-        user_subject&.bikes
+        Bike.unscoped.current_owner(user_subject.id)
       elsif params[:search_phone].present?
         Bike.search_phone(params[:search_phone])
       else
@@ -199,7 +227,7 @@ module Admin
       # Get a query error if both are passed
       if params[:search_email].present? && user_subject.blank?
         @search_email = params[:search_email]
-        bikes = bikes.admin_text_search(@search_email)
+        bikes = bikes.admin_email_search(@search_email)
       elsif params[:search_domain].present?
         @search_domain = params[:search_domain]
         bikes = bikes.matching_domain(@search_domain)

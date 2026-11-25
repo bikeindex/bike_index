@@ -52,7 +52,7 @@ RSpec.describe API::V1::OrganizationsController, type: :request do
         expect(organization.regional_parents.pluck(:id)).to eq([organization_regional_parent.id])
         expect(organization_regional_parent.enabled?("bike_stickers")).to be_truthy
         organization.update(updated_at: Time.current)
-        expect(organization.is_paid).to be_falsey
+        expect(organization.is_invoiced).to be_falsey
         # Obviously, this is the long way of getting here - could've just enabled bike_stickers directly on org
         # but it's worth including here because this is a place we care about it
         expect(organization.enabled?("bike_stickers")).to be_truthy
@@ -161,6 +161,7 @@ RSpec.describe API::V1::OrganizationsController, type: :request do
           put "#{base_url}/#{organization.to_param}", params: update_params.merge(access_token: "vvvvvvvvv").to_json, headers: json_headers
         }.to_not change(UpdateOrganizationPosKindJob.jobs, :count)
         expect(response.code).to eq("401")
+        expect(json_result).to eq({"401" => "Not permitted"})
         organization.reload
         expect(organization.manual_pos_kind).to be_blank
       end

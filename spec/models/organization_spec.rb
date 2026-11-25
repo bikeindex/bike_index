@@ -3,17 +3,74 @@ require "rails_helper"
 RSpec.describe Organization, type: :model do
   it_behaves_like "search_radius_metricable"
 
+  describe "user_creatable_kinds" do
+    it "is every kind but the admin-only ones, in display order with other last" do
+      expect(Organization.user_creatable_kinds).to eq %w[bike_shop bike_advocacy law_enforcement school municipality
+        bike_manufacturer software property_management other]
+    end
+  end
+
+  describe "name_problem" do
+    before { FactoryBot.create(:organization, name: "Shifty Bike Shop") }
+
+    it "says why a name can't be used" do
+      expect(Organization.name_problem("Shifty Cycles")).to be_nil
+      expect(Organization.name_problem(" shifty  BIKE shop")).to eq :taken
+      expect(Organization.name_problem("Shifty Bike-Shop!")).to eq :taken
+      expect(Organization.name_problem("Registrations")).to eq :reserved
+      expect(Organization.name_problem("Signups")).to eq :reserved
+      expect(Organization.name_problem("X")).to eq :too_short
+      expect(Organization.name_problem("<b></b>!")).to eq :too_short
+      # Fine as typed, but not once shortened to its short name, or slugged
+      expect(Organization.name_problem("Stolen (Bicycle Recovery Network of Portland)")).to eq :reserved
+      expect(Organization.name_problem("Adminx")).to eq :reserved
+    end
+
+    # /register/{slug} is the organization's registration link, unless /register has a page by that name
+    it "reserves the names of /register's pages" do
+      register_pages = Rails.application.routes.routes.filter_map { it.path.spec.to_s[%r{\A/register/(\w+)\(}, 1] if it.verb == "GET" }
+      expect(register_pages).to include("landing")
+      expect(register_pages.map { Organization.name_problem(it) }.uniq).to eq [:reserved]
+    end
+
+    # A landing page puts its organization's slug at the top level, beside every other route there
+    it "reserves the top level of routes, other than the landing pages' own" do
+      top_level = Rails.application.routes.routes.filter_map { it.path.spec.to_s[%r{\A/([[:alnum:]][\w-]*)}, 1] }.uniq -
+        LandingPageOrganizations::SLUGS
+      expect(top_level).to include("search", "marketplace", "e-bike-rules")
+      expect(top_level.reject { Organization.name_problem(it).in?(%i[reserved too_short]) }).to eq []
+    end
+  end
+
+  describe "landing_page_slug" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills University", previous_slug:) }
+    let(:previous_slug) { nil }
+
+    it "is nil unless routed" do
+      expect(organization.landing_page_slug).to be_nil
+    end
+
+    context "with a routed previous slug" do
+      let(:previous_slug) { "brakebills" }
+
+      it "is the previous slug" do
+        expect(organization.slug).to eq "brakebills-university"
+        expect(organization.landing_page_slug).to eq "brakebills"
+      end
+    end
+  end
+
   describe "factory" do
-    let(:organization) { FactoryBot.create(:organization, :paid) }
-    it "is paid and valid" do
-      expect(organization.reload.is_paid).to be_truthy
+    let(:organization) { FactoryBot.create(:organization, :with_invoice) }
+    it "is_invoiced and is valid" do
+      expect(organization.reload.is_invoiced).to be_truthy
       expect(organization.enabled_feature_slugs).to eq([])
       expect(organization.invoices.last.invoice_organization_features.pluck(:id)).to eq([])
     end
     context "organization_features" do
       let(:organization) { FactoryBot.create(:organization, :organization_features) }
       it "is valid" do
-        expect(organization.reload.is_paid).to be_truthy
+        expect(organization.reload.is_invoiced).to be_truthy
         expect(organization.enabled_feature_slugs).to eq(["csv_export"])
         expect(organization.invoices.last.invoice_organization_features.pluck(:id).count).to eq 1
       end
@@ -254,6 +311,8 @@ RSpec.describe Organization, type: :model do
     let!(:organization) { FactoryBot.create(:organization, short_name: "something cool") }
     let!(:organization2) { FactoryBot.create(:organization, short_name: "Bike Shop", name: "Trek Store of Santa Cruz") }
     let!(:organization3) { FactoryBot.create(:organization, short_name: "BikeEastBay", previous_slug: "ebbc") }
+    let!(:organization4) { FactoryBot.create(:organization, name: "Bike and Trike Shop") }
+    let!(:organization5) { FactoryBot.create(:organization, name: "Bike & Trike Shop", previous_slug: "bike-amp-trike-shop") }
     it "finds by slug, previous_slug and name" do
       expect(organization2.slug).to eq "bike-shop"
       expect(Organization.friendly_find(" ")).to be_nil
@@ -261,6 +320,10 @@ RSpec.describe Organization, type: :model do
       expect(Organization.friendly_find("bike shop")).to eq organization2
       expect(Organization.friendly_find("trek store of SANTA CRUZ")).to eq organization2
       expect(Organization.friendly_find("bikeeastbay")).to eq organization3
+      expect(organization5.slug).to eq "bike-and-trike-shop-2"
+      expect(Organization.friendly_find("bike-amp-trike-shop-2")).to eq organization5
+      # An exact previous slug beats the -and- version of an -amp- one
+      expect(Organization.friendly_find("bike-amp-trike-shop")).to eq organization5
       expect(Organization.friendly_find(organization)).to eq organization
     end
     it "scrubs null bytes rather than raising" do
@@ -347,11 +410,75 @@ RSpec.describe Organization, type: :model do
     end
   end
 
+  # The scope and the predicate answer the same question, one in SQL and one in memory
+  describe "contact_impounded" do
+    let(:organization) { FactoryBot.create(:organization) }
+
+    def scoped? = Organization.contact_impounded.where(id: organization.id).any?
+
+    it "is false for an organization trusted with none of the three" do
+      expect(organization.reload.contact_impounded?).to be_falsey
+      expect(scoped?).to be_falsey
+    end
+
+    context "with unstolen_notifications" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "unstolen_notifications") }
+
+      it "is true" do
+        expect(organization.reload.contact_impounded?).to be_truthy
+        expect(scoped?).to be_truthy
+      end
+    end
+
+    context "paid_money" do
+      before { organization.update_attribute :paid_money, true }
+
+      it "is true, without the feature" do
+        expect(organization.reload.enabled?("unstolen_notifications")).to be_falsey
+        expect(organization.contact_impounded?).to be_truthy
+        expect(scoped?).to be_truthy
+      end
+    end
+
+    context "ambassador" do
+      let(:organization) { FactoryBot.create(:organization_ambassador) }
+
+      it "is true" do
+        expect(organization.reload.contact_impounded?).to be_truthy
+        expect(scoped?).to be_truthy
+      end
+    end
+  end
+
+  describe "show_single_search_menu_item?" do
+    let(:organization) { Organization.new }
+
+    it "is truthy" do
+      expect(organization.show_single_search_menu_item?).to be_truthy
+    end
+
+    context "law_enforcement" do
+      let(:organization) { Organization.new(kind: "law_enforcement") }
+
+      it "is falsey" do
+        expect(organization.show_single_search_menu_item?).to be_falsey
+      end
+    end
+
+    context "ambassador" do
+      let(:organization) { Organization.new(kind: "ambassador") }
+
+      it "is falsey" do
+        expect(organization.show_single_search_menu_item?).to be_falsey
+      end
+    end
+  end
+
   describe "user_registration_all_bikes?" do
     it "is falsey" do
       expect(Organization.new.user_registration_all_bikes?).to be_falsey
     end
-    context "paid" do
+    context "with an invoice" do
       let(:enabled_feature_slugs) { ["regional_bike_counts"] }
       let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: enabled_feature_slugs) }
       # Excluded IDs are real prod orgs (SBR/BikeIndex); stub them so the test org's auto-increment id can't collide
@@ -368,12 +495,12 @@ RSpec.describe Organization, type: :model do
     end
   end
 
-  describe "is_paid and enabled? calculations" do
+  describe "is_invoiced and enabled? calculations" do
     let(:organization_feature) { FactoryBot.create(:organization_feature, amount_cents: 10_000, name: "CSV Exports", feature_slugs: %w[child_organizations csv_exports]) }
     let(:invoice) { FactoryBot.create(:invoice_paid, amount_due: 0) }
     let(:organization) { invoice.organization }
     let(:organization_child) { FactoryBot.create(:organization) }
-    it "uses associations to determine is_paid" do
+    it "uses associations to determine is_invoiced" do
       expect(organization.enabled?("csv_exports")).to be_falsey
       invoice.update(organization_feature_ids: [organization_feature.id])
       invoice.update(child_enabled_feature_slugs_string: "csv_exports")
@@ -381,21 +508,28 @@ RSpec.describe Organization, type: :model do
 
       expect { organization.save }.to change { UpdateOrganizationAssociationsJob.jobs.count }.by(1)
 
-      expect(organization.is_paid).to be_truthy
+      expect(organization.is_invoiced).to be_truthy
       expect(organization.enabled_feature_slugs).to eq(["child_organizations", "csv_exports"])
       expect(organization.enabled?("csv_exports")).to be_truthy
-      expect(organization_child.is_paid).to be_falsey
+      expect(organization_child.is_invoiced).to be_falsey
 
       organization_child.update(parent_organization: organization)
       organization.save
 
       expect(organization.parent?).to be_truthy
-      expect(organization_child.is_paid).to be_truthy
+      expect(organization_child.is_invoiced).to be_truthy
       expect(organization_child.current_invoices.first).to be_blank
       expect(organization_child.enabled_feature_slugs).to eq(["csv_exports"])
       expect(organization_child.enabled?("csv_exports")).to be_truthy # It also checks for the full name version
       expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
+    end
+    context "education_courses_edit" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["education_courses_edit"]) }
+
+      it "adds education_courses, since editing without viewing locks the organization out" do
+        expect(organization.reload.enabled_feature_slugs).to match_array(%w[education_courses education_courses_edit])
+      end
     end
     context "regional bike_stickers" do
       let!(:regional_child) { FactoryBot.create(:organization, :in_nyc) }
@@ -497,7 +631,7 @@ RSpec.describe Organization, type: :model do
   end
 
   describe "user_email_domain uniqueness" do
-    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :enabled) }
+    let(:saml_configuration) { FactoryBot.create(:organization_saml_configuration, :active) }
     let!(:sso_organization) { saml_configuration.organization }
     let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: "saml_sso") }
     before { sso_organization.update!(user_email_domain: "example.edu") }
@@ -507,6 +641,14 @@ RSpec.describe Organization, type: :model do
       expect(organization).to_not be_valid
       expect(organization.errors.attribute_names).to include(:user_email_domain)
       expect(Organization.saml_email_matching("someone@example.edu")).to eq sso_organization
+    end
+
+    context "when the SAML configuration is inactive" do
+      before { saml_configuration.update!(active: false) }
+
+      it "does not match the organization's domain" do
+        expect(Organization.saml_email_matching("someone@example.edu")).to be_nil
+      end
     end
 
     it "permits the claiming organization to keep its own domain" do
@@ -572,6 +714,17 @@ RSpec.describe Organization, type: :model do
       expect(organization.slug).to eq(slug)
     end
 
+    # A blank short_name slugs to "", which OrganizationNameValidator rejects
+    context "blank short_name" do
+      let(:organization) { Organization.new(name:, short_name: " ") }
+
+      it "falls back to the name" do
+        expect(organization).to be_valid
+        expect(organization.short_name).to eq "something"
+        expect(organization.slug).to eq "something"
+      end
+    end
+
     context "tags" do
       let(:name) { "<script>alert(document.cookie)</script>" }
       it "doesn't xss" do
@@ -583,13 +736,22 @@ RSpec.describe Organization, type: :model do
       end
     end
 
+    context "no letters" do
+      let(:name) { "$.0. $" }
+      it "replaces the name" do
+        organization.set_calculated_attributes
+        expect(organization.name).to eq "Stop messing about"
+        expect(organization.slug).to eq "stop-messing-about"
+      end
+    end
+
     context "&" do
       let(:name) { "Bikes & Trikes" }
       it "permits & in names" do
         organization.set_calculated_attributes
         expect(organization.name).to eq "Bikes & Trikes"
         expect(organization.short_name).to eq "Bikes & Trikes"
-        expect(organization.slug).to eq "bikes-amp-trikes"
+        expect(organization.slug).to eq "bikes-and-trikes"
       end
     end
 
@@ -621,7 +783,7 @@ RSpec.describe Organization, type: :model do
       it "truncates without ellipse" do
         organization.set_calculated_attributes
         expect(organization.short_name).to eq "Banff RCMP - Royal Canadian"
-        expect(organization.slug).to eq "banff-rcmp---royal-canadian"
+        expect(organization.slug).to eq "banff-rcmp-royal-canadian"
         expect(organization.name).to eq name
       end
       context "with parens" do
@@ -658,6 +820,17 @@ RSpec.describe Organization, type: :model do
         expect(org2.slug).to eq "buckshot-deleted-2"
         expect(org1.reload.slug).to eq "buckshot-deleted"
         expect(org1.short_name).to eq "buckshot-deleted"
+      end
+
+      it "leaves alone the deleted things whose slug isn't claimed" do
+        deleted = FactoryBot.create(:organization, name: "wobble", short_name: "wobble")
+        deleted.delete
+        org = FactoryBot.create(:organization, name: "buckshot", short_name: "buckshot")
+        org.update(name: "rambling", short_name: "rambling")
+
+        expect(org.reload.slug).to eq "rambling"
+        expect(deleted.reload.short_name).to eq "wobble"
+        expect(deleted.slug).to eq "wobble"
       end
     end
 
@@ -712,6 +885,13 @@ RSpec.describe Organization, type: :model do
         organization.save
         expect(organization.reload.auto_user_id).not_to be_nil
       end
+      it "doesn't set the embedable user if the AUTO_ORG_MEMBER account doesn't exist" do
+        organization = FactoryBot.create(:organization)
+        expect(User.fuzzy_email_find(ENV["AUTO_ORG_MEMBER"])).to be_blank
+        organization.embedable_user_email = ENV["AUTO_ORG_MEMBER"]
+        organization.save
+        expect(organization.reload.auto_user_id).to be_nil
+      end
     end
   end
 
@@ -738,6 +918,16 @@ RSpec.describe Organization, type: :model do
         organization.ensure_auto_user
         organization.reload
         expect(organization.auto_user).to eq auto_user
+      end
+    end
+    context "no members and no AUTO_ORG_MEMBER account" do
+      it "assigns nothing, rather than an address that resolves to nobody" do
+        expect(organization).to be_present
+        expect { organization.ensure_auto_user }
+          .to_not change(UpdateOrganizationAssociationsJob.jobs, :count)
+        organization.reload
+        expect(organization.embedable_user_email).to be_blank
+        expect(organization.auto_user).to be_blank
       end
     end
   end
@@ -788,7 +978,7 @@ RSpec.describe Organization, type: :model do
         expect(organization.additional_registration_fields.include?("reg_student_id")).to be_truthy
         expect(organization.additional_registration_fields.include?("reg_bike_sticker")).to be_truthy
 
-        expect(organization.organization_affiliation_options).to eq([["Undergraduate Student", "student"], ["Graduate Student", "graduate_student"], ["Employee", "employee"], ["Community Member", "community_member"]])
+        expect(organization.organization_affiliation_options).to eq([["Undergraduate Student", "student"], ["Graduate Student", "graduate_student"], ["Postdoc", "postdoc"], ["Employee", "employee"], ["Community Member", "community_member"]])
       end
     end
   end

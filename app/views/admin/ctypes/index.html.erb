@@ -1,9 +1,3 @@
-<% nav_header_list_items = capture do %>
-  <li class="nav-item">
-    <%= link_to "New Component type", new_admin_ctype_url, class: "nav-link" %>
-  </li>
-<% end %>
-
 <% header_content = capture do %>
   <%= render partial: "cgroups_table", locals: {cgroups: @cgroups, ctype_counts: @ctype_counts} %>
 <% end %>
@@ -12,11 +6,13 @@
   <%= render partial: "table", locals: {collection: @ctypes, render_sortable: true} %>
 <% end %>
 
-<%= render(Admin::IndexSkeleton::Component.new(
+<%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
   collection: @ctypes,
   viewing: "Component Types",
   skip_charting: true,
-  nav_header_list_items:,
   header_content:,
-  table_view:
-)) %>
+  table_view:,
+)) do |skeleton| %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "New Component type", href: new_admin_ctype_url, color: :primary, size: :sm)) } %>
+<% end %>

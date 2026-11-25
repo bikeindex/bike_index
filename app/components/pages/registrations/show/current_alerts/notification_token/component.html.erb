@@ -1,0 +1,42 @@
+<%= render(Pages::Registrations::Show::CurrentAlerts::PromptChrome::Component.new(variant: @variant, id: MODAL_ID, title: @matching_notification.subject)) do %>
+  <%= render(UI::UserTextBlockDisplay::Component.new(text: @matching_notification.message, max_height_class: "")) %>
+
+  <%# The org authors this as HTML in admin, and UserTextBlockDisplay would escape it %>
+
+  <% if organization_snippet.present? %>
+    <div class="tw:mt-2 tw:flex tw:flex-col tw:gap-2">
+      <%= organization_snippet.html_safe %>
+    </div>
+  <% end %>
+
+  <div class="tw:mt-4">
+    <% if resolved? %>
+      <p class="tw:font-bold"><%= resolved_text %></p>
+      <p class="tw:mt-1 tw:text-sm tw:opacity-65">
+        <%= translation(".no_futher_action_necessary") %>
+      </p>
+    <% else %>
+      <%= form_with(url: resolve_token_bike_path(@bike), method: :put, namespace: form_namespace, data: {controller: "csrf-refresh"}) do |form| %>
+        <%= form.hidden_field :token, value: @token %>
+        <%= form.hidden_field :token_type, value: @token_type %>
+
+        <%= render(UI::Button::Component.new(text: resolve_button_text, color: :purple, type: "submit")) %>
+      <% end %>
+    <% end %>
+  </div>
+
+  <% if organization.present? %>
+    <p class="tw:mt-4 tw:text-sm tw:opacity-65">
+      <%= translation(".organization_sent_this_message", org_name: organization.name) %>
+
+      <% if @matching_notification.sent_at.present? %>
+        <%= render(UI::Time::Component.new(time: @matching_notification.sent_at)) %>
+      <% end %>
+    </p>
+    <% if organization_email.present? %>
+      <p class="tw:mt-1 tw:text-sm tw:opacity-65">
+        <%= translation(".please_email_organization_with_questions_html", email_link: mail_to(organization_email, class: "twlink-underlined")) %>
+      </p>
+    <% end %>
+  <% end %>
+<% end %>

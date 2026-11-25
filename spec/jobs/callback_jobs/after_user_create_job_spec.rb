@@ -16,7 +16,7 @@ RSpec.describe CallbackJobs::AfterUserCreateJob, type: :job do
         expect {
           instance.perform(user.id, "new", user: user)
         }.to change(CallbackJobs::AfterUserCreateJob.jobs, :count).by 1
-        expect(Email::ConfirmationJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
+        expect(EmailJobs::ConfirmationJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
         expect(CallbackJobs::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
       end
 
@@ -26,7 +26,7 @@ RSpec.describe CallbackJobs::AfterUserCreateJob, type: :job do
           expect {
             instance.perform(user.id, "new", user: user)
           }.to change(CallbackJobs::AfterUserCreateJob.jobs, :count).by 1
-          expect(Email::WelcomeJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
+          expect(EmailJobs::WelcomeJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
           expect(CallbackJobs::AfterUserCreateJob.jobs.map { |j| j["args"] }.last.flatten).to eq([user.id, "async"])
         end
       end
@@ -69,6 +69,32 @@ RSpec.describe CallbackJobs::AfterUserCreateJob, type: :job do
             instance.perform(user.id, "async")
           }.to_not change(CallbackJobs::AfterUserCreateJob.jobs, :count)
         end
+      end
+    end
+  end
+
+  describe "associate_bug_reports" do
+    let!(:bug_report) { FactoryBot.create(:bug_report, email: "Owner1@a.com", status: :ignored) }
+    let!(:other_bug_report) { FactoryBot.create(:bug_report, email: "someone@a.com") }
+
+    it "links an unconfirmed user's reports once they confirm" do
+      expect(bug_report.reload.user_id).to be_nil
+      instance.perform(user.id, "async")
+      expect(bug_report.reload.user_id).to be_nil
+
+      user.confirm(user.confirmation_token)
+      instance.perform(user.id, "async")
+      expect(bug_report.reload.user_id).to eq user.id
+      expect(bug_report.status).to eq "ignored"
+      expect(other_bug_report.reload.user_id).to be_nil
+    end
+
+    context "merging an additional email" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+
+      it "links the reports sent from it" do
+        instance.perform(user.id, "merged", user:, email: "owner1@a.com")
+        expect(bug_report.reload.user_id).to eq user.id
       end
     end
   end
@@ -197,13 +223,13 @@ RSpec.describe CallbackJobs::AfterUserCreateJob, type: :job do
     let(:user) { User.new(id: 69) }
     it "enques enqueues confirmation email" do
       instance.send_welcoming_email(user)
-      expect(Email::ConfirmationJob).to have_enqueued_sidekiq_job(69)
+      expect(EmailJobs::ConfirmationJob).to have_enqueued_sidekiq_job(69)
     end
     context "confirmed user" do
       it "enques welcome email" do
         allow(user).to receive(:confirmed?) { true }
         instance.send_welcoming_email(user)
-        expect(Email::WelcomeJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
+        expect(EmailJobs::WelcomeJob.jobs.map { |j| j["args"] }.flatten).to eq([user.id])
       end
     end
   end

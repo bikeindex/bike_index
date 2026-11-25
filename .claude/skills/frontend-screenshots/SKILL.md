@@ -1,7 +1,7 @@
 ---
 name: frontend-screenshots
 description: >-
-  Capture desktop+mobile viewport screenshots of Bike Index pages from the
+  Capture desktop+mobile screenshots of Bike Index pages from the
   local `bin/dev` server via Playwright MCP, with a seeded-user identity gate
   that keeps PII out of uploaded images. Use whenever a task needs screenshots
   of local pages — PR documentation, bug repros, before/after comparisons
@@ -11,35 +11,60 @@ description: >-
   like" without naming Playwright. For a component that only renders under an
   env var / feature flag / hard-to-reach state (e.g. the review-app banner),
   screenshot its ViewComponent/Lookbook preview URL instead of a full page.
-  Inputs: `(url-path, page-slug)` pairs, optionally with per-URL interaction
-  steps. Output: local PNG paths.
-allowed-tools: Bash, Read
+  **Also read the filename rule here before any
+  `mcp__playwright__browser_take_screenshot` call**, including a one-off
+  capture of some other site — it's what keeps PNGs out of the working tree.
+allowed-tools: Bash, Read, ToolSearch, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_evaluate, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot, mcp__playwright__browser_wait_for, mcp__playwright__browser_console_messages, mcp__playwright__browser_click, mcp__playwright__browser_type, mcp__playwright__browser_press_key, mcp__playwright__browser_hover, mcp__playwright__browser_close
 ---
 
 # Frontend screenshots
 
-Drive Playwright MCP to capture viewport screenshots of pages served by `bin/dev`.
+Drive Playwright MCP to capture screenshots of pages served by `bin/dev`. Callers
+pass `(url-path, page-slug)` pairs, optionally with per-URL interaction steps, and
+get back local PNG paths.
+
+## Who runs this
+
+From a session with history, hand this skill to a subagent the way `AGENTS.md`'s **Who runs this** describes — `model: "sonnet"` (it works out how to drive each page; the pages are chosen) — briefed with the `(url-path, page-slug)` pairs and any interaction steps per page, who to sign in as (or signed out), and the base ref when the caller wants before/after. It replies with the PNG paths keyed by page, viewport and branch/base, and any capture it couldn't diagnose. It closes the shared Playwright browser when it's done, so finish with any page this session still needs first.
 
 ## Output filenames (load-bearing — callers parse these)
 
 `tmp/pr_screenshots/<branch>-<page>-<timestamp>-{desktop,mobile}.png`, where `<branch>=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')` and `<timestamp>=$(date +%Y%m%d-%H%M%S)`. Cross-branch shots get an extra `-base-` segment.
 
+**Every `browser_take_screenshot` anywhere passes a `filename:` starting with `tmp/`** — including a one-off `tmp/tooltip-hover.png` for visual verification that has nothing to do with a PR. The MCP tool's root is the project root, so a bare `tooltip.png` lands in the working tree and shows up in `git status`; `tmp/` is gitignored.
+
 ## Preflight
 
 - `eval "$(ruby bin/env --export)"` so `$BASE_URL` is set.
-- `curl -fs "$BASE_URL/" >/dev/null` — if it isn't, **stop and ask the user to start it**. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so the bin/dev the user starts will bind to the same port and DB this skill expects.
+- `curl -fs "$BASE_URL/" >/dev/null` — run it every time, even if an earlier check in the session failed; the user may have started it since. If it fails now, **stop and ask the user to start it — unless this is a spawned `.claude/worktrees/…` checkout or the web sandbox, where you start it yourself**. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so whoever starts bin/dev binds the same port and DB this skill expects.
+- **A 200 doesn't prove the server is this checkout's.** Confirm `ruby bin/env --export` names a `WORKSPACE_ID` first — without one the curl reaches the main checkout. See the `sandbox-test-setup` skill. The web sandbox (`/home/user/bike_index`) gets a `WORKSPACE_ID` like anywhere else — its setup script runs `bin/workspace_setup` — but it's the only checkout in that container, so whatever `$BASE_URL` resolves to is the right one.
+- A merge from the base can leave the dev DB unmigrated, and `-f` fails the curl on the 500 that
+  follows exactly as on a server that isn't running — check `-w '%{http_code}'` before asking anyone
+  to start it. A 200 doesn't clear it either: `CheckPending` only re-raises once the evented file
+  watcher notices `db/migrate` moved, so a passing curl can be followed by
+  `ActiveRecord::PendingMigrationError` on every page. `bundle exec rails db:migrate`, and read
+  `log/development.log` before blaming the capture.
+  A gem the merge bumped does the same: the running server keeps the version it booted with, so a
+  method the new one adds is a `NoMethodError` until `bin/rails restart`.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
+- **`Error reading storage state from …/ms-playwright/mcp-auth.json: ENOENT`** on the first call means the file `.mcp.json`'s `--storage-state` names is missing. It's in the home folder, so ask the user to create it (`{"cookies":[],"origins":[]}`) rather than writing it yourself, and skip the capture until they have.
+- **Check the workspace DB has records before planning a real-page capture** — `Bike.count` comes
+  back 0 in a workspace whose `db:seed` never ran, so only preview routes render. Seed it (it's the
+  per-workspace throwaway DB), or capture previews. In the web sandbox the seed is already running
+  in the background — wait on `/tmp/seed.status` (`sandbox-test-setup`) rather than starting a
+  second one, which dies on duplicates.
 
 ## Sign in (with the PII gate)
 
-Pick the user the caller specified, or default to `user@bikeindex.org` (lowest privilege; most non-org-affiliated pages render for them). All seeded users use password `pleaseplease12`:
+Pick the user the caller specified, or default to `user@bikeindex.org` (lowest privilege; most non-org-affiliated pages render for them). All seeded users use password `pleaseplease12`, and `db/seeds/seed_test_users.rb` is the list of record:
 
 - `user@bikeindex.org` — no org memberships. Default. Use for personal pages (`/my_account`, `/bikes/new`) or to show how an org-less account sees a route.
-- `member@bikeindex.org` — `member` (not admin) of Brakebills. Use to capture the non-admin view of an org.
+- `member@brakebills.edu` — `member` (not admin) of Brakebills. Use to capture the non-admin view of an org.
 - `admin@bikeindex.org` — `SuperuserAbility`; effectively admin of every org. Use when capturing admin-only menu items, `/admin/...` routes, or org pages where you want the fully-loaded sidebar.
+- `dev@bikeindex.org` — `SuperuserAbility` **and** `developer`. Use for the pages gated on both: the `Dev:` navbar entries and `/admin/organizations/:slug/custom_layouts/...`, which redirect for `admin@`.
 - `:anonymous` — skip sign-in entirely. Use for public pages where the signed-out rendering is the point.
 
-Signed-out is the normal starting state, **not** a blocker: if a page redirects to `/session/new` or `/session/magic_link` (or `#navUserSettingLink` has no email), drive the sign-in form via Playwright with the seed credentials above — don't ask the user to sign in manually, and don't skip the screenshot for lack of a session. **Only ever authenticate against the local dev server** (`$BASE_URL` / localhost) — never sign in to any other host, and never create, promote, or impersonate users to bypass auth.
+Signed-out is the normal starting state, **not** a blocker: if a page redirects to `/session/new` or `/session/magic_link` (or `#navUserSettingLink` has no email), sign in. In development every page carries a **"sign in as superadmin"** button in the top banner — one click, no credentials, and it lands back on the page you were on; use it whenever the target needs a superuser. Otherwise drive the sign-in form via Playwright with the seed credentials above — don't ask the user to sign in manually, and don't skip the screenshot for lack of a session. It's two steps (email → Continue → password). The fields are `input[name="session[email]"]` and `input[name="session[password]"]` — the scope is `session`, not `user`, which is the guess that costs a round trip. **Both** submits need addressing by value — `input[name='commit'][value='Continue']` then `input[name='commit'][value='Log in']`. A `[type=submit]` selector fails strict mode on either, and so does `input[name='commit']` on the second step, where "Email me the link" is the other match. **Only ever authenticate against the local dev server** (`$BASE_URL` / localhost) — never sign in to any other host, and never create, promote, or impersonate users to bypass auth.
 
 **Picking an org slug.** When the URL is org-scoped (`/o/<slug>/...`) and the caller didn't specify a slug, default to `brakebills`
 
@@ -51,35 +76,73 @@ document.getElementById('navUserSettingLink')?.dataset.email
 
 If it's set but not one of the seeded emails, **stop and ask** — you're signed in as a non-seed user (PII risk on upload). If it's `undefined` when you expected a session, sign-in didn't take (often the seeds haven't run — `bundle exec rails db:seed`); retry the sign-in, don't capture signed-out. For `:anonymous`, expect `undefined` and confirm before continuing.
 
+The admin layout has no `#navUserSettingLink`, so on an `/admin/...` route it reads `undefined` for a session that's fine — reaching the page at all proves superuser. Confirm the data instead: every email the page renders should be a seeded one — `@bikeindex.org`, `member@brakebills.edu`, or the `user@fakegmail.com` / `user1@gmail.com` / `user_2@gmail.com` bike owners.
+
+```js
+(document.body.innerText.match(/[\w.+-]+@[\w.-]+/g) || []).slice(0, 8)
+```
+
 **Don't capture if any on-page data looks non-seeded.** Even signed in as a seed user, if a page shows records that don't look like seed data (unfamiliar names/emails, real-looking user content), stop and ask — the dev DB may have been loaded with production data, and screenshots are permanent once uploaded.
 
 ## Capture
 
-Clear stale shots: `rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null || true`.
+Make the directory and clear stale shots: `mkdir -p tmp/pr_screenshots && rm -f tmp/pr_screenshots/<branch>-<page>-*.png 2>/dev/null || true` — on the branch capture only: the pattern matches `-base-` shots too, so a cross-branch rerun would delete branch shots its caller hasn't posted yet. `browser_take_screenshot` errors with `ENOENT` rather than creating the directory, so a fresh workspace fails on the first capture.
 
 Two viewports — resize once each, then walk every URL:
 1. `browser_resize` 1440×900 → for each URL: navigate → settle → hide the footer → `browser_take_screenshot` (`fullPage: true`) to `...-desktop.png`.
-2. `browser_resize` 390×844 → same loop → `...-mobile.png`.
+2. `browser_resize` 390×844 → same loop, also `fullPage: true` → `...-mobile.png`.
 
-**Full page, minus the footer and review-app banner, no `target:` arg.** Capture the whole page (`fullPage: true`) so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding) and the `#review-app-banner` topbar (dev/review-app-only chrome that isn't part of the real page). After each navigation (hiding doesn't persist across page loads), run:
+**Full page, minus the footer, review-app banner and profiler badge, no `target:` arg.** Capture the whole page (`fullPage: true`) at **both** viewports so nothing below the fold is cut off, but first hide the site footer (identical on every page, just padding), the `#review-app-banner` topbar and the `.profiler-results` badge (both dev-only chrome that isn't part of the real page). **Keep the footer when the diff changes it** — the reason to hide it is that it carries no information, which stops being true the moment it's the subject. The profiler badge reports *this request's* timing, so leaving it in makes every before/after pair differ on a number no reviewer cares about. After each navigation — and again immediately before the shot, since rack-mini-profiler injects `.profiler-results` after load — run:
 
 ```js
 browser_evaluate: () => {
-  document.querySelector('.primary-footer, footer, [role="contentinfo"]')?.style.setProperty('display', 'none');
+  document.querySelectorAll('.close, [data-dismiss="modal"], [aria-label="Close"]').forEach(c => c.click());
+  document.querySelectorAll('.modal-backdrop').forEach(b => b.style.setProperty('display', 'none'));
+  document.body.classList.remove('modal-open');
+  document.querySelector('.primary-footer')?.style.setProperty('display', 'none');
   document.getElementById('review-app-banner')?.style.setProperty('display', 'none');
-  return document.body.scrollHeight; // content height with the footer + banner gone
+  // A same-origin iframe (the legacy org add-a-bike page, the embeds) carries its own badge
+  [document, ...[...document.querySelectorAll('iframe')].map(f => f.contentDocument).filter(Boolean)]
+    .forEach(d => d.querySelector('.profiler-results')?.style.setProperty('display', 'none'));
+  return document.body.scrollHeight; // content height with the chrome gone
 }
 ```
 
+The donation modal is why that starts with a dismiss: a seeded user who hasn't donated gets it over the page on `/my_account` and friends, and it covers the whole shot rather than sitting in a corner. **Drop the dismiss when a modal is what the diff changes** — the same rule as the footer, and it bites harder here, since the dismiss also sets `hideDonationModal` and the base-branch shot of a modal that was the whole point comes back without it. **Drop it from the pre-shot re-run of a mid-interaction capture too** — its clicks land outside an open `UI::Dropdown` and close it.
+
 If the returned content height is **less than the viewport height**, `browser_resize` the height down to it before the shot (the `<html>` element's near-black background fills the gap otherwise), then resize back to the standard viewport before the next URL. Taller-than-viewport pages need no resize — `fullPage` scroll-stitches them.
 
-Element-only crops (`target:`) still slice context off — don't use them for page captures.
+**An org-sidebar page taller than the viewport needs that resize upward instead.** The sidebar is `position: fixed`, so `fullPage` stitching leaves it at viewport height over the same near-black background — resize up to the content height before the shot.
 
-**Settle before the screenshot.** Stimulus + Chartkick render after document load; either `browser_wait_for` on a known element or pause ~500ms–1s. Otherwise charts capture mid-draw.
+**The sidebar scrolls inside itself, so `body.scrollHeight` doesn't say whether its lower rows are in the shot.** At 1440×900 its own scroller overflows, and a row near the bottom captures as absent. Measure the row you're there for and resize the viewport height past its `getBoundingClientRect().bottom`. On mobile the sidebar is behind `button[aria-label="Menu"]` — open it, and run the same open-the-menu step on the base branch so the pair compares like for like. That state is an overlay taller than the viewport over a much longer page, which is one of the two cases to capture `fullPage: false` — the other is below.
+
+**Viewport-only is the caller's call, never yours — except when the diff's subject is a `position: fixed` or `sticky` element.** `fullPage` paints it once, where it sits at scroll 0, and nowhere else: on the 10,007px `/accept_vendor_terms` its bottom bar landed at y=798 with the remaining 9,100px of that column bare. Capture those at `fullPage: false`, scrolled to where the element pins. When the caller asks for it — "viewport only", "above the fold", "just the mobile viewport" — drop `fullPage` for the size they named and leave the other one full page.
+
+**`/bikebook` renders whatever catalog the dev server points it at.** With `BIKEBOOK_CATALOG_DIRECTORY` set it's a local `/bikebook_catalog/` that can trail *or lead* the published one by schema versions, so a capture of a schema change against the wrong one shows nothing new. Compare the two manifests' `schema_version` and capture against the one the diff reads — when that's the published one, `page.route` `/bikebook_catalog/` to `https://bikebook-catalog.bikeindex.org/catalog/` in `browser_run_code_unsafe`, on both branches. Without the variable the page fetches the published catalog itself, which the web sandbox's browser can't reach — no cards render; `page.route` `https://bikebook-catalog.bikeindex.org/**` to `route.fulfill` its `route.fetch()` with an `access-control-allow-origin: *` header.
+
+**Settle before the screenshot.** Stimulus + Chartkick render after document load; either `browser_wait_for` on a known element or pause ~500ms–1s. Otherwise charts capture mid-draw. **`loading="lazy"` images capture blank below the fold** — `fullPage` stitching never scrolls them into view (the search results, marketplace and `/stolen` recoveries use it). Set `loading = 'eager'` on them and wait for every `naturalWidth` before the shot.
 
 **Mid-interaction states are in scope.** When the caller asks for a dropdown open, a modal showing, a hover state, a partially-filled form, etc., drive Playwright between settle and the screenshot — `browser_click`, `browser_type`, `browser_press_key`, `browser_hover`, then wait for the UI to reach the target state (`browser_wait_for` on a marker element, or check via `browser_evaluate`) before `browser_take_screenshot`. Treat the interaction sequence as part of the page-slug — e.g. capture `combobox-open` after clicking + typing, distinct from a static `search-registrations` page-load shot. For cross-branch comparisons, run the *same* interaction sequence on each branch so the screenshots actually compare like-for-like.
 
-Sanity-check each PNG: under ~5 KB usually means the page errored. Pull `browser_console_messages` and look only for **uncaught exceptions from app code** (Stimulus registration failures, `TypeError`s in `app/javascript/**`) — Webpacker logs, asset 404s, third-party deprecation warnings are noise. To diagnose a failed capture: HTTP status via `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"`, response body via `curl -s "$BASE_URL/<path>" | head -200`, full backtrace via `tail -200 log/development.log`.
+**At the mobile width a `UI::Forms::Combobox` opens a dialog and its own input goes inert** — clicking `#<id>` works, but typing into it times out on "element is inert". Type into `#<id>-hw-dialog-combobox` instead.
+
+**A loading state is captured by holding the request open, not by racing it.** In `browser_run_code_unsafe`, `page.route` the frame's URL and delay with `await page.waitForTimeout(90000)` before `route.continue()` — `setTimeout` isn't defined there — then trigger the fetch the way the frame does, by re-setting its `src`. Load the results first: a frame that goes busy from an empty page captures a header reading "0 matches".
+
+**One capture's `?organization_id=` or `?view_as=<org>` changes what the *next* param-less URL renders.** `set_passive_organization` writes the org into the session, and `/registrations/:id` with no params then resolves through `default_view_for` to that org's admin view — so a `/registrations/54` shot taken after a `view_as=brakebills.staff` one is the org page, in the org layout, at the same URL. Nothing errors, and the pair only looks wrong once you open it. Navigate `?organization_id=false` before any capture whose URL carries no `view_as`, and remember the session survives the base-branch checkout, so the branch and base loops can drift apart on this if their orders differ.
+
+**`localStorage` survives that checkout too, and a mid-capture interaction writes to it.** The org search column toggle persists the checked set to `orgRegistrationColumns`, so a base loop run after a branch loop that toggled columns loads the branch's column set — the pair then compares different tables at the same URL. Clear the key, or re-apply the interaction, at the start of each loop rather than once per run.
+
+**Being signed in is that same drifting state, and it reaches every page.** A run that captures public pages signed out and then signs in for one org-scoped page leaves the session behind for whatever it captures next — so the base loop's public pages come back with a signed-in navbar against a signed-out branch shot, and the pair differs on chrome the PR never touched. Capture each loop's pages in the same order, and `/goodbye` back to signed out before the public ones.
+
+**An element missing from the shot may be a stale asset build, not the code.** `bin/dev`'s watchers don't pick up a new `@theme` token, so a class keyed off one (`tw:navbar:block!`) is absent from what the server serves while the specs — whose builds you regenerated — pass. Confirm with `getComputedStyle` on the element, then run `bin/rails tailwindcss:build` (or `dartsass:build` for a `.scss` edit); sprockets serves the new digest on the next request, so this needs no `bin/dev` restart and isn't `assets:precompile`.
+
+Sanity-check each PNG: under ~5 KB usually means the page errored. Pull `browser_console_messages` and look only for **uncaught exceptions from app code** (Stimulus registration failures, `TypeError`s in `app/javascript/**`) — asset 404s and third-party deprecation warnings are noise. To diagnose a failed capture: HTTP status via `curl -s -o /dev/null -w "%{http_code}\n" "$BASE_URL/<path>"`, response body via `curl -s "$BASE_URL/<path>" | head -200`, full backtrace via `tail -200 log/development.log`.
+
+**A 429 mid-capture is rack-attack, not a broken page.** `requests/ip` allows a burst per 20 seconds (`config/initializers/rack_attack.rb`), which a loop of `fetch`es from `browser_evaluate` blows through — navigate the pages you're capturing rather than probing them in bulk, and wait the window out rather than retrying.
+
+## Mailer previews (email components)
+
+An email renders at `$BASE_URL/rails/mailers/<mailer>/<action>`, but that route is preview chrome around an iframe — append `&part=text%2Fhtml` for the email body alone, which is what to capture. Every `OrganizedMailerPreview` action takes a record id (`?bike_id=75&part=text%2Fhtml`); `spec/mailers/previews/` is the list of actions and their params. Pick the record for the state you need — `finished_registration` renders a different email for a claimed ownership than an unclaimed one.
 
 ## Component previews (when no page shows the state)
 
@@ -89,11 +152,25 @@ Some components only render in a context you can't reproduce on a normal dev pag
 $BASE_URL/rails/view_components/<preview_path>/<scenario>
 ```
 
-`<preview_path>` is the preview class underscored with the `Preview` suffix dropped, and `<scenario>` is the preview method. `PageBlock::ReviewAppBanner::ComponentPreview#superadmin_signed_in` → `/rails/view_components/page_block/review_app_banner/component/superadmin_signed_in`. If a scenario doesn't exist yet, add a method to the component's `*_preview.rb` first — a preview that renders the exact state (pass the args that trigger it) is often the fastest path to a clean shot.
+`<preview_path>` is the preview class underscored with the `Preview` suffix dropped, and `<scenario>` is the preview method. `SharedBlocks::ReviewAppBanner::ComponentPreview#superadmin_signed_in` → `/rails/view_components/shared_blocks/review_app_banner/component/superadmin_signed_in`. If a scenario doesn't exist yet, add a method to the component's `*_preview.rb` first — a preview that renders the exact state (pass the args that trigger it) is often the fastest path to a clean shot.
 
-Use this bare route, not Lookbook's `/lookbook/...`, which wraps the component in its own browser chrome.
+Use this bare route, not Lookbook's `/lookbook/inspect/...`, which wraps the component in its own browser chrome. `/lookbook/preview/...` is the one route that puts a whole `@!group` on a single page — `/lookbook/preview/ui/tooltip/variants` for `UI::Tooltip::ComponentPreview`'s `# @!group Variants`. Reach for it when the shot needs several scenarios side by side; the component's system spec usually already visits it. **It takes a group, not a scenario, and drops the trailing `component`** — `/lookbook/preview/ui/tooltip/component/variants` and `/lookbook/preview/ui/tooltip/<scenario>` both 404, which reads as an unregistered group rather than a wrong path.
 
-The preview page loads Tailwind and renders the component standalone (no site chrome), so capture the viewport as usual (`fullPage: false`); a small ViewComponent render-timing line at the bottom is harmless. Everything else still applies — same PII/seed-data gate, same `(url-path, page-slug)` naming (use a slug like `banner-signed-in`).
+**On a dev server that's been up a while, the group page stops picking up newly added scenarios** — it renders every *other* one, and after a merge deletes a scenario's template it 404s the whole group — either reads as a broken preview rather than a stale registry (`bin/rails restart` clears it; a fresh server picks them up within a request or two). The bare `/rails/view_components/…` route stays current either way, since `config/initializers/lookbook.rb` patches `__vc_load_previews` to re-resolve through the autoloader — capture a new scenario there.
+
+The preview page loads Tailwind and renders the component standalone (no site chrome), so a preview that fits the viewport captures at `fullPage: false`; a small ViewComponent render-timing line at the bottom is harmless. **A preview taller than the viewport still captures `fullPage: true`** — page-sized components (a whole registration step, a long form) put the changed field below 900px, and cropping it out is the one thing the shot exists to show. Measure before choosing:
+
+```js
+() => document.querySelector('<selector for what changed>').getBoundingClientRect().top + window.scrollY
+```
+
+**A legacy-styled component needs the display option in the URL.** `layouts/component_preview` only includes `revised`/`kelsey_styles` when Lookbook passes it, and the bare route passes nothing — so a preview whose class carries `# @display legacy_stylesheet true` renders *unstyled* (the navbar's logo fills the viewport) unless you append it yourself:
+
+```
+$BASE_URL/rails/view_components/<preview_path>/<scenario>?lookbook%5Bdisplay%5D%5Blegacy_stylesheet%5D=true
+```
+
+Everything else still applies — same PII/seed-data gate, same `(url-path, page-slug)` naming (use a slug like `banner-signed-in`).
 
 Previews that query the dev DB (e.g. `User.admins.first`) render nothing when that data is missing — if the state doesn't appear, seed first with `bundle exec rails db:seed`. This is component-only: a preview can't show layout/stacking against the rest of the page (e.g. a navbar z-index fix), so use a real page for those.
 
@@ -101,14 +178,30 @@ Previews that query the dev DB (e.g. `User.admins.first`) render nothing when th
 
 When the caller wants before/after, repeat the capture loop against the base ref. The caller passes the base — `origin/main` by default, or the PR's actual base when it isn't `main` (a stacked PR's base often isn't). Set `BASE_REF` to that remote ref (e.g. `origin/main`, `origin/sethherr/feature-x`) and use it throughout; `git fetch origin` first so it's current.
 
-1. `git status` — abort if there are uncommitted changes.
-2. Diff `db/migrate/` between the branch and `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error.
-3. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_REF` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD at the remote ref is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files, repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`.
+**Capture the base at what the branch actually merged, not at the ref's tip.** A fetch moves `origin/main` to commits the branch hasn't taken, so a base capture there renders *the base's newer work* and the diff attributes it to this PR. Check `git rev-list --count HEAD..$BASE_REF` before detaching: non-zero means merge first, or detach at `$(git merge-base HEAD $BASE_REF)` instead. On a busy repo the base can move between the branch capture and the base capture of the same run.
 
-A `Gemfile.lock` diff is **not** a reason to abort.
+**The detached checkout in step 4 is a sanctioned exception to "never change branch" — don't stop and ask for it.** It detaches at a *remote* ref, reads, and returns to the same branch within this section, committing nothing. Nothing here licenses any other checkout, `git checkout -b`, or one that outlives the capture.
+
+1. `git status` — abort if there are uncommitted changes.
+2. Settle what you're detaching at, per the note above — `$BASE_REF`, or `$(git merge-base HEAD $BASE_REF)` when the branch is behind it. Call that `$BASE_AT`.
+3. Diff `db/migrate/` between the branch and **`$BASE_AT`**, not `$BASE_REF`; abort if it changed — a branch-only migration leaves the DB schema ahead of the base's code, so base pages can error. A migration that only shows up against the ref's tip belongs to commits the branch never took, and detaching at the merge-base is what resolves it; aborting there abandons a capture that was fine. **So does aborting on a migration that only adds a table, or a column with a default** — nothing on the base reads either, so load the target page after detaching and abort only if it errors.
+4. `BRANCH=$(git rev-parse --abbrev-ref HEAD)`, `git checkout --detach $BASE_AT` (detached — checking out a branch name fails if a sibling worktree holds it; detached HEAD is allowed concurrently and is the same code), navigate the browser to force Rails to reload the changed files — the watcher can lag that first request, so confirm the page shows the base's markup (the changed element gone) and re-navigate if it doesn't — repeat capture into `...-base-...` filenames, then `git checkout $BRANCH`. Run `bin/rails tailwindcss:build` after each checkout, and `bin/rails dartsass:build` too when the diff touches `app/assets/stylesheets/**` — the watchers don't rebuild on a checkout, so a capture can render the other side's CSS.
+
+A `Gemfile.lock` diff is **not** a reason to abort — but when it moves a gem the page loads (hotwire_combobox's JS and CSS), run `bundle install` and `bin/rails restart` after each checkout, or the base renders the branch's gem.
+
+**Don't call a pair identical with `cmp`.** Two captures of the *same* code routinely differ by a few dozen bytes, so byte-equality reports a change that isn't one (and its absence proves nothing). Compare pixels, and establish the noise floor before reading anything into a number — recapture one page without changing branches, and treat that count as zero:
+
+```bash
+magick compare -metric AE <base>.png <branch>.png null:   # differing pixel count
+magick compare <base>.png <branch>.png -compose src d.png && magick identify -format '%@' d.png   # where they differ
+```
+
+The bounding box is what settles it: dev-only chrome that slipped past the hide step lands in one small box, a real change doesn't.
 
 The seeded DB persists across checkouts, so the existing session usually still works. Preview routes (`/rails/view_components/...`, `/lookbook/...`) reload across the checkout like ordinary pages, so their before/after works against any `$BASE_REF` too.
 
 ## Clean up
 
-Once every screenshot is captured, quit Chrome with `browser_close`. Leaving it running holds the shared browser profile lock, so the next `browser_navigate` (this skill or another) fails with "Browser is already in use". Always close it before returning, even if the capture failed partway.
+Once every screenshot is captured, quit Chrome with `browser_close` — including when the capture failed partway. Leaving it running holds the shared browser profile lock, so the next `browser_navigate` (this skill or another) fails with "Browser is already in use".
+
+**Who closes is decided by who invoked you, so you never have to be told.** Invoked by the user — "grab a screenshot of X" — you're the last one in the browser: close it. Invoked by a workflow that captures again straight afterwards — the `pr` screenshot phase, which captures the base next — leave it open; closing between the two just pays the startup again.

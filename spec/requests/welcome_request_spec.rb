@@ -1,0 +1,189 @@
+require "rails_helper"
+
+RSpec.describe WelcomeController, type: :request do
+  describe "index" do
+    it "renders, ignoring the requested response format" do
+      get "/"
+      expect(response.status).to eq(200)
+      expect(response).to render_template("index")
+      expect(flash).to_not be_present
+
+      get "/", params: {format: :json}
+      expect(response.status).to eq(200)
+      expect(response).to render_template("index")
+      expect(flash).to_not be_present
+    end
+
+    describe "color scheme" do
+      def body = Capybara.string(response.body)
+
+      it "follows the cookie, and the system without a valid one" do
+        get "/"
+        expect(body).to have_no_css("body.dark")
+        expect(response.body).to include("window.colorSchemeQuery")
+        expect(body).to have_checked_field("System", visible: :all)
+
+        cookies[:color_scheme] = "dark"
+        get "/"
+        expect(body).to have_css("body.dark")
+        expect(response.body).to_not include("window.colorSchemeQuery")
+        expect(body).to have_checked_field("Dark", visible: :all)
+
+        cookies[:color_scheme] = "plaid"
+        get "/"
+        expect(body).to have_no_css("body.dark")
+        expect(response.body).to include("window.colorSchemeQuery")
+      end
+
+      context "signed in" do
+        include_context :request_spec_logged_in_as_user
+
+        it "follows the account over the cookie" do
+          current_user.update(color_scheme: "light")
+          cookies[:color_scheme] = "dark"
+          get "/"
+          expect(body).to have_no_css("body.dark")
+          expect(response.body).to_not include("window.colorSchemeQuery")
+          expect(body).to have_checked_field("Light", visible: :all)
+        end
+      end
+    end
+
+    context "organization destroyed after passive_organization was set" do
+      include_context :request_spec_logged_in_as_organization_admin
+
+      it "renders" do
+        get "/my_account"
+        expect(session[:passive_organization_id]).to eq current_organization.id
+        current_organization.destroy
+        expect(Organization.unscoped.find(current_organization.id)).to be_present
+        expect(current_user.reload.organizations.count).to eq 0
+
+        get "/"
+        expect(response.status).to eq(200)
+        expect(response).to render_template(:index)
+      end
+    end
+  end
+
+  describe "bike_creation_graph" do
+    it "renders embed without xframe block" do
+      get "/bike_creation_graph"
+      expect(response.code).to eq("200")
+      expect(response.headers["X-Frame-Options"]).to be_blank
+    end
+  end
+
+  describe "goodbye" do
+    it "renders" do
+      get "/goodbye"
+      expect(response.status).to eq(200)
+      expect(response).to render_template("goodbye")
+      expect(flash).to_not be_present
+    end
+
+    context "logged_in" do
+      include_context :request_spec_logged_in_as_user
+      it "redirects" do
+        get "/goodbye"
+        expect(response).to redirect_to logout_url
+      end
+
+      context "unconfirmed user" do
+        let(:current_user) { FactoryBot.create(:user) }
+        it "redirects" do
+          get "/goodbye"
+          expect(response).to redirect_to logout_url
+        end
+      end
+    end
+  end
+
+  describe "choose_registration" do
+    it "redirects" do
+      get "/choose_registration"
+      expect(response).to redirect_to(new_user_url)
+    end
+
+    context "user present" do
+      include_context :request_spec_logged_in_as_user
+      it "renders" do
+        get "/choose_registration"
+        expect(response.status).to eq(200)
+        expect(response).to render_template("choose_registration")
+      end
+    end
+  end
+
+  describe "recovery_stories" do
+    let(:quote) { "I got it back <script>alert(1)</script>" }
+    let!(:recovery_display) { FactoryBot.create(:recovery_display, quote:) }
+
+    it "escapes the quote" do
+      get "/recovery_stories"
+      expect(response.status).to eq(200)
+      expect(response.body).to_not include("<script>alert(1)</script>")
+      expect(response.body).to include(ERB::Util.html_escape(quote))
+    end
+
+    context "with more stories than fit on a page" do
+      let!(:recovery_displays) { FactoryBot.create_list(:recovery_display, 2) }
+
+      it "paginates, and redirects to the last valid page when the requested one is past the end" do
+        get "/recovery_stories", params: {per_page: 2}
+        expect(response.status).to eq(200)
+        expect(assigns(:recovery_displays).count).to eq 2
+        expect(response.body).to include("Load more stories")
+        expect(flash).to_not be_present
+
+        get "/recovery_stories", params: {per_page: 2, page: 2}
+        expect(response.body).to include("Newer stories")
+        expect(response.body).to include("Fund the next recovery")
+
+        get "/recovery_stories", params: {per_page: 2, page: 3}
+        expect(response).to redirect_to(recovery_stories_path(page: 2))
+      end
+
+      it "renders only the requested page's frame for a load more" do
+        get "/recovery_stories", params: {per_page: 2, page: 2}, headers: {"Turbo-Frame" => "recovery_stories_page_2"}
+        expect(response.status).to eq(200)
+        expect(response.body).to include('<turbo-frame class="tw:contents" id="recovery_stories_page_2">')
+        expect(response.body).to include(ERB::Util.html_escape(quote))
+        expect(response.body).to_not include("Load more stories")
+        expect(response.body).to_not include("Newer stories")
+        expect(response.body).to_not include("Fund the next recovery")
+      end
+
+      context "when stories share a recovered_at" do
+        let(:recovered_at) { Time.current.beginning_of_day + 6.hours }
+        let!(:recovery_displays) { FactoryBot.create_list(:recovery_display, 4, recovered_at:) }
+
+        # Postgres returns ties in whatever order a plan reads them, so a page
+        # boundary through them can repeat one story and skip another
+        it "breaks ties by id" do
+          shown = [1, 2, 3].flat_map do |page|
+            get "/recovery_stories", params: {per_page: 2, page:}
+            assigns(:recovery_displays).map(&:id)
+          end
+          expect(shown).to eq(RecoveryDisplay.reorder(recovered_at: :desc, id: :desc).pluck(:id))
+        end
+      end
+    end
+
+    context "with an organization the user has since left" do
+      include_context :request_spec_logged_in_as_organization_user
+
+      it "renders, dropping the organization from the session" do
+        get "/my_account"
+        expect(session[:passive_organization_id]).to eq current_organization.id
+        current_user.organization_roles.destroy_all
+
+        get "/recovery_stories"
+        expect(response.status).to eq(200)
+        expect(assigns(:recovery_displays).count).to eq 1
+        expect(session[:passive_organization_id]).to eq "0"
+        expect(assigns[:passive_organization]).to be_nil
+      end
+    end
+  end
+end

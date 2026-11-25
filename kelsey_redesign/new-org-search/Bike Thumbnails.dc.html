@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="design_doc_mode" content="canvas">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="./image-slot.js"></script>
+<style>
+  html { -webkit-font-smoothing: antialiased; }
+  body { margin:0; background:#ffffff; font-family:'Hanken Grotesk',sans-serif; color:#333; }
+  p { text-wrap: pretty; }
+  a { color:#016ec2; text-decoration:none; }
+  a:hover { color:#015a9e; }
+  .bi-thumb { transition:box-shadow .16s, transform .16s; }
+  .bi-thumb:hover { box-shadow:0 14px 34px rgba(26,26,31,.16) !important; transform:translateY(-2px); }
+  .bi-tip { position:relative; cursor:help; }
+  .bi-tip .bi-tip-body { opacity:0; visibility:hidden; transition:opacity .12s; }
+  .bi-tip:hover .bi-tip-body { opacity:1; visibility:visible; }
+</style>
+</helmet>
+
+<section style="padding:56px 60px 90px; display:flex; flex-direction:column; gap:30px">
+  <div style="display:flex; align-items:baseline; gap:14px; flex-wrap:wrap">
+    <div style="font-size:12px; font-weight:800; letter-spacing:.09em; text-transform:uppercase; color:#715eb2; background:#f0edf9; padding:6px 12px; border-radius:999px">Thumbnails</div>
+    <div style="font-size:15px; color:#6b6b73">Bike result thumbnails — <a href="#1c">1c</a> card grid / <a href="#1d">1d</a> dense row</div>
+  </div>
+
+  <div style="display:flex; align-items:center; gap:14px; flex-wrap:wrap; background:#f7f7f9; border:1px solid #e8e8ee; border-radius:14px; padding:13px 16px; width:max-content">
+    <div style="display:flex; align-items:center; gap:9px">
+      <div onClick="{{ toggleAllBikes }}" style="{{ allBikesBoxStyle }}">{{ allBikesCheck }}</div>
+      <div onClick="{{ toggleAllBikes }}" style="font-size:13.5px; font-weight:700; color:#1a1a1f; cursor:pointer">Search all bikes <span style="font-weight:500; color:#6b6b73">(not just Brakebills University)</span></div>
+    </div>
+    <div style="font-size:12.5px; color:#9a9aa2; border-left:1px solid #e2e2e8; padding-left:14px">adds an org-registration row to every thumbnail</div>
+  </div>
+
+  <div style="display:flex; flex-wrap:wrap; gap:56px; align-items:flex-start">
+
+    <div id="1c" style="display:flex; flex-direction:column; gap:14px">
+      <div style="display:flex; align-items:center; gap:12px">
+        <div style="font-size:13px; font-weight:800; color:#fff; background:#016ec2; padding:4px 10px; border-radius:8px">1c</div>
+        <div style="font-size:15px; font-weight:700; color:#1a1a1f">Card grid — status on the photo</div>
+      </div>
+      <div style="width:840px; background:#fff; border:1px solid #e2e2e8; border-radius:20px; padding:26px; box-shadow:0 22px 56px rgba(26,26,31,.1); display:flex; flex-direction:column; gap:18px">
+        <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2">Search results · grid</div>
+        <div style="display:grid; grid-template-columns:repeat(3,1fr); gap:18px">
+          <sc-for list="{{ bikes }}" as="b" hint-placeholder-count="6">
+            <div class="bi-thumb" style="border:1px solid #e2e2e8; border-radius:14px; overflow:hidden; background:#fff; cursor:pointer; display:flex; flex-direction:column">
+              <div style="position:relative; height:158px; background:#f0f0f2">
+                <image-slot id="{{ b.slotGrid }}" shape="rect" placeholder="Bike photo"></image-slot>
+                <div style="position:absolute; top:9px; left:9px; font-size:11px; font-weight:800; color:#fff; background:rgba(26,26,31,.82); padding:4px 9px; border-radius:999px; pointer-events:none">{{ b.price }}</div>
+                <div class="bi-tip" style="position:absolute; top:9px; right:9px">
+                  <div style="{{ b.statusPillStyle }}">{{ b.statusLabel }}</div>
+                  <sc-if value="{{ b.hasTip }}" hint-placeholder-val="{{ true }}">
+                    <div class="bi-tip-body" style="position:absolute; top:calc(100% + 7px); right:0; width:196px; background:#1a1a1f; color:#fff; font-size:11.5px; line-height:1.45; font-weight:500; padding:9px 11px; border-radius:9px; box-shadow:0 10px 26px rgba(26,26,31,.3); z-index:6">{{ b.tip }}</div>
+                  </sc-if>
+                </div>
+              </div>
+              <div style="padding:12px 13px 14px; display:flex; flex-direction:column; gap:7px">
+                <div style="font-size:14.5px; color:#1a1a1f; line-height:1.3"><span style="font-weight:800">{{ b.make }}</span> {{ b.model }}</div>
+                <div style="display:flex; align-items:center; gap:8px; flex-wrap:wrap">
+                  <div style="display:flex; gap:3px">
+                    <sc-for list="{{ b.colors }}" as="c" hint-placeholder-count="3">
+                      <div title="{{ c.name }}" style="{{ c.swatchStyle }}"></div>
+                    </sc-for>
+                  </div>
+                  <div style="font-size:12.5px; color:#6b6b73">{{ b.colorNames }}</div>
+                </div>
+                <div style="display:flex; align-items:center; gap:6px; flex-wrap:wrap">
+                  <sc-if value="{{ b.electric }}" hint-placeholder-val="{{ true }}">
+                    <div title="E-vehicle" style="{{ b.boltPillStyle }}">⚡</div>
+                  </sc-if>
+                  <div style="{{ b.vehiclePillStyle }}">{{ b.vehicleType }}</div>
+                </div>
+                <div style="font-size:12px; color:#9a9aa2">{{ b.location }}</div>
+                <div style="font-family:'JetBrains Mono',monospace; font-size:11px; color:#b3b3ba; letter-spacing:.02em">{{ b.serial }}</div>
+                <sc-if value="{{ allBikes }}" hint-placeholder-val="{{ true }}">
+                  <div style="{{ b.orgRowStyle }}">{{ b.orgLabel }}</div>
+                </sc-if>
+              </div>
+            </div>
+          </sc-for>
+        </div>
+      </div>
+    </div>
+
+    <div id="1d" style="display:flex; flex-direction:column; gap:14px">
+      <div style="display:flex; align-items:center; gap:12px">
+        <div style="font-size:13px; font-weight:800; color:#fff; background:#715eb2; padding:4px 10px; border-radius:8px">1d</div>
+        <div style="font-size:15px; font-weight:700; color:#1a1a1f">Dense row — scannable by serial</div>
+      </div>
+      <div style="width:840px; background:#fff; border:1px solid #e2e2e8; border-radius:20px; padding:26px; box-shadow:0 22px 56px rgba(26,26,31,.1); display:flex; flex-direction:column; gap:12px">
+        <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2">Search results · list</div>
+        <sc-for list="{{ bikes }}" as="b" hint-placeholder-count="6">
+          <div class="bi-thumb" style="{{ b.rowStyle }}">
+            <div style="width:140px; height:94px; flex:none; border-radius:10px; overflow:hidden; background:#f0f0f2">
+              <image-slot id="{{ b.slotRow }}" shape="rect" placeholder="Photo"></image-slot>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column; gap:6px; min-width:0">
+              <div style="font-size:16px; color:#1a1a1f; letter-spacing:-.01em"><span style="font-weight:800">{{ b.make }}</span> {{ b.model }}</div>
+              <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap; font-size:12.5px; color:#6b6b73">
+                <span style="display:flex; align-items:center; gap:6px">
+                  <sc-for list="{{ b.colors }}" as="c" hint-placeholder-count="3">
+                    <span title="{{ c.name }}" style="{{ c.swatchStyle }}"></span>
+                  </sc-for>
+                  {{ b.colorNames }}
+                </span>
+                <span>{{ b.location }}</span>
+                <span style="display:inline-flex; align-items:center; gap:5px">
+                  <sc-if value="{{ b.electric }}" hint-placeholder-val="{{ true }}">
+                    <span title="E-vehicle" style="{{ b.boltPillStyle }}">⚡</span>
+                  </sc-if>
+                  <span style="{{ b.vehiclePillStyle }}">{{ b.vehicleType }}</span>
+                </span>
+              </div>
+              <div style="display:flex; align-items:center; gap:9px; flex-wrap:wrap">
+                <div style="font-family:'JetBrains Mono',monospace; font-size:12px; color:#333; background:#f8f8f8; border:1px solid #eeeef1; border-radius:6px; padding:2px 7px">{{ b.serial }}</div>
+                <sc-if value="{{ allBikes }}" hint-placeholder-val="{{ true }}">
+                  <div style="{{ b.orgRowStyle }}">{{ b.orgLabel }}</div>
+                </sc-if>
+              </div>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:7px; flex:none">
+              <div style="font-family:'JetBrains Mono',monospace; font-size:17px; font-weight:600; color:#1a1a1f">{{ b.price }}</div>
+              <div class="bi-tip" style="display:flex; justify-content:flex-end">
+                <div style="{{ b.statusPillStyle }}">{{ b.statusLabel }}</div>
+                <sc-if value="{{ b.hasTip }}" hint-placeholder-val="{{ true }}">
+                  <div class="bi-tip-body" style="position:absolute; top:calc(100% + 7px); right:0; width:212px; background:#1a1a1f; color:#fff; font-size:11.5px; line-height:1.45; font-weight:500; padding:9px 11px; border-radius:9px; box-shadow:0 10px 26px rgba(26,26,31,.3); z-index:6">{{ b.tip }}</div>
+                </sc-if>
+              </div>
+            </div>
+          </div>
+        </sc-for>
+      </div>
+    </div>
+
+    <div id="1f" style="display:flex; flex-direction:column; gap:14px">
+      <div style="display:flex; align-items:center; gap:12px">
+        <div style="font-size:13px; font-weight:800; color:#fff; background:#1a1a1f; padding:4px 10px; border-radius:8px">Key</div>
+        <div style="font-size:15px; font-weight:700; color:#1a1a1f">Status + vehicle badges</div>
+      </div>
+      <div style="width:420px; background:#fff; border:1px solid #e2e2e8; border-radius:20px; padding:24px; box-shadow:0 22px 56px rgba(26,26,31,.1); display:flex; flex-direction:column; gap:18px">
+        <div style="display:flex; flex-direction:column; gap:11px">
+          <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2">Status</div>
+          <sc-for list="{{ statusKey }}" as="k" hint-placeholder-count="6">
+            <div style="display:flex; align-items:center; gap:11px">
+              <div style="{{ k.pillStyle }}">{{ k.label }}</div>
+              <div style="font-size:12.5px; color:#6b6b73; flex:1; min-width:0">{{ k.note }}</div>
+            </div>
+          </sc-for>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:11px; border-top:1px solid #f0f0f2; padding-top:16px">
+          <div style="font-size:11px; font-weight:700; letter-spacing:.05em; text-transform:uppercase; color:#9a9aa2">Vehicle type · 23 types, each e- or not</div>
+          <div style="display:flex; gap:7px; flex-wrap:wrap">
+            <sc-for list="{{ vehicleKey }}" as="v" hint-placeholder-count="8">
+              <div style="display:inline-flex; align-items:center; gap:5px">
+                <sc-if value="{{ v.electric }}" hint-placeholder-val="{{ true }}">
+                  <div title="E-vehicle" style="{{ v.boltPillStyle }}">⚡</div>
+                </sc-if>
+                <div style="{{ v.pillStyle }}">{{ v.label }}</div>
+              </div>
+            </sc-for>
+          </div>
+          <div style="font-size:12.5px; color:#6b6b73">The ⚡ prefix marks the e-version of any type.</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1820,&quot;height&quot;:1400}}">
+class Component extends DCLogic {
+  state = { allBikes: false };
+
+  static STATUS = {
+    Stolen:       { fg: '#fff',    bg: '#cc0000', bd: '#cc0000' },
+    Registered:   { fg: '#1f8a5b', bg: '#e8f5ee', bd: '#cfe9db', tip: 'Registered and protected, with owner' },
+    Impounded:    { fg: '#1a1a1f', bg: '#ffd660', bd: '#eebf3c' },
+    Found:        { fg: '#016ec2', bg: '#f2f8fd', bd: '#bcdcf5' },
+    Unregistered: { fg: '#fff',    bg: '#c26a00', bd: '#c26a00', tip: 'Added via the unregistered parking notification flow' },
+    'For Sale':   { fg: '#fff',    bg: '#715eb2', bd: '#715eb2' },
+  };
+
+  swatch(hex, i, size) {
+    const r = i === 0 ? '4px 0 0 4px' : '0 4px 4px 0';
+    return 'width:' + size + 'px; height:' + size + 'px; border-radius:' + r + '; background:' + hex + '; border:1px solid rgba(0,0,0,.14); box-sizing:border-box;';
+  }
+
+  pill(status, big) {
+    const c = Component.STATUS[status];
+    return 'display:flex; align-items:center; gap:5px; white-space:nowrap; font-size:' + (big ? '11' : '10.5') + 'px; font-weight:800; letter-spacing:.03em; text-transform:uppercase; color:' +
+      c.fg + '; background:' + c.bg + '; border:1px solid ' + c.bd + '; padding:4px 9px; border-radius:999px;';
+  }
+
+  vehiclePill(type, electric) {
+    return 'display:inline-flex; align-items:center; white-space:nowrap; font-size:11.5px; font-weight:700; color:' +
+      (electric ? '#5a4a94' : '#5b5b63') + '; background:' + (electric ? '#f0edf9' : '#f6f6f8') + '; border:1px solid ' +
+      (electric ? '#e2dcf3' : '#e8e8ee') + '; padding:3px 9px; border-radius:8px;';
+  }
+
+  boltPill() {
+    return 'display:inline-flex; align-items:center; justify-content:center; width:22px; height:21px; box-sizing:border-box; flex:none; font-size:11px; line-height:1; color:#5a4a94; background:#f0edf9; border:1px solid #e2dcf3; border-radius:8px; cursor:help;';
+  }
+
+  renderVals() {
+    const accent = '#016ec2';
+    const all = this.state.allBikes;
+
+    const raw = [
+      { make: 'Surly', model: 'Midnight Special', price: '$1,850', serial: 'SUR-77120934', location: 'Chicago, IL 60614',
+        colors: [['Purple', '#715eb2'], ['Black', '#1a1a1f']], type: 'Road', electric: false, status: 'Stolen', date: 'Stolen Aug 22', org: true },
+      { make: 'REI Co-op', model: 'Rev 24', price: '$120', serial: 'WTU1908F4432', location: 'Seattle, WA 98122',
+        colors: [['Maroon', '#8e2f4a']], type: 'Kids', electric: false, status: 'Registered', date: 'Registered Aug 19', org: true },
+      { make: '2023 Nakto', model: 'Fat Tire Cruiser', price: '$500', serial: 'NK23-0099817', location: 'Bertram, TX 78605',
+        colors: [['Black', '#1a1a1f'], ['Silver', '#b3b3ba'], ['Orange', '#c77700']], type: 'Cruiser', electric: true, status: 'Impounded', date: 'Impounded Sep 02', org: false },
+      { make: 'Yuba', model: 'Spicy Curry', price: '$3,400', serial: 'YB-4410772', location: 'Portland, OR 97214',
+        colors: [['Green', '#1f8a5b'], ['White', '#f2f2f4']], type: 'Cargo', electric: true, status: 'Found', date: 'Found Sep 06', org: true },
+      { make: 'Unknown', model: 'step-through frame', price: '—', serial: 'no serial', location: 'Brakebills lot C',
+        colors: [['Blue', '#3397dc']], type: 'City', electric: false, status: 'Unregistered', date: 'Notified Sep 11', org: false },
+      { make: 'Co-Motion', model: 'Periscope', price: '$2,200', serial: 'CM-2288140', location: 'Madison, WI 53703',
+        colors: [['Red', '#cc0000'], ['Cream', '#efe4cb'], ['Black', '#1a1a1f']], type: 'Tandem', electric: false, status: 'For Sale', date: 'Listed Sep 09', org: true },
+    ];
+
+    const bikes = raw.map((b, i) => {
+      const cfg = Component.STATUS[b.status];
+      const colors = b.colors.slice(0, 3).map(([name, hex], j) => ({
+        name,
+        swatchStyle: this.swatch(hex, j === 0 ? 0 : 1, 11) + (b.colors.length > 1 && j > 0 ? ' margin-left:-1px;' : ''),
+      }));
+      return {
+        ...b,
+        slotGrid: 'bi-grid-' + i,
+        slotRow: 'bi-row-' + i,
+        colors,
+        colorNames: b.colors.slice(0, 3).map(c => c[0]).join(' / '),
+        vehicleType: b.type,
+        vehiclePillStyle: this.vehiclePill(b.type, b.electric),
+        boltPillStyle: this.boltPill(),
+        statusLabel: b.status + ' · ' + b.date.replace(/^\w+ /, ''),
+        statusPillStyle: this.pill(b.status, true),
+        hasTip: !!cfg.tip,
+        tip: cfg.tip || '',
+        orgLabel: b.org ? 'Registered with Brakebills University' : 'Not registered with an organization',
+        orgRowStyle: 'display:inline-flex; align-items:center; white-space:nowrap; font-size:11.5px; font-weight:700; color:' +
+          (b.org ? '#015a9e' : '#8a8a92') + '; background:' + (b.org ? '#f2f8fd' : '#f6f6f8') + '; border:1px solid ' +
+          (b.org ? '#bcdcf5' : '#e8e8ee') + '; padding:3px 9px; border-radius:8px;',
+        rowStyle: 'display:flex; gap:16px; padding:12px; border:1px solid #e2e2e8; border-left:4px solid ' + cfg.bd +
+          '; border-radius:14px; cursor:pointer; align-items:center; background:#fff;',
+      };
+    });
+
+    const notes = {
+      Stolen: 'shown with the date stolen',
+      Registered: 'tooltip on hover',
+      Impounded: 'shown with the date impounded',
+      Found: 'shown with the date found',
+      Unregistered: 'tooltip on hover',
+      'For Sale': 'shown with the date listed',
+    };
+    const statusKey = Object.keys(Component.STATUS).map(label => ({
+      label, note: notes[label], pillStyle: this.pill(label, true),
+    }));
+
+    const vehicleKey = [
+      ['Bike', false], ['Cargo', true], ['Tandem', false], ['Cruiser', true],
+      ['Trailer', false], ['Recumbent', false], ['Scooter', true], ['Unicycle', false],
+    ].map(([label, electric]) => ({
+      label, electric, pillStyle: this.vehiclePill(label, electric), boltPillStyle: this.boltPill(),
+    }));
+
+    return {
+      bikes, statusKey, vehicleKey,
+      allBikes: all,
+      allBikesCheck: all ? '✓' : '',
+      allBikesBoxStyle: 'width:17px; height:17px; flex:none; border-radius:4px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:#fff; cursor:pointer; background:' +
+        (all ? accent : '#fff') + '; border:1.5px solid ' + (all ? accent : '#c7c7ce') + ';',
+      toggleAllBikes: () => this.setState(st => ({ allBikes: !st.allBikes })),
+    };
+  }
+}
+</script>
+</body>
+</html>

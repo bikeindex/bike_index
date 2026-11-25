@@ -20,19 +20,25 @@ RSpec.describe "Me API V3", type: :request do
     context "fully scoped token" do
       let(:scopes) { all_scopes }
       let!(:secondary_email) { FactoryBot.create(:user_email, user: user, email: "d@f.co") }
-      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user) }
+      let(:role) { "member" }
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user:, role:) }
       let(:organization) { organization_role.organization }
+      # The grouped menu the sidebar renders, which is what this serves now
       let(:target_menu) do
         [
-          {type: "link", label: "#{organization.short_name} Bikes",
-           path: "/o/#{organization.slug}/registrations",
-           secondary: false, active: "on_registrations_index"},
-          {type: "disabled", label: "Incomplete registrations", secondary: true},
-          {type: "link", label: "Add a bike",
-           path: "/o/#{organization.slug}/bikes/new",
-           secondary: false, active: "on_bikes_new"},
+          {type: "group", key: "registrations", label: "#{organization.short_name} Registrations",
+           icon: "bike",
+           children: [
+             {type: "link", label: "Search Registrations",
+              path: "/o/#{organization.slug}/registrations", icon: nil},
+             {type: "link", label: "Multi search",
+              path: "/o/#{organization.slug}/registrations/multi_search", icon: nil}
+           ]},
+          {type: "link", label: "Add a registration", path: "/o/#{organization.slug}/registrations/new",
+           icon: "plus-circle", match_params: {parking_notification: nil}},
           {type: "divider"},
-          {type: "disabled", label: "Registration stickers", secondary: false}
+          {type: "link", label: "#{organization.short_name} Information",
+           path: "/o/#{organization.slug}/info", icon: nil}
         ]
       end
       let(:target_membership) do
@@ -61,6 +67,17 @@ RSpec.describe "Me API V3", type: :request do
         expect(json_result["memberships"].is_a?(Array)).to be_truthy
         expect(json_result["memberships"]).to eq([target_membership.as_json])
         expect(response.response_code).to eq(200)
+      end
+
+      context "member_no_bike_edit" do
+        let(:role) { "member_no_bike_edit" }
+        it "doesn't include the organization access_token" do
+          get "/api/v3/me", params: {access_token: token.token}, headers: {format: :json}
+          expect(response.response_code).to eq(200)
+          membership = json_result["memberships"].first
+          expect(membership["user_is_organization_admin"]).to be_falsey
+          expect(membership["organization_access_token"]).to be_nil
+        end
       end
 
       context "organization with uploaded avatar" do
@@ -166,6 +183,18 @@ RSpec.describe "Me API V3", type: :request do
         expect(response.response_code).to eq(200)
         result = json_result["bikes"].find { |b| b["id"] == bike.id }
         expect(result).to include("status" => "with owner", "for_sale" => true)
+      end
+    end
+
+    context "with impounded bike" do
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      before { FactoryBot.create(:impound_record, bike:) }
+
+      it "shows the owner the serial" do
+        token.update_attribute :scopes, "read_bikes"
+        get "/api/v3/me/bikes", params: {access_token: token.token}, headers: {format: :json}
+        result = json_result["bikes"].find { |b| b["id"] == bike.id }
+        expect(result).to include("status" => "found", "serial" => bike.serial_number.upcase)
       end
     end
 

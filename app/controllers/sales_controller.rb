@@ -32,7 +32,9 @@ class SalesController < ApplicationController
       redirect_back(fallback_location: user_root_url) && return
     end
 
-    if @ownership&.bike.blank?
+    # Only a hand-entered URL carries an ownership_id; the mark-sold button links here
+    # with a marketplace_message_id
+    if params[:ownership_id].present? && Ownership.find_by_id(params[:ownership_id])&.bike.blank?
       store_return_and_authenticate_user(translation_key: :cannot_find_bike)
     else
       store_return_and_authenticate_user

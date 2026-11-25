@@ -4,6 +4,14 @@ require "rails_helper"
 
 RSpec.describe UI::Forms::RadioButtonGroup::Component, :js, type: :system do
   let(:base_path) { "/rails/view_components/ui/forms/radio_button_group/component/" }
+  # match_style retries, so it waits out the color transition
+  let(:purple) { {"background-color" => "rgb(113, 94, 178)"} }
+  let(:white) { {"background-color" => "rgb(255, 255, 255)"} }
+  # secondary's resting bg-white/80
+  let(:translucent_white) { {"background-color" => "oklab(0.999994 0.0000455677 0.0000200868 / 0.8)"} }
+  let(:transparent) { {"background-color" => "rgba(0, 0, 0, 0)"} }
+
+  def label(text) = find("label", text:)
 
   context "default" do
     it "renders and selects on click" do
@@ -16,11 +24,32 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, :js, type: :system do
       expect(page).to have_css "input[name='search_status'][value=''][checked]", visible: :all
       expect_axe_clean
 
+      # Keyboard focus widens the selected chip's ring past is-active's ring-2
+      page.send_keys(:tab)
+      expect(computed_ring(label("All"))).to include("0px 0px 0px 3px")
+
       find("label", text: "Active").click
       expect(page).to have_css "input[name='search_status'][value='active']:checked", visible: :all
 
       find("label", text: "Inactive").click
       expect(page).to have_css "input[name='search_status'][value='inactive']:checked", visible: :all
+      # The is-active variant matches a label around a checked radio
+      expect(label("Inactive")).to match_style(purple)
+      expect(label("Active")).to match_style(translucent_white)
+    end
+  end
+
+  context "toggle" do
+    it "raises the checked segment" do
+      visit("#{base_path}toggle")
+
+      expect(label("Set on map")).to match_style(white)
+      expect(label("Enter address manually")).to match_style(transparent)
+
+      find("label", text: "Enter address manually").click
+      expect(page).to have_css "input[name='location_mode'][value='entered']:checked", visible: :all
+      expect(label("Enter address manually")).to match_style(white)
+      expect(label("Set on map")).to match_style(transparent)
     end
   end
 

@@ -33,7 +33,7 @@ RSpec.describe StolenNotificationsController, type: :request do
             post base_url, params: {stolen_notification: stolen_notification_attributes}
             expect(flash[:success]).to be_present
           }.to change(StolenNotification, :count).by(1)
-        }.to change(Email::StolenNotificationJob.jobs, :count).by(1)
+        }.to change(EmailJobs::StolenNotificationJob.jobs, :count).by(1)
         stolen_notification = StolenNotification.last
         expect(stolen_notification.bike).to eq bike
         expect(stolen_notification.sender_id).to eq current_user.id
@@ -42,7 +42,7 @@ RSpec.describe StolenNotificationsController, type: :request do
         expect(stolen_notification.reference_url).to eq stolen_notification_attributes[:reference_url]
         expect(stolen_notification.kind).to eq "stolen_permitted"
 
-        Email::StolenNotificationJob.drain
+        EmailJobs::StolenNotificationJob.drain
         expect(ActionMailer::Base.deliveries.count).to eq 1
         mail = ActionMailer::Base.deliveries.last
         expect(mail.subject).to eq("Stolen bike contact")
@@ -67,7 +67,7 @@ RSpec.describe StolenNotificationsController, type: :request do
               post base_url, params: {stolen_notification: stolen_notification_attributes}
               expect(flash[:success]).to be_present
             }.to change(StolenNotification, :count).by(1)
-          }.to change(Email::StolenNotificationJob.jobs, :count).by(1)
+          }.to change(EmailJobs::StolenNotificationJob.jobs, :count).by(1)
           stolen_notification = StolenNotification.last
           expect(stolen_notification.bike).to eq bike
           expect(stolen_notification.sender_id).to eq current_user.id
@@ -76,12 +76,25 @@ RSpec.describe StolenNotificationsController, type: :request do
           expect(stolen_notification.reference_url).to eq stolen_notification_attributes[:reference_url]
           expect(stolen_notification.kind).to eq "unstolen_unclaimed_permitted_direct"
 
-          Email::StolenNotificationJob.drain
+          EmailJobs::StolenNotificationJob.drain
           expect(ActionMailer::Base.deliveries.count).to eq 1
           mail = ActionMailer::Base.deliveries.last
           expect(mail.subject).to eq("Stolen bike contact")
           expect(stolen_notification.receiver_email).to eq owner_email
         end
+      end
+      it "404s a bike_id that isn't an id" do
+        expect {
+          post base_url, params: {stolen_notification: stolen_notification_attributes.merge(bike_id: "RWLl8_zfhqJ_vHhQSJDsS7tbmX")}
+        }.to_not change(StolenNotification, :count)
+        expect(response).to have_http_status(:not_found)
+      end
+      it "redirects to the bike with an error for a blank message" do
+        expect {
+          post base_url, params: {stolen_notification: stolen_notification_attributes.merge(message: "")}
+        }.to_not change(StolenNotification, :count)
+        expect(response).to redirect_to(bike_path(bike))
+        expect(flash[:error]).to be_present
       end
       context "not permitted notification" do
         let(:bike) { FactoryBot.create(:bike) }

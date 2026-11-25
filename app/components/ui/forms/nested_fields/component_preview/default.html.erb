@@ -1,0 +1,6 @@
+<%= form_with(model: organization, url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::NestedFields::Component.new(form_builder: f, association: :locations,
+        fields_component: UI::Forms::NestedFields::PreviewFields::Component,
+        fields_class_name: "tw:mb-4 tw:rounded tw:border tw:border-gray-200 tw:p-3",
+        add_label: "Add a location")) %>
+<% end %>

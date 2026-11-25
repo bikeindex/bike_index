@@ -89,7 +89,8 @@
 
       <div class="binx-footer">
         <h5>
-          <% if render_donation?(@organization) %>
+          <%# Organized::EmailsController renders this layout with no message %>
+          <% if OrganizedMailer.render_donation?(organization: @organization, user: @user, emails: try(:message)&.to) %>
             <%= t(".help_prevent_theft") %>
             <%= link_to(t(".make_a_donation"), support_the_index_url) %>
           <% end %>

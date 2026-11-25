@@ -1,5 +1,6 @@
-%h1.mb-4.uncap
-  = t(".org_settings", org_name: @organization.short_name)
+= render(UI::Header::Component.new(text: t(".org_settings", org_name: @organization.short_name), html_class: "uncap"))
+
+= render(UI::Alerts::ObjectError::Component.new(object: @organization))
 
 = form_for @organization, {url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: "update", html: {class: "organized-form"}} do |f|
 
@@ -26,6 +27,12 @@
       class: "form-control"
       %span.below-input-help
         = t(".org_email_address_html", org_name: @organization.name)
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :send_self_registration_email, class_name: "tw:mt-4")) do
+        = t(".send_self_registration_email_to_html", email: render(UI::Code::Inline::Component.new(text: @organization.auto_user&.email)))
+      %span.below-input-help
+        = t(".send_self_registration_email_note", email: @organization.auto_user&.email)
+        - if @organization.enabled?("parking_notifications")
+          = t(".send_self_registration_email_includes_unregistered")
 
   - unless Organization.admin_required_kinds.include?(@organization.kind)
     .form-group.row
@@ -63,7 +70,7 @@
     %label.org-form-label
       = t(".organization_logo")
     .col-sm-4
-      = render(UI::Forms::FileUpload::Component.new(form_builder: f, attribute: :avatar, accept: ImageUploader.permitted_extensions))
+      = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :avatar, accept: ImageUploader.permitted_extensions))
       = f.hidden_field :avatar_cache
       %span.below-input-help
         = t(".square_image")
@@ -86,15 +93,14 @@
           = t(".when_checked_go_direct")
           %em.less-strong= t(".why_no_direct_by_default")
 
-- unless current_organization.paid?
+- unless current_organization.is_invoiced?
   %hr.delete-organization-section
   %p.text-md-center
     %a.collapsed{href: "#", data: {toggle: "collapse", target: "#delete-organization"}}
       = t(".i_would_like_to_terminate_my_account")
   #delete-organization.collapse
     .text-md-center
-      = link_to t(".delete_organization"),
-        organization_manage_path(id: current_organization.to_param, organization_id: current_organization.to_param),
-        method: :delete,
-        data: {confirm: t(".removal_confirmation", org_name: current_organization.name)},
-        class: "btn btn-danger"
+      = render(UI::ButtonLink::Component.new(text: t(".delete_organization"),
+        href: organization_manage_path(id: current_organization.to_param, organization_id: current_organization.to_param),
+        method: :delete, color: :error,
+        confirm: t(".removal_confirmation", org_name: current_organization.name)))

@@ -1,10 +1,13 @@
 module Admin
   class BugReportsController < Admin::BaseController
     include Binxtils::SortableTable
+    include Admin::TokenAccessible
+
+    token_accessible :index, :show, :update, :assign_tags
 
     # Keyed by the BugReport scope each filter applies
-    MEMBERSHIP_FILTERS = {"member" => "Only members", "paid_organization" => "Only paid org",
-                          "paid_organization_staff" => "Only paid org staff"}.freeze
+    MEMBERSHIP_FILTERS = {"member" => "Only members", "invoiced_organization" => "Only invoiced org",
+                          "invoiced_organization_staff" => "Only invoiced org staff"}.freeze
     STATUS_FILTER_ALL = "all"
     STATUS_FILTER_INVESTIGATE = "investigate"
 
@@ -12,9 +15,11 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 50)
+      bug_reports = matching_bug_reports.includes(user: %i[membership_active email_bans_active])
+      # Only the JSON serializes images
+      bug_reports = bug_reports.with_attached_images if request.format.json?
       @pagy, @collection = pagy(:countish,
-        matching_bug_reports.includes(:user)
-          .reorder("bug_reports.#{sort_column} #{sort_direction}"),
+        bug_reports.reorder(sortable_order(BugReport)),
         limit: @per_page,
         page: permitted_page)
 
@@ -28,6 +33,10 @@ module Admin
     end
 
     def show
+      respond_to do |format|
+        format.html
+        format.json { render json: {bug_report: bug_report_json(@bug_report)} }
+      end
     end
 
     def update
@@ -60,11 +69,24 @@ module Admin
       redirect_back(fallback_location: admin_bug_reports_path)
     end
 
-    helper_method :matching_bug_reports, :searchable_tags, :membership_filters,
-      :status_filters, :status_only_filters
+    # Chips carry the value verbatim - the combobox removes a selection by the text as typed
+    def tag_chips
+      render :tag_chips, formats: :turbo_stream, locals: {tags: params[:combobox_values].to_s.split(",")}
+    end
+
+    helper_method :matching_bug_reports, :searchable_tags, :tag_combobox_options, :searchable_receivers,
+      :membership_filters, :status_filters, :status_only_filters
 
     def searchable_tags
       @searchable_tags ||= BugReport.all_tags
+    end
+
+    def tag_combobox_options
+      searchable_tags.map { {display: it, value: it, content: helpers.render(Atoms::Admin::Badges::BugReportTag::Component.new(tag: it))} }
+    end
+
+    def searchable_receivers
+      @searchable_receivers ||= BugReport.all_receivers
     end
 
     def membership_filters
@@ -78,13 +100,13 @@ module Admin
     end
 
     def status_only_filters
-      BugReport.statuses.keys.index_with { |status| "Only #{status.humanize.downcase}" }
+      BugReport.statuses.keys.index_with { |status| "Only #{BugReport.status_display(status)}" }
     end
 
     protected
 
     def sortable_columns
-      %w[created_at received_at updated_at email user_id github_pull_request status].freeze
+      %w[created_at received_at updated_at email receiver user_id github_pull_request status].freeze
     end
 
     def earliest_period_date
@@ -93,9 +115,12 @@ module Admin
 
     def matching_bug_reports
       bug_reports = BugReport.all
-      @searched_tag = params[:search_tag] if searchable_tags.include?(params[:search_tag])
-      bug_reports = bug_reports.with_tag(@searched_tag) if @searched_tag.present?
+      @searched_tags = BugReport.normalized_tags(params[:search_tag])
+      bug_reports = bug_reports.with_tag(@searched_tags) if @searched_tags.any?
+      @searched_receiver = params[:search_receiver]
+      bug_reports = bug_reports.where(receiver: @searched_receiver) if @searched_receiver.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
+      bug_reports = bug_reports.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%") if params[:search_email].present?
       @searched_membership = params[:search_membership] if MEMBERSHIP_FILTERS.key?(params[:search_membership])
       bug_reports = filter_by_membership(bug_reports)
       bug_reports = filter_by_status(bug_reports)
@@ -107,8 +132,8 @@ module Admin
     def filter_by_membership(bug_reports)
       case @searched_membership
       when "member" then bug_reports.member
-      when "paid_organization" then bug_reports.paid_organization
-      when "paid_organization_staff" then bug_reports.paid_organization_staff
+      when "invoiced_organization" then bug_reports.invoiced_organization
+      when "invoiced_organization_staff" then bug_reports.invoiced_organization_staff
       else bug_reports
       end
     end
@@ -128,13 +153,23 @@ module Admin
       @bug_report = BugReport.find(params[:id])
     end
 
+    # Dropping an unknown status rather than letting the enum raise on assignment
     def permitted_params
-      params.require(:bug_report).permit(:github_pull_request, :tags, tags: [])
+      permitted = params.require(:bug_report).permit(:github_pull_request, :status, :tags, tags: [])
+
+      BugReport.statuses.key?(permitted[:status]) ? permitted : permitted.except(:status)
     end
 
     def bug_report_json(bug_report)
-      bug_report.as_json(only: %w[id user_id email from_name subject body tags github_pull_request
-        is_member is_paid_organization is_paid_organization_staff received_at created_at updated_at])
+      bug_report.as_json(only: %w[id user_id email from_name receiver subject body tags status github_pull_request
+        is_member is_invoiced_organization is_invoiced_organization_staff received_at created_at updated_at])
+        .merge("images" => bug_report.images.map { image_json(it) })
+    end
+
+    # BlobUrl serves the CDN rather than a signed redirect, so the url doesn't expire
+    def image_json(image)
+      {filename: image.filename.to_s, byte_size: image.byte_size,
+       content_type: image.content_type, url: BlobUrl.for(image.blob)}
     end
   end
 end

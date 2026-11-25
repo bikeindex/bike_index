@@ -1,0 +1,394 @@
+---
+name: fixing-flaky-failures
+description: >-
+  How to fix a test that fails intermittently in Bike Index — one that passes
+  locally but fails on CI, fails on one shard, passes on re-run, or is already
+  tagged `:flaky`. **Read this before touching any spec that is failing
+  intermittently, and before adding, raising, or relying on a `flaky:` tag or a
+  `wait:` bump.** Trigger on a CI failure the user calls flaky, unreliable,
+  intermittent, "green locally", "passes on retry", "fix CI", or a pasted
+  `gh run`/Actions URL whose failure isn't reproducible; also whenever you catch
+  yourself about to delete, skip, loosen, or retry an assertion to make a red
+  build go green. **Equally: any spec that fails intermittently while you verify
+  your own work** — deciding whether your change caused a flake, or whether to
+  ship past one, is this skill's problem too, and it arrives with no CI run, no
+  `:flaky` tag, and nobody but you calling it flaky.
+---
+
+# Fixing flaky failures
+
+Covers diagnosing the real mechanism, attributing a flake to a change, this
+repo's `flaky:` retry harness, and the known false-flake causes — a missing
+Tailwind build, the shared Redis autocomplete cache, Turbo frame timing,
+probe-run interference.
+
+## Who runs this
+
+From a session with history, hand this skill to a subagent the way `AGENTS.md`'s **Who runs this** describes — no `model` override (finding the mechanism is judgment) — briefed with the failing spec and its CI run or output, what the branch changed, and anything already tried. It replies with the mechanism and the evidence for it, the fix left uncommitted in the working tree, and the runs that show it holds — or, if it couldn't reproduce, what it ruled out.
+
+## The rule that overrides everything else here
+
+**You may not reduce test coverage to make a flaky test pass.** Not as a last
+resort, not "temporarily", not when the coverage looks redundant, not when you
+have already decided the failing step is a harness artifact rather than a real
+bug.
+
+All of these are reducing coverage, and none of them is a fix:
+
+- Deleting an assertion, a step, a helper call, or a whole example.
+- Loosening a matcher so it can't fail (`have_css(count: 2)` → `have_css`,
+  an exact string → a regex, `have_no_content` → nothing).
+- `skip`/`pending`/`xit`, or excluding the spec from a CI shard.
+
+A flaky test is a *reporting* problem — the suite is telling you something real
+and telling you unreliably. Every item above changes the reporting and leaves
+the underlying behaviour untested.
+
+If the only fix you can see requires giving up coverage, that is a decision for
+the user — describe what you'd have to give up and ask. Do not make that trade
+yourself and mention it in the summary afterwards; announcing a scope reduction
+is not the same as getting agreement for it.
+
+The one exception that isn't an exception: if the assertion is *wrong* — it
+asserts behaviour the app never promised — then fixing it is correcting a bad
+test, not reducing coverage. Say explicitly why it was wrong.
+
+## Retries and longer waits: allowed, but earn them first
+
+`:flaky` (and raising an existing `flaky: N`) and a bigger `wait:` are a
+different category from the list above, because they keep every assertion and
+still require it to pass. Nothing goes untested. They're a legitimate last
+resort — reach for them when the diagnosis below has genuinely run out, not as
+the first thing you try.
+
+What "earn them" means in practice:
+
+- Diagnose first. Instrument, read the failure literally, check the known causes
+  below. Most flakes here have a mechanism you can find in one focused pass, and
+  a retry over a findable cause just makes it intermittent for longer.
+- Leave a comment saying what you found and why the retry stands in for a fix —
+  the harness artifact, the contention, the thing you ruled out. The existing
+  `flaky: 4` on `search_registrations_spec` is the pattern: it names the click
+  landing on `about:blank`, lists what it ruled out, and says it went
+  unreproduced under local CPU throttling. A bare `flaky: true` with no comment tells the
+  next person nothing and will outlive the problem.
+- Say plainly in your summary that you papered over it rather than fixed it, so
+  the user can decide whether that's good enough.
+
+Two signals that a retry is the *wrong* answer even as a last resort: an example
+that fails through all its retries (the cause is structural, and a bigger N won't
+help), and a wait you can't say what it's waiting for. A bump is honest when the
+assertion starts before the work does — a held route released, a job enqueued,
+an expensive response — and the comment names that.
+
+**`click_button(wait:)` doesn't extend the click.** It covers finding the button; the click, and its wait for the navigation it starts, gets `Capybara.default_max_wait_time`. `using_wait_time(10) { click_button ... }` covers both.
+
+## Diagnose before you touch anything
+
+### 1. Get the real failure, not the summary
+
+```bash
+gh run view <run-id> --repo bikeindex/bike_index --json jobs \
+  --jq '.jobs[] | "\(.databaseId) \(.name) \(.conclusion)"'
+gh run view --repo bikeindex/bike_index --job <job-id> --log-failed
+```
+
+The log is large and ANSI-coloured; pipe through `sed 's/\x1b\[[0-9;]*m//g'`
+and grep for `Failure/Error`, `expected`, and `rspec ./spec/...` to get the
+failing example ids and the actual message.
+
+**Then download the Capybara screenshot.** Every `:js` failure writes one, and
+`ci.yml` uploads `tmp/capybara/` to the shard's `test-results-<node-index>`
+artifact for exactly this — but the log names the file without saying it's
+fetchable, so it usually goes unread. It shows the page the failure saw, which
+routinely settles a mechanism the log can only hint at: what a click actually
+landed on, a frame still loading, a control in a state no step in the example set.
+
+```bash
+gh api repos/bikeindex/bike_index/actions/runs/<run-id>/artifacts \
+  --jq '.artifacts[] | "\(.id) \(.name)"'
+gh api repos/bikeindex/bike_index/actions/artifacts/<id>/zip > tmp/a.zip && unzip -o tmp/a.zip -d tmp/ci_artifact
+```
+
+### 2. Read the message literally
+
+The exact failure text usually names the mechanism, and it is easy to skim past
+into a wrong assumption. Worked example from this repo: `expected nil to match
+/\/bikes\/\d+/` was long assumed to mean "the click was lost". It doesn't — a nil
+`current_path` means the URL had no path for Capybara to return, which is three
+different browser states, not one (`capybara/session.rb:207`: nil for an `about:`
+scheme, then `path unless path&.empty?`):
+
+| URL | how it got there |
+| --- | --- |
+| `about:blank` | traversed to entry 0, or the page was replaced |
+| `chrome-error://chromewebdata` | a cross-document navigation failed outright |
+| `""` | no document has committed yet |
+
+All three screenshot blank, so the picture can't tell them apart — `tmp/capybara/browser_events.log`
+(written by `spec/support/capybara.rb`, uploaded with the screenshots) can. Check the
+matcher's source when a message is surprising, and don't read one of these three as
+another: the fix differs, and "about:blank" has been the standing wrong guess.
+
+### 3. Instrument rather than theorise
+
+When you can't reproduce, you can still make the browser tell you what happened.
+Copy the spec to a scratch file, record the events the app actually emits, and
+run it — a log beats an argument, and this routinely overturns the theory you
+were about to ship:
+
+```ruby
+page.execute_script(<<~JS)
+  window.__events = []
+  const stamp = (name, extra) => window.__events.push(Object.assign({name, t: Math.round(performance.now())}, extra))
+  document.addEventListener("turbo:before-fetch-response", (e) => {
+    stamp("response", {target: e.target?.id, url: e.detail?.fetchResponse?.response?.url, prevented: e.defaultPrevented})
+  })
+JS
+# ...drive the spec...
+# A file, not puts - rtk's rspec wrapper reports a summary and drops the run's stdout
+File.open("tmp/probe.log", "a") { |f| page.evaluate_script("window.__events").each { |e| f.puts e.inspect } }
+```
+
+Parameterise the scratch spec over the variable you suspect (`[0, 8].each do |delay|`
+around an injected `sleep`) so one run compares the fast and slow paths. Delete the
+scratch file when you're done. Two things this buys that reasoning doesn't: it
+distinguishes "the event never arrived" from "the event arrived and the assertion
+misread it", and it tells you *when* things happened, which is usually the answer.
+
+A click that succeeds on a retry reports nothing, and `DEBUG=pw:api` doesn't reach Ruby's stderr. Its
+action log is in a trace: `context.tracing.start(snapshots: false, screenshots: false)` before the click,
+`tracing.stop(path:)` after, then the `log` events in the zip's `trace.trace`. Keep only the traces from
+failing runs, as the failure can be rare.
+
+### 4. Try to reproduce, and treat failure-to-reproduce as information
+
+```bash
+for i in 1 2 3; do bundle exec rspec <the spec file> 2>&1 | grep -E "examples, " | tail -1; done
+```
+
+Keep that loop on the one spec file — escalating it to `bin/ci` costs minutes of
+parallel workers and browsers per iteration, and answers the same question no better.
+
+Green locally three times doesn't mean "not reproducible, add a retry". It
+narrows the cause to something CI has and you don't: **contention** (browser,
+Rails and Postgres sharing one runner) or **ordering** (a different seed,
+knapsack handing this shard a different set of files, or state left by another
+example). Reason about which, then look for the mechanism.
+
+For contention, slow the renderer rather than the machine — CPU hogs slow the Ruby
+side too, so a loop of runs takes minutes and the extra load is spent where the race
+isn't, and one backgrounded from a non-interactive shell survives `kill $(jobs -p)` —
+`pgrep -f` it. CDP throttles the browser alone, and the driver hands you a session:
+
+```ruby
+page.driver.with_playwright_page do |playwright_page|
+  session = playwright_page.context.new_cdp_session(playwright_page)
+  session.send_message("Emulation.setCPUThrottlingRate", params: {rate: 6})
+end
+```
+
+A rate that leaves the spec green over ~20 runs is evidence, not proof: it stretches
+main-thread work, not the network or a parallel shard's I/O.
+
+Which is why it can't reach a race about *when a response arrives*. The common one here
+is a lazily loaded Stimulus controller, since the module is a fetch — hold it on the
+route and the late connect is deterministic, no loop:
+
+```ruby
+playwright_page.route(%r{serial_controller}, ->(route, request) { held << request.url; sleep 1; route.continue })
+```
+
+Registering a route disables the http cache, so the reload asks again. Assert on what
+the handler held: a route that stops matching (a moved asset path) otherwise leaves the
+example green on a page that held nothing back. Measured against `register--serial`'s
+connect-time reconcile, throttling at 6, 12 and 25 left it green over 30+ runs; the
+route hold failed it every time.
+
+A `sleep` in the handler is still a race — it has to outlast whatever else the page is
+doing, and the duration that wins locally is not the one that wins on a loaded CI
+runner. When the spec can observe the state the module must arrive *after*, block the
+handler on a `Queue` and release it from the example instead:
+
+```ruby
+playwright_page.context.route(%r{parking_notification_form_controller}, proc { |route, request|
+  held << request.url
+  release.pop
+  route.continue
+})
+# ...only the accordion can reveal the panel, so this is it having already opened
+expect(page).to have_content("Set on map", wait: 10)
+release << :continue
+```
+
+Blocking the handler doesn't stall the driver, so Capybara still polls while it waits.
+
+Caveat when measuring locally: after a heavy record-creating run (seeding,
+probe scripts, a big suite), `:js` specs fail spuriously for a while. Re-measure
+in a quiet environment before concluding a spec is flaky.
+
+### 5. Blaming your own change needs both arms measured together
+
+"Is this spec flaky?" and "did my change make it flaky?" are different questions.
+The second one is where sequential sampling lies to you: local load drifts — a
+browser left open, another suite, the machine waking up — so a sample taken now
+and one taken an hour ago aren't comparable, and whichever arm ran while things
+were busy looks guilty.
+
+Revert *only* the suspect change and run both arms the same number of times, back
+to back, then compare. Measured that way here, a patch blamed for `:js` failures
+on sequential samples (0 failures in 9 clean runs against 5 in 13 patched ones)
+came out at 2/6 versus the baseline's 1/6 — indistinguishable, and the spec was
+flaky on its own. Sample sizes this small can't separate a 17% failure rate from
+a 7% one, so treat a handful of green runs as weak evidence in either direction.
+
+Ruling ordering out is cheap and worth doing first: RSpec prints `Randomized with
+seed N`, and `--seed N` replays that order. A failing seed that passes on replay
+leaves timing, not ordering or leaked state.
+
+Measure the "without the fix" arm against the base ref by name — `git checkout
+origin/main -- <paths>`. Once the fix is committed, `git checkout -- <paths>` restores
+*it*, so the arm you think is unpatched is the patched one, and a regression test that
+does fail without the fix reads as passing. An uncommitted fix that checkout
+overwrites outright, so save it first — `git diff HEAD -- <paths> > tmp/flaky_fix.patch`
+— and put it back with `git checkout HEAD -- <paths> && git apply tmp/flaky_fix.patch`.
+
+## Known causes in this repo
+
+Work through these before inventing a new theory — most flakes here are one of
+them, and several look like timing but aren't.
+
+**Not actually flaky — the environment is wrong.** A missing
+`app/assets/builds/tailwind.css` makes `tw:hidden` silently not apply, so
+visibility assertions fail in ways that read as flakes —
+`bin/rails tailwindcss:build` (see [`sandbox-test-setup`](../sandbox-test-setup/SKILL.md)).
+Same class of thing: an unmigrated test DB, a stale VCR cassette.
+
+A build that's *present but predates a merge* fails the same way and reads worse, because
+the class the failing spec needs is in the source and the whole suite is otherwise green —
+Tailwind only generates what the content scan saw, so a class arriving with the merge
+(`tw:h-64`, used by one preview) isn't in a build from before it. `bin/dev` down means no
+watcher, so its `app/assets/builds/*.css` mtime against the merge commit's is the check;
+`bin/rails tailwindcss:build` is the fix. Deterministic, not intermittent: three identical
+failures with no ordering component is this rather than a flake.
+
+**Shared state across examples.** The autocomplete cache (`autc:test:*`) lives
+in a Redis DB shared across `:js` examples and survives 600s, and `load_all`
+never invalidates it — so a stale entry from an earlier spec changes what a
+combobox returns. The fix is `Autocomplete::Loader.clear_redis` in `before`,
+not a retry. Browser history looks like the same shape and isn't: the driver closes
+the browser context between examples, so no entry outlives one. A spec that resets
+history is treating its own earlier steps as contamination — walk them the way a
+reader would instead, and note that entry 0 of every example is `about:blank`, which
+a traversal lands on as a nil `current_path`.
+
+**Interacting with a page whose controllers haven't connected.** `application.js`
+lazy loads every Stimulus controller, so a freshly rendered page answers to none of
+them until each module lands: a combobox filters nothing, a one-shot event (like
+form-persist's restore) reaches no listener, and a `fill_in`'s text can end up in
+whatever autofocus left focused. Waiting on any one controller proves nothing about
+the rest — `wait_for_stimulus` (`spec/support/integration_spec_helpers.rb`) waits for
+every identifier the page names, and **pass it the one you're about to interact with**
+(`wait_for_stimulus("shared-blocks--navbar")`): bare, it is vacuously true on a document
+that has parsed none yet, so it returns before that element even exists.
+A reload of a form with a saved draft runs the other way: form-persist's restore can land
+*after* the example has checked or typed, and puts the draft back over it — a tick after
+connect, so `wait_for_stimulus` doesn't cover it. Wait for a value the draft restores
+(`have_field(..., with:)`) first; `register_organized_spec`'s single-page example is the pattern.
+
+**Interacting before the legacy page script has bound.** The same shape, one era
+back: `init.coffee`'s `loadPageScript` constructs the per-page class in
+`$(document).ready`, while `click_link` returns with the new document still
+parsing — so an interaction landing between the two is swallowed with nothing on
+the page to say so. `wait_for_page_script`
+(`spec/support/integration_spec_helpers.rb`) waits on `window.pageScript`; reach for
+it after any navigation into a jQuery-driven control.
+
+**Filling a field while a turbo-stream renders.** Every stream render runs through Turbo's
+`withPreservedFocus`, which puts focus back a frame later on whatever held it when the render
+began — so a `fill_in` landing in that frame types into the field before it (the failure reads as
+one field empty and its neighbour holding both values). A multiselect pick's chip is one such
+stream: wait for it, as `combobox_select` in `spec/components/pages/search/form/component_system_spec.rb`
+does. An async combobox pick sends a filter request whose response can land several steps later;
+`click_combobox_option` waits that one out.
+
+**Clicking something that is being re-rendered.** The dominant `:js` flake.
+A Turbo frame that reloads (an eager frame, `reloadFrameIfUrlStale` on
+`turbo:load`, a broadcast morph) detaches the element mid-click, and the click
+lands nowhere. Fix it by waiting for the settled state the user would wait for,
+then clicking:
+
+```ruby
+expect(page).to have_css("turbo-frame#results_frame[complete]:not([busy])", wait: 10)
+retry_on_detach { first(".bike-box-item .title-link a").click }
+```
+
+`retry_on_detach` (`spec/support/integration_spec_helpers.rb`) rescues the raw
+`Playwright::Error` for a detached node, which Capybara's own retry does not.
+This is *not* a coverage reduction: the assertions are untouched, the click just
+happens on a DOM that has stopped moving.
+
+**A retried click moves the scroller it's in.** Each retry scrolls the target first — `inline: "end"`,
+then center, then start — so a click that finds its link `not stable` shifts the row before any mouse
+event, and `snap-mandatory` can carry it further. It reads as the app losing a scroll position. A hover
+transition left by a parked pointer is one source: `settle_animations` on the element that transitions,
+then click. `expect_sideways_cards` in `spec/integration/bikebook_spec.rb` is the pattern.
+
+**A probe that measures itself instead of the app.** When a spec observes
+behaviour by listening for an event, check whether what it reads is a property of
+the app or of the listener's position. `event.defaultPrevented` read *inside* a
+`document` listener only reflects `preventDefault` calls from listeners that
+already ran, so it reports registration order as much as the app's verdict.
+Measured in this repo, same event, same run: read in the listener `false`, read on
+the next tick `true`. Defer the read so every listener has had its turn:
+
+```js
+document.addEventListener("turbo:before-fetch-response", (event) => {
+  if (event.target?.id !== "results_frame") return
+  // Next tick: the verdict no longer depends on where this sits in the order
+  setTimeout(() => { document.body.dataset.testRejected = event.defaultPrevented ? "true" : "false" })
+})
+```
+
+Order is easy to invert without noticing, because the two sides have different
+lifetimes: `document` listeners survive a Turbo Drive body swap, while Stimulus
+controllers disconnect and re-add theirs at the *end* of the list on reconnect. So
+a probe registered before a Turbo visit ends up ahead of the controller it's
+watching. Two habits that keep this class of bug visible: record the verdict for
+both outcomes (`"true"`/`"false"`) rather than only writing the marker on success,
+so a wrong verdict fails loudly instead of timing out as if the event never
+arrived; and prefer asserting the user-visible consequence alongside the internal
+verdict.
+
+**Programmatic back/forward.** Playwright drives these specs and there is no
+BFCache, so a traversal onto a `turbo-action: advance` entry depends on Turbo's
+restoration visit finishing. Check for an app race before blaming the harness:
+`search_marketplace_spec`'s `:flaky` tag blamed `go_forward` no-op'ing, when `go_forward`
+never did and a frame's follow-up visit was cancelling the restoration, which a rider
+can hit too. Logging `popstate`, `turbo:before-visit` and `turbo:load` tells them apart.
+Prefer not to chain a real navigation onto the tail of a back/forward sequence. If a
+spec must, expect to need the settle-then-click pattern above.
+
+## What a finished fix looks like
+
+- The change names a mechanism ("the frame reloads on `turbo:load` and detaches
+  the link"), not a symptom ("this is flaky on CI").
+- You can explain why the fix addresses that mechanism, even though you probably
+  can't reproduce the original failure locally.
+- Or — where you fell back to a retry or a longer wait — you say so as the
+  headline rather than the footnote, and the comment in the spec records what you
+  ruled out, so the next person starts where you stopped.
+- Comments describing the flake are corrected if your diagnosis contradicts
+  them — a wrong comment sends the next person down the same wrong path.
+- CI is the only real verification; local green doesn't prove it.
+
+## Working on an already-tagged spec
+
+`flaky:` retries only run on CI (`RETRY_FLAKY`, see `spec/rails_helper.rb`).
+`flaky: true` retries twice; `flaky: <n>` overrides the count. So a plain
+`bundle exec rspec` doesn't retry (`bin/ci` sets `RETRY_FLAKY`), and a `flaky:`-tagged spec failing once locally is not
+automatically "the known flake" — it may be a plain reproducible failure that
+the tag has been hiding on CI.
+
+Removing a now-unnecessary `flaky:` tag after you've fixed the cause is good
+housekeeping — that direction adds signal rather than removing it.

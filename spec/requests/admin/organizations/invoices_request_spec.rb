@@ -19,18 +19,22 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
-    it "renders" do
+    it "renders in the organization tabs, with New Invoice top right" do
       get base_url
       expect(response.status).to eq(200)
       expect(response).to render_template(:index)
+      expect(response.body).to include(edit_admin_organization_path(organization, tab: "locations"))
+      expect(response.body).to include("href=\"#{base_url}/new\"")
     end
   end
 
   describe "new" do
-    it "renders" do
+    it "renders, without a New Invoice link to the page it's on" do
       get "#{base_url}/new"
       expect(response.status).to eq(200)
       expect(response).to render_template(:new)
+      expect(response.body).to include(edit_admin_organization_path(organization, tab: "locations"))
+      expect(response.body).to_not include("href=\"#{base_url}/new\"")
     end
     context "passed end_at" do
       let(:end_at) { Time.current + 10.years }
@@ -49,6 +53,16 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:edit)
     end
+
+    context "paid in full" do
+      let(:invoice) { FactoryBot.create(:invoice_paid, organization:) }
+
+      it "renders a PUT form for creating the following invoice" do
+        get "#{base_url}/#{invoice.to_param}/edit"
+        action = "#{base_url}/#{invoice.to_param}?create_following_invoice=true"
+        expect(Capybara.string(response.body)).to have_css("form[action='#{action}'] input[name=_method][value=put]", visible: :hidden)
+      end
+    end
   end
 
   describe "create" do
@@ -58,7 +72,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
       }.to change(Invoice, :count).by 1
       invoice = organization.invoices.last
       expect(invoice.active?).to be_falsey
-      expect(organization.is_paid).to be_falsey
+      expect(organization.is_invoiced).to be_falsey
       expect(organization.enabled_feature_slugs).to eq([])
       expect(invoice.organization_feature_ids).to match_array([organization_feature1.id, organization_feature2.id])
       expect(invoice.amount_due).to eq 1220
@@ -86,7 +100,7 @@ RSpec.describe Admin::Organizations::InvoicesController, type: :request do
           invoice = organization.invoices.last
           expect(invoice.paid_in_full?).to be_truthy
           expect(invoice.active?).to be_truthy
-          expect(organization.reload.is_paid).to be_truthy
+          expect(organization.reload.is_invoiced).to be_truthy
           expect(organization.enabled_feature_slugs).to eq(%w[parking_notifications passwordless_users])
           expect(invoice.organization_feature_ids).to match_array([organization_feature1.id, organization_feature2.id])
           expect(invoice.amount_due).to eq 0

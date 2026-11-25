@@ -26,15 +26,132 @@ RSpec.describe Admin::GraphsController, type: :request do
       end
     end
     context "bikes" do
-      it "renders" do
+      it "renders, leaving the tables to their lazy frames" do
         get base_url, params: {search_kind: "bikes"}
         expect(response.status).to eq(200)
         expect(response).to render_template(:index)
+        frames = Nokogiri::HTML(response.body).css("turbo-frame[loading=lazy]")
+        expect(frames.map { it["id"] }).to eq(Pages::Admin::Graphs::BikesTable::Component::KINDS.map { "bikes_table_#{it}" })
+
+        Pages::Admin::Graphs::BikesTable::Component::KINDS.each do |table_kind|
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", table_kind:}
+          expect(response.status).to eq(200)
+          frame = Nokogiri::HTML(response.body).at_css("turbo-frame#bikes_table_#{table_kind}")
+          expect(frame["src"]).to be_nil
+          expect(frame.css("table")).to be_present
+        end
+      end
+
+      context "with bikes registered different ways" do
+        let!(:sticker_bikes) { FactoryBot.create_list(:bike, 2, :with_ownership, creation_state_origin: "sticker") }
+        let!(:web_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "web") }
+        let(:origin_colors) { Pages::Admin::Graphs::BikesTable::Component::ORIGIN_COLORS }
+        # [origin, swatch color, bike count] per row of the origin table, as rendered
+        let(:origin_rows) do
+          Nokogiri::HTML(response.body).css("td span[style*='background-color']").map do |swatch|
+            [swatch.next_element.children.first.text.strip, swatch["style"][/#\h{6}/], swatch.parent.next_element.text.strip]
+          end
+        end
+
+        it "sorts the origin table highest count first, each swatch the chart's color for that origin" do
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "origin"}
+          expect(response.status).to eq(200)
+          expect(origin_rows.first(2)).to eq([["sticker", origin_colors["sticker"], "2"],
+            ["web", origin_colors["web"], "1"]])
+          # The origins with no bikes keep Ownership.origins order, rather than reshuffling
+          expect(origin_rows.map(&:first))
+            .to eq((%w[sticker web] | Ownership.origins).map { Ownership.creation_kind_humanized(it) })
+
+          get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "origin"}
+          expect(json_result.to_h { [it["name"], it["color"]] })
+            .to eq(origin_colors.transform_keys { Ownership.creation_kind_humanized(it) })
+          # Every origin gets a zero-filled series, not just the ones the grouped query found
+          totals = json_result.to_h { |series| [series["name"], series["data"].sum(&:last)] }
+          expect(totals).to eq(Ownership.origins.to_h { [Ownership.creation_kind_humanized(it), 0] }.merge("sticker" => 2, "web" => 1))
+        end
+      end
+
+      context "with bikes registered with the organization registration form settings" do
+        let!(:single_page_bikes) do
+          FactoryBot.create_list(:bike, 2, :with_ownership,
+            creation_registration_info: {register_single_page: true, register_separate_attestation: false})
+        end
+        let!(:both_bike) do
+          FactoryBot.create(:bike, :with_ownership,
+            creation_registration_info: {register_single_page: true, register_separate_attestation: true})
+        end
+        let!(:web_bike) { FactoryBot.create(:bike, :with_ownership) }
+        let!(:organization_form_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "organization_form") }
+        let!(:embed_bike) { FactoryBot.create(:bike, :with_ownership, creation_state_origin: "embed") }
+        # The label without the origin's description tooltip
+        let(:setting_rows) do
+          document = Nokogiri::HTML(response.body).tap { it.css("[data-controller='ui--tooltip']").each(&:remove) }
+          document.css("tbody tr").map { |row| row.css("td").map { it.text.strip } }
+        end
+
+        it "counts the bikes registered with each, and on the legacy org form" do
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "register_setting"}
+          expect(response.status).to eq(200)
+          expect(setting_rows).to eq([["Separate attestation", "1"], ["Single page", "3"], ["legacy org form", "1"]])
+
+          get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "register_setting"}
+          expect(json_result.map { [it["name"], it["data"].sum(&:last)] })
+            .to eq([["Separate attestation", 1], ["Single page", 3], ["legacy org form", 1]])
+        end
+      end
+
+      context "with bikes registered from the iOS app" do
+        let!(:bikes_old_version) do
+          FactoryBot.create_list(:bike, 2, :with_ownership, creation_registration_info: {ios_version: "1.6.9"})
+        end
+        let!(:bike_new_version) { FactoryBot.create(:bike, :with_ownership, creation_registration_info: {ios_version: "2.0.1"}) }
+        let!(:web_bike) { FactoryBot.create(:bike, :with_ownership) }
+        let(:ios_version_rows) do
+          Nokogiri::HTML(response.body).css("tr").map { |row| row.css("td").map { it.text.strip } }
+            .select { |cells| cells.first&.match?(/\A\d+\.\d+\.\d+\z/) }
+        end
+
+        it "counts bikes by iOS version, highest count first" do
+          get "#{base_url}/bikes_table", params: {search_kind: "bikes", period: "week", table_kind: "ios_version"}
+          expect(response.status).to eq(200)
+          expect(ios_version_rows).to eq([%w[1.6.9 2], %w[2.0.1 1]])
+
+          get "#{base_url}/variable", params: {search_kind: "bikes", period: "week", bike_graph_kind: "ios_version"}
+          expect(json_result.map { [it["name"], it["data"].sum(&:last)] })
+            .to eq([["iOS 1.6.9", 2], ["iOS 2.0.1", 1]])
+        end
       end
     end
   end
 
+  describe "logged_searches" do
+    before { RedisPool.conn { |r| r.del(Counts::STORAGE_KEY) } }
+
+    let(:request_at) { Time.current.beginning_of_day }
+    let!(:bikebook_search) { FactoryBot.create(:logged_search, endpoint: :web_bikebook, serial_normalized: "XXX", request_at:) }
+    let!(:comparison_searches) { FactoryBot.create_list(:logged_search, 2, endpoint: :web_bikebook, query_items: {vehicle_models: "m/a/2025/b,m/c/2025/d"}, request_at:) }
+    let!(:serial_search) { FactoryBot.create(:logged_search, endpoint: :web_bikes, serial_normalized: "XXX", request_at:) }
+    let!(:no_serial_searches) { FactoryBot.create_list(:logged_search, 2, endpoint: :api_v3_bikes, request_at:) }
+    let!(:ebike_rules_searches) { FactoryBot.create_list(:logged_search, 3, endpoint: :web_ebike_rules, request_at:) }
+    let!(:marketplace_searches) { FactoryBot.create_list(:logged_search, 4, endpoint: :web_marketplace, request_at:) }
+    let!(:marketplace_serial_search) { FactoryBot.create(:logged_search, endpoint: :web_marketplace, serial_normalized: "XXX", request_at:) }
+    let!(:organized_serial_search) { FactoryBot.create(:logged_search, endpoint: :org_bikes, serial_normalized: "XXX", request_at:) }
+
+    it "charts the stored counts: bikebook searches, comparisons and ebike rules searches, and the rest split by org, user, serial and marketplace" do
+      Counts.assign_logged_searches
+      get "#{base_url}/logged_searches", params: {search_endpoint: "web_bikebook", period: "week"}
+      expect(response.status).to eq(200)
+      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["Bike Book", 1], ["Comparisons", 2], ["E-bike rules", 3]])
+
+      get "#{base_url}/logged_searches", params: {search_endpoint: "not_web_bikebook", period: "week"}
+      expect(response.status).to eq(200)
+      expect(json_result.map { [it["name"], it["data"].sum(&:last)] }).to eq([["Org", 0], ["Org serial", 1], ["User", 2], ["User serial", 1], ["Marketplace", 5]])
+    end
+  end
+
   describe "tables" do
+    include_context :geocoder_default_location
+    include_context :geocoder_stubbed_bounding_box
     it "renders" do
       get "#{base_url}/tables"
       expect(response.status).to eq(200)
@@ -42,6 +159,7 @@ RSpec.describe Admin::GraphsController, type: :request do
       get "#{base_url}/tables", params: {location: "San Francisco, CA"}
       expect(response.status).to eq(200)
       expect(response).to render_template(:tables)
+      expect(response.body).to include("within 100 miles of")
     end
   end
 
@@ -56,7 +174,7 @@ RSpec.describe Admin::GraphsController, type: :request do
       it "returns json" do
         get "#{base_url}/variable", params: {search_kind: "users", timezone: "America/Los_Angeles", period: "all"}
         expect(response.status).to eq(200)
-        expect(json_result.is_a?(Array)).to be_truthy
+        expect(json_result.map { it["name"] }).to eq(["Users"])
         expect(assigns(:start_time)).to be_within(1.day).of earliest_time
         expect(assigns(:end_time)).to be_within(1.minute).of Time.current
       end
@@ -79,7 +197,7 @@ RSpec.describe Admin::GraphsController, type: :request do
       it "returns json" do
         get "#{base_url}/variable", params: {search_kind: "recoveries", timezone: "America/Los_Angeles"}
         expect(response.status).to eq(200)
-        expect(json_result.is_a?(Array)).to be_truthy
+        expect(json_result.map { it["name"] }).to eq(["Recoveries"])
         expect(assigns(:start_time)).to be_within(1.day).of(Time.current - 1.year)
         expect(assigns(:end_time)).to be_within(1.minute).of Time.current
       end

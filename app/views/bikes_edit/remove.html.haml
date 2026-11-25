@@ -63,7 +63,8 @@
             %hr
 
             .delete-from-index.no-divider-row
-              = link_to bike_version_path(@bike_version), method: :delete, confirm: "Are you sure?" do
+              = render(UI::ButtonLink::Component.new(href: bike_version_path(@bike_version), color: :link,
+                method: :delete, confirm: "Are you sure?")) do
                 = render "/shared/trash_icon"
                 = t(".delete_this_version_html", version_name: @bike.display_name)
           - else
@@ -111,7 +112,8 @@
 - modal_body = capture_haml do
   = form_tag do |t|
     .modal-body
-      = render partial: "shared/alert", locals: { body: t(".reason_modal_body", bike_type: @bike.type), title: t(".reason_modal_title"), class_names: "currently-hidden" }
+      .modal-validation-alert{class: "tw:hidden"}
+        = render(UI::Alerts::Base::Component.new(kind: :error, header: t(".reason_modal_title"), text: t(".reason_modal_body", bike_type: @bike.type)))
       = hidden_field_tag :bike_delete_bike_id, @bike.id
 
       .form-group

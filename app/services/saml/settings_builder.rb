@@ -6,7 +6,6 @@ module Saml
     extend Functionable
 
     HTTP_POST = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-POST"
-    HTTP_REDIRECT = "urn:oasis:names:tc:SAML:2.0:bindings:HTTP-Redirect"
 
     def build(saml_configuration)
       settings = OneLogin::RubySaml::Settings.new
@@ -27,16 +26,22 @@ module Saml
     #
     # private below here
     #
-    def single_logout_service_url(saml_configuration)
-      "#{base_url}/sso/#{slug(saml_configuration)}/slo"
-    end
-
     def sp_certificate
-      ENV["SAML_SP_CERTIFICATE"].presence
+      pem_from_env("SAML_SP_CERTIFICATE")
     end
 
     def sp_private_key
-      ENV["SAML_SP_PRIVATE_KEY"].presence
+      pem_from_env("SAML_SP_PRIVATE_KEY")
+    end
+
+    # Kamal writes each secret as one `KEY=value` line, so deploy environments carry the PEM
+    # base64-encoded. Strict, so a mangled secret raises rather than silently dropping the
+    # KeyDescriptor from our metadata
+    def pem_from_env(name)
+      value = ENV[name].presence
+      return value if value.nil? || value.start_with?("-----BEGIN")
+
+      Base64.strict_decode64(value.gsub(/\s/, ""))
     end
 
     def slug(saml_configuration)
@@ -51,8 +56,6 @@ module Saml
       settings.sp_entity_id = sp_entity_id(saml_configuration)
       settings.assertion_consumer_service_url = assertion_consumer_service_url(saml_configuration)
       settings.assertion_consumer_service_binding = HTTP_POST
-      settings.single_logout_service_url = single_logout_service_url(saml_configuration)
-      settings.single_logout_service_binding = HTTP_REDIRECT
       settings.certificate = sp_certificate
       settings.private_key = sp_private_key
     end
@@ -75,11 +78,15 @@ module Saml
       settings.soft = true # collect validation errors instead of raising
       settings.security[:want_assertions_signed] = true
       settings.security[:authn_requests_signed] = true
+      # Metadata-only in ruby-saml: adds the encryption KeyDescriptor so an IdP that encrypts
+      # has a key to encrypt to. It requires nothing — decryption runs off the SP private key
+      # whenever an EncryptedAssertion arrives, set or not.
+      settings.security[:want_assertions_encrypted] = true
       settings.security[:digest_method] = XMLSecurity::Document::SHA256
       settings.security[:signature_method] = XMLSecurity::Document::RSA_SHA256
     end
 
-    conceal :single_logout_service_url, :sp_certificate, :sp_private_key, :slug,
+    conceal :sp_certificate, :sp_private_key, :pem_from_env, :slug,
       :base_url, :assign_sp, :assign_idp, :assign_security
   end
 end

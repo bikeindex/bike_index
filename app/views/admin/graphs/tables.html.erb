@@ -1,0 +1,46 @@
+<% sortable_params = graphs_sortable_params %>
+
+<% if current_user.superuser? %>
+  <%= render partial: "admin/graphs/graphs_subnav", locals: {location_count: true, sortable_params: sortable_params} %>
+<% end %>
+
+<div class="tw:mb-6">
+  <%= form_with(url: tables_admin_graphs_path, method: :get, html: {class: "twsearchrow"}) do |f| %>
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :location,
+      html_options: {value: params[:location], placeholder: "Location"}) %>
+
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :location_radius,
+      html_options: {value: params[:location_radius], placeholder: "Proximity in miles", class: "tw:w-full tw:sm:w-48"}) %>
+
+    <%= hidden_field_tag :tables, true %>
+    <%= render UI::Button::Component.new(text: "Load", color: :primary, type: "submit", name: "search") %>
+  <% end %>
+</div>
+
+<%= render(UI::Header::Component.new(text: "Records everywhere", tag: :h2)) %>
+
+<p class="tw:mb-4">
+  The <span class="less-strong">data in this color</span> is (simplified, not
+  accounting for seasonalness) projections for the end of the current year
+</p>
+
+<%= render(Pages::Admin::Graphs::YearCounts::Component.new) %>
+
+<% if @bounding_box.present? %>
+  <% location_title = capture do %>
+    Records <em>within <%= @location_radius %> miles of</em>
+    <strong><%= params[:location] %></strong>
+  <% end %>
+
+  <%= render(UI::Header::Component.new(text: location_title, tag: :h3)) %>
+
+  <div class="tw:mt-4">
+    <%= render(Pages::Admin::Graphs::YearCounts::Component.new(bounding_box: @bounding_box)) %>
+  </div>
+<% else %>
+  <%= render(UI::Header::Component.new(text: tag.em("Add a location to the search section at the top of the page to see stats about that location"), tag: :h2)) %>
+
+  <% if params[:location].present? %>
+    <%= render(UI::Header::Component.new(text: "The location and proximity you entered weren't useable. Try again.", tag: :h3)) %>
+  <% end %>
+<% end %>

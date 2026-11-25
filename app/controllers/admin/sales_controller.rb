@@ -5,7 +5,7 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 50)
       @pagy, @collection = pagy(:countish,
-        matching_sales.includes(:seller, :ownership).reorder(sortable_opts),
+        matching_sales.includes(:seller, :buyer, :ownership).reorder(sortable_opts),
         limit: @per_page,
         page: permitted_page)
     end
@@ -24,7 +24,7 @@ module Admin
     end
 
     def sortable_opts
-      "sales.#{sort_column} #{sort_direction}"
+      sortable_order(Sale)
     end
 
     def earliest_period_date

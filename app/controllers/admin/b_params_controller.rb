@@ -6,7 +6,7 @@ module Admin
       @per_page = permitted_per_page
       @pagy, @b_params = pagy(:countish, matching_b_params
         .includes(:creator, :organization)
-        .reorder("b_params.#{sort_column} #{sort_direction}"), limit: @per_page, page: permitted_page)
+        .reorder(sortable_order(BParam)), limit: @per_page, page: permitted_page)
     end
 
     def show
@@ -32,6 +32,8 @@ module Admin
       else
         @search_completeness = "all"
       end
+      @education_course_in_progress = Binxtils::InputNormalizer.boolean(params[:search_education_course_in_progress])
+      matching_b_params = matching_b_params.education_course_in_progress if @education_course_in_progress
       matching_b_params = matching_b_params.where(organization_id: current_organization.id) if params[:organization_id].present?
       matching_b_params = matching_b_params.email_search(params[:query]) if params[:query].present?
       matching_b_params.where(created_at: @time_range)

@@ -1,17 +1,17 @@
 class MembershipsController < ApplicationController
   before_action :store_return_and_authenticate_user, only: %i[edit]
 
-  layout "payments_layout"
-
   def new
-    if current_user&.membership_active.present?
-      redirect_to edit_membership_path
-    end
     @initial_level = params[:membership_level]
     @referral_source = referral_source_from_params
+    @stripe_prices = StripePrice.active_for(current_currency)
   end
 
   def create
+    if current_user&.membership_active.present?
+      return redirect_to(my_account_membership_path, notice: translation(:already_a_member))
+    end
+
     stripe_price = StripePrice.active.where(stripe_price_parameters).first
     stripe_subscription = StripeSubscription.create_for(stripe_price:, user: current_user,
       referral_source: referral_source_from_params)
@@ -19,21 +19,13 @@ class MembershipsController < ApplicationController
   end
 
   def success
-    render layout: "application"
   end
 
   def edit
-    if current_user.membership_active.present?
-      if current_user.membership_active.admin_managed?
-        flash[:notice] = translation(:free_membership)
-        redirect_to my_account_path
-      else
-        redirect_to(current_user.membership_active.stripe_portal_session.url, allow_other_host: true)
-      end
-    else
-      flash[:notice] = translation(:no_active_membership)
-      redirect_to new_membership_path
-    end
+    membership = current_user.membership_active
+    return redirect_to(my_account_membership_path) unless membership&.stripe_managed?
+
+    redirect_to(membership.stripe_portal_session.url, allow_other_host: true)
   end
 
   private

@@ -1,0 +1,8 @@
+<%= render(UI::Container::Component.new(**options)) do %>
+  <%= render(UI::Card::Component.new) do %>
+    <%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name)) %>
+      <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :description, kind: :text_area)) %>
+    <% end %>
+  <% end %>
+<% end %>

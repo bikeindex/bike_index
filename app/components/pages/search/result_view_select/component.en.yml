@@ -1,0 +1,8 @@
+---
+en:
+  components:
+    pages:
+      search:
+        result_view_select:
+          cards_view: View as cards
+          list_view: View as list

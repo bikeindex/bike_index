@@ -7,13 +7,13 @@ module Admin
     def index
       @per_page = permitted_per_page(default: 100)
       @pagy, @stolen_notifications = pagy(:countish, searched_stolen_notifications
-        .reorder("#{sort_column} #{sort_direction}")
+        .reorder(sortable_order(StolenNotification))
         .includes(:bike), limit: @per_page, page: permitted_page)
     end
 
     def resend
       if (@stolen_notification.send_dates_parsed.count == 0) || params[:pretty_please]
-        Email::StolenNotificationJob.perform_async(@stolen_notification.id, true)
+        EmailJobs::StolenNotificationJob.perform_async(@stolen_notification.id, true)
         flash[:success] = "Notification resent!"
         redirect_to admin_stolen_notifications_url
       else
@@ -23,7 +23,7 @@ module Admin
     end
 
     def show
-      @bike = @stolen_notification.bike
+      @bike = Bike.unscoped.find_by(id: @stolen_notification.bike_id)
     end
 
     def find_notification

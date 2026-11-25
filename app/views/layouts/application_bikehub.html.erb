@@ -3,7 +3,7 @@
 
 <html lang="<%= I18n.locale %>" style="background: #fff; padding-bottom: 40px;">
   <head>
-    <%= render(PageBlock::HeaderTags::Component.new(**header_tags_component_options)) %>
+    <%= render(SharedBlocks::HeaderTags::Component.new(**header_tags_component_options)) %>
     <%= csrf_meta_tags %>
     <%= stylesheet_link_tag 'revised', media: 'all' %>
     <%= tag.meta name: "honeybadger-api-key", content: ENV["HONEYBADGER_FRONTEND_API_KEY"] %>
@@ -33,7 +33,7 @@
     </script>
   </head>
 
-  <body id="<%= page_id %>" class="<%= body_class %>" style="padding-top: 0;">
+  <%= body_tag(style: "padding-top: 0;") do %>
     <%# This is either the signup or signin page %>
     <% signup_page = controller_name != "sessions" %>
 
@@ -129,7 +129,7 @@
         </div>
       </div>
     </div>
-  </body>
+  <% end %>
 
   <%= render "/shared/analytics" %>
 

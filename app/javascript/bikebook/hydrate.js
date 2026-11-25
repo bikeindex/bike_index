@@ -1,0 +1,277 @@
+import { html, nothing } from 'lit-html'
+import { localSources } from 'utils/hw_combobox_patch'
+import { renderChips, renderCounts } from 'bikebook/catalog'
+import { numberDisplay } from 'bikebook/templates/helpers'
+import { filterOption } from 'bikebook/templates/filter_option'
+import { pickedClassifications, renderClassCards } from 'bikebook/templates/vehicles/class_cards'
+import { tooltip } from 'bikebook/templates/ui/tooltip'
+import { FILTERS, LISTS, RANGES, SINGLES, ordered, searching, toQuery } from 'bikebook/query'
+import { fragmentOf, renderInto } from 'bikebook/render'
+import { preferredSize } from 'bikebook/sizes'
+import { groupId, vehicleIds } from 'bikebook/vehicle_models'
+import { settingsFrom } from 'bikebook/similarity'
+import { chosenPhotos, MAX_COMPARE, VehicleViewer } from 'bikebook/vehicle_viewer'
+
+/* global CSS */
+
+const combobox = (root, name) => root.getElementById(`${name}-hw-hidden-field`).closest('.hw-combobox')
+const panelOf = (root) => root.querySelector('[data-controller~="bikebook--catalog-filters"]')
+const MARKET_ATTRIBUTE = 'data-bikebook--catalog-filters-default-market-value'
+// CycleType::NOT_CYCLE_TYPE, by the catalog's slugs
+const NOT_CYCLE_TYPE = ['e-scooter', 'non-e-skateboard', 'personal-mobility', 'stroller', 'wheelchair', 'e-motorcycle', 'e-atv']
+const JURISDICTION_ATTRIBUTE = 'data-bikebook--catalog-filters-default-jurisdiction-value'
+
+// "Select an e-scooter, choose multiple to compare them" once the first of `vehicles` is one that isn't a bike, both
+// where the search is labelled and its dialog on a phone. The catalog names types in English, which picks the article
+const labelSearch = (root, { vehicle_type: types }, [first]) => {
+  const type = first?.data.type && first.data.type !== 'bike' && types.find(({ value }) => value === first.data.type)?.display.toLowerCase()
+  if (!type) return
+  const label = root.getElementById('vehicle-models-label')
+  const text = label.dataset[/^(?!uni)[aeiou]/.test(type) ? 'anType' : 'aType'].replace('%{bike_type}', type)
+  label.textContent = text
+  combobox(root, 'vehicle_models').querySelector('.hw-combobox__dialog__label').textContent = text
+}
+
+// The fields as `filters` set them, none of which needs the catalog
+const fillFields = (root, filters) => {
+  panelOf(root).setAttribute('data-bikebook--catalog-filters-sort-value', filters.sort === 'price' ? 'price' : 'year')
+  panelOf(root).setAttribute('data-bikebook--catalog-filters-year-dir-value', filters.year_dir === 'asc' ? 'asc' : 'desc')
+  panelOf(root).setAttribute('data-bikebook--catalog-filters-price-dir-value', filters.price_dir === 'desc' ? 'desc' : 'asc')
+  for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-hidden-field`).setAttribute('value', filters[name])
+  for (const name of RANGES) root.querySelector(`input[name="${name}"]`).setAttribute('value', filters[name])
+  const scope = root.querySelector(`input[name="market_scope"][value="${CSS.escape(filters.market_scope)}"]`) ?? root.querySelector('input[name="market_scope"][value=""]')
+  for (const input of root.querySelectorAll('input[name="market_scope"]')) input.toggleAttribute('checked', input === scope)
+  const { jurisdiction } = filters
+  const state = root.querySelector(`#jurisdiction-hw-listbox [role="option"][data-value="${CSS.escape(jurisdiction)}"]`)
+  if (state) {
+    root.getElementById('jurisdiction-hw-hidden-field').setAttribute('value', jurisdiction)
+    combobox(root, 'jurisdiction').dataset.hwComboboxPrefilledDisplayValue = state.dataset.autocompletableAs
+  }
+  // evc/out-of-class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
+  for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
+}
+
+// The e-bike classes legal where the visitor is. In the US, the electric filter's values for those of the jurisdiction the
+// filters pick or the visitor is in, whose checkboxes are the US's for a state without its own; elsewhere the market's
+// e-bike law, none where the catalog has none
+const legalClasses = (root, filters, { e_vehicle_classifications: classifications }) => {
+  if (filters.market && filters.market !== 'US') {
+    return Object.keys(classifications).filter((id) => classifications[id].e_bike_law && classifications[id].jurisdiction === filters.market)
+  }
+  const classes = root.querySelector(`[data-jurisdiction="${CSS.escape(filters.jurisdiction)}"]`) ?? root.querySelector('[data-jurisdiction="US"]')
+  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'evc/out-of-class')
+}
+
+// `url`'s filters, its ranges in order and an older link's "all" markets as any, without which the market and the
+// jurisdiction - a state's abbreviation, or US - are the panel's defaults
+const urlFilters = (root, url) => {
+  const filters = ordered(Object.fromEntries(FILTERS.map((name) => [name, url.searchParams.get(name) ?? ''])))
+  const all = filters.market === 'all'
+  return {
+    ...filters,
+    market: (!all && filters.market) || panelOf(root).getAttribute(MARKET_ATTRIBUTE),
+    market_scope: all ? 'any' : filters.market_scope,
+    jurisdiction: filters.jurisdiction || panelOf(root).getAttribute(JURISDICTION_ATTRIBUTE)
+  }
+}
+
+// as the catalog reads them: a renamed slug as its new one, and a value naming no option dropped
+const filtersAt = ({ vocabulary: { kit }, options }, root, url) => {
+  const filters = urlFilters(root, url)
+  return {
+    ...filters,
+    ...Object.fromEntries(LISTS.map((name) => {
+      const values = new Set(options[name].map(({ value }) => value))
+      const slugs = filters[name].split(',').map((value) => kit.slug_aliases[name]?.[value] ?? value)
+      return [name, [...new Set(slugs.filter((value) => values.has(value)))].join(',')]
+    }))
+  }
+}
+
+// With nothing picked, the `count` of models `filters` leave, the ones featured, and whether filters narrow it
+const unpicked = async (catalog, root, filters) => ({
+  ...await catalog.featured(filters, legalClasses(root, filters, catalog.vocabulary)),
+  // the market narrows every visitor's search, so it's no filter of theirs
+  filtered: [...LISTS, ...SINGLES, ...RANGES, 'electric'].some((name) => name !== 'market' && filters[name])
+})
+
+// The vehicles' place with nothing picked, for `url`'s filters, which change in `page` without rendering it afresh, and
+// no similar models' adjustments for the filters to hold
+export async function unpickedVehicles (catalog, page, url) {
+  const filters = filtersAt(catalog, page, url)
+  return { vehicles: new VehicleViewer(catalog.vocabulary, filters).render([], url, null, await unpicked(catalog, page, filters)), adjustments: nothing }
+}
+
+const pickedOf = (catalog, url, { market }) => catalog.vehicles(vehicleIds(url), { market })
+
+// The models most like the first of `vehicles` where the catalog publishes what it compares, scored once their section
+// is open, of those the `filters` leave. `waiting`, until the comparison says whether it does
+const similarOf = async (catalog, url, vehicles, filters) => {
+  if (catalog.comparable === false || !vehicles.length) return null
+  if (catalog.comparable === undefined) return { waiting: true }
+  const settings = settingsFrom(url.searchParams)
+  return { ...settings, results: url.searchParams.get('similar') === '1' ? await catalog.similar(vehicles[0].value, settings, filters) : undefined }
+}
+
+// What opens and adjusts the similar models, from beside their section
+const renderSimilarControls = (root, viewer, vehicles, similar) => {
+  const toggle = viewer.compareToggle(vehicles, similar)
+  for (const slot of root.querySelectorAll('[data-similar-slot]')) renderInto(slot, toggle)
+  renderInto(root.querySelector('#similar-adjustments'), viewer.similarAdjustments(vehicles, similar))
+}
+
+// The similar models' cards for `vehicle` by its `settings`, which change without rendering the page afresh
+export async function rescoredSimilar (catalog, page, url, vehicle, settings) {
+  const filters = filtersAt(catalog, page, url)
+  const [picks, results] = await Promise.all([pickedOf(catalog, url, filters), catalog.similar(vehicle, settings, filters)])
+  return new VehicleViewer(catalog.vocabulary, filters).similarResults(url, results, chosenPhotos(url, picks))
+}
+
+// the model group `url`'s overview shows, of one of its vehicles, in the `filters`' market
+const groupOf = (catalog, url, filters) => {
+  const id = groupId(url)
+  const view = url.searchParams.get('view')
+  return vehicleIds(url).slice(0, MAX_COMPARE).includes(id) && (!view || view === 'basics') ? catalog.group(id, filters) : null
+}
+
+// The picked vehicles' place for `url`'s jurisdiction, which decides which are out of class there, and market, which
+// which are sold elsewhere, and the similar models' adjustments for the filters' card
+export async function pickedVehicles (catalog, page, url) {
+  const filters = filtersAt(catalog, page, url)
+  const [found, group] = await Promise.all([pickedOf(catalog, url, filters), groupOf(catalog, url, filters)])
+  const vehicles = found.slice(0, MAX_COMPARE)
+  const viewer = new VehicleViewer(catalog.vocabulary, filters)
+  const similar = await similarOf(catalog, url, vehicles, filters)
+  return { vehicles: viewer.render(vehicles, url, preferredSize(), {}, { group, similar }), adjustments: viewer.similarAdjustments(vehicles, similar) }
+}
+
+// What the comparison adds to `page`, rendered at `url` without it: the frame materials and, unless `current` says it's
+// since rendered with them, picked vehicles' similar ones. In place, as the reader may be typing in the search
+export async function addComparison (catalog, page, url, current) {
+  page.querySelector('#frame_material-hw-listbox').append(fragmentOf(catalog.options.frame_material.map(filterOption)))
+  const filters = filtersAt(catalog, page, url)
+  const vehicles = (await pickedOf(catalog, url, filters)).slice(0, MAX_COMPARE)
+  const similar = await similarOf(catalog, url, vehicles, filters)
+  if (!vehicles.length || !current()) return
+
+  const viewer = new VehicleViewer(catalog.vocabulary, filters)
+  page.querySelector('[data-similar-waiting]')?.remove()
+  page.querySelector('#vehicle-viewers').prepend(fragmentOf(viewer.similarModels(vehicles[0], similar, url, chosenPhotos(url, vehicles))))
+  renderSimilarControls(page, viewer, vehicles, similar)
+}
+
+// The page at `url` while the catalog loads: its filters live and filled in from the URL, their values as it has them, and
+// its comboboxes, whose options are the catalog's, disabled. `status` stands in for the vehicles
+export function loadingShell (shell, url, status) {
+  const root = shell.content.cloneNode(true)
+  const panel = panelOf(root)
+  panel.hidden = !searching(url)
+  const filters = urlFilters(root, url)
+  fillFields(root, filters)
+  // the search, which answers from the catalog, and a filter holding what only the catalog names, rather than the Any it isn't
+  for (const name of ['vehicle_models', ...[...LISTS, ...SINGLES].filter((each) => filters[each] ?? url.searchParams.get(each))]) {
+    const field = combobox(root, name)
+    const input = field.querySelector('.hw-combobox__input')
+    field.dataset.hwComboboxPrefilledDisplayValue = ''
+    input.placeholder = panel.dataset.loadingPlaceholder
+    input.dataset.awaitingCatalog = ''
+  }
+  for (const field of root.querySelectorAll('.hw-combobox')) {
+    field.inert = true
+    field.querySelector('.hw-combobox__input').disabled = true
+    // the catalog names its chips and answers its searches once it's in, rather than the server
+    localSources.set(field, { chips: () => {}, filter: () => {} })
+  }
+  root.getElementById('vehicle-viewers').append(status)
+  return root
+}
+
+// The loading shell with `url`'s picked vehicles, which `picks` has before the index that names them for a chip and says
+// where they're sold, where it has any of them
+export async function picksShell (picks, shell, url, status) {
+  const root = loadingShell(shell, url, status)
+  const found = await pickedOf(picks, url, {})
+  const vehicles = found.slice(0, MAX_COMPARE).map((vehicle) => ({ ...vehicle, display: `${vehicle.data.manufacturer} ${vehicle.data.model}` }))
+  if (!vehicles.length) return { content: root }
+
+  renderChips(combobox(root, 'vehicle_models'), vehicles)
+  const viewers = root.getElementById('vehicle-viewers')
+  const viewer = new VehicleViewer(picks.vocabulary, urlFilters(root, url))
+  const similar = await similarOf(picks, url, vehicles)
+  renderInto(viewers, viewer.render(vehicles, url, preferredSize(), {}, { similar }))
+  renderSimilarControls(root, viewer, vehicles, similar)
+  viewers.append(status)
+  return { content: root, title: vehicles[0].display }
+}
+
+const optionFragments = new WeakMap()
+
+// Some thousand options, rendered once for each list of them and cloned for every render after
+const optionsOf = (options) => {
+  if (!optionFragments.has(options)) optionFragments.set(options, fragmentOf(options.map(filterOption)))
+  return optionFragments.get(options).cloneNode(true)
+}
+
+// The page at `url`: the shell, with the catalog's filter options, filled in from the URL. Its
+// comboboxes answer from the catalog: the vehicle combobox through `source`, the filters' chips
+// from their own options
+export async function hydrate (catalog, source, shell, url) {
+  const root = shell.content.cloneNode(true)
+  panelOf(root).hidden = !searching(url)
+  for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-listbox`).append(optionsOf(catalog.options[name]))
+
+  // the visitor's country, when it's a market with models
+  const panel = panelOf(root)
+  const located = panel.getAttribute(MARKET_ATTRIBUTE)
+  panel.setAttribute(MARKET_ATTRIBUTE, catalog.options.market.some(({ value }) => value === located) ? located : '')
+  const filters = filtersAt(catalog, root, url)
+  const [found, { filteredCount }, group] = await Promise.all([pickedOf(catalog, url, filters), catalog.search(filters, 0, 0), groupOf(catalog, url, filters)])
+  const vehicles = found.slice(0, MAX_COMPARE)
+  const classifications = catalog.vocabulary.e_vehicle_classifications
+  const cards = pickedClassifications(url, classifications)
+  const values = [...vehicles.map(({ value }) => value), ...cards].join(',')
+
+  renderCounts(root, filteredCount)
+  labelSearch(root, catalog.options, vehicles)
+  panel.setAttribute('data-bikebook--catalog-filters-cycle-value', !NOT_CYCLE_TYPE.includes(vehicles[0]?.data.type))
+  const manufacturers = catalog.options.manufacturer.length
+  renderInto(root.getElementById('manufacturer-count'),
+    html`(${numberDisplay(manufacturers)} ${tooltip({ text: `${manufacturers.toLocaleString('en-US')} manufacturers have models in the catalog` })})`)
+
+  const query = toQuery({ ...filters, vehicle_models: values })
+  combobox(root, 'vehicle_models').dataset.hwComboboxAsyncSrcValue = `${url.pathname}?${query ? `${query}&` : ''}for_id=vehicle_models`
+  root.getElementById('vehicle_models-hw-hidden-field').setAttribute('value', values)
+  // chipped before it's shown, rather than once the combobox asks the worker, which would leave the field bare a frame
+  renderChips(combobox(root, 'vehicle_models'), [...vehicles.filter(({ display }) => display != null),
+    ...cards.map((value) => ({ value, display: classifications[value].label }))])
+  fillFields(root, filters)
+  renderClassCards(root, cards, classifications)
+  for (const name of SINGLES) {
+    const display = catalog.options[name].find(({ value }) => value === filters[name])?.display
+    if (display) combobox(root, name).dataset.hwComboboxPrefilledDisplayValue = display
+  }
+
+  const viewer = new VehicleViewer(catalog.vocabulary, filters)
+  for (const input of root.querySelectorAll('input[name="electric"]')) {
+    const id = input.value.replace(/^class-/, 'evc/us/class-')
+    const classification = catalog.vocabulary.e_vehicle_classifications[id]
+    // a marker's checkbox has the page's own tooltip
+    if (classification && !classification.marker) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))
+  }
+
+  const similar = await similarOf(catalog, url, vehicles, filters)
+  renderInto(root.getElementById('vehicle-viewers'), viewer.render(vehicles, url, preferredSize(),
+    vehicles.length ? {} : await unpicked(catalog, root, filters), { group, similar }))
+  renderSimilarControls(root, viewer, vehicles, similar)
+
+  localSources.set(combobox(root, 'vehicle_models'), source)
+  for (const name of LISTS) {
+    localSources.set(combobox(root, name), {
+      chips: ({ element }, chosen) => renderChips(element, String(chosen).split(',').filter(Boolean).flatMap((value) => {
+        const option = element.querySelector(`[role="option"][data-value="${CSS.escape(value)}"]`)
+        return option ? [{ value, display: option.dataset.autocompletableAs }] : []
+      }))
+    })
+  }
+  return { content: root, title: vehicles[0]?.display }
+}

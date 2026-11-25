@@ -5,6 +5,7 @@ require "sidekiq/web"
 Rails.application.routes.draw do
   # Liveness endpoint (200 if the app boots). Used by the review-app kamal-proxy health check
   get "up", to: "rails/health#show", as: :rails_health_check
+  get "up/bikebook", to: "bikebook#up"
 
   mount Sidekiq::Web => "/sidekiq", :constraints => AuthRestriction::Developer
   mount PgHero::Engine, at: "/pghero", constraints: AuthRestriction::Developer
@@ -18,17 +19,24 @@ Rails.application.routes.draw do
     controllers authorized_applications: "oauth/authorized_applications"
   end
 
-  get "/shop", to: redirect("https://bikeindex.org/info/bike-index-store"), as: :shop
-  get "/store", to: redirect("https://bikeindex.org/info/bike-index-store"), as: :store
+  get "/shop", to: "shop#index", as: :shop
+  get "/store", to: redirect(path: "/shop")
   get "/discuss", to: redirect("https://discuss.bikeindex.org"), as: :discuss
   get "discourse_authentication", to: "discourse_authentication#index"
 
-  resources :organizations do
+  # Before resources :organizations, whose show would take "signup" as an id
+  resource :organization_signup, only: %i[new create show update], path: "organizations/signup",
+    controller: :organization_signup do
+    get :confirm
+    post :confirm_email
+    post :resend
+  end
+
+  resources :organizations, only: :new do
     member do
       get :embed
       get :embed_extended, as: :embed_extended
       get :embed_create_success
-      get :qr
     end
   end
 
@@ -36,25 +44,51 @@ Rails.application.routes.draw do
 
   get "/user_root_url_redirect", to: "welcome#user_root_url_redirect", as: :user_root_url_redirect
 
-  LandingPages::ORGANIZATIONS.each do |slug|
+  LandingPageOrganizations::SLUGS.each do |slug|
     get slug, to: "landing_pages#show", organization_id: slug
   end
 
   %w[ambassadors_current ambassadors_how_to ascend bike_shop_packages for_bike_shops
-    for_community_groups for_cities for_law_enforcement for_schools].freeze.each do |page|
-    get page, controller: "landing_pages", action: page
-  end
+    for_community_groups for_cities for_law_enforcement for_schools].each { get it, controller: "landing_pages", action: it }
+  %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
+    protect_your_bike serials about where vendor_terms resources privacy terms security
+    how_not_to_buy_stolen lightspeed membership wheel_sizes].each { get it, controller: "info", action: it }
+  get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
+  get "donate/year-end-2026", to: "info#donate_year_end", as: :donate_year_end
+  get "donate/year-end", to: redirect(path: "/donate/year-end-2026", status: 302) # a later year's campaign takes it over
+  get "ebike-rules", to: "ebike_rules#show", as: :ebike_rules
+  get "ebike-rules/:country(/:region)", to: "ebike_rules#show", as: :ebike_rules_place, constraints: {country: /[a-z]{2}/i, region: /[a-z0-9]{1,3}/i}
+  get "e-bike-rules(/*rest)", to: redirect { |_, request| request.fullpath.sub("/e-bike-rules", "/ebike-rules") }
+  get "marketplace/how-it-works", to: "marketplace#how_it_works", as: :marketplace_how_it_works
+  get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
 
-  get "for_advocacy", to: redirect("/for_community_groups")
-  get "for_shops", to: redirect("/for_bike_shops")
-  get "ambassadors", to: redirect("/ambassadors_how_to") # Because convenience
+  %w[stolen_bikes roadmap spokecard how_it_works image_resources dev_and_design].each { get it, to: redirect(path: "/resources") }
+  {"for_advocacy" => "/for_community_groups", "for_shops" => "/for_bike_shops", "ambassadors" => "/ambassadors_how_to",
+   "lightspeed_integration" => "/lightspeed", "why-donate" => "/donate", "theft-ring" => "/theft-rings"}
+    .each { |path, target| get path, to: redirect(path: target) }
+  get "ucmerced", to: redirect("/register/new?organization_id=uc-merced")
   get "ambassadors/new", to: redirect("https://docs.google.com/forms/d/e/1FAIpQLSenRXqarY4KFNw1AQ3u5iHwIaaIpgy6cb1sD3YTSQiR0ICeCQ/viewform"), as: :new_ambassador
 
   %w[update_browser choose_registration goodbye bike_creation_graph].freeze.each do |page|
     get page, controller: "welcome", action: page
   end
 
-  get "recovery_stories", to: "welcome#recovery_stories", as: :recovery_stories
+  get "bikebook", to: "bikebook#show"
+  get "bikebook_schemas", to: "bikebook#schema_viewer"
+  # before the glob below, which would take it for a model
+  get "bikebook/license", to: "bikebook#license", as: :bikebook_license
+  get "bikebook/*vehicle_model", to: "bikebook#vehicle", format: false
+  get "bikebook_schemas/*id", to: "bikebook#schema", format: false
+  get ":spelling(/*rest)", to: redirect { |params, request| request.fullpath.sub(params[:spelling], "bikebook") },
+    constraints: {spelling: /bike[-_]?book/i}, format: false
+  # a catalog model's own id, its manufacturer, year and model
+  get "m/*vehicle_model", to: "bikebook#vehicle", format: false, constraints: {vehicle_model: %r{[a-z0-9-]+/\d{4}/[a-z0-9-]+(?:@[A-Z]+)?}}
+  # an e-vehicle classification's id, whose card the page shows
+  get "evc/*classification", to: redirect(status: 302) { |params, _request| "/bikebook?classifications=evc/#{params[:classification]}" },
+    format: false, constraints: {classification: %r{[a-z0-9-]+(/[a-z0-9-]+)*}}
+  if Integrations::Bikebook::Catalog::LOCAL_DIRECTORY
+    mount Rack::Files.new(Integrations::Bikebook::Catalog::LOCAL_DIRECTORY) => Integrations::Bikebook::Catalog::LOCAL_PATH
+  end
 
   resource :session, only: %i[new create destroy] do
     collection do
@@ -69,9 +103,16 @@ Rails.application.routes.draw do
 
   # Organization SAML SSO (Service Provider). Metadata is public for IdP onboarding;
   # init begins SP-initiated login, callback is the Assertion Consumer Service.
-  get "/sso/:org_slug/metadata", to: "saml#metadata", as: :saml_metadata
-  get "/sso/:org_slug/init", to: "saml#init", as: :saml_init
-  post "/sso/:org_slug/callback", to: "saml#callback", as: :saml_callback
+  # Every path here is a string an IdP has registered - `/metadata` is our entityID - so an
+  # extension has to 404 rather than reach the same action under a second name
+  scope format: false do
+    get "/sso/:org_slug/metadata", to: "saml#metadata", as: :saml_metadata
+    get "/sso/:org_slug/sp.crt", to: "saml#certificate", as: :saml_certificate
+    get "/sso/:org_slug/init", to: "saml#init", as: :saml_init
+    get "/sso/:org_slug/test", to: "saml#test", as: :saml_test
+    post "/sso/:org_slug/test_start", to: "saml#test_start", as: :saml_test_start
+    post "/sso/:org_slug/callback", to: "saml#callback", as: :saml_callback
+  end
 
   resources :payments, only: %i[new create] do
     collection { get :success }
@@ -106,7 +147,6 @@ Rails.application.routes.draw do
 
   resources :feedbacks, only: %i[index create]
   post "csp_reports", to: "csp_reports#create"
-  get "vendor_signup", to: redirect("/organizations/new")
   get "lightspeed_interface", to: "organizations#lightspeed_interface"
   get "help", to: "feedbacks#index"
   get "feedbacks/new", to: redirect("/help")
@@ -126,13 +166,17 @@ Rails.application.routes.draw do
     end
     member do
       get "unsubscribe"
+      # A client without one-click opens the POST target in a browser; that GET gets the interstitial
+      get "unsubscribe_update", to: "users#unsubscribe", as: nil
       post "unsubscribe_update"
     end
   end
   resource :my_account, only: %i[show update destroy] do
-    post :toggle_show_redesign
     resources :messages, only: %i[index show create], controller: "my_accounts/messages"
+    resource :membership, only: %i[show], controller: "my_accounts/memberships"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
+    resources :organization_roles, only: %i[update destroy], controller: "my_accounts/organization_roles"
+    resources :pos_registration_matches, only: %i[show update], controller: "my_accounts/pos_registration_matches"
   end
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
 
@@ -172,20 +216,27 @@ Rails.application.routes.draw do
   get "registrations/*id", to: "registrations#show", constraints: {id: /r\W.*/i}, format: false
   resources :registrations, only: %i[new create show edit] do
     collection { get :embed }
+    member { post :update_legacy_view }
   end
 
   # Redesigned registration flow: quick start, then complete on-site or via email.
   # new makes an empty registration and redirects into show, which renders
-  # ?step=1|2|3…|review|finished (and handles the emailed confirmation link)
+  # ?step=1|2|report|3…|review|finished (and handles the emailed confirmation link)
   resource :register, only: %i[new create show update], controller: :register do
+    get :embed
+    get :landing
+    patch :report
     patch :acknowledge
     # The emailed confirmation link, and the form it posts itself to
     get :confirm
     post :confirm_email
   end
 
-  # Registration photos upload before there's a session, so they get their own endpoint
+  # Registration photos - the /register flow's and the embed forms' - upload before
+  # there's a session, so they get their own endpoint
   post "/register/direct_uploads" => "register/direct_uploads#create", :as => :register_direct_uploads
+  # After the resource above, so its named actions aren't taken for slugs
+  get "register/:organization_id", to: "register/organizations#show", as: :register_organization
 
   # Shadows ActiveStorage's own route (drawn last, so this wins) so the stock controller, which
   # checks nothing, isn't reachable. Deliberately unnamed - rails_direct_uploads_path still
@@ -209,6 +260,7 @@ Rails.application.routes.draw do
     resources :marketplace, only: [] do
       collection { get :counts }
     end
+    get "/bikebook", to: "bikebook#index", as: :bikebook
   end
 
   # Short_id forms the resources :id segment can't match; before resources, as with registrations above
@@ -253,16 +305,23 @@ Rails.application.routes.draw do
       end
     end
 
+    get "bikes/duplicates", to: redirect("/admin/duplicate_bikes?search_view=segments")
     resources :bikes do
       collection do
-        get :duplicates
         put :ignore_duplicate_toggle
         get :missing_manufacturer
         post :update_manufacturers
         put :unrecover
+        # Selection chips for the organizations combobox on the edit form
+        post :organization_chips
       end
-      member { get :get_destroy }
+      member do
+        get :get_destroy
+        put :undelete
+      end
     end
+    resources :duplicate_bikes, only: %i[index show]
+    resources :pos_registration_matches, only: %i[index]
     get "credibility_badges", to: "dashboard#credibility_badges"
     get "maintenance", to: "dashboard#maintenance"
     get "scheduled_jobs", to: "dashboard#scheduled_jobs"
@@ -292,9 +351,10 @@ Rails.application.routes.draw do
       :primary_activities
 
     %i[
-      bike_sticker_updates email_bans exports graduated_notifications invoices logged_searches
+      bike_sticker_updates cycle_types email_bans exports graduated_notifications invoices logged_searches
       mailchimp_data model_attestations model_audits
-      notifications organization_statuses paper_trail_versions parking_notifications public_images
+      notifications organization_landing_pages organization_messages organization_statuses paper_trail_versions
+      parking_notifications public_images
       strava_activities strava_gears strava_requests
       stripe_prices stripe_subscriptions user_alerts user_bans user_registration_organizations
     ].each { resources it, only: %i[index] }
@@ -309,17 +369,25 @@ Rails.application.routes.draw do
 
     resources :theft_alert_plans, only: %i[index edit update new create]
 
-    resources :registration_sequences, only: %i[index show edit update] do
+    resources :education_courses, only: %i[index create show edit update destroy] do
       member { get :preview }
-      resources :pages, only: %i[new create], controller: "registration_sequence_pages"
+      resources :pages, only: %i[new create], controller: "education_course_pages"
     end
-    resources :registration_sequence_pages, only: %i[edit update destroy]
+    resources :education_course_pages, only: %i[edit update destroy]
+    resources :education_course_acknowledgments, only: %i[index]
 
     resources :bug_reports, only: %i[index show update] do
-      collection { post :assign_tags }
+      collection do
+        post :assign_tags
+        # Selection chips for the tags combobox on the show page
+        post :tag_chips
+      end
     end
 
     resources :organizations do
+      # Selection chips for the features filter combobox on the index
+      post :feature_chips, on: :collection
+
       resources :custom_layouts, only: %i[index edit update], controller: "organizations/custom_layouts"
       resources :invoices, controller: "organizations/invoices"
     end
@@ -327,10 +395,11 @@ Rails.application.routes.draw do
 
     resources :stolen_bikes do
       member { post :approve }
+      collection { patch :bulk_update }
     end
     resources :customer_contacts, only: %i[create show]
     resources :recoveries do
-      collection { post :approve }
+      collection { patch :bulk_update }
     end
     resources :stolen_notifications do
       member { get :resend }
@@ -339,6 +408,8 @@ Rails.application.routes.draw do
       collection do
         get :tables
         get :variable
+        get :logged_searches
+        get :bikes_table
       end
     end
     resources :ownerships, only: %i[show edit update index]
@@ -351,6 +422,8 @@ Rails.application.routes.draw do
     resources :news do
       collection do
         get :listicle_image_edit
+        # Selection chips for the tags combobox on the edit form
+        post :content_tag_chips
       end
     end
     resources :manufacturers do
@@ -418,23 +491,10 @@ Rails.application.routes.draw do
 
   resources :components, only: %i[index]
 
-  get "theft-rings", to: "stolen_bike_listings#index" # Temporary, may switch to being an info post
-  get "theft-ring", to: redirect("theft-rings")
   resources :stolen_bike_listings, only: %i[index]
 
-  %w[donate support_bike_index support_the_index support_the_bike_index primary_activities
-    protect_your_bike serials about where vendor_terms resources privacy terms security
-    how_not_to_buy_stolen lightspeed membership].freeze.each do |page|
-    get page, controller: "info", action: page
-  end
-  get "why-donate", to: "info#why_donate", as: "why_donate"
-  get "why_donate", to: redirect("/why-donate")
-  get "lightspeed_integration", to: redirect("/lightspeed")
   get "/info/how-to-get-your-stolen-bike-back", controller: "info", action: "show", id: "how-to-get-your-stolen-bike-back", as: :get_your_stolen_bike_back
   resources :info, only: %i[show]
-
-  %w[stolen_bikes roadmap spokecard how_it_works image_resources dev_and_design].freeze
-    .each { |p| get p, to: redirect("/resources") }
 
   get "strava_search", to: "strava_search#index"
   post "strava_search/token", to: "strava_search#create_token", as: :strava_search_token
@@ -456,10 +516,12 @@ Rails.application.routes.draw do
     get "/", to: "dashboard#root", as: :root
     resources :dashboard, only: %i[index]
     get "landing", to: "manages#landing", as: :landing
-    resources :registrations, only: %i[index] do
+    resources :registrations, only: %i[index new] do
       collection do
         get :multi_search
         get :multi_search_response
+        get :settings
+        post :switches
       end
     end
     resources :bikes, only: %i[new create show update] do
@@ -476,6 +538,7 @@ Rails.application.routes.draw do
     resources :emails, only: %i[index show edit update]
     resources :parking_notifications
     resources :graduated_notifications, only: %w[index show]
+    resources :organization_messages, only: %i[create]
     resources :impound_records, only: %i[index show update]
     resources :impound_claims, only: %i[index show update]
     resources :stickers, only: %i[index show edit update]
@@ -487,6 +550,7 @@ Rails.application.routes.draw do
       end
     end
     resources :ambassador_task_assignments, only: %i[update]
+    resource :info, only: %i[show], controller: :info
 
     # Organized Admin resources (below here controllers should inherit Organized::AdminController)
     resource :manage, only: %i[show update destroy] do
@@ -496,10 +560,10 @@ Rails.application.routes.draw do
     end
     resource :manage_impounding
     resources :users, except: %i[show]
-    resources :registration_sequences, only: %i[index create show edit update destroy] do
-      resources :pages, only: %i[new create], controller: "registration_sequence_pages"
+    resources :education_courses, only: %i[index create show edit update destroy] do
+      resources :pages, only: %i[new create], controller: "education_course_pages"
     end
-    resources :registration_sequence_pages, only: %i[edit update destroy]
+    resources :education_course_pages, only: %i[edit update destroy]
   end
 
   # This is the public organizations section
@@ -516,8 +580,11 @@ Rails.application.routes.draw do
   get "*id", to: "registrations#show", constraints: {id: %r{[rR]/.*}}, format: false
   # Short bike_version URLs: /v/<short_id> (and /V/...)
   get "*id", to: "bike_versions#show", constraints: {id: %r{[vV]/.*}}, format: false
-  # Short marketplace_listing URLs: /m/<short_id> (and /M/...)
-  get "*id", to: "marketplace_listings#show", constraints: {id: %r{[mM]/.*}}, format: false
+  # Short marketplace_listing URLs: /f/<short_id> (and /F/...)
+  get "*id", to: "marketplace_listings#show", constraints: {id: %r{[fF]/.*}}, format: false
+
+  # /for-bike-shops and /ebike_rules answer too, redirecting to the spelling routed above
+  get "*path", to: redirect { |_, request| PathSpellingRedirect.location(request) }, constraints: PathSpellingRedirect, format: false
 
   get "*unmatched_route", to: "errors#not_found" if Rails.env.production? || Rails.env.sandbox? # Handle 404s with lograge
 end

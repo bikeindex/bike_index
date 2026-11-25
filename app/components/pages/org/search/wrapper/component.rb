@@ -1,0 +1,167 @@
+# frozen_string_literal: true
+
+module Pages
+  module Org
+    module Search
+      module Wrapper
+        # A card of org registrations: the match count and the column settings button, the
+        # column-visibility panel, the table and the pagination footer. On the registrations
+        # search (search_page) the header also carries the view switcher and the export, the
+        # cards and list views swap the table for cards or rows, and the card renders inside
+        # the results turbo-frame, so every search brings it back whole.
+        #
+        # With impound_records it's the impound records search's: its rows are the records, and
+        # its actions (in place of the export) and below_header open their multi-update form.
+        class Component < ApplicationComponent
+          renders_one :actions
+          renders_one :below_header
+
+          # Display order, and the first is what search_result_view falls back to
+          RESULT_VIEWS = %i[table list cards].freeze
+
+          def self.permitted_result_view(result_view)
+            view = result_view&.to_sym
+            RESULT_VIEWS.include?(view) ? view : RESULT_VIEWS.first
+          end
+
+          def initialize(
+            organization:,
+            pagy:,
+            per_page:,
+            params:,
+            bikes: [],
+            impound_records: nil,
+            interpreted_params: {},
+            sort_state: ComponentStructs::SortState.new,
+            search_stickers: nil,
+            search_address: nil,
+            search_status: "all",
+            search_unregisteredness: nil,
+            search_all: false,
+            bike_sticker: nil,
+            model_audit: nil,
+            settings: nil,
+            result_view: nil,
+            search_page: false
+          )
+            @organization = organization
+            @pagy = pagy
+            @bikes = impound_records&.map(&:bike) || bikes
+            @impound_records = impound_records
+            @interpreted_params = interpreted_params
+            @sort_state = sort_state
+            @per_page = per_page
+            @params = params
+            @search_stickers = search_stickers
+            @search_address = search_address
+            @search_status = search_status
+            @search_unregisteredness = search_unregisteredness
+            @search_all = search_all
+            @bike_sticker = bike_sticker
+            @model_audit = model_audit
+            @settings = settings
+            @result_view = self.class.permitted_result_view(result_view)
+            # The search page brings its own Stimulus controllers, and the row of actions
+            # across this card's header; everywhere else the card is on its own
+            @search_page = search_page
+          end
+
+          private
+
+          # Two sentences rather than a count interpolated into one, so a translation can
+          # order "over" however it reads. count picks the plural; number is what it renders,
+          # which number_display has already marked up
+          def count_html
+            unless count_stopped?
+              return translation(".matching_html", count: @pagy.count, number: number_display(@pagy.count))
+            end
+
+            translation(".over_count_matching_html",
+              number: number_display(BikeServices::OrganizedSearch::SEARCH_ALL_COUNT_LIMIT))
+          end
+
+          def count_stopped?
+            @search_all && @pagy.count >= BikeServices::OrganizedSearch::SEARCH_ALL_COUNT_LIMIT
+          end
+
+          def settings
+            @settings ||= ComponentStructs::OrgSearchSettings.new(
+              organization: @organization,
+              interpreted_params: @interpreted_params,
+              sortable_search_params: @sort_state.search_params,
+              search_stickers: @search_stickers,
+              search_address: @search_address,
+              search_status: @search_status,
+              search_unregisteredness: @search_unregisteredness,
+              search_all: @search_all,
+              impound: !@impound_records.nil?
+            )
+          end
+
+          # On the search page the .twwiderow holding the card supplies the gap above it, and
+          # search-results-card is what the results frame reads to leave this card standing while
+          # it loads; elsewhere the card stands alone
+          def card_classes
+            ["org-search-component", UI::Table::InCard::Component::CARD_CLASSES,
+              @search_page ? "search-results-card" : "tw:mt-4"].join(" ")
+          end
+
+          def table_clip_classes
+            ["tw:overflow-hidden tw:table-bleed:-mx-(--gutter)", results_swap_class].compact.join(" ")
+          end
+
+          # The rows hide for the spinner above them while the frame they render in is busy
+          def results_swap_class = ("tw:group-[[busy]]:hidden" if @search_page)
+
+          # Built here rather than on the settings struct, which route helpers never reach
+          def export_path
+            organization_registrations_path(settings.search_params.merge(create_export: true))
+          end
+
+          # Only the search page offers the view switcher, so it's the only place cards or rows
+          # render - and :table isn't one of Container's, which is what sends it to BikesTable
+          def result_component
+            SharedBlocks::SearchResults::Container::Component::RESULT_VIEW_COMPONENT[@result_view] if @search_page
+          end
+
+          # The cards and rows have no headers to sort by, so their views name the order
+          def ordered_by_text
+            return @ordered_by_text if defined?(@ordered_by_text)
+
+            column = settings.sort_column_label(@sort_state.sort)
+            @ordered_by_text = if column.nil?
+              nil
+            elsif @sort_state.direction == "asc"
+              translation(".ordered_by_asc", column:)
+            else
+              translation(".ordered_by_desc", column:)
+            end
+          end
+
+          def result_view_entries
+            RESULT_VIEWS.map do |view|
+              ComponentStructs::Shapes.entry(translation(".view_#{view}"), href: result_view_path(view),
+                active: @result_view == view, data: {turbo_action: "advance"})
+            end
+          end
+
+          # The search this card renders in, which the impound records search shares
+          def result_view_path(result_view)
+            url_for(@sort_state.search_params.merge(organization_id: @organization.to_param, search_result_view: result_view))
+          end
+
+          def show_pagination?
+            @pagy.pages > 1
+          end
+
+          # The search page declares org--search itself, on a div spanning the form and the
+          # chart as well as this card
+          def card_data_attributes
+            Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(controllers: ("org--search" unless @search_page),
+              impound: !@impound_records.nil?).merge(table_bleed: false)
+          end
+        end
+      end
+    end
+  end
+end

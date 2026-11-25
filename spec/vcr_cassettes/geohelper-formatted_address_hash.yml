@@ -21,7 +21,7 @@ http_interactions:
       Content-Type:
       - application/json; charset=UTF-8
       Date:
-      - Fri, 05 Jun 2026 17:59:29 GMT
+      - Mon, 21 Sep 2026 18:07:21 GMT
       Pragma:
       - no-cache
       Expires:
@@ -41,13 +41,13 @@ http_interactions:
       Server:
       - mafe
       Content-Length:
-      - '3312'
+      - '3078'
       X-Xss-Protection:
       - '0'
       X-Frame-Options:
       - SAMEORIGIN
       Server-Timing:
-      - gfet4t7; dur=102
+      - gfet4t7; dur=111
       Alt-Svc:
       - h3=":443"; ma=2592000,h3-29=":443"; ma=2592000
     body:
@@ -89,11 +89,8 @@ http_interactions:
         : 37.7882962302915,\n                  \"lng\" : -122.4023648197085\n               },\n
         \              \"southwest\" : \n               {\n                  \"lat\"
         : 37.7855982697085,\n                  \"lng\" : -122.4050627802915\n               }\n
-        \           }\n         },\n         \"navigation_points\" : \n         [\n
-        \           {\n               \"location\" : \n               {\n                  \"latitude\"
-        : 37.7871928,\n                  \"longitude\" : -122.4039456\n               }\n
-        \           }\n         ],\n         \"place_id\" : \"ChIJhZ74MY-AhYARscx5mk67G-w\",\n
+        \           }\n         },\n         \"place_id\" : \"ChIJhZ74MY-AhYARscx5mk67G-w\",\n
         \        \"types\" : \n         [\n            \"premise\",\n            \"street_address\"\n
         \        ]\n      }\n   ],\n   \"status\" : \"OK\"\n}"
-  recorded_at: Fri, 05 Jun 2026 17:59:29 GMT
+  recorded_at: Mon, 21 Sep 2026 18:07:21 GMT
 recorded_with: VCR 6.4.0

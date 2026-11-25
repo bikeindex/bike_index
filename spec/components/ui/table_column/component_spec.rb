@@ -28,6 +28,18 @@ RSpec.describe UI::TableColumn::Component do
       expect(col.th_classes(bordered: false)).to include("w-32")
       expect(col.td_classes(bordered: false)).not_to include("w-32")
     end
+
+    context "in a table with sortable columns" do
+      it "is normal weight when not sortable" do
+        expect(col.th_classes(bordered: false, sortable_table: true)).to include("tw:font-normal")
+        expect(col.th_classes(bordered: false)).not_to include("tw:font-normal")
+      end
+
+      it "keeps a sortable header's weight" do
+        col = described_class.new(sortable: "name")
+        expect(col.th_classes(bordered: false, sortable_table: true)).not_to include("tw:font-normal")
+      end
+    end
   end
 
   describe "#td_classes" do

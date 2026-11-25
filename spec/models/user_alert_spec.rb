@@ -65,6 +65,8 @@ RSpec.describe UserAlert, type: :model do
       expect(user_alert.dismissed?).to be_truthy
       expect(user_alert.active?).to be_falsey
       expect(user_alert.inactive?).to be_truthy
+      expect(UserAlert.inactive.pluck(:id)).to eq([user_alert.id])
+      expect(UserAlert.active.pluck(:id)).to eq([])
       expect(user_alert.resolved?).to be_falsey
       expect(user_alert.alertable).to eq user_phone
       expect(user_alert.alertable_type).to eq "UserPhone"
@@ -130,8 +132,7 @@ RSpec.describe UserAlert, type: :model do
   describe "update_unfinished_registrations" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let!(:b_param) do
-      FactoryBot.create(:b_param, creator: user, origin: "register_flow",
-        params: {bike: {manufacturer_id: 1}})
+      FactoryBot.create(:b_param_unfinished_registration, creator: user)
     end
 
     it "leaves the alert the b_param created alone" do
@@ -222,11 +223,37 @@ RSpec.describe UserAlert, type: :model do
           expect(UserAlert.create_notification.pluck(:id)).to eq([])
         end
       end
+      context "user deleted" do
+        it "is false" do
+          user_alert.user.destroy
+          expect(user_alert.reload.create_notification?).to be_falsey
+          expect(UserAlert.create_notification.pluck(:id)).to eq([])
+        end
+      end
       context "stolen bike no_notify" do
         it "is false" do
           user_alert.bike.current_stolen_record.update(receive_notifications: false)
           expect(user_alert.reload.create_notification?).to be_falsey
         end
+      end
+    end
+  end
+
+  describe "email_subject" do
+    let(:bike) { FactoryBot.create(:stolen_bike, cycle_type: "personal-mobility") }
+    let(:user_alert) { FactoryBot.build(:user_alert, kind:, bike:) }
+
+    context "theft_alert_without_photo" do
+      let(:kind) { "theft_alert_without_photo" }
+      it "names the cycle type rather than its slug" do
+        expect(user_alert.email_subject).to eq "Your stolen e-personal mobility device needs a photo"
+      end
+    end
+
+    context "stolen_bike_without_location" do
+      let(:kind) { "stolen_bike_without_location" }
+      it "names the cycle type rather than its slug" do
+        expect(user_alert.email_subject).to eq "Your stolen e-personal mobility device is missing its location"
       end
     end
   end

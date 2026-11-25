@@ -65,8 +65,6 @@ RSpec.describe BikeV2Serializer do
       end
       it "returns the expected thing" do
         expect(bike.reload.status).to eq "status_stolen"
-        # expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "stolen_record"
-        # expect(bike.registration_address(true)["latitude"]).to eq 40.7143528
         expect(serializer.as_json(root: false)).to eq target_stolen
       end
     end
@@ -83,6 +81,17 @@ RSpec.describe BikeV2Serializer do
         expect(impound_record.address_record.publicly_visible_attribute).to eq "postal_code"
         expect(bike.to_coordinates).to eq([40.7143528, -74.0059731])
         expect(serializer.as_json(root: false)).to eq target_found
+      end
+
+      context "held at an organization's location" do
+        let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :chicago) }
+        let!(:impound_record) { FactoryBot.create(:impound_record, :with_address_record, address_in: :new_york, bike:, location:) }
+
+        it "returns where it was found, not where it's held" do
+          expect(impound_record.reload.address_record_id).to eq location.address_record_id
+          expect(bike.reload.status).to eq "status_impounded"
+          expect(serializer.as_json(root: false)[:location_found]).to eq "New York, NY 10007, United States"
+        end
       end
     end
   end

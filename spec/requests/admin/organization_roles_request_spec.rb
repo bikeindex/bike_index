@@ -45,8 +45,8 @@ RSpec.describe Admin::OrganizationRolesController, type: :request do
         expect(organization.organization_roles.count).to eq 1
         existing_user.reload
         organization_role = OrganizationRole.last
-        expect(Users::ProcessOrganizationRoleJob.jobs.count).to eq 1
-        Users::ProcessOrganizationRoleJob.drain
+        expect(UserJobs::ProcessOrganizationRoleJob.jobs.count).to eq 1
+        UserJobs::ProcessOrganizationRoleJob.drain
         organization.reload
         organization_role.reload
         expect(existing_user.organization_roles.count).to eq 1

@@ -56,7 +56,7 @@ RSpec.describe CspReportsController, type: :request do
       # flood can't consume a user's navigation budget.
       it "does not count against the global per-IP throttle" do
         Rack::Attack::MAX_REQUESTS_PER_TWENTY.times { post_report }
-        get "/vendor_signup" # a normal (non-excluded) path that redirects without rendering
+        get "/support" # a normal (non-excluded) path that redirects without rendering
         expect(response).not_to have_http_status(:too_many_requests)
       end
     end

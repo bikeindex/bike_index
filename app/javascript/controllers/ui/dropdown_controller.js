@@ -1,7 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { computePosition, flip, shift, offset } from '@floating-ui/dom'
-
-let zCounter = 50
+import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_index'
 
 // Connects to data-controller="ui--dropdown"
 export default class extends Controller {
@@ -14,6 +13,7 @@ export default class extends Controller {
     this.clickOutside = this.clickOutside.bind(this)
     this.handleEscape = this.handleEscape.bind(this)
     this.handleResize = this.handleResize.bind(this)
+    this.closeIfOtherOpened = this.closeIfOtherOpened.bind(this)
   }
 
   disconnect () {
@@ -34,14 +34,17 @@ export default class extends Controller {
   }
 
   async open () {
+    // toggle stops propagation, so other dropdowns' clickOutside never sees this click
+    window.dispatchEvent(new CustomEvent('ui--dropdown:opened', { detail: this.element }))
     this.menuTarget.classList.remove('tw:hidden')
-    this.menuTarget.style.zIndex = ++zCounter
+    claimFloatingZIndex(this.menuTarget)
     this.buttonTarget.setAttribute('aria-expanded', 'true')
     await this.updatePosition()
     this.addEventListeners()
   }
 
   close () {
+    releaseFloatingZIndex(this.menuTarget)
     this.menuTarget.classList.add('tw:hidden')
     this.buttonTarget.setAttribute('aria-expanded', 'false')
     this.removeEventListeners()
@@ -51,12 +54,14 @@ export default class extends Controller {
     document.addEventListener('click', this.clickOutside)
     document.addEventListener('keydown', this.handleEscape)
     window.addEventListener('resize', this.handleResize)
+    window.addEventListener('ui--dropdown:opened', this.closeIfOtherOpened)
   }
 
   removeEventListeners () {
     document.removeEventListener('click', this.clickOutside)
     document.removeEventListener('keydown', this.handleEscape)
     window.removeEventListener('resize', this.handleResize)
+    window.removeEventListener('ui--dropdown:opened', this.closeIfOtherOpened)
   }
 
   async updatePosition () {
@@ -79,6 +84,10 @@ export default class extends Controller {
     if (!this.element.contains(event.target)) {
       this.openValue = false
     }
+  }
+
+  closeIfOtherOpened (event) {
+    if (event.detail !== this.element) this.openValue = false
   }
 
   handleEscape (event) {

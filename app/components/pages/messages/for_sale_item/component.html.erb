@@ -1,0 +1,14 @@
+<ul class="bike-boxes">
+  <%= render(
+    SharedBlocks::SearchResults::BikeBox::Component.new(
+      bike: @vehicle,
+      current_user: @current_user,
+      skip_cache: true,
+      event_record: @marketplace_listing,
+      render_deleted: true
+    )
+  ) %>
+</ul>
+
+<%# TODO: show this too! %>
+<%# = render(Pages::Bikes::MarketplaceListingPanel::Component.new(marketplace_listing: @bike.current_marketplace_listing)) %>

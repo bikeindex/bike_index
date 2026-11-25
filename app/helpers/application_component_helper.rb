@@ -10,7 +10,12 @@ module ApplicationComponentHelper
   end
 
   def number_display(number)
-    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-less-strong" : ""))
+    content_tag(:span, number_with_delimiter(number), class: ((number == 0) ? "less-strong" : ""))
+  end
+
+  # Hyphenated words never wrap at the hyphen, which splits "e-bike" across lines
+  def unbroken_hyphen(text)
+    safe_join(text.split(/(\S+-\S+)/).map { it.include?("-") ? tag.span(it, class: "tw:whitespace-nowrap") : it })
   end
 
   # currency_name_suffix options: [false, true, :if_not_default]
@@ -36,27 +41,11 @@ module ApplicationComponentHelper
   end
 
   def search_emoji
-    "🔎"
+    tag.span("🔎", class: "keep-with-previous")
   end
 
   def link_emoji
-    image_tag("link.svg", class: "link-emoji")
-  end
-
-  def phone_display(str)
-    return "" if str.blank?
-
-    phone_components = Phonifyer.components(str)
-    number_to_phone(phone_components[:number], phone_components.except(:number))
-  end
-
-  def phone_link(phone, html_options = {})
-    return "" if phone.blank?
-
-    phone_d = phone_display(phone)
-    return "" if phone_d.blank?
-    # Switch extension to be pause in link
-    link_to(phone_d, "tel:#{phone_d.tr("x", ";")}", html_options)
+    image_tag("link.svg", class: "tw:inline-block tw:w-4")
   end
 
   private

@@ -10,7 +10,7 @@ user = User.find_by_email("user@bikeindex.org")
 raise "missing Brakebills org or test users" if brakebills.blank? || member.blank? || user.blank?
 
 # --- Mail snippets ---
-# Bodies for the "structural" snippets (header/welcome/footer/security/partial_registration)
+# Bodies for the "structural" snippets (header/welcome/after_welcome/footer/security/partial_registration)
 # are copied verbatim from the dev database's Brakebills records. The notification-kind
 # snippets exercise the `organization_message_snippet` paths in OrganizedMailer previews.
 snippets = {
@@ -30,6 +30,14 @@ snippets = {
     body: <<~HTML
       <p style="color: purple; margin: 20px 0; text-align: center;">
         <strong>We can add text here!</strong> - this is the <em>welcome</em>  snippet
+      </p>
+    HTML
+  },
+  "after_welcome" => {
+    is_enabled: true,
+    body: <<~HTML
+      <p style="color: purple; margin: 20px 0; text-align: center;">
+        <strong>We can add text here!</strong> - this is the <em>After Welcome</em>  snippet
       </p>
     HTML
   },
@@ -138,19 +146,10 @@ OrganizationStolenMessage.for(brakebills).update!(
 brakebills.update!(graduated_notification_interval: 1.year.to_i) if brakebills.graduated_notification_interval.blank?
 
 if GraduatedNotification.where(organization: brakebills).none?
+  SeedHelpers.tick
   graduated_bike = BikeServices::Creator.new.create_bike(
     BParam.create!(creator: user, params: {
-      bike: {
-        cycle_type: "bike",
-        propulsion_type: "foot-pedal",
-        serial_number: "GRADUATED01",
-        manufacturer_id: SeedHelpers.weighted_frame_maker_id,
-        primary_frame_color_id: Color.pluck(:id).sample,
-        rear_tire_narrow: "true",
-        handlebar_type: HandlebarType.slugs.first,
-        owner_email: user.email,
-        creation_organization_id: brakebills.id.to_s
-      }
+      bike: org_bike_params(owner_email: user.email, creation_organization_id: brakebills.id).merge(serial_number: "GRADUATED01")
     })
   )
   raise "Graduated bike creation failed" if graduated_bike.errors.any?
@@ -201,6 +200,17 @@ if impound_records.any? && ImpoundClaim.where(organization: brakebills).none?
   end
 end
 
+# --- OrganizationMessage: a member's note to a Brakebills registrant ---
+if OrganizationMessage.where(organization: brakebills).none?
+  message_bike = brakebills.bikes.reorder(:id)
+    .detect { |bike| OrganizationMessage.for?(bike:, organization: brakebills) && bike.contact_owner?(member, brakebills) }
+  raise "no Brakebills bike a member can message" if message_bike.blank?
+
+  OrganizationMessage.create!(organization: brakebills, sender: member, bike: message_bike,
+    message: "Your bike is locked to the welters court fence — please move it to a rack by Friday.")
+  puts "  Created OrganizationMessage on bike ##{message_bike.id}"
+end
+
 # --- Transferred bike: needed for the `finished_registration_transferred`
 # preview, which selects an unorganized, unclaimed bike that has a
 # previous_ownership_id (i.e. was transferred to a new owner). ---
@@ -210,6 +220,7 @@ transferred_bike_exists = Bike.left_joins(:current_ownership)
   .where.not(ownerships: {previous_ownership_id: nil}).exists?
 
 unless transferred_bike_exists
+  SeedHelpers.tick
   bike = BikeServices::Creator.new.create_bike(
     BParam.create!(creator: user, params: {
       bike: {

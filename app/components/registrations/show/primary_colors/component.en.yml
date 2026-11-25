@@ -1,9 +1,0 @@
----
-en:
-  components:
-    registrations:
-      show:
-        primary_colors:
-          primary_color:
-            one: Primary color
-            other: Primary colors

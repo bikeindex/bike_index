@@ -1,0 +1,19 @@
+<%= render UI::Alerts::Base::Component.new do %>
+  <%= render UI::Button::Component.new(text: translation(".confirm_your_phone_number"),
+        color: :link, commandfor: MODAL_ID, command: "show-modal") %>
+<% end %>
+
+<%= render UI::Modal::Component.new(id: MODAL_ID, title: modal_title) do |modal| %>
+  <% modal.with_body do %>
+    <%= form_tag user_phone_path(@user_phone.to_param), method: :patch do %>
+      <div class="tw:mb-4">
+        <%= label_tag :confirmation_code, translation(".verification_code"), class: "twlabel" %>
+        <%= text_field_tag :confirmation_code, "", required: true, autocomplete: "one-time-code", class: "twinput" %>
+      </div>
+
+      <div class="tw:text-center">
+        <%= render UI::Button::Component.new(text: modal_title, type: "submit", color: :primary, size: :lg) %>
+      </div>
+    <% end %>
+  <% end %>
+<% end %>

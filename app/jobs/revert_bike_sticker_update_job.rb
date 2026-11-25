@@ -28,7 +28,7 @@ class RevertBikeStickerUpdateJob < ApplicationJob
     elsif previous_updates.present?
       last_update = previous_updates.first
       previous_bike_id = previous_updates.second&.bike_id
-      secondary_organization_id = previous_updates.other_paid_organization.first&.organization_id
+      secondary_organization_id = previous_updates.other_invoiced_organization.first&.organization_id
       last_update.slice(:bike_id, :user_id).merge(claimed_at: last_update.created_at,
         previous_bike_id:, secondary_organization_id:)
     else

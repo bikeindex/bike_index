@@ -12,8 +12,12 @@ class MoneyFormatter
       money_without_cents_and_with_symbol Money.new(amnt || 0, currency_name_for(currency))
     end
 
+    def money_format_no_cents_if_whole(amnt, currency = nil)
+      Money.new(amnt || 0, currency_name_for(currency)).format(no_cents_if_whole: true)
+    end
+
     def convert_to_cents(amnt)
-      amnt.to_f * 100
+      (amnt.to_f * 100).round
     end
 
     private

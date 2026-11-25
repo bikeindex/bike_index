@@ -34,6 +34,7 @@ module CallbackJobs
       # Also, we we need to process with the previous email, not the user's current email
       associate_organization_role_invites(user, email, skip_confirm: true)
       associate_ownerships(user, email)
+      associate_bug_reports(user, email)
     end
 
     def perform_confirmed_jobs(user, email)
@@ -47,6 +48,7 @@ module CallbackJobs
       import_user_attributes(user)
       if user.confirmed?
         associate_ownerships(user, email)
+        associate_bug_reports(user, email)
         associate_graduated_notifications(user.reload)
       end
     end
@@ -54,9 +56,9 @@ module CallbackJobs
     def send_welcoming_email(user)
       # If the user is confirmed, send the welcome email, otherwise send the confirmation email
       if user.confirmed?
-        Email::WelcomeJob.perform_async(user.id)
+        EmailJobs::WelcomeJob.perform_async(user.id)
       else
-        Email::ConfirmationJob.perform_in(1.second, user.id)
+        EmailJobs::ConfirmationJob.perform_in(1.second, user.id)
       end
     end
 
@@ -64,6 +66,12 @@ module CallbackJobs
       Ownership.where(owner_email: email).each do |ownership|
         ownership.update(user_id: user.id)
       end
+    end
+
+    # A report only links to a confirmed address, so one sent before the account existed - or before
+    # it was confirmed - is picked up here
+    def associate_bug_reports(user, email)
+      BugReport.where(user_id: nil, email: EmailNormalizer.normalize(email)).find_each { it.update(user:) }
     end
 
     def associate_graduated_notifications(user)
@@ -76,12 +84,12 @@ module CallbackJobs
       return false unless organization_roles.any?
 
       first, *rest = organization_roles.pluck(:id)
-      Users::ProcessOrganizationRoleJob.new.perform(first, user.id)
+      UserJobs::ProcessOrganizationRoleJob.new.perform(first, user.id)
 
       # We want to do the first one inline so we can redirect
       # the user to the org page
       rest.each do |organization_role_id|
-        Users::ProcessOrganizationRoleJob.perform_async(organization_role_id, user.id)
+        UserJobs::ProcessOrganizationRoleJob.perform_async(organization_role_id, user.id)
       end
 
       user.confirm(user.confirmation_token) unless skip_confirm

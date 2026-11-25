@@ -19,7 +19,7 @@ RSpec.describe Payment, type: :model do
       expect(Payment.normalize_referral_source("BIKES_12")).to eq "bikes-12"
     end
     it "handles ios" do
-      expect(Payment.normalize_referral_source("app-ios-11.2.3")).to eq "app-ios-1123"
+      expect(Payment.normalize_referral_source("app-ios-11.2.3")).to eq "app-ios-11-2-3"
     end
   end
 
@@ -52,7 +52,7 @@ RSpec.describe Payment, type: :model do
       it "enqueues an email job, associates the user" do
         expect {
           payment
-        }.to change(Email::ReceiptJob.jobs, :size).by(1)
+        }.to change(EmailJobs::ReceiptJob.jobs, :size).by(1)
         payment.reload
         expect(payment.id).to be_present
         expect(payment.user_id).to eq user.id
@@ -63,7 +63,7 @@ RSpec.describe Payment, type: :model do
         it "does not send an extra email" do
           expect {
             payment
-          }.to change(Email::ReceiptJob.jobs, :size).by 0
+          }.to change(EmailJobs::ReceiptJob.jobs, :size).by 0
           payment.reload
           expect(payment.id).to be_present
           expect(payment.user_id).to eq user.id
@@ -76,7 +76,7 @@ RSpec.describe Payment, type: :model do
       it "does not enqueue an email" do
         expect {
           payment # it is created here
-        }.to_not change(Email::ReceiptJob.jobs, :size)
+        }.to_not change(EmailJobs::ReceiptJob.jobs, :size)
         expect(payment.valid?).to be_truthy
         payment.reload
         expect(payment.id).to be_present

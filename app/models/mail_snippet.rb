@@ -49,6 +49,8 @@ class MailSnippet < ApplicationRecord
 
   validates_uniqueness_of :organization_id, scope: [:kind], allow_nil: true
   validates_uniqueness_of :doorkeeper_app_id, scope: [:kind], allow_nil: true
+  # Organization layouts start as empty snippets, so only a snippet created from scratch needs a body
+  validates_presence_of :body, on: :admin_create
 
   attr_accessor :skip_update
 
@@ -99,6 +101,10 @@ class MailSnippet < ApplicationRecord
       return kind.to_s unless organization_snippet_kinds.include?(kind)
 
       organization_snippets.dig(kind, :emails)
+    end
+
+    def kind_display(kind)
+      "#{kind_humanized(kind)} - in #{organization_email_for(kind)} emails"
     end
 
     def organization_emails_with_snippets
@@ -177,6 +183,10 @@ class MailSnippet < ApplicationRecord
 
   def kind_humanized
     self.class.kind_humanized(kind)
+  end
+
+  def body_stripped
+    @body_stripped ||= Binxtils::InputNormalizer.plain_text(body)
   end
 
   def max_body_length

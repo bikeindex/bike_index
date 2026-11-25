@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          bike_index_card:
+            activity: Activity
+            frame_material: Frame material
+            id: ID
+            registered_since: Registered since
+            this_bike_on_bike_index: This %{bike_type} on Bike Index

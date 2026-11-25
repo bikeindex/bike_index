@@ -1,0 +1,14 @@
+<span class="<%= wrapper_class %>">
+  <% badges.each do |badge| %>
+    <span>
+      <% if @full_text %>
+        <%= render(UI::Badge::Component.new(text: badge[:text], color: badge[:color])) %>
+        <span class="less-strong"><%= description(badge) %></span>
+      <% else %>
+        <%= render(UI::Badge::Component.new(text: badge[:text], title: badge[:label], color: badge[:color])) do |component| %>
+          <% component.with_tooltip_body { description(badge) } if badge[:link] %>
+        <% end %>
+      <% end %>
+    </span>
+  <% end %>
+</span>

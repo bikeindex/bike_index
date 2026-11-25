@@ -1,0 +1,23 @@
+<%= render(UI::Card::Component.new) do %>
+  <div
+    data-controller="ui--collapse"
+    data-ui--collapse-param-value="contact_owner"
+  >
+    <h2 class="tw:tweyebrow">
+      <%= translation(".know_something_about_this_bike_type", bike_type: @bike.type) %>
+    </h2>
+
+    <div class="tw:mt-3">
+      <% if sign_in_redirect %>
+        <%= render(UI::ButtonLink::Component.new(href: sign_in_redirect, text: translation(".contact_the_owner"), color: :purple)) %>
+      <% else %>
+        <%= render(UI::Collapse::Component.new(text: translation(".contact_the_owner"), color: :purple)) %>
+        <div data-ui--collapse-target="content" class="tw:mt-3 tw:hidden">
+          <%= render(Pages::Registrations::Show::StolenNotificationForm::Component.new(bike: @bike)) %>
+        </div>
+      <% end %>
+    </div>
+
+    <%= render(Pages::Registrations::Show::OwnerPhone::Component.new(phone: owner_phone)) %>
+  </div>
+<% end %>

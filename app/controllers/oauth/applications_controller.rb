@@ -18,7 +18,7 @@ module Oauth
         @max_per_page = 500
         @per_page = permitted_per_page(default: 50, max: @max_per_page)
 
-        @pagy, @collection = pagy(:countish, ordered_applications, limit: @per_page)
+        @pagy, @collection = pagy(:countish, ordered_applications.includes(:owner), limit: @per_page)
         @matching_applications = admin_oauth_applications
 
         render "admin_index", layout: "admin"
@@ -41,7 +41,7 @@ module Oauth
 
         redirect_to oauth_application_url(@application)
       else
-        render :new
+        render :new, status: :unprocessable_entity
       end
     end
 
@@ -58,9 +58,9 @@ module Oauth
     def ordered_applications
       if params[:sort] == "tokens_count"
         admin_oauth_applications.left_joins(:access_tokens).group(:id)
-          .order("count(oauth_applications.id) #{sort_direction}")
+          .order(sortable_order("count(oauth_applications.id)", nulls_last: false))
       else
-        admin_oauth_applications.reorder("#{sort_column} #{sort_direction}")
+        admin_oauth_applications.reorder(sortable_order(Doorkeeper::Application))
       end
     end
 

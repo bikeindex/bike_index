@@ -1,0 +1,116 @@
+<% component = self %>
+
+<div class="tw:mt-6" data-controller="admin--invoice-form">
+  <%= form_for [:admin, @organization, @invoice] do |f| %>
+    <%= render(UI::Container::Component.new(width: :wide)) do %>
+      <%= f.hidden_field :organization_feature_ids, data: {"admin--invoice-form-target": "featureIds"} %>
+      <%= render(UI::Alerts::ObjectError::Component.new(object: @invoice)) %>
+
+      <%= render(UI::Table::Base::Component.new(records: @organization_features)) do |table| %>
+        <% table.column(label: "") do |organization_feature| %>
+          <%= component.feature_checkbox(organization_feature) %>
+        <% end %>
+
+        <% table.column(label: "Name") do |organization_feature| %>
+          <%= link_to organization_feature.name, edit_admin_organization_feature_url(organization_feature), class: "twlink" %>
+
+          <% if organization_feature.feature_slugs.any? %>
+            <span class="only-dev-visible"><%= render(UI::Code::Inline::Component.new(text: organization_feature.feature_slugs.join(" "), small: true)) %></span>
+          <% end %>
+        <% end %>
+
+        <% table.column(label: "Kind", classes: "tw:text-xs") do |organization_feature| %>
+          <%= organization_feature.kind.humanize %>
+        <% end %>
+
+        <% table.column(label: "Amount") do |organization_feature| %>
+          <%= organization_feature.amount_formatted %>
+        <% end %>
+      <% end %>
+
+      <div class="tw:mb-6 tw:ml-auto tw:max-w-sm">
+        <%= render(UI::DefinitionList::Container::Component.new) do %>
+          <%= render(UI::DefinitionList::Row::Component.new(label: "One Time Features", render_with_no_value: true)) do %>
+            <small
+              class="less-strong"
+              data-admin--invoice-form-target="oneTimeCount"
+            ></small>
+            $
+            <span data-admin--invoice-form-target="oneTimeCost"></span>
+          <% end %>
+
+          <%= render(UI::DefinitionList::Row::Component.new(label: "Recurring Features", render_with_no_value: true)) do %>
+            <small
+              class="less-strong"
+              data-admin--invoice-form-target="recurringCount"
+            ></small>
+            $
+            <span data-admin--invoice-form-target="recurringCost"></span>
+          <% end %>
+
+          <%= render(UI::DefinitionList::Row::Component.new(label: "Total", render_with_no_value: true)) do %>
+            $
+            <span data-admin--invoice-form-target="totalCost"></span>
+          <% end %>
+
+          <%= render(UI::DefinitionList::Row::Component.new(label: f.label(:amount_due, "Amount due $", class: "twlabel"), render_with_no_value: true)) do %>
+            <%= render(UI::Forms::Input::Component.new(form_builder: f, attribute: :amount_due, kind: :number_field,
+              html_options: {data: {"admin--invoice-form-target": "amountDue", action: "input->admin--invoice-form#recalculate"}})) %>
+          <% end %>
+
+          <%= render(UI::DefinitionList::Row::Component.new(label: "Discount", render_with_no_value: true)) do %>
+            $
+            <span data-admin--invoice-form-target="discountCost"></span>
+          <% end %>
+        <% end %>
+      </div>
+
+      <div class="twwiderow">
+        <div>
+          <%= f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
+
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :start_at, kind: :datetime_local_field,
+            label_text: "Coverage starts", required: true, html_options: {value: start_at, step: 60})) %>
+        </div>
+
+        <div
+          class="<%= "tw:hidden!" if @invoice.endless? %>"
+          data-admin--invoice-form-target="endsAt"
+        >
+          <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :end_at, kind: :datetime_local_field,
+            label_text: "Coverage ends", required: true, html_options: {value: end_at, step: 60})) %>
+        </div>
+      </div>
+
+      <div class="twwiderow">
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :notes, kind: :text_area,
+          html_options: {rows: 4})) %>
+
+        <div class="tw:mt-6 tw:flex tw:flex-col tw:items-start tw:gap-4">
+          <%= render(UI::Button::Component.new(text: "Save", color: :primary, size: :lg, type: "submit")) %>
+
+          <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :is_endless,
+            label: "Coverage never ends",
+            html_options: {data: {"admin--invoice-form-target": "isEndless", action: "change->admin--invoice-form#toggleEndsAt"}})) %>
+        </div>
+      </div>
+
+      <hr class="twhr">
+
+      <div class="tw:mt-6 tw:md:w-1/2">
+        <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :child_enabled_feature_slugs_string,
+          kind: :text_area, label_text: "Features passed on to children",
+          html_options: {rows: 2, placeholder: "comma separated list of features"})) do |group| %>
+          <% group.with_label_note do %>
+            <em>If this is for a parent organization, choose which features from this invoice should apply to the child organizations</em>
+          <% end %>
+
+          <% group.with_helper_text do %>
+            <em>available features in current invoice:</em>
+            <%= safe_join(@invoice.feature_slugs.map { |slug| render(UI::Code::Inline::Component.new(text: slug)) }, ", ") %>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+  <% end %>
+</div>

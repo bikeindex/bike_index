@@ -1,0 +1,27 @@
+---
+en:
+  components:
+    pages:
+      recovery_stories:
+        index:
+          donors_keep_it_free: >-
+            Bike Index doesn't charge riders, sell data, or run ads. Every recovery
+            on this page was powered by donors who keep registration, search, and
+            stolen alerts free for everyone.
+          every_one_found_its_way_home: Every one of these bikes found its way home.
+          fund_the_next_recovery: Fund the next recovery
+          help_it_come_home: Somewhere tonight, a bike is being stolen. Help it come
+            home.
+          in_their_own_words: In their own words
+          lede: >-
+            Behind each photo is a rider who thought it was gone for good, and someone
+            who cared enough to check. A shop mechanic. A police officer. A stranger
+            who remembered an alert. This is what a free, open registry makes possible,
+            and it's kept free by people like you.
+          recovery_stories: Recovery stories
+          register_your_bike: Register your bike
+          share_your_story: Share your story
+          shared_by_the_person: Every story here is shared by the person who got their
+            bike back.
+          started_with_a_registration: Every story here started with a registration.
+          takes_two_minutes: Takes about two minutes. It's free, forever.

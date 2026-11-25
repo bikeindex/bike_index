@@ -4,12 +4,7 @@
 <% end %>
 
 <div class="finished-registration-card finished-registration-intro">
-  <table
-    width="100%"
-    cellpadding="0"
-    cellspacing="0"
-    border="0"
-  >
+  <table width="100%" cellpadding="0" cellspacing="0" border="0">
     <tbody>
       <tr>
         <td class="intro-art-cell">
@@ -32,7 +27,9 @@
   </table>
 
   <% if show_organization_stolen_message? %>
-    <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: bike.current_stolen_record} %>
+    <div class="organization-stolen-message-alert">
+      <%= render partial: "/bikes/organization_stolen_message", locals: {stolen_record: bike.current_stolen_record} %>
+    </div>
   <% end %>
 
   <% if claim_message? %>
@@ -45,6 +42,16 @@
       </p>
     <% end %>
   <% end %>
+
+  <% unless claimed? %>
+    <div class="finished-registration-cta">
+      <%= render(Emails::Partials::TokenLink::Component.new(href: bike_url_with_token, text: cta_text)) %>
+
+      <p>
+        <%= translation("sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: bike.type) %>
+      </p>
+    </div>
+  <% end %>
 </div>
 
 <% if show_after_welcome_snippet? %>
@@ -52,7 +59,7 @@
 <% end %>
 
 <div class="finished-registration-card finished-registration-bike-box">
-  <h3><%= translation("bike_details") %></h3>
+  <h3><%= translation("bike_details", bike_type: bike.type_titleize) %></h3>
   <%= render(Emails::Partials::BikeBox::Component.new(bike:, ownership: @ownership, bike_url_path: bike_url_with_token)) %>
 
   <% if bike.status_stolen_or_impounded? %>
@@ -64,7 +71,7 @@
       <% else %>
         <%= translation("hopefully_you_find_the_bike", bike_type: bike.type) %>
         <strong>
-          <%= link_to(translation("mark_your_bike_recovered"), recovery_url, "data-pm-no-track" => true) %>
+          <%= render(Emails::Partials::TokenLink::Component.new(href: recovery_url, text: translation("mark_your_bike_recovered", bike_type: bike.type), html_class: nil)) %>
           <%= translation("when_you_do") %>
         </strong>
       <% end %>
@@ -75,25 +82,21 @@
     <div class="donate-message">
       <h5>
         <%= translation("please_consider_prefix") %>
-        <%= link_to translation("donating"), why_donate_url %>
+        <%= link_to translation("donating"), donate_url %>
         <%= translation("please_consider_suffix") %>
       </h5>
 
       <p>
         <%= translation("a_donation_will_prioritize_prefix") %>
         <%= link_to translation("prioritize_your_listing"), news_url('get-your-donations-in-this-summer-to-help-bike-index-master-bike-seaso') %>
-        <%= translation("a_donation_will_prioritize_suffix") %>
+        <%= translation("a_donation_will_prioritize_suffix", bike_type: bike.type) %>
       </p>
     </div>
   <% end %>
 
-  <% unless claimed? %>
+  <% if show_view_bike_cta? %>
     <div class="finished-registration-cta">
-      <%= link_to claim_cta_text, bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
-
-      <p>
-        <%= translation("sign_up_on_bikeindexorg_to_claim_your_bik", bike_type: bike.type) %>
-      </p>
+      <%= render(Emails::Partials::TokenLink::Component.new(href: bike_url_with_token, text: cta_text)) %>
     </div>
   <% end %>
 </div>
@@ -103,7 +106,7 @@
 <% elsif show_default_security_section? %>
   <div class="finished-registration-card finished-registration-security">
     <h2>
-      <%= translation("protect_your_bike_by_following_these_lock") %>
+      <%= translation("protect_your_bike_by_following_these_lock", bike_type: bike.type) %>
     </h2>
 
     <table
@@ -116,15 +119,9 @@
       <tbody>
         <tr>
           <td class="locking-copy">
-            <h3>
-              <%= translation("use_a_ulock") %> <%= translation("cable_locks_should_never_be_used") %>
+            <h3 class="uncap" style="font-weight: 400">
+              <%= translation("use_a_ulock_or_foldable_lock") %> <%= translation("cable_locks_should_never_be_used", bike_type: bike.type) %>
             </h3>
-          </td>
-
-          <td class="locking-art">
-            <%= image_tag template_asset_url("assets-howtolock-fighter.png"),
-                      alt: translation("ulock_illustration"),
-                      class: "locking-inline-art" %>
           </td>
         </tr>
       </tbody>
@@ -139,9 +136,9 @@
     >
       <tbody>
         <tr>
-          <td class="locking-copy locking-copy-wide">
+          <td class="locking-copy">
             <p>
-              <%= translation("secure_both_wheels_either_with_two_ulocks") %> <%= translation("before_locking_check") %>
+              <%= translation("secure_both_wheels_with_locking_skewers") %> <%= translation("before_locking_check") %>
             </p>
           </td>
         </tr>
@@ -168,9 +165,9 @@
         <tr>
           <td class="pro-tip-copy">
             <p>
-              <%= translation("indoor_storage_tip") %>
+              <%= translation("indoor_storage_tip", bike_type: bike.type) %>
               <%= translation("read_more_about_prefix") %>
-              <%= link_to translation("protecting_your_bike_here"), protect_your_bike_url %>.
+              <%= link_to translation("protecting_your_bike_here", bike_type: bike.type), protect_your_bike_url %>.
             </p>
           </td>
 
@@ -189,12 +186,7 @@
   <div class="finished-registration-card finished-registration-next-steps">
     <h2><%= translation("whats_next") %></h2>
 
-    <table
-      width="100%"
-      cellpadding="0"
-      cellspacing="0"
-      border="0"
-    >
+    <table width="100%" cellpadding="0" cellspacing="0" border="0">
       <tbody>
         <tr>
           <td class="next-step">
@@ -202,8 +194,11 @@
                       alt: translation("theft_victims_illustration"),
                       class: "next-step-art" %>
 
-            <h3><%= translation("what_if_my_bike_gets_stolen") %></h3>
-            <p><%= translation("stolen_guidance") %></p>
+            <h3>
+              <%= translation("what_if_my_bike_gets_stolen", bike_type: bike.type) %>
+            </h3>
+
+            <p><%= translation("stolen_guidance", bike_type: bike.type) %></p>
           </td>
 
           <td class="next-step">
@@ -215,15 +210,13 @@
               <%= translation("keep_your_registration_updated") %>
             </h3>
 
-            <p><%= translation("updated_registration_guidance") %></p>
+            <p>
+              <%= translation("updated_registration_guidance", bike_type: bike.type) %>
+            </p>
           </td>
         </tr>
       </tbody>
     </table>
-
-    <div class="finished-registration-cta subtle">
-      <%= link_to translation("view_your_bike"), bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
-    </div>
   </div>
 <% end %>
 
@@ -235,9 +228,7 @@
         <%= translation("spread_the_word_body") %>
       </p>
 
-      <% if claimed? %>
-        <%= link_to translation("view_your_bike"), bike_url_with_token, "data-pm-no-track" => true, class: "binx-button" %>
-      <% end %>
+      <%= render(Emails::Partials::TokenLink::Component.new(href: bike_url_with_token, text: cta_text)) %>
     </div>
 
     <table

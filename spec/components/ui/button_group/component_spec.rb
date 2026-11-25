@@ -18,10 +18,28 @@ RSpec.describe UI::ButtonGroup::Component, type: :component do
     expect(render_inline(described_class.new(entries: [{label: "only <strong>not</strong> impounded", href: "/x"}]))).to have_css("a span strong", text: "not")
   end
 
-  # The chip carries the classes the radio group's <label> chips are built from, so the
-  # two groups can't drift apart
-  it "styles the chips like the radio group's" do
-    expect(component.css("a").first["class"].split).to include(*described_class::RESTING_CHIP_CLASSES.split)
+  # Equality, not include: any added utility is a visual difference from the button
+  it "styles the chips as UI::Button's secondary" do
+    expect(component.css("a").first["class"]).to eq(UI::Button::Component.build_classes(color: :secondary, size: :md))
+  end
+
+  it "raises on a kind it doesn't have" do
+    expect { described_class.new(entries:, kind: :segmented) }
+      .to raise_error(ArgumentError, /unknown kind :segmented/)
+  end
+
+  it "raises on a full_width it can't honor" do
+    expect { described_class.new(entries:, kind: :toggle, full_width: true) }
+      .to raise_error(ArgumentError, /full_width is not supported/)
+  end
+
+  context "kind: toggle" do
+    let(:component) { render_inline(described_class.new(entries:, kind: :toggle)) }
+
+    it "renders the entries as segments of a single track" do
+      expect(component).to have_css("div.tw\\:bg-gray-100[data-controller='ui--toggle']")
+      expect(component).to have_css("a.tw\\:font-extrabold", count: 2)
+    end
   end
 
   context "entries without an href" do

@@ -24,18 +24,18 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
-  def password_reset_email(user)
+  def password_reset_email(user, return_to: nil)
     @user = user
-    @url = update_password_form_with_reset_token_users_url(token: @user.token_for_password_reset)
+    @url = update_password_form_with_reset_token_users_url(token: @user.token_for_password_reset, return_to:)
 
     I18n.with_locale(@user&.preferred_language) do
       mail(to: @user.email, tag: __callee__)
     end
   end
 
-  def magic_login_link_email(user)
+  def magic_login_link_email(user, return_to: nil)
     @user = user
-    @url = magic_link_session_url(token: @user.magic_link_token)
+    @url = magic_link_session_url(token: @user.magic_link_token, return_to:)
 
     I18n.with_locale(@user&.preferred_language) do
       mail(to: @user.email, tag: __callee__)
@@ -65,6 +65,11 @@ class CustomerMailer < ApplicationMailer
     @_action_has_layout = false # layout is manually included here
     @mail_snippet_body = mail_snippet.body
     @title = mail_snippet.subject
+    @unsubscribe_signed_id = @user.unsubscribe_signed_id
+
+    # RFC 8058 one-click, required by Gmail and Yahoo for bulk senders
+    headers["List-Unsubscribe"] = "<#{unsubscribe_update_user_url(@unsubscribe_signed_id)}>"
+    headers["List-Unsubscribe-Post"] = "List-Unsubscribe=One-Click"
 
     mail(to: @user.email, subject: @title, tag: __callee__)
   end
@@ -74,7 +79,7 @@ class CustomerMailer < ApplicationMailer
     raise "Missing theft survey mail snippet" if mail_snippet.blank?
 
     mail_body = mail_snippet.body.gsub("SURVEY_LINK_ID", notification.survey_id.to_s)
-    if notification.user.present?
+    if notification.user&.name.present?
       mail_body = mail_body.gsub(/Bike Index Registrant/i, notification.user.name)
     end
 
@@ -151,7 +156,7 @@ class CustomerMailer < ApplicationMailer
         cc: ["bryan@bikeindex.org", "gavin@bikeindex.org"],
         reply_to: @stolen_notification.sender.email,
         from: "bryan@bikeindex.org",
-        subject: @stolen_notification.subject || default_i18n_subject,
+        subject: @stolen_notification.subject || default_i18n_subject(bike_type: @stolen_notification.bike.type),
         tag: __callee__
       )
     end
@@ -166,7 +171,7 @@ class CustomerMailer < ApplicationMailer
 
     I18n.with_locale(@user&.preferred_language) do
       mail(
-        to: @user_alert.user.email,
+        to: @user.email,
         from: "bryan@bikeindex.org",
         subject: @user_alert.email_subject,
         tag: __callee__
@@ -186,10 +191,23 @@ class CustomerMailer < ApplicationMailer
     end
   end
 
+  def pos_registration_match_email(pos_registration_match, user)
+    @user = user
+    pos_bike = pos_registration_match.pos_bike
+    component = Emails::PosRegistrationMatch::Component.new(bike: pos_registration_match.bike, pos_bike:,
+      pos_registration_match:)
+
+    I18n.with_locale(@user.preferred_language) do
+      mail(to: @user.email, subject: default_i18n_subject(bike_type: pos_bike.type), tag: __callee__) do |format|
+        format.html { render component }
+      end
+    end
+  end
+
   def recovered_from_link(stolen_record)
     @stolen_record = stolen_record
     @bike = stolen_record.bike
-    @bike_type = @bike.cycle_type_name&.downcase
+    @bike_type = @bike.type
     @recovering_user = stolen_record.recovering_user
 
     I18n.with_locale(@bike.owner&.preferred_language) do

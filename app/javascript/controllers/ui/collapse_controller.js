@@ -1,31 +1,65 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
+import { storage } from 'utils/storage'
+import { setUrlParam } from 'utils/url_param'
+
+/* global requestAnimationFrame */
 
 // Connects to data-controller='ui--collapse'
 // Animates [data-ui--collapse-target=content] open/closed. Optionally rotates a
 // [data-ui--collapse-target=chevron] and keeps [data-ui--collapse-target=trigger]'s
 // aria-expanded and data-active (the is-active variant) in sync. With
 // data-ui--collapse-param-value set, the open state persists to the URL query
-// (?param=1) so it survives reloads and navigation.
+// (?param=1, ?param=0 collapsed) so it survives reloads and navigation; with
+// data-ui--collapse-storage-key-value it persists to localStorage instead, for a panel
+// whose state is the rider's preference rather than part of the address. A toggle that
+// opens it dispatches ui--collapse:shown, for content loaded once it's wanted, and one that
+// closes it ui--collapse:hidden, for state kept somewhere a param can't. Those sharing
+// data-ui--collapse-group-value, with ui--collapse:shown@window->ui--collapse#closeForGroup,
+// are open one at a time.
 export default class extends Controller {
   static targets = ['content', 'chevron', 'trigger']
-  static values = { duration: { type: Number, default: 200 }, param: String }
+  static values = { param: String, storageKey: String, direction: String, group: String }
 
   connect () {
-    // Restore the open state from the URL without animating on load.
-    if (this.hasParamValue && this.paramInUrl) this.setExpanded(true, 0)
+    // Restore the persisted state without animating on load. Restoring applies rather than
+    // sets: persisting here would only write back what it just read.
+    if (this.urlExpanded !== null) return this.applyExpanded(this.urlExpanded, 0)
+    if (this.hasStorageKeyValue) return this.applyExpanded(this.stored, 0)
+
+    // The server can render the content open -- a panel whose state is part of the
+    // response rather than a preference. Only the trigger needs catching up, and it
+    // mustn't persist: writing the param here would put it in a URL nobody asked it of.
+    this.syncTriggers(!this.collapsed)
   }
 
-  toggle () {
-    this.setExpanded(this.collapsed, this.durationValue)
+  press (event) {
+    this.pressedAt = [event.clientX, event.clientY]
+  }
+
+  // A drag that selects the label still ends in a click
+  toggle (event) {
+    if (event?.detail && this.dragSelected(event)) return
+    this.setExpanded(this.collapsed)
+  }
+
+  dragSelected (event) {
+    const selection = window.getSelection()
+    const [x, y] = this.pressedAt ?? [event.clientX, event.clientY]
+    return !selection.isCollapsed && event.currentTarget.contains(selection.anchorNode) &&
+    Math.hypot(event.clientX - x, event.clientY - y) > 3
   }
 
   show () {
-    this.setExpanded(true, this.durationValue)
+    this.setExpanded(true)
   }
 
   hide () {
-    this.setExpanded(false, this.durationValue)
+    this.setExpanded(false)
+  }
+
+  closeForGroup ({ target, detail }) {
+    if (target !== this.element && detail.group === this.groupValue && !this.collapsed) this.hide()
   }
 
   get collapsed () {
@@ -33,29 +67,58 @@ export default class extends Controller {
       content.classList.contains('tw:hidden') || content.classList.contains('tw:hidden!'))
   }
 
-  get paramInUrl () {
-    return new URLSearchParams(window.location.search).has(this.paramValue)
+  // null when there's no param to read, so the rendered state stands.
+  get urlExpanded () {
+    if (!this.hasParamValue) return null
+
+    const value = new URLSearchParams(window.location.search).get(this.paramValue)
+    if (value === null) return null
+
+    return !['', '0', 'false'].includes(value)
   }
 
+  get stored () {
+    return storage.getItem(this.storageKeyValue) === 'true'
+  }
+
+  // duration 0 restores state without animating
   setExpanded (expanding, duration) {
-    collapse(expanding ? 'show' : 'hide', this.contentTargets, duration)
+    this.applyExpanded(expanding, duration)
+    this.persist(expanding)
+    this.keepFocus(expanding)
+    this.dispatch(expanding ? 'shown' : 'hidden', { detail: { group: this.groupValue } })
+  }
+
+  // A focused trigger the toggle hides - inside the content it collapses, or in what an open panel hides - hands focus
+  // to one still showing, rather than dropping it to the page
+  keepFocus (expanding) {
+    const focused = this.triggerTargets.find((trigger) => trigger === document.activeElement)
+    if (!focused) return
+
+    const showing = (trigger) => trigger.checkVisibility() && (expanding || !this.contentTargets.some((content) => content.contains(trigger)))
+    // once the styles keyed off aria-expanded apply
+    requestAnimationFrame(() => {
+      if (!showing(focused)) this.triggerTargets.find(showing)?.focus()
+    })
+  }
+
+  applyExpanded (expanding, duration) {
+    collapse(expanding ? 'show' : 'hide', this.contentTargets, duration, this.directionValue)
+    this.syncTriggers(expanding)
+  }
+
+  syncTriggers (expanding) {
     this.chevronTargets.forEach((chevron) => chevron.classList.toggle('tw:rotate-90', expanding))
     this.triggerTargets.forEach((trigger) => {
       trigger.setAttribute('aria-expanded', String(expanding))
       trigger.dataset.active = String(expanding)
     })
-    this.persist(expanding)
   }
 
   persist (expanding) {
-    if (!this.hasParamValue) return
-    const url = new URL(window.location)
-    if (expanding) {
-      url.searchParams.set(this.paramValue, '1')
-    } else {
-      url.searchParams.delete(this.paramValue)
-    }
-    // replaceState (not pushState) so a toggle doesn't stack history entries.
-    window.history.replaceState(window.history.state, '', url)
+    if (this.hasStorageKeyValue) storage.setItem(this.storageKeyValue, String(expanding))
+    // Collapsed writes 0 rather than dropping the param: a caller rebuilding the query
+    // string from its own fields can't copy an absent one forward.
+    if (this.hasParamValue) setUrlParam(this.paramValue, expanding ? '1' : '0')
   }
 }
