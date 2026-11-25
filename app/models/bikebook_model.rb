@@ -1,7 +1,5 @@
 # frozen_string_literal: true
 
-# A model in the Bike Book catalog's index, which BikebookModelsSyncJob copies here so that registering doesn't wait on
-# the index, the catalog's biggest file. `markets` are every market it's sold in, its market variants' too
 # == Schema Information
 #
 # Table name: bikebook_models
@@ -24,6 +22,8 @@
 #  index_bikebook_models_on_catalog_id                      (catalog_id) UNIQUE
 #  index_bikebook_models_on_manufacturer_id_and_model_slug  (manufacturer_id,model_slug)
 #
+# A model in the Bike Book catalog's index, which BikebookModelsSyncJob copies here so that registering doesn't wait on
+# the index, the catalog's biggest file. `markets` are every market it's sold in, its market variants' too
 class BikebookModel < ApplicationRecord
   acts_as_paranoid
 

@@ -7,8 +7,8 @@ description: >-
   existing colors, shadows, and hover states to report. Trigger when a branch adds or
   redesigns a page's markup, especially a marketing, landing, donate or "how it works"
   page or a design handoff built from a mockup. Also trigger on "use existing
-  components", "reuse the markup", "is this hand-rolled", and from the `pr` skill's
-  markup audit. It replaces without asking.
+  components", "reuse the markup", "is this hand-rolled", and from the `code-review-bike-index`
+  skill's markup audit. It replaces without asking.
 ---
 
 # Use existing markup
