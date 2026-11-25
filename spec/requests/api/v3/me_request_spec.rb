@@ -226,16 +226,17 @@ RSpec.describe "Me API V3", type: :request do
       let(:target_alerts) do
         [
           {id: user_alert_photo.id, kind: "theft_alert_without_photo", title: "Please add a photo",
-           message: "Promoted alerts need an image to be effective - add a photo to your #{bike.title_string}",
-           url: "#{ENV["BASE_URL"]}/bikes/#{bike.to_param}/edit/photos", bike_id: bike.id,
+           message: "Successful promoted alerts need to have an image",
+           action: "Add a photo to your #{bike.title_string}", url: "#{ENV["BASE_URL"]}/bikes/#{bike.to_param}/edit/photos", bike_id: bike.id,
            organization_id: nil, created_at: user_alert_photo.created_at.to_i},
-          {id: user_alert_org.id, kind: "unassigned_bike_org", title: "Connect to #{organization.short_name}",
-           message: "Some of your registrations are connected to #{organization.short_name}, but your #{bike.title_string} is not",
-           url: "#{ENV["BASE_URL"]}/my_account", bike_id: bike.id,
+          {id: user_alert_org.id, kind: "unassigned_bike_org", title: nil,
+           message: "Some of your registrations are connected to #{organization.short_name}, but your " \
+             "#{bike.title_string} isn't. Generally, you should connect all of them to #{organization.short_name}.",
+           action: "Add it now!", url: "#{ENV["BASE_URL"]}/my_account", bike_id: bike.id,
            organization_id: organization.id, created_at: user_alert_org.created_at.to_i},
           {id: user_alert_location.id, kind: "stolen_bike_without_location", title: "Please add theft location",
-           message: "It is critical for recovery that you include the address or cross-street where your #{user_alert_location.bike.title_string} was stolen",
-           url: "#{ENV["BASE_URL"]}/bikes/#{user_alert_location.bike.to_param}/edit/theft_details#where-theft-happened",
+           message: "It is critical for recovery that you include the address or cross-street where your bike was stolen.",
+           action: "Add the location of the theft of your #{user_alert_location.bike.title_string}", url: "#{ENV["BASE_URL"]}/bikes/#{user_alert_location.bike.to_param}/edit/theft_details#where-theft-happened",
            bike_id: user_alert_location.bike_id, organization_id: nil, created_at: user_alert_location.created_at.to_i}
         ]
       end
@@ -251,7 +252,8 @@ RSpec.describe "Me API V3", type: :request do
         expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
         user_alert_registration = user.user_alerts.unfinished_registration.first
         target_registration = {id: user_alert_registration.id, kind: "unfinished_registration",
-                               title: "Finish your registration", message: "Your Surly cargo bike isn't registered yet!",
+                               title: nil, message: "Your Surly cargo bike isn't registered yet! Please finish the required steps",
+                               action: "finish the required steps",
                                url: "#{ENV["BASE_URL"]}/register?b_param_token=#{b_param.id_token}",
                                bike_id: nil, organization_id: nil, created_at: user_alert_registration.created_at.to_i}
         # phone_waiting_confirmation is behind a flag
@@ -265,8 +267,7 @@ RSpec.describe "Me API V3", type: :request do
         get "/api/v3/me/alerts", params: {access_token: token.token}
         user_alert_phone = user.user_alerts.phone_waiting_confirmation.first
         target_phone = {id: user_alert_phone.id, kind: "phone_waiting_confirmation",
-                        title: "Confirm your phone number",
-                        message: "Enter the verification code we texted to 433-444-4444",
+                        title: "Verify 433-444-4444", message: nil, action: "Confirm your phone number",
                         url: "#{ENV["BASE_URL"]}/my_account/edit", bike_id: nil, organization_id: nil,
                         created_at: user_alert_phone.created_at.to_i}
         expect(json_result[:alerts]).to match_array((target_alerts + [target_phone]).as_json)

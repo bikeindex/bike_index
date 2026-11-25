@@ -92,7 +92,7 @@ module API
           authorizations: {oauth2: {scope: :read_user}},
           notes: <<-NOTE
             The things the current user needs to do, so long as the access_token has the `read_user` scope.
-            Each alert has a `kind`, a plain text `title` and `message`, and the `url` of the page on Bike Index that resolves it.
+            Each alert has a `kind`, the plain text of the alert on Bike Index - a `title` and `message`, either of which can be null, and the `action` its link or button says - and the `url` of the page that resolves it.
             `bike_id` and `organization_id` are set for the kinds that are about a bike or an organization.
 
           NOTE
