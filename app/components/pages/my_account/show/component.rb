@@ -21,8 +21,9 @@ module Pages
         def bike_count = @pagy.count
 
         def subtitle
-          [translation(".bike_count", count: bike_count), translation(".lock_count", count: @locks.size),
-            (translation(".membership_subtitle", level: membership.basic? ? "" : membership.level_humanized) if membership.present?)].compact.join(" · ")
+          return if membership.blank?
+
+          translation(".membership_subtitle", level: membership.basic? ? "" : membership.level_humanized)
         end
 
         def tabs

@@ -26,7 +26,7 @@
       <% if thumb_image_url.present? %>
         <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:h-full tw:w-full tw:rounded-t-[11px] tw:object-cover") %>
       <% else %>
-        <%= image_tag(helpers.bike_placeholder_image_path, alt: @bike.title_string, class: "tw:h-full tw:w-full tw:object-contain tw:p-8") %>
+        <%= helpers.bike_placeholder_image_tag(alt: @bike.title_string, class: "tw:h-full tw:w-full tw:object-contain tw:p-8") %>
       <% end %>
 
       <% if for_sale_listing&.amount_cents.present? %>
@@ -87,8 +87,26 @@
         <p class="tw:m-0 tw:text-xs tw:text-gray-400"><%= location %></p>
       <% end %>
 
-      <%= render(Atoms::Serial::Component.new(bike: @bike, organization: @organization, explanation: :tooltip,
-        html_class: "tw:text-xs! tw:text-gray-400!")) %>
+      <div
+        class="
+          tw:@container tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-2
+          tw:gap-y-1
+        "
+      >
+        <span
+          class="
+            tw:rounded-md tw:border tw:border-gray-100 tw:bg-gray-50
+            tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs
+            tw:dark:border-gray-700 tw:dark:bg-gray-900
+          "
+        >
+          <%= render(Atoms::Serial::Component.new(bike: @bike, organization: @organization, explanation: :serial_tooltip)) %>
+        </span>
+
+        <% if credibility_badges? %>
+          <%= render(Atoms::RegistrationDates::Component.new(bike: @bike)) %>
+        <% end %>
+      </div>
 
       <% if render_org_badge? %>
         <div>

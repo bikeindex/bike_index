@@ -37,6 +37,13 @@ module Atoms
 
       def self.border_class(bike) = BORDER_CLASSES[color(bike)]
 
+      # When the status began: occurred_at is the stolen or impounded date, and an
+      # abandoned bike's is the notification that marked it. Nil for a registered bike
+      def self.event_time(bike, for_sale_listing: nil)
+        bike.occurred_at || for_sale_listing&.published_at ||
+          (bike.parking_notifications.active.appears_abandoned_notification.maximum(:created_at) if bike.status_abandoned?)
+      end
+
       # override_status: the marketplace preview, where the listing is still a draft
       # time: when the status began, rendered after the label
       def initialize(bike:, override_status: nil, skip_with_owner: false, size: :md, time: nil)

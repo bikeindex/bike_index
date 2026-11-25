@@ -38,15 +38,13 @@ module Pages
             @thumb_image_url ||= @bike.public_images.first&.image_url(:small) || BikeServices::Displayer.thumb_image_url(@bike)
           end
 
-          # A stock photo fills the frame, but the owner still hasn't added one of their own
-          def photo_path
-            @bike.thumb_path.present? ? bike_path(@bike) : edit_bike_path(@bike, edit_template: "photos")
-          end
+          # A link to the bike once it has a photo of its own; until then the frame holds the
+          # add-photo button, which can't sit inside a link
+          def photo_frame(&)
+            classes = "tw:relative tw:flex tw:h-20 tw:w-28 tw:items-center tw:justify-center tw:overflow-hidden tw:rounded-lg tw:bg-gray-100 tw:@xl:row-span-2 tw:@xl:h-[124px] tw:@xl:w-[180px] tw:dark:bg-gray-900"
+            return link_to(bike_path(@bike), class: classes, &) if @bike.thumb_path.present?
 
-          def add_photo_prompt
-            return if @bike.thumb_path.present?
-
-            tag.span(render(UI::Badge::Component.new(text: translation(".add_a_photo"), color: :empty)), class: "tw:absolute tw:bottom-2 tw:left-2")
+            tag.div(class: classes, &)
           end
 
           def strava_gear_link
@@ -94,10 +92,6 @@ module Pages
 
           def sale_link_text
             @bike.is_for_sale ? translation(".update_listing") : translation(".list_for_sale")
-          end
-
-          def title_html
-            safe_join([tag.strong([@bike.year, @bike.mnfg_name].compact.join(" ")), @bike.frame_model_truncated.presence].compact, " ")
           end
         end
       end

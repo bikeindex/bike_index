@@ -36,15 +36,16 @@ RSpec.describe SharedBlocks::SearchResults::BikeListItem::Component, type: :comp
       expect(component).to have_no_css("span.localizeTime")
     end
 
-    # BikeCard's copy of status_time, which no longer reaches this one
     context "with credibility_badges" do
       let(:organization) do
         FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"])
       end
 
-      it "carries the registration date" do
-        expect(component).to have_text("Registered ·")
-        expect(component).to have_css("span.localizeTime")
+      it "shows the registered and updated dates beside the serial, not in the badge" do
+        expect(component).not_to have_text("Registered ·")
+        expect(component).to have_text(/Registered\s+\S/)
+        expect(component).to have_text("Updated")
+        expect(component).to have_css("span.localizeTime", count: 2)
       end
     end
   end

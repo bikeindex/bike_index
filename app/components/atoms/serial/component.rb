@@ -5,7 +5,8 @@ module Atoms
     # Renders a bike's serial as seen by the given user, or by the given organization's
     # members - which a page cached per organization passes. A hidden, unknown or absent
     # serial renders that word in place of the number, and a hidden serial is followed
-    # by why it's hidden - inline, or in a tooltip.
+    # by why it's hidden - inline, or in a tooltip. With :serial_tooltip, the serial is
+    # itself the trigger of a tooltip that labels it and says why it's hidden.
     # Pass a bike, or a raw serial string.
     class Component < ApplicationComponent
       # What serial_display returns in place of a number
@@ -25,6 +26,7 @@ module Atoms
       end
 
       def call
+        return render(UI::Tooltip::Component.new(text: serial_tooltip_text)) { serial_block } if @explanation == :serial_tooltip
         return serial_block unless explanation?
 
         safe_join([serial_block, " ", explanation_block])
@@ -53,6 +55,11 @@ module Atoms
         when "made without serial" then translation(".made_without_serial")
         else translation(".unknown")
         end
+      end
+
+      def serial_tooltip_text
+        text = translation(".serial_number", serial: placeholder? ? placeholder_text : serial)
+        explanation? ? "#{text} (#{explanation_text})" : text
       end
 
       def explanation?

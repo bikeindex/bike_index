@@ -88,6 +88,22 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
     end
   end
 
+  describe ".event_time" do
+    it "is nil for a registered bike" do
+      expect(described_class.event_time(FactoryBot.create(:bike))).to be_nil
+    end
+
+    context "abandoned by a parking notification" do
+      let(:parking_notification) { FactoryBot.create(:parking_notification, kind: "appears_abandoned_notification", created_at: Time.current - 2.days) }
+      let(:bike) { parking_notification.bike.reload }
+
+      it "is when the notification marked it" do
+        expect(bike.status).to eq "status_abandoned"
+        expect(described_class.event_time(bike)).to match_time parking_notification.created_at
+      end
+    end
+  end
+
   describe ".status_humanized" do
     it "returns the bike's own status" do
       expect(described_class.status_humanized(Bike.new(status: :status_stolen))).to eq "stolen"

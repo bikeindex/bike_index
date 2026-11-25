@@ -6,7 +6,7 @@
 >
   <div
     class="
-      tw:-mb-3.5 tw:flex tw:flex-wrap tw:items-center tw:justify-between
+      tw:-mb-3.5 tw:flex tw:flex-wrap tw:items-baseline tw:justify-between
       tw:gap-5
     "
   >
@@ -14,8 +14,8 @@
       <%= render(UI::Header::Component.new(text: translation(".header_title", current_user_name: @user.display_name), subtitle:)) %>
     </div>
 
-    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-      <%= render(UI::ButtonLink::Component.new(text: translation(".add_a_bike"), href: register_path, color: :yellow, size: :callout_sm)) %>
+    <div class="tw:flex tw:flex-wrap tw:items-baseline tw:gap-2">
+      <%= render(UI::ButtonLink::Component.new(text: translation(".register_a_bike"), href: register_path, color: :yellow, size: :callout_sm)) %>
       <%= render(UI::ButtonLink::Component.new(text: translation(".add_a_lock"), href: new_lock_url, color: :secondary, size: :callout_sm)) %>
     </div>
   </div>
@@ -44,9 +44,9 @@
                     <span class="tw:font-mono"><%= lock.combination %></span>
                   <% end %>
 
-                  <%= translation(".registered") %>
+                  <strong><%= translation(".registered") %></strong>
                   <%= render(UI::Time::Component.new(time: lock.created_at)) %>
-                  · <%= translation(".updated") %>
+                  · <strong><%= translation(".updated") %></strong>
                   <%= render(UI::Time::Component.new(time: lock.updated_at)) %>
                 </div>
               </div>
@@ -95,7 +95,7 @@
         <%= translation(".no_bikes_registered_yet") %>
       </div>
 
-      <%= render(UI::ButtonLink::Component.new(text: translation(".add_a_bike_empty"), href: register_path, color: :primary, size: :sm)) %>
+      <%= render(UI::ButtonLink::Component.new(text: translation(".register_a_bike_empty"), href: register_path, color: :primary, size: :sm)) %>
     </div>
   <% end %>
 

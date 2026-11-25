@@ -14,9 +14,9 @@ RSpec.describe Pages::MyAccount::Show::Component, type: :component do
   context "without bikes or locks" do
     it "renders the header, the empty state and the prompts" do
       expect(component).to have_css("h1", text: "Alexandra on Bike Index")
-      expect(component).to have_text(/0 bikes ·\s+0 locks/)
+      expect(component).not_to have_text("0 bikes")
       expect(component).to have_text("No bikes registered yet")
-      expect(component).to have_link("+ Add a bike", href: "/register")
+      expect(component).to have_link("+ Register a bike", href: "/register")
       expect(component).to have_link("Update profile")
       expect(component).to have_link("Donate", href: %r{/donate\z})
       expect(component).to have_text("Strava")
@@ -37,7 +37,6 @@ RSpec.describe Pages::MyAccount::Show::Component, type: :component do
     let!(:lock) { FactoryBot.create(:lock, user:, key_serial: "KEY-9") }
 
     it "renders the counts and the bikes" do
-      expect(component).to have_text(/1 bike ·\s+1 lock/)
       expect(component).to have_link("Bikes")
       expect(component).to have_link("Locks", href: "/my_account?active_tab=locks")
       expect(component).to have_text("LISTED-123")
