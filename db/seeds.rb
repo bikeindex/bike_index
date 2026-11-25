@@ -18,7 +18,7 @@ cgroup_priorities.each do |name, priority|
   cgroup.update!(priority:)
 end
 
-# Half the seeded bikes are Bike Book models
+# Inline: a bike's creation only enqueues it, which would finish after the seeded bikes picked their models
 BikebookModelsSyncJob.new.perform
 
 # NOTE: this does not seed manufacturers, primary_activities, components or wheel sizes, those are pulled via rake task
