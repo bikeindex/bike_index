@@ -34,7 +34,7 @@ class BikebookModelsSyncJob < ScheduledJob
     manufacturer_ids = Manufacturer.where(slug: models.pluck("manufacturer").uniq).pluck(:slug, :id).to_h
     rows = models.filter_map { |model| manufacturer_ids[model["manufacturer"]]&.then { row(model, it) } }
     rows.each_slice(1_000) { BikebookModel.upsert_all(it, unique_by: :catalog_id) }
-    BikebookModel.where.not(catalog_id: rows.pluck(:catalog_id)).delete_all
+    BikebookModel.where.not(catalog_id: rows.pluck(:catalog_id)).update_all(deleted_at: Time.current)
     Rails.cache.write(SYNCED_KEY, synced)
   end
 
@@ -43,6 +43,6 @@ class BikebookModelsSyncJob < ScheduledJob
   def row(model, manufacturer_id)
     {catalog_id: model["id"], manufacturer_id:, name: model["model"],
      model_slug: Slugifyer.book_slug(model["model"]), first_year: model["first_year"], final_year: model["final_year"],
-     markets: [*model["markets"], *model["variants"].flat_map { it["markets"] }].uniq}
+     markets: [*model["markets"], *model["variants"].flat_map { it["markets"] }].uniq, deleted_at: nil}
   end
 end

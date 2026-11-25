@@ -8,6 +8,7 @@
 # Database name: primary
 #
 #  id              :bigint           not null, primary key
+#  deleted_at      :datetime
 #  final_year      :integer
 #  first_year      :integer          not null
 #  markets         :string           default([]), not null, is an Array
@@ -24,15 +25,17 @@
 #  index_bikebook_models_on_manufacturer_id_and_model_slug  (manufacturer_id,model_slug)
 #
 class BikebookModel < ApplicationRecord
+  acts_as_paranoid
+
   belongs_to :manufacturer
 
   scope :sold_in_year, ->(year) { where(first_year: ..year, final_year: [nil, year..]) }
 
-  # The catalog id of the manufacturer's model of that name sold in that year, nil for one the catalog lacks. Of
-  # several, the one sold in `market`, a catalog market, then the latest
-  def self.catalog_id_for(manufacturer_id:, name:, year:, market: "US")
+  # The manufacturer's model of that name sold in that year, nil for one the catalog lacks. Of several, the one sold in
+  # `market`, a catalog market, then the latest
+  def self.matching(manufacturer_id:, name:, year:, market: "US")
     models = where(manufacturer_id:, model_slug: Slugifyer.book_slug(name)).sold_in_year(year).order(first_year: :desc, catalog_id: :asc).to_a
-    (models.find { it.markets.include?(market) } || models.first)&.catalog_id
+    models.find { it.markets.include?(market) } || models.first
   end
 
   # The name of a catalog id or a market variant's citation key (…/haul-st@CA), which a pick in registration's model

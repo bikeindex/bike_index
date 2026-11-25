@@ -16,9 +16,10 @@ module Integrations
 
         year = options[:year].to_i
         market = Integrations::Bikebook::Catalog.market(options[:market])
-        id = BikebookModel.catalog_id_for(manufacturer_id: options[:manufacturer_id], name: options[:frame_model], year:, market:)
-        record = id && Integrations::Bikebook::Catalog.model(id, market:)
-        record && {bike: bike_attributes(record, year), components: component_attributes(record)}.with_indifferent_access
+        bikebook_model = BikebookModel.matching(manufacturer_id: options[:manufacturer_id], name: options[:frame_model], year:, market:)
+        record = bikebook_model && Integrations::Bikebook::Catalog.model(bikebook_model.catalog_id, market:)
+        record && {bike: bike_attributes(record, year), components: component_attributes(record),
+                   vehicle_specification: {bikebook_model_id: bikebook_model.id, bikebook_market: market}}.with_indifferent_access
       rescue Integrations::Bikebook::Catalog::Unreachable
         nil
       end

@@ -5,9 +5,9 @@ require "rails_helper"
 RSpec.describe BikebookModel, type: :model do
   before { sync_bikebook_models }
 
-  describe "catalog_id_for" do
+  describe "matching" do
     def catalog_id(name, year, market = "US", manufacturer: "Specialized")
-      described_class.catalog_id_for(manufacturer_id: Manufacturer.friendly_find(manufacturer).id, name:, year:, market:)
+      described_class.matching(manufacturer_id: Manufacturer.friendly_find(manufacturer).id, name:, year:, market:)&.catalog_id
     end
 
     it "is the model sold that year, the one sold in its market of several" do
