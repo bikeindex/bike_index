@@ -39,7 +39,7 @@ module Atoms
 
       # When the status began: occurred_at is the stolen or impounded date, and an
       # abandoned bike's is the notification that marked it. Nil for a registered bike
-      def self.event_time(bike, for_sale_listing: nil)
+      def self.event_time(bike, for_sale_listing: bike.current_for_sale_marketplace_listing)
         bike.occurred_at || for_sale_listing&.published_at ||
           (bike.parking_notifications.active.appears_abandoned_notification.maximum(:created_at) if bike.status_abandoned?)
       end

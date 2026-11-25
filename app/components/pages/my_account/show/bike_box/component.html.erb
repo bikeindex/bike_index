@@ -18,7 +18,7 @@
       <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-2.5">
         <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
           <%# Pulled left and sized to the title so it lines up %>
-          <span class="tw:has-[*]:-ml-[calc(0.5rem+1px)]"><%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :inherit, time: Atoms::RegistrationStatusBadge::Component.event_time(@bike, for_sale_listing: @bike.current_for_sale_marketplace_listing))) %></span>
+          <span class="tw:has-[*]:-ml-[calc(0.5rem+1px)]"><%= render(Atoms::RegistrationStatusBadge::Component.new(bike: @bike, size: :inherit, time: Atoms::RegistrationStatusBadge::Component.event_time(@bike))) %></span>
 
           <%= link_to bike_path(@bike), class: "tw:twtext-color tw:hover:underline" do %>
             <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
@@ -32,28 +32,14 @@
             tw:text-sm tw:text-gray-500
           "
         >
-          <% if @bike.frame_color_records.any? %>
-            <span class="tw:flex tw:items-center tw:gap-1.5">
-              <span class="tw:flex tw:gap-0.5">
-                <% @bike.frame_color_records.each do |color| %>
-                  <%= render(UI::ColorSwatch::Component.new(display: color.display, name: color.name, size: :sm)) %>
-                <% end %>
-              </span>
-
-              <%= @bike.frame_colors.join(" / ") %>
-            </span>
-          <% end %>
+          <%= render(Atoms::FrameColors::Component.new(bike: @bike)) %>
 
           <% if location.present? %>
             <span><%= location %></span>
           <% end %>
 
           <span class="tw:inline-flex tw:items-center tw:gap-1.5">
-            <% if @bike.motorized? %>
-              <%= render(UI::Badge::Component.new(text: "⚡", title: translation(".e_vehicle"), color: :purple)) %>
-            <% end %>
-
-            <%= render(UI::Badge::Component.new(text: @bike.type_titleize, color: @bike.motorized? ? :purple : :gray)) %>
+            <%= render(Atoms::VehicleTypeBadges::Component.new(bike: @bike)) %>
           </span>
 
           <% if @bike.user_hidden %>
@@ -77,16 +63,7 @@
             tw:gap-y-1 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400
           "
         >
-          <span
-            class="
-              tw:rounded-md tw:border tw:border-gray-100 tw:bg-gray-50
-              tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-900
-              tw:dark:border-gray-700 tw:dark:bg-gray-900
-              tw:dark:text-gray-100
-            "
-          >
-            <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :serial_tooltip)) %>
-          </span>
+          <%= render(Atoms::Serial::Component.new(bike: @bike, user: @current_user, explanation: :serial_tooltip)) %>
 
           <%= render(Atoms::RegistrationDates::Component.new(bike: @bike)) %>
         </div>

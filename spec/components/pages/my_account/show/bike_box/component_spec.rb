@@ -114,15 +114,6 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     end
   end
 
-  context "an e-bike" do
-    before { bike.update(cycle_type: :bike, propulsion_type: :"pedal-assist") }
-
-    it "marks it as an e-vehicle" do
-      expect(component).to have_text("⚡")
-      expect(component).to have_text("E-vehicle")
-    end
-  end
-
   context "with a bike sticker" do
     before { FactoryBot.create(:bike_sticker_claimed, code: "A40340", bike:, user:) }
 
@@ -150,7 +141,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     it "offers to update the listing, and says it's for sale" do
       expect(component).to have_text("For Sale")
       expect(component).to have_link("Update listing")
-      # The registered date in the badge, and the updated date
+      # Registered and updated; with no published listing the badge carries no date
       expect(component).to have_css(".localizeTime", count: 2)
     end
   end

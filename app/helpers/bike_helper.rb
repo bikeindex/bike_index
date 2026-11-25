@@ -27,7 +27,7 @@ module BikeHelper
 
   # The drawing is white, so on a dark background it stands out far more than on light
   def bike_placeholder_image_tag(**options)
-    image_tag(bike_placeholder_image_path, **options, class: [options[:class], "tw:dark:opacity-15"].compact.join(" "))
+    image_tag(bike_placeholder_image_path, **options, class: class_names(options[:class], "tw:dark:opacity-15"))
   end
 
   private

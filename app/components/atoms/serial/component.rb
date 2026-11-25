@@ -5,12 +5,14 @@ module Atoms
     # Renders a bike's serial as seen by the given user, or by the given organization's
     # members - which a page cached per organization passes. A hidden, unknown or absent
     # serial renders that word in place of the number, and a hidden serial is followed
-    # by why it's hidden - inline, or in a tooltip. With :serial_tooltip, the serial is
-    # itself the trigger of a tooltip that labels it and says why it's hidden.
+    # by why it's hidden - inline, or in a tooltip. With :serial_tooltip, the serial is a
+    # pill that triggers a tooltip labelling it and saying why it's hidden.
     # Pass a bike, or a raw serial string.
     class Component < ApplicationComponent
       # What serial_display returns in place of a number
       PLACEHOLDERS = ["hidden", "unknown", "made without serial"].freeze
+      PILL_CLASSES = "tw:rounded-md tw:border tw:border-gray-100 tw:bg-gray-50 tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-900 " \
+        "tw:dark:border-gray-700 tw:dark:bg-gray-900 tw:dark:text-gray-100"
 
       def initialize(bike: nil, serial: nil, user: nil, organization: nil, explanation: :inline, html_class: nil)
         @bike = bike
@@ -26,7 +28,7 @@ module Atoms
       end
 
       def call
-        return render(UI::Tooltip::Component.new(text: serial_tooltip_text)) { serial_block } if @explanation == :serial_tooltip
+        return content_tag(:span, render(UI::Tooltip::Component.new(text: serial_tooltip_text)) { serial_block }, class: PILL_CLASSES) if @explanation == :serial_tooltip
         return serial_block unless explanation?
 
         safe_join([serial_block, " ", explanation_block])

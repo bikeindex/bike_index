@@ -7,7 +7,6 @@ en:
           bike_box:
             add_a_photo: Add a photo
             bike_sticker: Bike Sticker
-            e_vehicle: E-vehicle
             edit_registration: Edit %{bike_type}
             impound_claim_html: "%{status} claim to %{claimed_bike}"
             list_for_sale: List for sale

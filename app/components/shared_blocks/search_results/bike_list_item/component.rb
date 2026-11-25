@@ -54,7 +54,6 @@ module SharedBlocks
             time: Atoms::RegistrationStatusBadge::Component.event_time(@bike, for_sale_listing:))
         end
 
-        # How long a bike has been registered is what vouches for it
         def credibility_badges? = @organization&.enabled?("credibility_badges")
 
         # Member listings sort ahead of the rest on the marketplace, so the badge says why
