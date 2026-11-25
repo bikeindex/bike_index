@@ -1,5 +1,5 @@
 <li class="tw:flex tw:flex-col tw:gap-2">
-  <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike: @bike, current_user: @current_user, unfinished_b_param: @unfinished_b_param)) %>
+  <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: @unfinished_b_param, current_user: @current_user, kind: :error, margin_classes: "tw:mb-0")) %>
 
   <% cache(cache_key) do %>
     <%= render(UI::Card::Component.new(additional_classes: class_names("tw:relative tw:z-10 tw:flex tw:flex-wrap tw:items-stretch tw:gap-[18px] tw:border-l-[5px]", accent_classes))) do %>
@@ -68,7 +68,7 @@
           <% if bike_sticker_codes.any? %>
             <span>
               <%= translation(".bike_sticker").pluralize(bike_sticker_codes.size) %>:
-              <%= safe_join(bike_sticker_codes.map { tag.code(it) }, ", ") %>
+              <%= safe_join(bike_sticker_codes.map { render(Atoms::Sticker::Component.new(pretty_code: it)) }, ", ") %>
             </span>
           <% end %>
 
@@ -96,5 +96,5 @@
     <% end %>
   <% end %>
 
-  <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike: @bike, current_user: @current_user, user_alerts: @user_alerts, under_card: true)) %>
+  <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(user_alerts: @user_alerts)) %>
 </li>

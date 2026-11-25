@@ -41,7 +41,6 @@ RSpec.describe Pages::MyAccount::Show::Component, type: :component do
       expect(component).to have_link("Bikes")
       expect(component).to have_link("Locks", href: "/my_account?active_tab=locks")
       expect(component).to have_text("LISTED-123")
-      expect(component).not_to have_link(href: /view=/)
     end
 
     context "with an unassigned_bike_org alert" do

@@ -4,9 +4,9 @@ module Pages
   module MyAccount
     module Show
       module BikeBox
-        # A registration as a card in the list. The alerts render outside
-        # the cache, since resolving or dismissing one doesn't touch the bike. Each is loaded
-        # once for the page, and each box picks out its own
+        # A registration as a card in the list. The alerts render outside the cache, since
+        # resolving or dismissing one doesn't touch the bike. Each is loaded once for the
+        # page, and each box picks out its own
         class Component < ApplicationComponent
           def self.user_alerts(user)
             return [] unless user.alert_slugs.intersect?(UserAlert.account_kinds)
@@ -80,11 +80,16 @@ module Pages
 
           # A marketplace listing shows its own address
           def location
-            record = @bike.current_event_record
-            return if record.blank? || @bike.is_for_sale
-            return record.formatted_address_string unless record.is_a?(ImpoundRecord)
+            return @location if defined?(@location)
 
-            record.address_record&.formatted_address_string(visible_attribute: :street)
+            record = @bike.current_event_record
+            @location = if record.blank? || @bike.is_for_sale
+              nil
+            elsif record.is_a?(ImpoundRecord)
+              record.address_record&.formatted_address_string(visible_attribute: :street)
+            else
+              record.formatted_address_string
+            end
           end
 
           def sale_link_text

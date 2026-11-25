@@ -1,10 +1,6 @@
-<div class="<%= class_names("tw:flex tw:flex-col tw:gap-4", "tw:-mt-4.5": @under_card) %>">
-  <% if @unfinished_b_param %>
-    <%= render(SharedBlocks::UserAlerts::UnfinishedRegistration::Component.new(b_param: @unfinished_b_param, current_user: @current_user, kind: :error, margin_classes: "tw:mb-0")) %>
-  <% end %>
-
+<div class="tw:-mt-3 tw:flex tw:flex-col tw:gap-4">
   <% @user_alerts.each_with_index do |user_alert, index| %>
-    <%= render(UI::Alerts::Base::Component.new(margin_classes: alert_margin_classes(index))) do %>
+    <%= render(UI::Alerts::Base::Component.new(margin_classes: index.zero? ? "tw:mb-0 tw:pt-5!" : "tw:mb-0")) do %>
       <%= translation(".generally_connect_to_org", org_name: user_alert.organization&.short_name) %>
 
       <%= render(UI::ButtonLink::Component.new(text: translation(".add_it_now"), href: user_alert_path(id: user_alert.id, add_bike_organization: true), method: :patch, color: :primary, size: :sm, form: {class: "tw:ml-1 tw:inline-block"})) %>

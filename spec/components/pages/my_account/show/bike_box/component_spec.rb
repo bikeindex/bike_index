@@ -155,7 +155,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
 
     it "renders only this bike's alert, tucked under the card" do
       expect(component).to have_css("[role=alert]", count: 1)
-      expect(component).to have_css("li > div:last-child.tw\\:-mt-4\\.5 [role=alert].tw\\:pt-6\\.5\\!")
+      expect(component).to have_css("li > div:last-child.tw\\:-mt-3 [role=alert].tw\\:pt-5\\!")
       expect(component).to have_text("associated with Brakebills")
       expect(component).to have_css("form[action='/user_alerts/#{user_alert.id}?add_bike_organization=true'] button", text: "Add it now!")
       expect(component).to have_css("form[action='/user_alerts/#{user_alert.id}?alert_action=dismiss'] button", text: "Ignore this suggestion")
@@ -170,7 +170,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     end
 
     it "renders the unfinished registration alert, above the registration" do
-      expect(component).to have_css("li > div:first-child [role=alert]", text: "Your Surly bike isn't registered yet!")
+      expect(component).to have_css("li > [role=alert]:first-child", text: "Your Surly bike isn't registered yet!")
       expect(component).to have_link("finish the required steps")
     end
   end
