@@ -6,11 +6,11 @@ description: >-
   with an existing PR (by #number, URL, branch name, or "the open PR"), regardless of verb —
   attach, embed, add, put, post, drop, show, document. Also covers visually documenting test runs,
   bug repros, UI states, or CI failures on an existing PR. Uploads through `gh`'s `--attach` flag —
-  except in the Claude Code web sandbox, where `gh` doesn't work and images are hosted through the PR branch's
-  history instead. It also owns the PR's one `## Screenshots` comment — finding, creating, editing
+  except in the Claude Code web sandbox, where nothing can post an image, so it leaves them for the user
+  to attach by hand. It also owns the PR's one `## Screenshots` comment — finding, creating, editing
   and verifying it — so other workflows (the `pr` skill's screenshot phase) hand it a composed body
   that references local image paths, and it posts it.
-allowed-tools: Bash(gh:*), Bash(rtk proxy gh:*), Bash(ruby .claude/skills/github-pr-images/assets/inline_attachments.rb:*), Bash(brew upgrade gh), Bash(cp:*), Bash(bash .claude/skills/github-pr-images/assets/commit_images.sh:*), Bash(curl -sI https://raw.githubusercontent.com/:*), Read, Write, mcp__github__list_pull_requests, mcp__github__get_me, mcp__github__issue_read, mcp__github__add_issue_comment, mcp__github__update_issue_comment
+allowed-tools: Bash(gh:*), Bash(rtk proxy gh:*), Bash(ruby .claude/skills/github-pr-images/assets/inline_attachments.rb:*), Bash(brew upgrade gh), Bash(cp:*), Read, Write, mcp__github__list_pull_requests, mcp__github__get_me, mcp__github__issue_read, mcp__github__add_issue_comment, mcp__github__update_issue_comment
 ---
 
 # Upload Image to PR
@@ -27,7 +27,7 @@ From a session with history, hand this skill to a subagent the way `AGENTS.md`'s
 
 `$CLAUDE_CODE_REMOTE` decides which, before anything else here.
 
-**`true`** — the web sandbox, where `gh` is missing or refused (GraphQL 403s), and follows [references/web-sandbox.md](references/web-sandbox.md) for the **whole flow**.
+**`true`** — the web sandbox. Nothing there can put an image in a PR, so follow [references/web-sandbox.md](references/web-sandbox.md) and stop: no comment, no commits.
 
 **Unset** — make sure `gh` has `--attach`:
 
