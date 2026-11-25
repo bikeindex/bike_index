@@ -6855,6 +6855,11 @@ nl:
             wheres_my_serial: Waar is mijn serienummer?
             without_serial: Deze %{cycle_type} is gemaakt zonder serienummer.
             without_serial_number: Deze %{cycle_type} is gemaakt zonder serienummer.
+            change_back: Terugzetten
+            looks_like_cm: Dat lijkt op centimeters en niet op inches, dus hebben
+              we het aangepast.
+            looks_like_inches: Dat lijkt op inches en niet op centimeters, dus hebben
+              we het aangepast.
           color_fields:
             add_another_color: Voeg nog een kleur toe
             color: Kleur

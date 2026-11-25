@@ -6939,6 +6939,10 @@ es:
             wheres_my_serial: "¿Dónde está mi número de serie?"
             without_serial: Este %{cycle_type} se hizo sin número de serie.
             without_serial_number: Este %{cycle_type} se fabricó sin número de serie.
+            change_back: Volver a cambiar
+            looks_like_cm: Parece que son centímetros, no pulgadas, así que lo cambiamos.
+            looks_like_inches: Parece que son pulgadas, no centímetros, así que lo
+              cambiamos.
           color_fields:
             add_another_color: Añade otro color
             color: Color
