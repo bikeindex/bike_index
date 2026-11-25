@@ -185,8 +185,7 @@ const listenForClickIntoFocus = function (input) {
 HwComboboxController.prototype.comboboxTargetConnected = listenForClickIntoFocus
 HwComboboxController.prototype.dialogComboboxTargetConnected = listenForClickIntoFocus
 
-// Chrome puts a scrolling list in the tab order, so Tab from an open combobox landed on the list - where the
-// arrow keys and Enter do nothing, as the gem listens for them on the input
+// Chrome puts a scrolling list in the tab order, but the gem listens for the arrow keys and Enter on the input
 const leaveTabOrder = (listbox) => { listbox.tabIndex = -1 }
 
 HwComboboxController.prototype.listboxTargetConnected = leaveTabOrder
