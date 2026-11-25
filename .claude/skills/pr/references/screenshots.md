@@ -59,6 +59,8 @@ Skip per-page only when the URL didn't exist on the base (a brand-new route or p
 
 Re-invoke `frontend-screenshots` with the same `(url-path, page-slug)` pairs, passing the base as its `BASE_REF` (`origin/main` unless **Orient** chose otherwise) — its "Cross-branch comparison" section does the rest, whether or not the base is `main`.
 
+**When the detached checkout is refused** (auto mode's permission classifier can deny it), don't retry it another way. A base half already in the `## Screenshots` comment stays if `git log --since=<comment updated_at> origin/main -- <the page's paths>` is empty; a new page goes up branch-only. Say which in your summary.
+
 Two things the checkout itself does, either side of it:
 
 - **`bin/rails tailwindcss:build` after each checkout when the diff deletes or rewrites a template, as well as when it touches `app/assets/tailwind/**`; `bin/rails dartsass:build` too when it touches `app/assets/stylesheets/**`.** Tailwind builds from a scan of the templates, so a branch that deletes one drops that template's classes from the build — #4414 removed `VehicleThumbnail` and with it `tw:aspect-square`, leaving the base's own grid to render unstyled in a shot the PR then gets blamed for. The watcher doesn't rebuild on a checkout, so the base capture otherwise renders the branch's CSS — a before/after that silently shows the same styling twice. A diff that moves a rule *between* the two pipelines needs both, or the base renders the rule twice over. Verify by grepping `app/assets/builds/{tailwind,revised}.css` for a selector the branch moves; build both again on the way back.

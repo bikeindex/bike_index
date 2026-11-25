@@ -7,6 +7,7 @@ module BikeServices
 
     REG_FIELDS = %w[address bike_sticker extra_registration_number organization_affiliation
       phone student_id].freeze
+    LEGACY_STOCK_PHOTO_HOST = "https://bikebook.s3.amazonaws.com/"
 
     # Whether a registration form should ask for one of the organization's additional
     # fields. Pass the user only when the registration is their own - what their account
@@ -91,11 +92,10 @@ module BikeServices
 
     def thumb_image_url(bike)
       return bike.thumb_path if bike.thumb_path.present?
-      return nil if bike.stock_photo_url.blank?
+      # Only the legacy bucket has small_ versions; the Bike Book catalog's photos are a single size
+      return bike.stock_photo_url.presence unless bike.stock_photo_url&.start_with?(LEGACY_STOCK_PHOTO_HOST)
 
-      small = bike.stock_photo_url.split("/")
-      ext = "/small_" + small.pop
-      small.join("/") + ext
+      bike.stock_photo_url.sub(%r{/(?=[^/]+\z)}, "/small_")
     end
 
     def header_image_urls(bike)

@@ -20,7 +20,7 @@ const TOP_TUBES = 'frame.top_tube'
 const INTERFACES = 'frame.mounts.interface'
 export const TARGET_RIDERS = { kid: 'Kids', woman: "Women's", adaptive: 'Adaptive' }
 // lengths charts list in centimeters, to the tenth, with an imperial viewer's feet or inches after
-const IN_CENTIMETERS = /^(wheelbase|standover|seat_tube_ctc?$|seat_height|rider_inseam|cargo\.(length|width)$)/
+const IN_CENTIMETERS = /^(standover|seat_tube_ctc?$|seat_height|rider_inseam|cargo\.(length|width)$)/
 const SINGULAR = { feet: 'foot', inches: 'inch' }
 
 // The names, units and lookups the vehicle templates present a model's data with
@@ -28,7 +28,7 @@ const SINGULAR = { feet: 'foot', inches: 'inch' }
 const FEET_AND_INCHES = ["'", '"']
 
 export class VehiclePresenter {
-  constructor (kit, vocabulary) {
+  constructor ({ kit, ...vocabulary }) {
     // an extra's bb as the catalog's own labels write "BB Drop", standover above it short, as its tooltip
     // explains it, and the actual seat angle without the catalog's note on it
     this.kit = {
@@ -44,8 +44,9 @@ export class VehiclePresenter {
     this.vocabulary = { ...vocabulary, names: { ...vocabulary.names, [MATERIALS]: materials, [TOP_TUBES]: topTubes, [INTERFACES]: interfaces, target_riders: riders } }
     this.half = new RegExp(kit.shis.half)
     this.shisPattern = new RegExp(kit.shis.pattern)
-    // standover above the bottom bracket in feet and inches, as a wheelbase is, where the kit's standover reads in inches
-    this.imperialLengths = [{ pattern: /^standover_above_bb$/, parts: kit.feet_and_inches },
+    // standover above the bottom bracket in feet and inches, where the kit's standover reads in inches, and a wheelbase in
+    // mm alone, as geometry charts list it, where the kit's reads in feet and inches
+    this.imperialLengths = [{ pattern: /^standover_above_bb$/, parts: kit.feet_and_inches }, { pattern: /^wheelbase$/, parts: [] },
       ...kit.imperial_lengths.map(({ pattern, parts }) => ({ pattern: new RegExp(pattern), parts }))]
     this.unitSuffix = new RegExp(kit.geometry.unit_suffix)
     this.componentGroups = new Map(Object.entries(kit.component_groups).flatMap(([group, types]) => types.map((type) => [type, group])))

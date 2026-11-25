@@ -474,6 +474,12 @@ RSpec.describe BikeServices::Displayer do
         end
       end
     end
+    context "with a Bike Book catalog stock photo" do
+      let(:stock_photo_url) { "https://bikebook.bikeindex.org/aventon/2022/level-2.jpg" }
+      it "is the stock photo" do
+        expect(BikeServices::Displayer.thumb_image_url(bike)).to eq stock_photo_url
+      end
+    end
   end
 
   describe "header_image_urls" do

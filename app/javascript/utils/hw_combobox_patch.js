@@ -185,6 +185,12 @@ const listenForClickIntoFocus = function (input) {
 HwComboboxController.prototype.comboboxTargetConnected = listenForClickIntoFocus
 HwComboboxController.prototype.dialogComboboxTargetConnected = listenForClickIntoFocus
 
+// Chrome puts a scrolling list in the tab order, but the gem listens for the arrow keys and Enter on the input
+const leaveTabOrder = (listbox) => { listbox.tabIndex = -1 }
+
+HwComboboxController.prototype.listboxTargetConnected = leaveTabOrder
+HwComboboxController.prototype.dialogListboxTargetConnected = leaveTabOrder
+
 // The dialog is the small-screen picker, but the gem measures the window the combobox is
 // in - so an iframe narrower than the breakpoint got it on a desktop, where it can't
 // escape the frame to be full-screen anyway.

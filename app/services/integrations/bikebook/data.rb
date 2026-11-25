@@ -15,10 +15,11 @@ module Integrations
         return unless options.values_at(:manufacturer_id, :year, :frame_model).all?(&:present?)
 
         year = options[:year].to_i
-        id = BikebookModel.catalog_id_for(manufacturer_id: options[:manufacturer_id], name: options[:frame_model], year:,
-          market: options[:market])
-        record = id && Integrations::Bikebook::Catalog.model(id)
-        record && {bike: bike_attributes(record, year), components: component_attributes(record)}.with_indifferent_access
+        market = Integrations::Bikebook::Catalog.market(options[:market])
+        bikebook_model = BikebookModel.matching(manufacturer_id: options[:manufacturer_id], name: options[:frame_model], year:, market:)
+        record = bikebook_model && Integrations::Bikebook::Catalog.model(bikebook_model.catalog_id, market:)
+        record && {bike: bike_attributes(record, year), components: component_attributes(record),
+                   vehicle_specification: {bikebook_model_id: bikebook_model.id, bikebook_market: market}}.with_indifferent_access
       rescue Integrations::Bikebook::Catalog::Unreachable
         nil
       end
@@ -41,8 +42,7 @@ module Integrations
 
       # A component's type by the name its Ctype has
       def component_attributes(record)
-        vocabulary = Integrations::Bikebook::Catalog.vocabulary
-        names = vocabulary && Integrations::Bikebook::Catalog.file(vocabulary)&.dig("names", "components.type")
+        names = Integrations::Bikebook::Catalog.vocabulary_dig("names", "components.type")
         record["components"].to_a.map do |component|
           position = Array(component["position"])
           {component_type: names&.dig(component["type"]) || component["type"]&.humanize, description: component["description"],
