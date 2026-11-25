@@ -33,14 +33,18 @@ export const soldYears = ({ first_year: first, final_year: final, years }) => {
   return first ? Array.from({ length: last - first + 1 }, (_, index) => last - index) : []
 }
 
-// Its photo for `year`, nothing for a year the catalog has no record of: of that year's colorways, the one its stock
-// photo shows, else the first with one, else its stock photo. With no year, or no years recorded, its stock photo
-// through the years it was sold
-export const yearPhoto = (data, year) => {
+// Whether the catalog has `year` of it: its record of that year, or with no years recorded, a year it was sold
+export const knownYear = (data, year) => {
   const records = array(data.years)
-  if (!year || !records.length) return !year || soldYears(data).includes(year) ? data.stock_photo : null
-  const record = records.find((each) => each.year === year)
-  if (!record) return null
-  const photos = array(record.colorways).map(({ stock_photo: photo }) => photo).filter(present)
+  return records.length ? records.some((each) => each.year === year) : soldYears(data).includes(year)
+}
+
+// Its photo for `year`, nothing for a year the catalog doesn't know: of that year's colorways, the one its stock photo
+// shows, else the first with one, else its stock photo. With no year, or no years recorded, its stock photo
+export const yearPhoto = (data, year) => {
+  if (!year) return data.stock_photo
+  if (!knownYear(data, year)) return null
+  const record = array(data.years).find((each) => each.year === year)
+  const photos = array(record?.colorways).map(({ stock_photo: photo }) => photo).filter(present)
   return photos.length && !photos.includes(data.stock_photo) ? photos[0] : data.stock_photo
 }
