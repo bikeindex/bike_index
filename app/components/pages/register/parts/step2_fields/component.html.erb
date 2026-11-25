@@ -37,7 +37,7 @@
       <%= render UI::Forms::Input::Component.new(form_builder: @form, attribute: :frame_size_number, kind: :number_field,
           html_options: {value: bike["frame_size_number"], step: 0.5, min: 0, placeholder: translation(".enter_size"),
             class: "tw:rounded-r-none",
-            data: {"register--frame-size-target": "number", action: "input->register--frame-size#pickNumber"}}) %>
+            data: {"register--frame-size-target": "number", action: "input->register--frame-size#pickNumber change->register--frame-size#checkUnit"}}) %>
 
       <%= @form.select :frame_size_unit, [[translation(".inches"), "in"], [translation(".cm"), "cm"]],
           {selected: bike["frame_size_unit"] || "in"},
@@ -45,9 +45,25 @@
             tw:border-gray-300 tw:bg-gray-50 tw:px-3 tw:py-1.5
             tw:text-sm tw:font-medium tw:text-gray-500
             tw:dark:border-gray-600 tw:dark:bg-gray-700
-            tw:dark:text-gray-400" %>
+            tw:dark:text-gray-400",
+          data: {"register--frame-size-target": "unit", action: "change->register--frame-size#pickUnit"} %>
     </div>
   </div>
+
+  <p
+    class="
+      tw:hidden! tw:pt-1.5 tw:text-sm tw:text-amber-700
+      tw:dark:text-amber-400
+    "
+    data-register--frame-size-target="wrongUnit"
+  >
+    <%= translation(".looks_like_wrong_unit") %>
+
+    <% [["in", translation(".change_back_to_inches")], ["cm", translation(".change_back_to_cm")]].each do |unit, text| %>
+      <%= render UI::Button::Component.new(text:, value: unit, color: :link, hidden: true,
+          data: {"register--frame-size-target": "revert", action: "register--frame-size#revert"}) %>
+    <% end %>
+  </p>
 </div>
 
 <%= render UI::Forms::Group::Component.new(form_builder: @form, attribute: :image,

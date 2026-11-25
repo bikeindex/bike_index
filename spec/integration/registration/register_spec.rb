@@ -168,6 +168,14 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "+ Add another color"
     type_into("#bike_tertiary_frame_color_id", "Green")
     click_combobox_option("Green")
+    # A size that reads as the other unit switches to it, and offers to switch back
+    fill_in_verified "bike[frame_size_number]", with: "56"
+    find_field("bike[frame_size_number]").send_keys(:tab)
+    expect(page).to have_select("bike[frame_size_unit]", selected: "cm")
+    expect(page).to have_content("Looks like you entered the wrong unit.")
+    click_button "Change back to inches"
+    expect(page).to have_select("bike[frame_size_unit]", selected: "inches")
+    expect(page).to have_no_content("Looks like you entered the wrong unit.")
     find("label", text: "M", exact_text: true).click
     select "cm", from: "bike[frame_size_unit]"
     check "Missing serial"
