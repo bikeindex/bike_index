@@ -46,21 +46,18 @@
             tw:text-sm tw:font-medium tw:text-gray-500
             tw:dark:border-gray-600 tw:dark:bg-gray-700
             tw:dark:text-gray-400",
-          data: {"register--frame-size-target": "unit", action: "change->register--frame-size#pickUnit"} %>
+          data: {"register--frame-size-target": "unit", action: "register--frame-size#pickUnit"} %>
     </div>
   </div>
 
   <p
-    class="
-      tw:hidden! tw:pt-1.5 tw:text-sm tw:text-amber-700
-      tw:dark:text-amber-400
-    "
+    class="tw:hidden tw:pt-1.5 tw:text-sm <%= UI::Alerts::Base::Component::TEXT_CLASSES[:warning] %>"
     data-register--frame-size-target="wrongUnit"
   >
     <%= translation(".looks_like_wrong_unit") %>
 
     <% [["in", translation(".change_back_to_inches")], ["cm", translation(".change_back_to_cm")]].each do |unit, text| %>
-      <%= render UI::Button::Component.new(text:, value: unit, color: :link, hidden: true,
+      <%= render UI::Button::Component.new(text:, value: unit, color: :link, html_class: "tw:hidden!",
           data: {"register--frame-size-target": "revert", action: "register--frame-size#revert"}) %>
     <% end %>
   </p>

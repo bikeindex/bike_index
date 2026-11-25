@@ -1,9 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 
-// Bike#clean_frame_size guesses the unit from the same split
-const CM_ABOVE = 30
-
 // Connects to data-controller='register--frame-size'
 //
 // Frame size is either an ordinal chip (XS-XL) or a number - picking one clears
@@ -26,10 +23,10 @@ export default class extends Controller {
     const size = parseFloat(this.numberTarget.value)
     if (!(size > 0)) return
 
-    const unit = size >= CM_ABOVE ? 'cm' : 'in'
+    const unit = size >= 30 ? 'cm' : 'in' // Bike#clean_frame_size's split
     if (unit === this.unitTarget.value) return
 
-    this.revertTargets.forEach(button => { button.hidden = button.value !== this.unitTarget.value })
+    this.revertTargets.forEach(button => collapse(button.value === unit ? 'hide' : 'show', button, 0))
     this.unitTarget.value = unit
     collapse('show', this.wrongUnitTarget)
   }
