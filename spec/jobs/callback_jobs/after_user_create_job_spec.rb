@@ -73,6 +73,32 @@ RSpec.describe CallbackJobs::AfterUserCreateJob, type: :job do
     end
   end
 
+  describe "associate_bug_reports" do
+    let!(:bug_report) { FactoryBot.create(:bug_report, email: "Owner1@a.com", status: :ignored) }
+    let!(:other_bug_report) { FactoryBot.create(:bug_report, email: "someone@a.com") }
+
+    it "links an unconfirmed user's reports once they confirm" do
+      expect(bug_report.reload.user_id).to be_nil
+      instance.perform(user.id, "async")
+      expect(bug_report.reload.user_id).to be_nil
+
+      user.confirm(user.confirmation_token)
+      instance.perform(user.id, "async")
+      expect(bug_report.reload.user_id).to eq user.id
+      expect(bug_report.status).to eq "ignored"
+      expect(other_bug_report.reload.user_id).to be_nil
+    end
+
+    context "merging an additional email" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+
+      it "links the reports sent from it" do
+        instance.perform(user.id, "merged", user:, email: "owner1@a.com")
+        expect(bug_report.reload.user_id).to eq user.id
+      end
+    end
+  end
+
   describe "associate_ownerships" do
     let(:bike) { FactoryBot.create(:bike, owner_email: "owner1@a.com") }
     let!(:ownership) { FactoryBot.create(:ownership, owner_email: "OWner1@a.com", bike: bike) }

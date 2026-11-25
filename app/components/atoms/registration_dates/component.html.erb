@@ -1,0 +1,11 @@
+<span class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+  <strong class="tw:hidden tw:@sm:inline"><%= translation(".registered") %></strong>
+  <span class="tw:@sm:hidden"><%= render(UI::Tooltip::Component.new(text: translation(".registered_at"))) { tag.strong(translation(".registered_abbreviation")) } %></span>
+  <%= render(UI::Time::Component.new(time: @bike.created_at)) %>
+</span>
+
+<span class="tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+  <strong class="tw:hidden tw:@sm:inline"><%= translation(".updated") %></strong>
+  <span class="tw:@sm:hidden"><%= render(UI::Tooltip::Component.new(text: translation(".updated_at"))) { tag.strong(translation(".updated_abbreviation")) } %></span>
+  <%= render(UI::Time::Component.new(time: @bike.updated_by_user_fallback)) %>
+</span>

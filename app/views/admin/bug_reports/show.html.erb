@@ -55,7 +55,7 @@
 
     <%= render(UI::Forms::Group::Component.new(attribute: :tags, form_builder: f)) do %>
       <%= render UI::Forms::Combobox::Component.new(name: :tags,
-        options: searchable_tags, free_text: true, multiselect_chip_src: tag_chips_admin_bug_reports_path,
+        options: tag_combobox_options, free_text: true, multiselect_chip_src: tag_chips_admin_bug_reports_path,
         html_options: {form: f, placeholder: "Select or create tags"}) %>
     <% end %>
 
@@ -64,6 +64,12 @@
     <%= render UI::Button::Component.new(text: "Update", color: :primary, type: "submit") %>
   <% end %>
 </div>
+
+<% if @bug_report.feedback_id.present? %>
+  <p class="tw:mb-2">
+    <%= link_to "View the full feedback", admin_feedback_path(@bug_report.feedback_id), class: "twlink" %>
+  </p>
+<% end %>
 
 <%= render(UI::Card::Component.new(additional_classes: "tw:max-w-3xl")) do %>
   <p class="tw:mb-4">

@@ -1,13 +1,15 @@
 class BugReportsMailbox < ApplicationMailbox
   def process
     email, from_name = BugReport.sender_from_mail(mail)
+    body = body_text
     bug_report = BugReport.create!(
       inbound_email:,
       email:,
       from_name:,
       receiver: BugReport.receiver_from_mail(mail),
       subject: mail.subject,
-      body: body_text,
+      body:,
+      tags: BugReport.tags_from_mail(mail, body),
       received_at: mail.date || Time.current
     )
     mail.attachments.each do |attachment|

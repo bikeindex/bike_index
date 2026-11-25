@@ -70,6 +70,14 @@ RSpec.describe AdminHelper, type: :helper do
         expect(admin_path_for_object(UserEmail.new(id: 1, user_id: 42))).to eq admin_user_path(42)
       end
     end
+    context "pos_registration_match" do
+      let(:pos_registration_match) { FactoryBot.create(:pos_registration_match) }
+
+      it "returns its owner's matches" do
+        expect(admin_path_for_object(pos_registration_match))
+          .to eq admin_pos_registration_matches_path(user_id: pos_registration_match.bike.user_id, period: "all")
+      end
+    end
     context "organization_signup" do
       it "returns its organization, or the emails to its address" do
         expect(admin_path_for_object(OrganizationSignup.new(id: 1, email: "a@b.com"))).to eq admin_notifications_path(query: "a@b.com")

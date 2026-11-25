@@ -19,8 +19,8 @@ Rails.application.routes.draw do
     controllers authorized_applications: "oauth/authorized_applications"
   end
 
-  get "/shop", to: redirect("https://bikeindex.org/info/bike-index-store"), as: :shop
-  get "/store", to: redirect("https://bikeindex.org/info/bike-index-store"), as: :store
+  get "/shop", to: "shop#index", as: :shop
+  get "/store", to: redirect(path: "/shop")
   get "/discuss", to: redirect("https://discuss.bikeindex.org"), as: :discuss
   get "discourse_authentication", to: "discourse_authentication#index"
 
@@ -176,6 +176,7 @@ Rails.application.routes.draw do
     resource :membership, only: %i[show], controller: "my_accounts/memberships"
     resources :marketplace_listings, only: %i[update], controller: "my_accounts/marketplace_listings"
     resources :organization_roles, only: %i[update destroy], controller: "my_accounts/organization_roles"
+    resources :pos_registration_matches, only: %i[show update], controller: "my_accounts/pos_registration_matches"
   end
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
 
