@@ -211,6 +211,7 @@ module BikeServices
       b_param.params["bike"]["rear_wheel_bsd"] = bb_data["bike"]["rear_wheel_bsd"] if bb_data["bike"]["rear_wheel_bsd"].present?
       b_param.params["bike"]["stock_photo_url"] = bb_data["bike"]["stock_photo_url"] if bb_data["bike"]["stock_photo_url"].present?
       b_param.params["components"] = bb_data["components"] && bb_data["components"].map { |c| c.merge("is_stock" => true) }
+      b_param.params["vehicle_specification"] = bb_data["vehicle_specification"]
       b_param.clean_params # if we just rely on the before_save filter, b_param needs to be reloaded
       b_param.save if b_param.id.present?
       b_param
@@ -268,6 +269,7 @@ module BikeServices
       create_parking_notification(b_param, bike) if b_param&.status_abandoned? || b_param&.unregistered_parking_notification?
       create_bike_organizations(ownership)
       ComponentCreator.new(bike: bike, b_param: b_param).create_components_from_params
+      b_param.params["vehicle_specification"]&.then { bike.create_vehicle_specification!(it) }
       bike.create_normalized_serial_segments
       assign_user_attributes(bike, ownership&.user)
       BikeServices::StolenRecordUpdator.new(bike: bike, b_param: b_param).update_records

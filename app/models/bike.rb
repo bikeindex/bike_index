@@ -166,6 +166,7 @@ class Bike < ApplicationRecord
 
   has_one :current_marketplace_listing, -> { current }, class_name: "MarketplaceListing", as: :item
   has_one :strava_gear, as: :item
+  has_one :vehicle_specification, as: :vehicle
 
   accepts_nested_attributes_for :stolen_records
   accepts_nested_attributes_for :impound_records

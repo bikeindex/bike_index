@@ -77,6 +77,8 @@ class BikeVersion < ApplicationRecord
 
   belongs_to :owner, class_name: "User" # Direct association, unlike bike
 
+  has_one :vehicle_specification, as: :vehicle
+
   validates :name, presence: true, uniqueness: {scope: [:bike_id, :owner_id]}
 
   attr_accessor :timezone
