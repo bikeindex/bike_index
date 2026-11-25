@@ -48,8 +48,13 @@ module Integrations
         (record || raise(Unreachable)).presence
       end
 
-      # The catalog's market for a country's ISO code: it lists an EU member's models under the EU
-      def market(iso) = EbikeRuleServices::Places::EU_MEMBERS.include?(iso) ? "EU" : iso
+      # The catalog's market for a country's ISO code: it lists an EU member's models under the EU. The US for one that's
+      # unknown, as Cloudflare's CF-IPCountry is XX, or T1 over Tor, when it can't tell
+      def market(iso)
+        return "US" if iso.blank? || %w[XX T1].include?(iso)
+
+        EbikeRuleServices::Places::EU_MEMBERS.include?(iso) ? "EU" : iso
+      end
 
       # The index's models, nil while the catalog doesn't answer. Too big to cache, and read by a job, outside rack-timeout
       def index_models(path)

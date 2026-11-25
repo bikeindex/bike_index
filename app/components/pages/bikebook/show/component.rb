@@ -13,7 +13,7 @@ module Pages
           @manifest_url = manifest_url
           @framed = framed
           @paint_colors = paint_colors
-          @market = (%w[XX T1].include?(market) || market.blank?) ? "US" : Integrations::Bikebook::Catalog.market(market)
+          @market = Integrations::Bikebook::Catalog.market(market)
           @jurisdiction = state&.dig(:abbr) || "US"
           @query = query
         end

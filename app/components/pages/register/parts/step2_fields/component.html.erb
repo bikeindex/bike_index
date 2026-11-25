@@ -11,7 +11,7 @@
     <% if bikebook_models? %>
       <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
       <template data-register--model-lookup-target="combobox">
-        <%= render UI::Forms::Combobox::Component.new(name: :frame_model, src: bikebook_path(manufacturer: @b_param.manufacturer.slug),
+        <%= render UI::Forms::Combobox::Component.new(name: :frame_model, src: bikebook_path(manufacturer: @b_param.manufacturer.slug, market: bikebook_market),
             free_text: true, rich_display: :inline, dialog_label: translation(".model"), html_options: {form: @form, **model_options}) %>
       </template>
 

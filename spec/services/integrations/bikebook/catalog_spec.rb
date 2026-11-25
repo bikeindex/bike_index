@@ -125,6 +125,12 @@ RSpec.describe Integrations::Bikebook::Catalog do
     end
   end
 
+  describe "market" do
+    it "is the catalog's market for a country, the US for one Cloudflare can't place" do
+      expect([nil, "XX", "T1", "US", "CA", "DE"].map { described_class.market(it) }).to eq %w[US US US US CA EU]
+    end
+  end
+
   describe "model" do
     it "is the model's record" do
       expect(described_class.model("m/segway/2025/gt3-pro")).to include("id" => "m/segway/2025/gt3-pro", "motors" => be_present)

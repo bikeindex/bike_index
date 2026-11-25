@@ -15,7 +15,7 @@ module Integrations
         return unless options.values_at(:manufacturer_id, :year, :frame_model).all?(&:present?)
 
         year = options[:year].to_i
-        market = Integrations::Bikebook::Catalog.market(options[:market].presence || "US")
+        market = Integrations::Bikebook::Catalog.market(options[:market])
         id = BikebookModel.catalog_id_for(manufacturer_id: options[:manufacturer_id], name: options[:frame_model], year:, market:)
         record = id && Integrations::Bikebook::Catalog.model(id, market:)
         record && {bike: bike_attributes(record, year), components: component_attributes(record)}.with_indifferent_access

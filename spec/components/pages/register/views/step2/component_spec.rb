@@ -82,7 +82,8 @@ RSpec.describe Pages::Register::Views::Step2::Component, type: :component do
         render_step_2
         expect(page).to have_css(lookup)
         expect(page.find(lookup)).to have_field("bike[frame_model]", type: "text", with: "Haul ST")
-        expect(rendered_content).to include('data-hw-combobox-async-src-value="/bikebook?manufacturer=specialized&amp;')
+        # in the market of a registrant Cloudflare can't place
+        expect(rendered_content).to include('data-hw-combobox-async-src-value="/bikebook?manufacturer=specialized&amp;market=US&amp;')
       end
     end
   end
