@@ -7,7 +7,7 @@ class BikebookModelsSyncJob < ScheduledJob
 
   # The index's file name is a digest of it, so a publish that changes it renames it. A manufacturer added since can
   # match models the last sync skipped. Versioned with what a row holds, so a change to it syncs without a publish
-  SYNCED_KEY = ["bikebook_catalog/synced", 2]
+  SYNCED_KEY = ["bikebook_catalog/synced", 3]
   # Off in test, where every inline spec creating a bike would read the catalog
   SYNC_ON_BIKE_CREATION = !Rails.env.test?
 

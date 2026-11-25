@@ -14,15 +14,8 @@ module Integrations
         models.find { it.markets.include?(market) } || models.first
       end
 
-      # Drops "bike", "e-bike", "bicycle" and the like, which people put in everything
-      def slug(name)
-        I18n.transliterate(name.to_s.downcase).strip
-          .gsub("%20", " ")
-          .gsub(/\s(e(lectric)?.?)?((bi)?cycles?|bikes?)/i, " ")
-          .gsub("+", "plus").gsub("&", "amp")
-          .gsub(/[^a-z0-9]/i, " ")
-          .split.join("_")
-      end
+      # Keeps parenthesized text, which tells catalog models apart - eg Bianchi's "(SPECIFIC FOR ASIA)" builds
+      def slug(name) = Slugifyer.slugify(Slugifyer.without_cycle_words(name).tr("()", " "))
     end
   end
 end

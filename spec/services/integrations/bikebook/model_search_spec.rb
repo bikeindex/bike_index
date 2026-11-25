@@ -31,24 +31,16 @@ RSpec.describe Integrations::Bikebook::ModelSearch do
   end
 
   describe "slug" do
-    it "removes special characters and downcase" do
-      slug = described_class.slug("Surly's Cross-check bike (small wheel)")
-      expect(slug).to eq("surly_s_cross_check_small_wheel")
+    it "slugifies, without cycle words" do
+      expect(described_class.slug("Cross-check Singlespeed BicyclE")).to eq "cross-check-singlespeed"
+      expect(described_class.slug("Turbo Vado E-Bike")).to eq "turbo-vado"
+      expect(described_class.slug("paké rum runner")).to eq "pake-rum-runner"
+      expect(described_class.slug("L100+ Lowstep BLX")).to eq "l100-plus-lowstep-blx"
+      expect(described_class.slug("Trail SL 29'er 4")).to eq described_class.slug("Trail SL 29er 4")
     end
 
-    it "removes bikes and bicycles, because people just put them in everything" do
-      slug = described_class.slug("Cross-check Singlespeed BicyclE")
-      expect(slug).to eq("cross_check_singlespeed")
-    end
-
-    it "removes diacritics and bicycles, because people just put them in everything" do
-      slug = described_class.slug("paké rum runner")
-      expect(slug).to eq("pake_rum_runner")
-    end
-
-    it "changes + to plus for URL safety, and Trek uses + to differentiate" do
-      slug = described_class.slug("L100+ Lowstep BLX")
-      expect(slug).to eq("l100plus_lowstep_blx")
+    it "keeps parenthesized text" do
+      expect(described_class.slug("Sprint Ultegra 11sp (SPECIFIC FOR ASIA)")).to eq "sprint-ultegra-11sp-specific-for-asia"
     end
   end
 end

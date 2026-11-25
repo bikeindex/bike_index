@@ -84,18 +84,18 @@ RSpec.describe Slugifyer do
     end
     it "handles Riese & Müller (Riese and Muller)" do
       slug = Slugifyer.broader_company_slugify("Riese & Müller (Riese and Muller)")
-      expect(slug).to eq "riese_amp_muller"
+      expect(slug).to eq "riese-and-muller"
     end
     it "removes accell" do
-      expect(Slugifyer.broader_company_slugify("Poopy Panters Accell")).to eq "poopy_panters"
+      expect(Slugifyer.broader_company_slugify("Poopy Panters Accell")).to eq "poopy-panters"
       expect(Slugifyer.broader_company_slugify("Accell")).to eq "accell"
     end
     it "keeps the suffix when removing it would leave only digits" do
-      expect(Slugifyer.broader_company_slugify("101 Bikes")).to eq "101_bikes"
-      expect(Slugifyer.broader_company_slugify("101_bikes")).to eq "101_bikes"
-      expect(Slugifyer.broader_company_slugify("101 Electric Bikes (Other Name)")).to eq "101_electric_bikes"
-      expect(Slugifyer.broader_company_slugify("22 Bicycle Co.")).to eq "22_bicycle"
-      expect(Slugifyer.broader_company_slugify("24 Seven Bikes")).to eq "24_seven"
+      expect(Slugifyer.broader_company_slugify("101 Bikes")).to eq "101-bikes"
+      expect(Slugifyer.broader_company_slugify("101_bikes")).to eq "101-bikes"
+      expect(Slugifyer.broader_company_slugify("101 Electric Bikes (Other Name)")).to eq "101-electric-bikes"
+      expect(Slugifyer.broader_company_slugify("22 Bicycle Co.")).to eq "22-bicycle"
+      expect(Slugifyer.broader_company_slugify("24 Seven Bikes")).to eq "24-seven"
     end
   end
 end

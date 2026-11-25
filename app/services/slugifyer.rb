@@ -19,8 +19,11 @@ module Slugifyer
 
     name = remove_parens(string).gsub(/\sco(\.|mpany)/i, " ").gsub(/\s(frame)?works/i, " ")
     # An empty (bare "Accell") or all-digit slug falls back, since Manufacturer.friendly_find reads digits as an id
-    underscored(name.gsub(/accell/i, "")).then { it.match?(/\D/) ? it : slugify(name).tr("-", "_") }
+    slugify(without_cycle_words(name.gsub(/accell/i, ""))).then { it.match?(/\D/) ? it : slugify(name) }
   end
+
+  # Drops "bike", "e-bike", "bicycles" and the like, which people put in everything
+  def without_cycle_words(string) = string.to_s.gsub(/\s(e(lectric)?.?)?((bi)?cycles?|bikes?)/i, " ")
 
   #
   # private below here
@@ -34,14 +37,5 @@ module Slugifyer
     I18n.transliterate(string.to_s.downcase).strip
   end
 
-  def underscored(string)
-    transliterate(string)
-      .gsub("%20", " ")
-      .gsub(/\s(e(lectric)?.?)?((bi)?cycles?|bikes?)/i, " ")
-      .gsub("+", "plus").gsub("&", "amp")
-      .gsub(/[^a-z0-9]/i, " ")
-      .split.join("_")
-  end
-
-  conceal :remove_parens, :transliterate, :underscored
+  conceal :remove_parens, :transliterate
 end
