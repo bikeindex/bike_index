@@ -24,12 +24,14 @@ RSpec.describe Pages::Org::ImpoundSettings::Component, type: :component do
     before do
       FactoryBot.create(:impound_record, organization:, display_id_prefix: "2025-")
       FactoryBot.create(:impound_record, organization:)
+      ImpoundRecord.where(display_id_prefix: "2025-").update_all(display_id_integer: 7)
     end
 
     it "offers them as buttons that fill in the prefix" do
       buttons = form.css("button[data-action='org--impound-settings#use']")
       expect(buttons.map { it["data-org--impound-settings-prefix-param"] }).to match_array(%w[2025- BB-])
       expect(component).to have_text "no prefix"
+      expect(JSON.parse(form["data-org--impound-settings-next-ids-value"])).to include("2025-" => 8, "BB-" => 2)
     end
   end
 

@@ -19,6 +19,17 @@ RSpec.describe ImpoundConfiguration, type: :model do
     end
   end
 
+  describe "next_display_id_integers" do
+    let(:impound_configuration) { FactoryBot.create(:impound_configuration, display_id_prefix: "c8s") }
+    let(:organization) { impound_configuration.organization }
+    it "continues each prefix that's been used, and sets the current prefix's own next" do
+      expect(impound_configuration.next_display_id_integers).to eq({"c8s" => 1})
+      organization.impound_records.create(display_id_prefix: "old-", display_id_integer: 12, bike: FactoryBot.create(:bike))
+      organization.impound_records.create(display_id_integer: 4, bike: FactoryBot.create(:bike))
+      expect(impound_configuration.next_display_id_integers).to eq({"old-" => 13, "c8s" => 5})
+    end
+  end
+
   describe "calculated_display_id_next_integer" do
     let(:impound_configuration) { FactoryBot.create(:impound_configuration) }
     it "returns 1" do

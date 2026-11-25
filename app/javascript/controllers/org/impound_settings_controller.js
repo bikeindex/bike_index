@@ -4,7 +4,7 @@ import { Controller } from '@hotwired/stimulus'
 // Without JS the form works as before, showing the saved next ID
 export default class extends Controller {
   static targets = ['prefix', 'nextId', 'unsaved']
-  static values = { savedPrefix: String }
+  static values = { savedPrefix: String, nextIds: Object }
 
   connect () {
     this.savedMarkup = this.nextIdTarget.innerHTML
@@ -13,8 +13,9 @@ export default class extends Controller {
 
   preview () {
     const changed = this.prefixTarget.value !== this.savedPrefixValue
-    // Changing the prefix restarts numbering at 1; the saved ID is the server's markup
-    if (changed) this.nextIdTarget.querySelector('code').textContent = `${this.prefixTarget.value}1`
+    // A prefix with no records starts at 1; the saved ID is the server's markup
+    const prefix = this.prefixTarget.value
+    if (changed) this.nextIdTarget.querySelector('code').textContent = `${prefix}${this.nextIdsValue[prefix] ?? 1}`
     else this.nextIdTarget.innerHTML = this.savedMarkup
     this.unsavedTarget.classList.toggle('tw:hidden', !changed)
   }

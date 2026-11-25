@@ -2,7 +2,8 @@
     subtitle: translation(".subtitle"), html_class: "uncap") %>
 
 <%= form_for @impound_configuration, url: form_url, html: {data: {controller: "org--impound-settings",
-      "org--impound-settings-saved-prefix-value": @impound_configuration.display_id_prefix_was.to_s}} do |f| %>
+      "org--impound-settings-saved-prefix-value": @impound_configuration.display_id_prefix_was.to_s,
+      "org--impound-settings-next-ids-value": @impound_configuration.next_display_id_integers.to_json}} do |f| %>
   <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
     <span class="twlabel tw:sm:text-right"><%= translation(".public_search") %></span>
 

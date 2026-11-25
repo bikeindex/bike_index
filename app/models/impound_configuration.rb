@@ -35,6 +35,14 @@ class ImpoundConfiguration < ApplicationRecord
     organization.impound_records.distinct.pluck(:display_id_prefix).reject(&:blank?)
   end
 
+  # Keyed by prefix, "" for none. A prefix that's been used continues from its last record, so
+  # only a prefix that never was restarts at 1
+  def next_display_id_integers
+    ImpoundRecord.where(organization_id:).where.not(display_id_integer: nil).group(:display_id_prefix).maximum(:display_id_integer)
+      .to_h { |prefix, integer| [prefix.to_s, integer + 1] }
+      .merge(display_id_prefix.to_s => calculated_display_id_next_integer)
+  end
+
   def calculated_display_id_next
     "#{display_id_prefix}#{calculated_display_id_next_integer}"
   end
