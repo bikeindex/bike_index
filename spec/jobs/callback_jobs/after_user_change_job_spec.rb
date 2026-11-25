@@ -357,6 +357,22 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       expect(user.user_alerts.resolved.pluck(:kind)).to match_array %w[stolen_bike_without_location
         theft_alert_without_photo unfinished_registration]
     end
+
+    context "with a theft alert bought by an organization member" do
+      let(:organization) { FactoryBot.create(:organization) }
+      let(:user) { FactoryBot.create(:organization_user, organization:) }
+      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
+
+      it "alerts until the bike is deleted" do
+        expect(bike.reload.authorized?(user)).to be_truthy
+        instance.perform(user.id)
+        expect(user.reload.alert_slugs).to eq %w[theft_alert_without_photo unfinished_registration]
+
+        bike.destroy
+        instance.perform(user.id)
+        expect(user.reload.alert_slugs).to eq %w[unfinished_registration]
+      end
+    end
   end
 
   describe "ownerships" do

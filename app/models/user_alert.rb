@@ -141,8 +141,15 @@ class UserAlert < ApplicationRecord
       .each(&:resolve!)
   end
 
-  # Deleted and transferred bikes leave user.bikes, which is all the other updates revisit
-  def self.resolve_without_bike(user, bike_ids: user.bike_ids)
+  # Deleted and transferred bikes leave these, which is all the other updates revisit.
+  # An organization member can buy a theft alert for a bike they don't own
+  def self.alert_bike_ids(user)
+    bike_ids = user.bike_ids
+    other_ids = user.theft_alerts.where.not(bike_id: bike_ids).distinct.pluck(:bike_id)
+    bike_ids + Bike.current_with_user_hidden.where(id: other_ids).select { it.authorized?(user) }.map(&:id)
+  end
+
+  def self.resolve_without_bike(user, bike_ids: alert_bike_ids(user))
     user.user_alerts.active.where.not(bike_id: nil).where.not(bike_id: bike_ids)
       .update_all(resolved_at: Time.current, updated_at: Time.current)
   end

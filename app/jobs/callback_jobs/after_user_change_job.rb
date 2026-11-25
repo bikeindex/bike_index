@@ -52,7 +52,7 @@ module CallbackJobs
 
       # Above the returns below - anyone can walk away mid-registration
       UserAlert.update_unfinished_registrations(user)
-      bike_ids = user.bike_ids
+      bike_ids = UserAlert.alert_bike_ids(user)
       UserAlert.resolve_without_bike(user, bike_ids:)
 
       # Ignore alerts below for superusers
