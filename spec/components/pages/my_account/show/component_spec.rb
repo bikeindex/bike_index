@@ -36,7 +36,7 @@ RSpec.describe Pages::MyAccount::Show::Component, type: :component do
     let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:, serial_number: "LISTED-123") }
     let!(:lock) { FactoryBot.create(:lock, user:, key_serial: "KEY-9") }
 
-    it "renders the counts and the bikes" do
+    it "renders the tabs and the bikes" do
       expect(component).to have_link("Bikes")
       expect(component).to have_link("Locks", href: "/my_account?active_tab=locks")
       expect(component).to have_text("LISTED-123")
