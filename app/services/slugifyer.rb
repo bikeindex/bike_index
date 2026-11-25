@@ -13,8 +13,8 @@ module Slugifyer
   # & slugified to -amp- before it was -and-; nil unless the slug has one
   def amp_as_and(slug) = slug.gsub("-amp-", "-and-").then { it unless it == slug }
 
-  # The pre-slugify manufacturer slug, minus "Accell", which is appended to many of its brands' names
-  def legacy_manufacturer(string)
+  # Drops company suffixes ("Co.", "Works", "Bicycles") and "Accell", which is appended to many of its brands' names
+  def broader_company_slugify(string)
     return nil unless string
 
     name = remove_parens(string).gsub(/\sco(\.|mpany)/i, " ").gsub(/\s(frame)?works/i, " ")
