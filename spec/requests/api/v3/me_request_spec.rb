@@ -203,4 +203,77 @@ RSpec.describe "Me API V3", type: :request do
       expect(response.response_code).to eq(403)
     end
   end
+
+  describe "current/alerts" do
+    let!(:token) { create_doorkeeper_token(scopes:) }
+    let(:scopes) { "read_user" }
+
+    it "403s if read_user isn't in token" do
+      token.update(scopes: "read_bikes")
+      get "/api/v3/me/alerts", params: {access_token: token.token}
+      expect(response.response_code).to eq(403)
+    end
+
+    context "with alerts" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:user_alert_photo) do
+        FactoryBot.create(:user_alert, user:, bike:, kind: "theft_alert_without_photo")
+      end
+      let!(:user_alert_org) do
+        FactoryBot.create(:user_alert, user:, bike:, organization:, kind: "unassigned_bike_org")
+      end
+      let!(:user_alert_location) { FactoryBot.create(:user_alert_stolen_bike_without_location, user:) }
+      let!(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: user) }
+      let(:user_phone) { FactoryBot.create(:user_phone, user:, phone: "4334444444") }
+      let(:target_alerts) do
+        [
+          {id: user_alert_photo.id, kind: "theft_alert_without_photo", title: "Please add a photo",
+           message: "Promoted alerts need an image to be effective - add a photo to your #{bike.title_string}",
+           url: "#{ENV["BASE_URL"]}/bikes/#{bike.to_param}/edit/photos", bike_id: bike.id,
+           organization_id: nil, created_at: user_alert_photo.created_at.to_i},
+          {id: user_alert_org.id, kind: "unassigned_bike_org", title: "Connect to #{organization.short_name}",
+           message: "Some of your registrations are connected to #{organization.short_name}, but your #{bike.title_string} is not",
+           url: "#{ENV["BASE_URL"]}/my_account", bike_id: bike.id,
+           organization_id: organization.id, created_at: user_alert_org.created_at.to_i},
+          {id: user_alert_location.id, kind: "stolen_bike_without_location", title: "Please add theft location",
+           message: "It is critical for recovery that you include the address or cross-street where your #{user_alert_location.bike.title_string} was stolen",
+           url: "#{ENV["BASE_URL"]}/bikes/#{user_alert_location.bike.to_param}/edit/theft_details#where-theft-happened",
+           bike_id: user_alert_location.bike_id, organization_id: nil, created_at: user_alert_location.created_at.to_i}
+        ]
+      end
+
+      it "responds with the active alerts, in plain text" do
+        UserAlert.update_unfinished_registrations(user)
+        UserAlert.update_phone_waiting_confirmation(user:, user_phone:)
+        FactoryBot.create(:user_alert, user:, bike:, kind: "theft_alert_without_photo", resolved_at: Time.current)
+        FactoryBot.create(:user_alert, kind: "theft_alert_without_photo")
+
+        get "/api/v3/me/alerts", params: {access_token: token.token}
+        expect(response.response_code).to eq(200)
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        user_alert_registration = user.user_alerts.unfinished_registration.first
+        target_registration = {id: user_alert_registration.id, kind: "unfinished_registration",
+                               title: "Finish your registration", message: "Your Surly cargo bike isn't registered yet!",
+                               url: "#{ENV["BASE_URL"]}/register?b_param_token=#{b_param.id_token}",
+                               bike_id: nil, organization_id: nil, created_at: user_alert_registration.created_at.to_i}
+        # phone_waiting_confirmation is behind a flag
+        expect(json_result[:alerts]).to match_array((target_alerts + [target_registration]).as_json)
+
+        Flipper.enable(:phone_verification)
+        # Expiry is silent, so the alert stays active
+        b_param.update_column(:created_at, Time.current - BParam::TOKEN_EXPIRATION - 1.day)
+        expect(user.user_alerts.active.unfinished_registration.count).to eq 1
+
+        get "/api/v3/me/alerts", params: {access_token: token.token}
+        user_alert_phone = user.user_alerts.phone_waiting_confirmation.first
+        target_phone = {id: user_alert_phone.id, kind: "phone_waiting_confirmation",
+                        title: "Confirm your phone number",
+                        message: "Enter the verification code we texted to 433-444-4444",
+                        url: "#{ENV["BASE_URL"]}/my_account/edit", bike_id: nil, organization_id: nil,
+                        created_at: user_alert_phone.created_at.to_i}
+        expect(json_result[:alerts]).to match_array((target_alerts + [target_phone]).as_json)
+      end
+    end
+  end
 end

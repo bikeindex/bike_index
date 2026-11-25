@@ -4967,6 +4967,24 @@ en:
       unable_to_save: We're unable to save that registration, please try again
     shops_map:
       map_of_partner_locations: Map of partner locations
+    user_alerts:
+      phone_waiting_confirmation_message: Enter the verification code we texted to
+        %{phone_number}
+      phone_waiting_confirmation_title: Confirm your phone number
+      stolen_bike_without_location_message: >-
+        It is critical for recovery that you include the address or cross-street where
+        your %{bike_title} was stolen
+      stolen_bike_without_location_title: Please add theft location
+      theft_alert_without_photo_message: >-
+        Promoted alerts need an image to be effective - add a photo to your %{bike_title}
+      theft_alert_without_photo_title: Please add a photo
+      unassigned_bike_org_message: >-
+        Some of your registrations are connected to %{org_name}, but your %{bike_title}
+        is not
+      unassigned_bike_org_title: Connect to %{org_name}
+      unfinished_registration_message: Your %{manufacturer} %{bike_type} isn't registered
+        yet!
+      unfinished_registration_title: Finish your registration
   support:
     array:
       last_word_connector: ", and "

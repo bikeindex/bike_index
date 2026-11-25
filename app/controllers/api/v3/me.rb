@@ -87,6 +87,23 @@ module API
             each_serializer: BikeV2Serializer,
             root: "bikes", scope: current_user).as_json
         end
+
+        desc "Current user's alerts<span class='accstr'>*</span>", {
+          authorizations: {oauth2: {scope: :read_user}},
+          notes: <<-NOTE
+            The things the current user needs to do, so long as the access_token has the `read_user` scope.
+            Each alert has a `kind`, a plain text `title` and `message`, and the `url` of the page on Bike Index that resolves it.
+            `bike_id` and `organization_id` are set for the kinds that are about a bike or an organization.
+
+          NOTE
+        }
+        get "/alerts" do
+          user_alerts = current_user.user_alerts.active.where.not(kind: UserAlert.disabled_kinds)
+            .includes(:bike, :organization, :alertable).order(:id)
+            .select { UserAlertSerializer.displayable?(it, current_user) }
+          ActiveModel::ArraySerializer.new(user_alerts, each_serializer: UserAlertSerializer,
+            root: "alerts").as_json
+        end
       end
     end
   end
