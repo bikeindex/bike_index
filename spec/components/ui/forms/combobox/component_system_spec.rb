@@ -18,6 +18,11 @@ RSpec.describe UI::Forms::Combobox::Component, :js, type: :system do
     expect(page).to have_css('[role="option"]', count: CycleType.slugs.count)
     expect_axe_clean
 
+    # Tab leaves the combobox, rather than landing on its scrolling list
+    send_keys(:tab)
+
+    expect(page.evaluate_script("document.activeElement.tagName")).to eq "BODY"
+
     # A query matching nothing says so, and Enter keeps it open to edit
     fill_in "Cycle type", with: "zzqq"
 

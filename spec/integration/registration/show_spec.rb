@@ -19,6 +19,7 @@ RSpec.describe "Viewing a registration", :js, type: :system do
     # The message form is collapsed until the viewer opens it
     expect(page).to have_no_field("stolen_notification[message]")
 
+    wait_for_stimulus("ui--collapse")
     click_button "Contact the owner"
 
     fill_in "stolen_notification[message]", with: "I spotted this bike locked up on Main St"

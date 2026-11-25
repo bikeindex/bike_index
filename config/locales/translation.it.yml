@@ -6957,6 +6957,10 @@ it:
               serie
             without_serial_number: Questo %{cycle_type} è stato realizzato senza numero
               di serie
+            change_back: Torna indietro
+            looks_like_cm: Sembra che si tratti di centimetri e non di pollici, quindi
+              l'abbiamo invertito.
+            looks_like_inches: Sembra pollici e non centimetri, quindi l'abbiamo invertito.
           color_fields:
             add_another_color: Aggiungi un altro colore
             color: Colore
