@@ -19,8 +19,7 @@ RSpec.describe BikebookModelsSyncJob, type: :job do
     expect(BikebookModel.distinct.pluck(:manufacturer_id)).to match_array [specialized.id, aventon.id, kris_holm.id]
     expect(BikebookModel.count).to eq 30
     expect(BikebookModel.find_by(catalog_id: "m/specialized/2025/haul-st")).to have_attributes(manufacturer: specialized,
-      name: "Haul ST", model_slug: "haul_st", first_year: 2025, final_year: nil, markets: ["US"],
-      market_variants: ["CA"])
+      name: "Haul ST", model_slug: "haul_st", first_year: 2025, final_year: nil, markets: ["US"])
     expect(BikebookModel.find_by(catalog_id: "m/kris-holm/2023/kh24").manufacturer).to eq kris_holm
     expect(BikebookModel.find_by(catalog_id: dropped.catalog_id)).to be_nil
 

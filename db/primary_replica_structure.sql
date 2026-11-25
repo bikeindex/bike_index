@@ -742,8 +742,7 @@ CREATE TABLE public.bikebook_models (
     final_year integer,
     markets character varying[] DEFAULT '{}'::character varying[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL,
-    market_variants character varying[] DEFAULT '{}'::character varying[] NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL
 );
 
 

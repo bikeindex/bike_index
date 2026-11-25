@@ -130,6 +130,13 @@ RSpec.describe Integrations::Bikebook::Catalog do
       expect(described_class.model("m/segway/2025/gt3-pro")).to include("id" => "m/segway/2025/gt3-pro", "motors" => be_present)
     end
 
+    it "is its market's variant where the catalog has one, reading the block once a lookup" do
+      haul_st = "m/specialized/2025/haul-st"
+      expect(described_class.model(haul_st, market: "CA")["description"]).to include("up to 100 km")
+      expect(described_class.model(haul_st, market: "MX")["description"]).to include("60 miles")
+      WebMock::API.assert_requested(:get, %r{models/specialized/2025}, times: 2)
+    end
+
     it "is nil for what isn't a model's id, without reading or caching anything for it" do
       WebMock.stub_request(:get, /#{Regexp.escape(described_class::URL)}/o).to_return(status: 503)
 
