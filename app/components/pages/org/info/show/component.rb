@@ -26,8 +26,6 @@ module Pages
 
           def admin? = @current_user.admin_of?(@organization)
 
-          def registration_url = register_organization_url(@organization)
-
           # is_invoiced? rather than paid_money?, which a $0 invoice - the usual endless one - leaves false
           def invoiced? = @organization.is_invoiced?
 

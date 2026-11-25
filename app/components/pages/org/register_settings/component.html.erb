@@ -1,70 +1,72 @@
-<%= render UI::Header::Component.new(text: translation(".registration_form_settings"), html_class: "uncap") %>
+<%= render UI::Header::Component.new(text: translation(".registration_form_settings"), html_class: "uncap",
+    subtitle: translation(".share_link_and_choose_options")) %>
 
-<%= form_with(url: switches_organization_registrations_path(organization_id: @organization.to_param),
-    data: {turbo: false, controller: "org--register-settings"}) do %>
-  <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
-    <span class="twlabel tw:sm:text-right"><%= translation(".registration_page") %></span>
+<%= render Atoms::Org::RegistrationLink::Component.new(organization: @organization, html_class: "tw:mb-8") %>
 
-    <div class="tw:sm:col-span-2">
-      <%= render UI::Forms::Checkbox::Component.new(name: :old_view, checked: @old_view,
-          label: translation(".old_view"), html_options: {data: {"org--register-settings-target": "oldView",
-            action: "org--register-settings#apply"}}) %>
-    </div>
-  </div>
+<%= render(UI::Card::Component.new(additional_classes: "tw:rounded-lg! tw:p-7!")) do %>
+  <%= form_with(url: switches_organization_registrations_path(organization_id: @organization.to_param),
+      data: {turbo: false, controller: "org--register-settings"}) do %>
+    <%= render UI::Header::Component.new(text: translation(".form_options"), tag: :h2) %>
 
-  <div
-    class="
-      tw:mb-6 tw:gap-x-8 tw:has-disabled:opacity-50 tw:sm:grid
-      tw:sm:grid-cols-3
-    "
-  >
-    <span class="twlabel tw:sm:text-right"><%= translation(".form_options") %></span>
+    <div class="tw:divide-y tw:divide-gray-200 tw:dark:divide-gray-700">
+      <div class="tw:gap-x-6 tw:pb-6 tw:sm:grid tw:sm:grid-cols-3">
+        <span class="twlabel"><%= translation(".registration_page") %></span>
 
-    <div class="tw:sm:col-span-2">
-      <%= render UI::Forms::Checkbox::Component.new(name: :single_page, checked: @single_page,
-          label: translation(".single_page"),
-          html_options: {data: {"org--register-settings-target": "oldViewShown"}}) %>
-
-      <% if safety_rules? %>
-        <%= render UI::Forms::Checkbox::Component.new(name: :separate_attestation, checked: @separate_attestation,
-            class_name: "tw:mt-2", label: translation(".separate_attestation"),
-            html_options: {data: {"org--register-settings-target": "oldViewShown", old_view_checked: true}}) %>
-        <p
-          class="
-            tw:mt-1 tw:mb-0 tw:pl-6 tw:text-xs tw:text-gray-500
-            tw:dark:text-gray-400
-          "
-        >
-          <%= translation(".separate_attestation_helper") %>
-        </p>
-      <% end %>
-    </div>
-  </div>
-
-  <% if @organization.enabled?("parking_notifications") %>
-    <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
-      <span class="twlabel tw:sm:text-right"><%= translation(".unregistered_notification_page") %></span>
-
-      <div class="tw:sm:col-span-2">
-        <%= render UI::Forms::Checkbox::Component.new(name: :old_unregistered_notification_view,
-            checked: @old_unregistered_notification_view, label: translation(".old_unregistered_notification_view")) %>
+        <div class="tw:sm:col-span-2">
+          <%= render UI::Forms::Checkbox::Component.new(name: :old_view, checked: @old_view,
+              label: translation(".old_view"), html_options: {data: {"org--register-settings-target": "oldView",
+                action: "org--register-settings#apply"}}) %>
+        </div>
       </div>
-    </div>
-  <% end %>
 
-  <div class="tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
-    <div class="tw:sm:col-span-2 tw:sm:col-start-2">
-      <%= render UI::Button::Component.new(text: translation(".update"), color: :primary, size: :lg,
-          type: "submit") %>
-
-      <p
+      <div
         class="
-          tw:mt-3 tw:mb-0 tw:text-sm tw:text-gray-500 tw:italic
-          tw:dark:text-gray-400
+          tw:gap-x-6 tw:py-6 tw:has-disabled:opacity-50 tw:sm:grid
+          tw:sm:grid-cols-3
         "
       >
+        <span class="twlabel"><%= translation(".form_options") %></span>
+
+        <div class="tw:sm:col-span-2">
+          <%= render UI::Forms::Checkbox::Component.new(name: :single_page, checked: @single_page,
+              label: translation(".single_page"),
+              html_options: {data: {"org--register-settings-target": "oldViewShown"}}) %>
+
+          <% if safety_rules? %>
+            <%= render UI::Forms::Checkbox::Component.new(name: :separate_attestation, checked: @separate_attestation,
+                class_name: "tw:mt-3.5", label: translation(".separate_attestation"),
+                html_options: {data: {"org--register-settings-target": "oldViewShown", old_view_checked: true}}) %>
+            <p
+              class="
+                tw:mt-1 tw:mb-0 tw:pl-6 tw:text-sm tw:text-gray-600
+                tw:dark:text-gray-400
+              "
+            >
+              <%= translation(".separate_attestation_helper") %>
+            </p>
+          <% end %>
+        </div>
+      </div>
+
+      <% if @organization.enabled?("parking_notifications") %>
+        <div class="tw:gap-x-6 tw:pt-6 tw:sm:grid tw:sm:grid-cols-3">
+          <span class="twlabel"><%= translation(".unregistered_notification_page") %></span>
+
+          <div class="tw:sm:col-span-2">
+            <%= render UI::Forms::Checkbox::Component.new(name: :old_unregistered_notification_view,
+                checked: @old_unregistered_notification_view, label: translation(".old_unregistered_notification_view")) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-4 tw:pt-8">
+      <%= render UI::Button::Component.new(text: translation(".update"), color: :primary, size: :callout_sm,
+          type: "submit") %>
+
+      <p class="tw:mb-0 tw:text-sm tw:text-gray-600 tw:italic tw:dark:text-gray-400">
         <%= translation(".browser_only") %>
       </p>
     </div>
-  </div>
+  <% end %>
 <% end %>

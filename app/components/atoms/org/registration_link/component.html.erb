@@ -1,0 +1,52 @@
+<%= render UI::Card::Component.new(additional_classes: card_classes) do %>
+  <div class="tw:flex tw:flex-col tw:gap-4" data-controller="ui--collapse">
+    <%= render UI::Header::Component.new(text: translation(".your_public_registration_link"), tag: :h2, html_class: "tw:mb-0!") %>
+
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
+      <code
+        class="
+          tw:min-w-0 tw:flex-[1_1_20rem] tw:rounded-sm tw:border
+          tw:border-gray-200 tw:bg-gray-50 tw:px-3.5 tw:py-3 tw:font-mono
+          tw:text-base tw:wrap-anywhere tw:text-inherit
+          tw:dark:border-gray-700 tw:dark:bg-gray-900
+        "
+      >
+        <%= registration_url %>
+      </code>
+
+      <div class="tw:flex tw:gap-2">
+        <%= render UI::Button::Component.new(color: :primary, size: :callout_sm, html_class: "tw:group",
+            data: {controller: "ui--copy-button", "ui--copy-button-text-value": registration_url,
+              action: "ui--copy-button#copy"}) do %>
+          <span class="tw:group-data-copied:hidden"><%= translation(".copy_link") %></span>
+          <span class="tw:hidden tw:group-data-copied:inline"><%= translation(".copied") %></span>
+        <% end %>
+
+        <%= render UI::Collapse::Component.new(text: translation(".qr_code"), color: :secondary, size: :callout_sm) %>
+      </div>
+    </div>
+
+    <div
+      class="
+        tw:hidden! tw:flex-wrap tw:items-center tw:gap-5 tw:rounded-lg
+        tw:border tw:border-gray-200 tw:p-4 tw:dark:border-gray-700
+      "
+      data-ui--collapse-target="content"
+    >
+      <%= image_tag(qr_code_path, alt: translation(".qr_code_alt"), width: 140, height: 140,
+          class: "tw:size-35 tw:rounded-sm tw:bg-white") %>
+
+      <div class="tw:flex tw:max-w-sm tw:flex-col tw:gap-2">
+        <p class="tw:mb-0 tw:text-gray-600 tw:dark:text-gray-300">
+          <%= translation(".qr_code_description") %>
+        </p>
+
+        <%= link_to translation(".download_qr_code"), qr_code_path, class: "twlink tw:font-semibold", target: "_blank", rel: "noopener" %>
+      </div>
+    </div>
+
+    <p class="tw:mb-0 tw:text-gray-600 tw:dark:text-gray-300">
+      <%= translation(".associated_with_org_html", org_name: @organization.name) %>
+    </p>
+  </div>
+<% end %>
