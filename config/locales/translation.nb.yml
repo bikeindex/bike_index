@@ -6649,6 +6649,9 @@ nb:
             wheres_my_serial: Hvor er serienummeret mitt?
             without_serial: Denne %{cycle_type} ble laget uten serienummer
             without_serial_number: Denne %{cycle_type} ble laget uten serienummer
+            change_back: Bytt tilbake
+            looks_like_cm: Det ser ut som cm ikke tommer, så vi byttet det.
+            looks_like_inches: Det ser ut som tommer, ikke cm, så vi byttet det.
           color_fields:
             add_another_color: Legg til en annen farge
             color: Farge
