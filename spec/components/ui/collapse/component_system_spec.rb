@@ -23,6 +23,7 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
       })
     JS
 
+    wait_for_stimulus("ui--collapse")
     click_button("Toggle details")
 
     # The checkbox sits at its full-open offset from the first frame, so unclipped it would
@@ -62,6 +63,7 @@ RSpec.describe "ui--collapse controller", :js, type: :system do
     visit "/rails/view_components/ui/collapse/component/with_storage_key"
     expect(page).to have_no_content("Stored panel body")
 
+    wait_for_stimulus("ui--collapse")
     click_button("Toggle stored panel")
     expect(page).to have_content("Stored panel body")
     expect(page).not_to have_current_path(/\?/, url: true)
