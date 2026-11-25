@@ -88,9 +88,7 @@ module BikeJobs
       UserAlert.active.where(bike_id: bike.id).update_all(resolved_at: Time.current, updated_at: Time.current)
       PublicImage.unscoped.where(imageable: bike).update_all(imageable_id: pos_bike.id)
       Sale.where(item: bike).update_all(item_id: pos_bike.id)
-      # It's the Bike Book model of frame_model, which the owner's replaces
-      VehicleSpecification.where(vehicle: pos_bike).delete_all
-      VehicleSpecification.where(vehicle: bike).update_all(vehicle_id: pos_bike.id)
+      merge_vehicle_specification(bike, pos_bike)
       # Gear is its Strava athlete's
       unless StravaGear.where(item: pos_bike).exists?
         StravaGear.where(item: bike, strava_integration: StravaIntegration.where(user_id: pos_bike.user_id))
@@ -134,6 +132,16 @@ module BikeJobs
         merged_organization_ids
       BikeOrganization.unscoped.where(bike_id: pos_bike.id, organization_id: restricted_organization_ids, can_not_edit_claimed: false)
         .update_all(can_not_edit_claimed: true, updated_at: Time.current)
+    end
+
+    # The owner's values win where they have one, as their frame_model does
+    def merge_vehicle_specification(bike, pos_bike)
+      specification = bike.vehicle_specification
+      return if specification.blank?
+
+      (pos_bike.vehicle_specification || pos_bike.build_vehicle_specification)
+        .update!(specification.slice(:bikebook_model_id, :bikebook_market).compact)
+      specification.destroy!
     end
 
     def merge_attributes(bike, pos_bike)
