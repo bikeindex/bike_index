@@ -176,8 +176,6 @@ RSpec.describe Admin::BikesController, type: :request do
         expect(body).to have_link("ignore ACTIVE123", exact: true) { it[:onclick].include?("Ignore it?") }
         expect(body).to have_button("un-ignore IGNORED123", exact: true)
         expect(response.body.index("ACTIVE123")).to be < response.body.index("IGNORED123")
-        # Ignored groups don't list their bikes
-        expect(body).to have_css("tbody tr", text: /\b#{other_bike.id}\b/, count: 1)
 
         put "#{base_url}/ignore_duplicate_toggle", params: {id: active_group.id}
         expect(active_group.reload.ignore).to be_truthy

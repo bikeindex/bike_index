@@ -48,10 +48,16 @@
       </span>
     </div>
 
-    <%# An ignored group can be a placeholder serial shared by thousands, so only active ones list their bikes %>
-    <% unless duplicate_group.ignore? %>
-      <%= render Pages::Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes, sort_state:,
-            no_show_header: true, show_serial: true) %>
+    <%# A group can be a placeholder serial shared by thousands, so it lists a few of its bikes %>
+    <% bikes_count = duplicate_group.bikes.count %>
+
+    <%= render Pages::Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes.limit(25), sort_state:,
+          no_show_header: true, show_serial: true) %>
+
+    <% if bikes_count > 25 %>
+      <p class="tw:text-sm">
+        The first 25 of <%= number_display(bikes_count) %> bikes
+      </p>
     <% end %>
   <% end %>
 

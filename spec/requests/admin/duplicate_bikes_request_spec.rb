@@ -178,6 +178,11 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(assigns(:duplicate_groups)).to eq []
       get base_url, params: {search_view: "segments", search_serial: "wtu 123456", search_ignored: "all"}
       expect(assigns(:duplicate_groups)).to eq [duplicate_group]
+      # A stored segment with leading zeros, as typed
+      zeros_group = DuplicateBikeGroup.create
+      pair.each { NormalizedSerialSegment.create(bike: it, duplicate_bike_group: zeros_group, segment: "00123456") }
+      get base_url, params: {search_view: "segments", search_serial: "00123456"}
+      expect(assigns(:duplicate_groups)).to eq [zeros_group]
     end
   end
 
