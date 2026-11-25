@@ -666,7 +666,7 @@ module BikeServices
 
     # Blank values keep what step 1 saved - except the additional colors, where
     # blank is the "remove color" button clearing one
-    def step_2_params(bike_params, image_signed_id:, completed:, registrant_country: nil)
+    def step_2_params(bike_params, image_signed_id:, completed:, registrant_country:)
       bike_params = bike_params.reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
       # The unit only means something alongside a numeric size
       bike_params = bike_params.except("frame_size_unit") if bike_params["frame_size_number"].blank?
