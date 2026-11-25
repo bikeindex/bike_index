@@ -151,7 +151,7 @@ The one that talks itself into existence is the "still accurate" update — a la
 Two gates, either of which skips the section outright:
 
 - **Not a frontend diff** — per the classifier above. **Unless a `## Screenshots` comment already exists**: the user asked for those captures, so a commit since the last one that changes what they show stales them even here. Recapture only those pages.
-- **No `gh`**, with `$CLAUDE_CODE_REMOTE` unset. Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. **The web sandbox is not this case**, though `gh` doesn't work there: `$CLAUDE_CODE_REMOTE` is `true` there, and the section runs, because `github-pr-images` hosts through the PR branch's history — see the appendix.
+- **No `gh`**, with `$CLAUDE_CODE_REMOTE` unset. Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. **The web sandbox is not this case** — see the appendix.
 
 **A dev server you believe is down is not a gate.** Run `curl -fs "$BASE_URL/"` now, whatever an earlier check in the session said — the user starts `bin/dev` whenever, and #4319 went out without screenshots on a stale "isn't running". Only a failing curl *this* run is a reason to stop and ask.
 
@@ -179,7 +179,7 @@ Then return the PR URL.
 
 ## Appendix: the sandbox where `gh` doesn't work
 
-Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_REMOTE` is `true`) lacks the GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found" — or, since a `gh` binary can be present there, `HTTP 403: GitHub GraphQL is not available from Claude Code sessions` — swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
+Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_REMOTE` is `true`) lacks a working GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found" — or, since a `gh` binary can be present there, `HTTP 403: GitHub GraphQL is not available from Claude Code sessions` — swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
 
 | Where | `gh` | MCP |
 | --- | --- | --- |
@@ -190,4 +190,4 @@ Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_R
 
 Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
 
-**Screenshots do run here**, though `gh` doesn't: `github-pr-images`' `references/web-sandbox.md` commits the images to the PR's branch, deletes them in a second commit, and posts sha-pinned `raw.githubusercontent.com` URLs through the MCP tools. Follow that reference from its probe — a session whose comment tools rewrite image URLs ends the phase before any capture — then capture as normal and follow it for the hosting and posting steps. Those URLs live as long as the branch's objects do, so say in your summary that a merged PR's screenshots aren't archival.
+**Screenshots do run here**: `github-pr-images`' preflight decides how they upload.
