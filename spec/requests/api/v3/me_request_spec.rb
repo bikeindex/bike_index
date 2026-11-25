@@ -205,16 +205,13 @@ RSpec.describe "Me API V3", type: :request do
   end
 
   describe "current/alerts" do
-    let!(:token) { create_doorkeeper_token(scopes:) }
-    let(:scopes) { "read_user" }
-
     it "403s if read_user isn't in token" do
-      token.update(scopes: "read_bikes")
       get "/api/v3/me/alerts", params: {access_token: token.token}
       expect(response.response_code).to eq(403)
     end
 
     context "with alerts" do
+      let(:token) { create_doorkeeper_token(scopes: "read_user") }
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
       let(:organization) { FactoryBot.create(:organization) }
       let!(:user_alert_photo) do

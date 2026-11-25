@@ -137,7 +137,7 @@ class UserAlert < ApplicationRecord
   # after_commit that would resolve them
   def self.resolve_finished_registrations(user)
     user.user_alerts.active.unfinished_registration.includes(:alertable)
-      .reject { |user_alert| user_alert.alertable&.unfinished_registration?(user) }
+      .reject { it.displayable?(user) }
       .each(&:resolve!)
   end
 
@@ -212,6 +212,16 @@ class UserAlert < ApplicationRecord
 
   def kind_humanized
     self.class.kind_humanized(kind)
+  end
+
+  # Alerts outlive the bike, phone or organization they point at until a job resolves them
+  def displayable?(user)
+    case kind
+    when "unfinished_registration" then alertable&.unfinished_registration?(user)
+    when "phone_waiting_confirmation" then alertable.present?
+    when "unassigned_bike_org" then bike.present? && organization.present?
+    else bike.present?
+    end
   end
 
   def dismissable?

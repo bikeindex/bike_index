@@ -100,7 +100,7 @@ module API
         get "/alerts" do
           user_alerts = current_user.user_alerts.active.where.not(kind: UserAlert.disabled_kinds)
             .includes(:bike, :organization, :alertable).order(:id)
-            .select { UserAlertSerializer.displayable?(it, current_user) }
+            .select { it.displayable?(current_user) }
           ActiveModel::ArraySerializer.new(user_alerts, each_serializer: UserAlertSerializer,
             root: "alerts").as_json
         end

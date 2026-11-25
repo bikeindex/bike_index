@@ -1,34 +1,19 @@
-# Plain text and a web URL that resolves the alert, in place of the HTML and modals the
-# site renders - for clients that can't render either
+# Plain text and the web URL that resolves the alert, for clients that can't render the
+# site's HTML and modals
 class UserAlertSerializer < ApplicationSerializer
-  attributes :id, :kind, :title, :message, :url, :bike_id, :organization_id, :created_at
-
-  # Alerts outlive what they point at until a job resolves them, and the registration
-  # alert outlives the registration finishing elsewhere
-  def self.displayable?(user_alert, user)
-    case user_alert.kind
-    when "unfinished_registration" then user_alert.alertable&.unfinished_registration?(user)
-    when "phone_waiting_confirmation" then user_alert.alertable.present?
-    when "unassigned_bike_org" then user_alert.bike.present? && user_alert.organization.present?
-    else user_alert.bike.present?
-    end
-  end
+  attributes :id, :kind, :bike_id, :organization_id, :created_at
 
   # The copy follows the locale and the bike's title, neither of which moves the alert's version
   def perform_caching = false
 
   def created_at = object.created_at.to_i
 
-  def title = content[:title]
-
-  def message = content[:message]
-
-  def url = content[:url]
+  def attributes = super.merge(content)
 
   private
 
   def content
-    @content ||= case object.kind
+    case object.kind
     when "phone_waiting_confirmation"
       {title: I18n.t("shared.user_alerts.phone_waiting_confirmation_title"),
        message: I18n.t("shared.user_alerts.phone_waiting_confirmation_message",
