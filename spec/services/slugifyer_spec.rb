@@ -43,28 +43,6 @@ RSpec.describe Slugifyer do
     end
   end
 
-  describe "book_slug" do
-    it "removes special characters and downcase" do
-      slug = Slugifyer.book_slug("Surly's Cross-check bike (small wheel)")
-      expect(slug).to eq("surly_s_cross_check_small_wheel")
-    end
-
-    it "removes bikes and bicycles, because people just put them in everything" do
-      slug = Slugifyer.book_slug("Cross-check Singlespeed BicyclE")
-      expect(slug).to eq("cross_check_singlespeed")
-    end
-
-    it "removes diacritics and bicycles, because people just put them in everything" do
-      slug = Slugifyer.book_slug("paké rum runner")
-      expect(slug).to eq("pake_rum_runner")
-    end
-
-    it "changes + to plus for URL safety, and Trek uses + to differentiate" do
-      slug = Slugifyer.book_slug("L100+ Lowstep BLX")
-      expect(slug).to eq("l100plus_lowstep_blx")
-    end
-  end
-
   describe "broader_company_slugify" do
     it "removes works rivendell" do
       slug = Slugifyer.broader_company_slugify("Rivendell Bicycle Works")

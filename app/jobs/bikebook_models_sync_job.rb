@@ -42,7 +42,7 @@ class BikebookModelsSyncJob < ScheduledJob
 
   def row(model, manufacturer_id)
     {catalog_id: model["id"], manufacturer_id:, name: model["model"],
-     model_slug: Slugifyer.book_slug(model["model"]), first_year: model["first_year"], final_year: model["final_year"],
+     model_slug: Integrations::Bikebook::ModelSearch.slug(model["model"]), first_year: model["first_year"], final_year: model["final_year"],
      markets: [*model["markets"], *model["variants"].flat_map { it["markets"] }].uniq, deleted_at: nil}
   end
 end

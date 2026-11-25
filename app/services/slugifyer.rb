@@ -19,23 +19,7 @@ module Slugifyer
 
     name = remove_parens(string).gsub(/\sco(\.|mpany)/i, " ").gsub(/\s(frame)?works/i, " ")
     # An empty (bare "Accell") or all-digit slug falls back, since Manufacturer.friendly_find reads digits as an id
-    book_slug(name.gsub(/accell/i, "")).then { it.match?(/\D/) ? it : slugify(name).tr("-", "_") }
-  end
-
-  # underscores, also removes some extra stuff
-  def book_slug(string)
-    slug = transliterate(string)
-    key_hash = {
-      "%20" => " ",
-      '\s(e(lectric)?.?)?((bi)?cycles?|bikes?)' => " ",
-      '\+' => "plus",
-      "&" => "amp",
-      "([^A-Za-z0-9])" => " "
-    }
-    key_hash.keys.each do |k|
-      slug.gsub!(/#{k}/i, key_hash[k])
-    end
-    slug.strip.gsub(/\s+/, "_") # strip and then turn any length of spaces into underscores
+    underscored(name.gsub(/accell/i, "")).then { it.match?(/\D/) ? it : slugify(name).tr("-", "_") }
   end
 
   #
@@ -50,5 +34,14 @@ module Slugifyer
     I18n.transliterate(string.to_s.downcase).strip
   end
 
-  conceal :remove_parens, :transliterate
+  def underscored(string)
+    transliterate(string)
+      .gsub("%20", " ")
+      .gsub(/\s(e(lectric)?.?)?((bi)?cycles?|bikes?)/i, " ")
+      .gsub("+", "plus").gsub("&", "amp")
+      .gsub(/[^a-z0-9]/i, " ")
+      .split.join("_")
+  end
+
+  conceal :remove_parens, :transliterate, :underscored
 end
