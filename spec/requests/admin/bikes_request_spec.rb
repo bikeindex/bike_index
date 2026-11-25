@@ -53,6 +53,23 @@ RSpec.describe Admin::BikesController, type: :request do
         expect(assigns(:bikes).pluck(:id)).to eq([bike_deleted.id])
       end
     end
+
+    context "user_id with search_previous_owner" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      let!(:bike_transferred) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      before { FactoryBot.create(:ownership, bike: bike_transferred) }
+
+      it "finds the bikes the user used to own" do
+        get base_url, params: {user_id: user.id}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike.id])
+        expect(response.body).to include("view bikes previously owned by")
+
+        get base_url, params: {user_id: user.id, search_previous_owner: true}
+        expect(assigns(:bikes).pluck(:id)).to eq([bike_transferred.id])
+        expect(response.body).to include("view currently owned bikes")
+      end
+    end
   end
 
   describe "missing_manufacturer" do

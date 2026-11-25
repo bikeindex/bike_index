@@ -194,8 +194,9 @@ module Admin
     end
 
     def matching_bikes
+      @previous_owner = Binxtils::InputNormalizer.boolean(params[:search_previous_owner])
       bikes = if params[:user_id].present?
-        Bike.unscoped.current_owner(user_subject.id)
+        @previous_owner ? Bike.unscoped.previous_owner(user_subject.id) : Bike.unscoped.current_owner(user_subject.id)
       elsif params[:search_phone].present?
         Bike.search_phone(params[:search_phone])
       else
