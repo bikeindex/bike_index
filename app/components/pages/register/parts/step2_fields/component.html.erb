@@ -56,9 +56,8 @@
     </div>
   </div>
 
-  <% [["in", translation(".switched_to_cm"), translation(".change_back_to_inches")],
-      ["cm", translation(".switched_to_inches"), translation(".change_back_to_cm")]].each do |unit, message, text| %>
-    <div
+  <% [["in", translation(".looks_like_cm")], ["cm", translation(".looks_like_inches")]].each do |unit, message| %>
+    <p
       class="
         tw:hidden tw:pt-1.5 tw:text-sm tw:text-gray-500
         tw:dark:text-gray-400
@@ -66,14 +65,11 @@
       data-register--frame-size-target="wrongUnit"
       data-unit="<%= unit %>"
     >
-      <p><%= message %></p>
+      <%= message %>
 
-      <%# Its own line: pressed, it turns bold, which can wrap it out from under the click %>
-      <div>
-        <%= render UI::Button::Component.new(text:, value: unit, color: :link_gray,
-            data: {action: "register--frame-size#revert"}) %>
-      </div>
-    </div>
+      <%= render UI::Button::Component.new(text: translation(".change_back"), value: unit, color: :link_gray,
+          html_class: "tw:inline!", data: {action: "register--frame-size#revert"}) %>
+    </p>
   <% end %>
 </div>
 

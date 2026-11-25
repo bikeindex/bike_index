@@ -11,8 +11,7 @@ en:
             attach_photo: Attach photo of %{cycle_type}
             bike_details: "%{cycle_type} details"
             bottom_bracket: Bottom bracket
-            change_back_to_cm: Change back to cm
-            change_back_to_inches: Change back to inches
+            change_back: Change back
             cm: cm
             complete_registration: Complete %{cycle_type} Registration
             contact_info: Contact info
@@ -33,6 +32,8 @@ en:
             information_for_org: Information for %{org_name}
             is_a_handmade_frame: Is a handmade frame
             it_probably_has_a_serial_number: It probably has a serial number.
+            looks_like_cm: That looks like cm not inches, so we switched it.
+            looks_like_inches: That looks like inches not cm, so we switched it.
             missing_serial: Missing serial
             model: Model
             model_placeholder: e.g. Marlin 7
@@ -72,9 +73,6 @@ en:
             stolen: Stolen
             stolen_description: This %{cycle_type} has been stolen
             student_id: Student ID
-            switched_to_cm: We think that is in cm not inches, so we switched it.
-            switched_to_inches: We think that is in inches not cm, so we switched
-              it.
             very_very_few_bikes_html: >-
               Very <em>very</em> few %{cycle_types} are made without serials. Unless
               this %{cycle_type}:
