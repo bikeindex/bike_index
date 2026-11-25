@@ -353,6 +353,11 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_content("Add your bike", wait: 10)
 
     model = find("#bike_frame_model[role='combobox']", wait: 10)
+    type_into(model, "fuse")
+    retry_on_detach { find("[role='option']", text: "Specialized Fuse FOUR").click }
+    # Its one year, which can't be changed but submits
+    expect(page).to have_field("Model year", with: "2007", readonly: true)
+
     type_into(model, "haul")
     # Only the registration's manufacturer's
     expect(page).to have_no_css("[role='option']", text: "Segway")

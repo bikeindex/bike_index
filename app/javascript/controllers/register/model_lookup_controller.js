@@ -43,15 +43,17 @@ export default class extends Controller {
     if (picked !== undefined) this.offerYears(picked ? yearsOf(picked.data) : [], type === 'hw-combobox:selection')
   }
 
-  // In place of the year's text field, which keeps what's chosen for a pick replaced by typed text
+  // In place of the year's text field, which keeps what's chosen for a pick replaced by typed text. A single year is the
+  // field itself, read only - unlike a disabled field, it submits
   offerYears (years, fresh) {
     const year = this.yearTarget
     this.yearId ??= year.id
     const chosen = years.includes(Number(year.value)) && !fresh ? Number(year.value) : years[0]
+    const choosing = years.length > 1
     if (years.length) year.value = chosen
     // the select takes the field's id while it's shown, which the label is for
-    Object.assign(year, { hidden: years.length > 0, disabled: years.length > 0, id: years.length ? '' : this.yearId })
-    renderInto(this.yearSelect, years.length
+    Object.assign(year, { hidden: choosing, disabled: choosing, readOnly: years.length === 1, id: choosing ? '' : this.yearId })
+    renderInto(this.yearSelect, choosing
       ? html`<select class="twinput tw:font-mono" id=${this.yearId} name=${year.name}
           @change=${({ target }) => { year.value = target.value }}>${years.map((each) => html`<option value=${each}
           ?selected=${each === chosen}>${each}</option>`)}</select>`
