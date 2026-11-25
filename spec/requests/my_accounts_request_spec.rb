@@ -105,6 +105,16 @@ RSpec.describe MyAccountsController, type: :request do
             end
           end
         end
+        context "paged" do
+          before { FactoryBot.create_list(:bike, 2, :with_ownership_claimed, user: current_user) }
+
+          it "keeps the per_page in the pagination, and nothing else from the URL" do
+            get base_url, params: {page: 1, per_page: 1, host: "attacker.test"}
+            expect(response.status).to eq(200)
+            expect(response.body).to include("/my_account?page=2&amp;per_page=1")
+            expect(response.body).not_to include("attacker.test")
+          end
+        end
         context "with lock with deleted manufacturer" do
           let(:lock) { FactoryBot.create(:lock, user: current_user) }
           it "renders and user things are assigned" do

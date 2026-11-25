@@ -204,22 +204,20 @@
                   controller: "shared-blocks--locale-select",
                   action: "submit->shared-blocks--locale-select#submit change->shared-blocks--locale-select#submit"
                 } do %>
-              <div class="row">
-                <div class="form-group">
-                  <%= label_tag(:locale, translation(".language")) %>
+              <div class="form-group">
+                <%= label_tag(:locale, translation(".language")) %>
 
-                  <%= select_tag(:locale,
-                  options_for_select(helpers.language_choices, selected: I18n.locale),
-                  class: "form-control-sm") %>
+                <%= select_tag(:locale,
+                options_for_select(helpers.language_choices, selected: I18n.locale),
+                class: "form-control-sm") %>
 
-                  <% if @current_user.present? && @current_user.preferred_language != I18n.locale %>
-                    <em class="below-input-help text-right">
-                      <%= link_to translation(".change_preferred_language"), edit_my_account_path %>
-                    </em>
-                  <% end %>
+                <% if @current_user.present? && @current_user.preferred_language != I18n.locale %>
+                  <em class="below-input-help text-right">
+                    <%= link_to translation(".change_preferred_language"), edit_my_account_path %>
+                  </em>
+                <% end %>
 
-                  <%= submit_tag "update", name: "Update", class: "btn btn-primary btn-sm sr-only" %>
-                </div>
+                <%= submit_tag "update", name: "Update", class: "btn btn-primary btn-sm sr-only" %>
               </div>
             <% end %>
           </div>
