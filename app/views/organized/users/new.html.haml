@@ -1,47 +1,43 @@
-.mb-4
-  = render(UI::Header::Component.new(text: t(".invite_user")))
-  - if current_organization.restrict_invitations?
-    %p
-      - count = number_with_delimiter(current_organization.sent_invitation_count)
-      = t(".you_have_invited_html", users_count: pluralize(count, t(".user")))
-    %p
-      - count = number_with_delimiter(current_organization.remaining_invitation_count)
-      = t(".remaining_invites_html", invitations_count: count)
-  - if current_organization.enabled?("passwordless_users")
-    %p= t(".automatic_passwordless")
+- organization_id = current_organization.to_param
+- restricted = current_organization.restrict_invitations?
+%p
+  = link_to organization_users_path(organization_id:), class: "twlink" do
+    %span{"aria-hidden": "true"} ←
+    = t(".back_to_users")
 
-    - if current_organization.user_email_domain.present?
-      .col-md-8.offset-md-1
-        = render(UI::Alerts::Base::Component.new(header: t(".you_have_a_permitted_domain"), margin_classes: "tw:mt-4",
-          text: t(".signing_in_with_permitted_domain_html", email_suffix: "@#{current_organization.user_email_domain}", org_name: current_organization.short_name)))
+= render(UI::Header::Component.new(text: t(".invite_users_heading"), html_class: "uncap"))
+- if restricted
+  %p
+    = t(".invited_so_far_html", count: current_organization.sent_invitation_count, number: number_display(current_organization.sent_invitation_count))
+    = t(".invitations_remaining_html", count: number_display(current_organization.remaining_invitation_count))
+- if current_organization.enabled?("passwordless_users")
+  %p= t(".automatic_passwordless")
+- if current_organization.user_email_domain.present?
+  = render(UI::Alerts::Base::Component.new(header: t(".you_have_a_permitted_domain"),
+    text: t(".signing_in_with_permitted_domain_html", email_suffix: "@#{current_organization.user_email_domain}", org_name: current_organization.short_name)))
 
-= form_for @organization_role, { as: :organization_role, url: organization_users_path(organization_id: current_organization.to_param), action: 'create', html: { class: 'organized-form', data: {controller: "org--field-expander"} } } do |f|
-
+- form_data = {controller: "org--invite-form", "org--invite-form-emails-count-value": t(".emails_count").to_json,
+  "org--invite-form-send-label-value": t(".send_invitation"), "org--invite-form-send-many-label-value": t(".send_invitations"),
+  "org--invite-form-not-valid-value": t(".not_valid_email"), "org--invite-form-left-value": t(".only_invitations_left").to_json}
+- form_data["org--invite-form-remaining-value"] = current_organization.remaining_invitation_count if restricted
+= form_for @organization_role, { as: :organization_role, url: organization_users_path(organization_id:), action: "create", html: {data: form_data} } do |f|
   = render(UI::Alerts::ObjectError::Component.new(object: @organization_role, name: t(".organization_role")))
 
-  - display_multi_invite = params[:multiple_emails_invited].present?
-  .form-group.row{ class: ("tw:hidden" if display_multi_invite), data: {"org--field-expander-target": "collapsed"} }
-    = f.label :invited_email, t(".email_youre_inviting"), class: "org-form-label"
-    .col-sm-4
-      = f.email_field :invited_email, class: "form-control"
-      .below-input-help
-        = render(UI::Button::Component.new(text: t(".invite_multiple_emails"), color: :link, data: {action: "org--field-expander#expand"}))
+  %div{class: "twwiderow tw:items-start"}
+    - emails = capture do
+      = render(UI::Forms::Group::Component.new(attribute: :multiple_emails_invited, label_text: t(".who_are_you_inviting"), optional_badge: false, wrapper_class: "tw:mb-0")) do
+        = text_area_tag :multiple_emails_invited, params[:multiple_emails_invited], rows: 7, class: "twinput", "aria-describedby": "emails_help",
+          placeholder: "alice@example.com\nquentin@example.com", data: {"org--invite-form-target": "emails", action: "input->org--invite-form#check"}
+      %div{class: "tw:mt-2 tw:flex tw:flex-wrap tw:justify-between tw:gap-x-3 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400"}
+        %span#emails_help= t(".one_email_per_line")
+        %span{class: "tw:font-semibold", data: {"org--invite-form-target": "count"}}
+      %p{class: "tw:mt-1 tw:mb-0 tw:hidden tw:text-sm tw:text-red-600 tw:dark:text-red-400", data: {"org--invite-form-target": "invalid"}}
+    = render partial: "card", locals: {title: t(".emails"), body: emails}
 
-  .form-group.row{ class: ("tw:hidden" unless display_multi_invite), data: {"org--field-expander-target": "expanded"} }
-    = label_tag :multiple_emails_invited, class: "org-form-label" do
-      = t(".multiple_emails")
-      %br
-      %em.small= t(".1_email_per_line")
+    - role = capture do
+      = render partial: "organization_role_fields", locals: {f:}
+    = render partial: "card", locals: {title: t(".role"), body: role}
 
-    .col-sm-4
-      = text_area_tag :multiple_emails_invited,
-        params[:multiple_emails_invited],
-        placeholder: "email1@gmail.com\nemail2@gmail.com\nemail3@gmail.com",
-        rows: 4,
-        class: "form-control"
-
-  = render partial: "organization_role_fields", locals: {f: f}
-
-  .form-group.row
-    .form-submit-button
-      = f.submit t(".send_invitation"), class: 'btn btn-success btn-lg'
+  %div{class: "tw:mt-6 tw:flex tw:flex-wrap tw:items-center tw:gap-4"}
+    = render(UI::Button::Component.new(text: t(".send_invitation"), color: :primary, type: "submit", data: {"org--invite-form-target": "submit"}))
+    %span{class: "tw:hidden tw:text-sm tw:text-red-600 tw:dark:text-red-400", data: {"org--invite-form-target": "limit"}}

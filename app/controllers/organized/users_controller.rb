@@ -31,7 +31,7 @@ module Organized
     end
 
     def new
-      @organization_role ||= OrganizationRole.new(organization_id: current_organization.id)
+      @organization_role ||= OrganizationRole.new(organization_id: current_organization.id, role: "member")
       @page_errors = @organization_role.errors
     end
 
@@ -41,7 +41,7 @@ module Organized
         redirect_to(current_root_path) && return
       end
       @organization_role = OrganizationRole.new(permitted_create_params)
-      if params[:multiple_emails_invited].present?
+      if multiple_emails_invited.any?
         if current_organization.restrict_invitations? && (multiple_emails_invited.count > current_organization.remaining_invitation_count)
           flash[:error] = translation(:insufficient_invitations,
             invite_count: multiple_emails_invited.count,
@@ -96,7 +96,7 @@ module Organized
     end
 
     def multiple_emails_invited
-      params[:multiple_emails_invited].split(/\s+/).flatten.reject(&:blank?).uniq
+      params[:multiple_emails_invited].to_s.split(/[\s,;]+/).reject(&:blank?).uniq
     end
 
     def permitted_update_params

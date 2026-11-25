@@ -1,0 +1,51 @@
+import { Controller } from '@hotwired/stimulus'
+import { collapse } from 'utils/collapse_utils'
+
+const EMAIL_PATTERN = /^[^@\s]+@[^@\s]+\.[^@\s]+$/
+
+// Connects to data-controller='org--invite-form'
+// Counts and validates the emails as they're typed, and keeps the form from submitting
+// until there is at least one, all of them look right, and the organization can invite them
+export default class extends Controller {
+  static targets = ['emails', 'count', 'invalid', 'limit', 'submit']
+  static values = {
+    emailsCount: Object, // plural templates, with %{count}
+    sendLabel: String,
+    sendManyLabel: String, // with %{count}
+    notValid: String, // with %{emails}
+    left: Object, // plural templates, with %{count}
+    remaining: Number // present only when invitations are restricted
+  }
+
+  connect () {
+    this.check()
+  }
+
+  check () {
+    const emails = [...new Set(this.emailsTarget.value.split(/[\s,;]+/).filter(Boolean))]
+    const invalid = emails.filter((email) => !EMAIL_PATTERN.test(email))
+    const count = emails.length - invalid.length
+    const over = this.hasRemainingValue && count > this.remainingValue
+
+    this.countTarget.textContent = count === 0 ? '' : this.pluralize(this.emailsCountValue, count)
+    this.countTarget.classList.toggle('tw:text-red-600', over)
+    this.emailsTarget.classList.toggle('tw:border-red-600!', invalid.length > 0 || over)
+    this.invalidTarget.textContent = invalid.length ? this.notValidValue.replace('%{emails}', invalid.join(', ')) : ''
+    this.limitTarget.textContent = over ? this.pluralize(this.leftValue, this.remainingValue) : ''
+    this.toggle(this.invalidTarget, invalid.length > 0)
+    this.toggle(this.limitTarget, over)
+    this.submitTarget.disabled = count === 0 || invalid.length > 0 || over
+    this.submitTarget.textContent = count > 1 ? this.sendManyLabelValue.replace('%{count}', count) : this.sendLabelValue
+  }
+
+  pluralize (templates, count) {
+    return (count === 1 ? templates.one : templates.other).replace('%{count}', count)
+  }
+
+  // Only on a change, so typing doesn't restart the animation
+  toggle (element, show) {
+    if (element.classList.contains('tw:hidden') !== show) return
+
+    collapse(show ? 'show' : 'hide', element)
+  }
+}

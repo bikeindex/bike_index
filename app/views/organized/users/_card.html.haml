@@ -1,0 +1,4 @@
+-# locals: (title:, body:, padded: true)
+= render(UI::Card::Component.new(divided: true, additional_classes: "tw:overflow-hidden")) do
+  %h2{class: "uncap tw:m-0 tw:bg-gray-50 tw:px-5 tw:py-3.5 tw:text-base tw:font-bold tw:text-gray-900 tw:dark:bg-gray-800 tw:dark:text-gray-100"}= title
+  %div{class: ("tw:p-5" if padded)}= body

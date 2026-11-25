@@ -1,72 +1,63 @@
-= render(UI::Header::Component.new(text: t(".manage_users"), html_class: "uncap"))
-
+- organization_id = current_organization.to_param
+%div{class: "tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-4"}
+  = render(UI::Header::Component.new(text: t(".manage_users"), html_class: "uncap"))
+  %div{class: "tw:mb-6"}
+    = render(UI::ButtonLink::Component.new(text: t(".invite_users"), href: new_organization_user_path(organization_id:), color: :primary, size: :sm))
 
 - unless @show_matching_count
-  - user_count = number_with_delimiter(current_organization.sent_invitation_count)
+  %p
+    = t(".current_users_count_html", count: number_display(current_organization.sent_invitation_count))
   - if current_organization.restrict_invitations?
     %p
-      = t(".you_have_invited_html", users_count: pluralize(user_count, t(".user")))
-    %p
-      - remaining_count = number_with_delimiter(current_organization.remaining_invitation_count)
-      = t(".remaining_invites_html", invitations_count: remaining_count)
-
-      - if current_organization.remaining_invitation_count > 0
-        = link_to t(".invite_more_users"), new_organization_user_path(organization_id: current_organization.to_param)
+      = t(".invitations_remaining_html", count: number_display(current_organization.remaining_invitation_count))
+      = link_to t(".invite_more_users"), new_organization_user_path(organization_id:), class: "twlink"
   - else
-    %p
-      %strong
-        #{user_count}
-      = t(".current_users")
     %p
       = t(".permitted_domain_info_html", email_suffix: "@#{current_organization.user_email_domain}", org_name: current_organization.short_name)
       %em.less-strong
         = t(".you_can_also")
-        #{link_to t(".manually_invite_email"), new_organization_user_path(organization_id: current_organization.to_param)}.
-  %p
-    - if current_organization.auto_user.present?
+        #{link_to t(".manually_invite_email"), new_organization_user_path(organization_id:), class: "twlink"}.
+  - if current_organization.auto_user.present?
+    %p
       = t(".emails_are_currently_sent_from_html", email: current_organization.auto_user.email)
-      =  link_to t(".update_email"), organization_manage_path(organization_id: current_organization.to_param)
+      = link_to t(".update_email"), organization_manage_path(organization_id:), class: "twlink"
 
-.row.mb-4.mt-4
-  .col-md-6
-    .pt-4.pb-4
-      = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
+%div{class: "tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-x-4"}
+  %div
+    = render(UI::Pagination::Component.new(pagy: @pagy, page_params: params, size: :lg))
   - if @show_user_search
-    .col-md-6.text-right{ style: "margin-top: 0.25rem;" }
-      = form_tag organization_users_path(organization_id: current_organization.to_param), method: :get, class: "form-inline" do
-        = render partial: "/shared/hidden_search_fields"
-        .form-group
-          = text_field_tag :query, params[:query], placeholder: t(".find_by_name_or_email"), class: "form-control mt-2"
-          = submit_tag t(".search"), name: "search", class: "btn btn-primary ml-2 mt-2"
+    = form_tag organization_users_path(organization_id:), method: :get, class: "twsearchrow" do
+      = render partial: "/shared/hidden_search_fields"
+      = text_field_tag :query, params[:query], placeholder: t(".find_by_name_or_email"), class: "twinput"
+      = render(UI::Button::Component.new(text: t(".search"), color: :primary, type: "submit", name: "search"))
 
 - if @show_matching_count
   %p.mt-2.mb-2
     %strong
-      = number_with_delimiter(@pagy.count)
+      = number_display(@pagy.count)
     = t(".matching_user").pluralize(@pagy.count)
 
-- organization_id = current_organization.to_param
 - admin = t(".admin")
 - member = t(".member")
 - no_bike_edit = t(".no_bike_edit")
+- view = t(".view")
 = render(UI::Table::Base::Component.new(records: @organization_roles, render_sortable: true, sort_state:)) do |table|
-  - table.column(sortable: "created_at", label: t(".created")) do |organization_role|
-    = link_to render(UI::Time::Component.new(time: organization_role.created_at)), edit_organization_user_path(organization_role.id, organization_id:), class: "twlink"
-  - table.column(sortable: "invited_email", label: t(".to")) do |organization_role|
-    = organization_role.invited_display_name
-    %small.less-strong.d-none.d-lg-inline-block
-      = organization_role.invited_email
-  - table.column(sortable: "claimed_at", label: t(".claimed")) do |organization_role|
-    - if organization_role.claimed_at.present?
-      = render(UI::Time::Component.new(time: organization_role.created_at))
+  - table.column(label: tag.span(view, class: "tw:sr-only")) do |organization_role|
+    = render(UI::ButtonLink::Component.new(text: view, href: edit_organization_user_path(organization_role.id, organization_id:), size: :sm))
+  - table.column(sortable: "invited_email", label: t(".user_column")) do |organization_role|
+    %div{class: "tw:font-semibold"}= organization_role.invited_display_name
+    - if organization_role.invited_display_name != organization_role.invited_email
+      %small.less-strong= organization_role.invited_email
   - table.column(sortable: "role", label: t(".role")) do |organization_role|
     - if organization_role.admin?
       %span.text-info= admin
     - else
       %span.less-strong= member
       - if organization_role.member_no_bike_edit?
-        %small= no_bike_edit
-  - table.column(sortable: "sender_id", label: t(".sender"), header_classes: "tw:text-xs") do |organization_role|
-    - if organization_role.sender.present?
-      %small
-        = organization_role.sender.display_name
+        %small{class: "tw:block"}= no_bike_edit
+  - table.column(sortable: "created_at", label: t(".created")) do |organization_role|
+    = render(UI::Time::Component.new(time: organization_role.created_at))
+  - table.column(sortable: "claimed_at", label: t(".claimed")) do |organization_role|
+    = render(UI::Time::Component.new(time: organization_role.claimed_at))
+  - table.column(sortable: "sender_id", label: t(".invited_by")) do |organization_role|
+    = organization_role.sender&.display_name || "—"

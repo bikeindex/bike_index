@@ -53,6 +53,9 @@ RSpec.describe Organized::UsersController, type: :request do
         expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:organization_roles).pluck(:user_id)).to match_array([current_user.id, user2.id])
+        expect(response.body).to include("invitations remaining")
+        expect(response.body).to include("Invite users")
+        expect(response.body).to include(edit_organization_user_path(user2.organization_roles.first.id, organization_id: current_organization.to_param))
         current_organization.reload
         expect(current_organization.organization_roles.admin_text_search("jill").pluck(:user_id)).to eq([user2.id])
         expect(current_organization.organization_roles.admin_text_search("monica").pluck(:user_id)).to eq([user2.id])
@@ -70,6 +73,8 @@ RSpec.describe Organized::UsersController, type: :request do
         get "#{base_url}/new", params: {organization_id: current_organization.to_param}
         expect(response.code).to eq("200")
         expect(response).to render_template :new
+        expect(response.body).to include("multiple_emails_invited")
+        expect(response.body).to include("checked=\"checked\" value=\"member\"").or include("value=\"member\" checked=\"checked\"")
       end
       context "passwordless_users with a permitted domain" do
         let(:current_organization) do
@@ -92,6 +97,7 @@ RSpec.describe Organized::UsersController, type: :request do
           get "#{base_url}/#{organization_role.id}/edit", params: {organization_id: current_organization.to_param}
           expect(assigns(:organization_role)).to eq organization_role
           expect(response.code).to eq("200")
+          expect(response.body).to include(organization_role.invited_email)
           expect(response).to render_template :edit
         end
       end
@@ -255,6 +261,14 @@ RSpec.describe Organized::UsersController, type: :request do
             expect(current_organization.organization_roles.pluck(:invited_email)).to match_array(target_invited_emails)
             expect(current_organization.users.count).to eq 1
             expect(ActionMailer::Base.deliveries.empty?).to be_falsey
+          end
+        end
+        context "separated by commas and semicolons" do
+          it "invites each" do
+            expect {
+              post base_url, params: {organization_role: organization_role_params, multiple_emails_invited: "a@stuff.com, b@stuff.com;c@stuff.com\nd@stuff.com"}
+            }.to change(OrganizationRole, :count).by 4
+            expect(current_organization.organization_roles.pluck(:invited_email)).to include("a@stuff.com", "b@stuff.com", "c@stuff.com", "d@stuff.com")
           end
         end
         context "more than available" do
