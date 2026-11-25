@@ -18,9 +18,7 @@ cgroup_priorities.each do |name, priority|
   cgroup.update!(priority:)
 end
 
-# Half the seeded bikes are Bike Book models. The sync skips a catalog the cache says it synced, which a fresh database
-# hasn't
-Rails.cache.delete(BikebookModelsSyncJob::SYNCED_KEY)
+# Half the seeded bikes are Bike Book models
 BikebookModelsSyncJob.new.perform
 
 # NOTE: this does not seed manufacturers, primary_activities, components or wheel sizes, those are pulled via rake task
