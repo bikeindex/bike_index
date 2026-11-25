@@ -245,6 +245,14 @@ RSpec.describe InfoController, type: :request do
     end
   end
 
+  describe "store" do
+    let!(:blog) { FactoryBot.create(:blog, title: Blog.store_slug) }
+    it "redirects to the shop" do
+      get "/info/#{blog.title_slug}"
+      expect(response).to redirect_to("/shop")
+    end
+  end
+
   describe "user with stolen info" do
     include_context :request_spec_logged_in_as_user
     before do

@@ -1,6 +1,40 @@
 require "rails_helper"
 
 RSpec.describe PosRegistrationMatch, type: :model do
+  describe "answer!" do
+    let(:match) { FactoryBot.create(:pos_registration_match) }
+    let(:user) { match.bike.user }
+
+    it "confirms for the owner and queues the merge" do
+      expect(match.answer!(user: FactoryBot.create(:user_confirmed), merge: true)).to be_falsey
+      expect(match.reload.status).to eq "pending"
+
+      expect(match.answer!(user:, merge: true)).to be_truthy
+      expect(match.reload).to have_attributes(status: "confirmed", merger_id: user.id)
+      expect(BikeJobs::MergePosRegistrationJob.jobs.map { it["args"] }).to eq([[match.id]])
+      # Already answered
+      expect(match.answer!(user:, merge: false)).to be_falsey
+    end
+
+    it "only takes true or false" do
+      expect(match.answer!(user:, merge: "merge")).to be_falsey
+      expect(match.answer!(user:, merge: nil)).to be_falsey
+      expect(match.reload.status).to eq "pending"
+    end
+
+    it "declines" do
+      expect(match.answer!(user:, merge: false)).to be_truthy
+      expect(match.reload).to have_attributes(status: "declined", merger_id: nil)
+      expect(BikeJobs::MergePosRegistrationJob.jobs).to be_empty
+    end
+
+    it "doesn't take an answer on a review candidate" do
+      match.update!(review_reasons: ["multiple_registrations"])
+      expect(match.answer!(user:, merge: true)).to be_falsey
+      expect(match.reload.status).to eq "pending"
+    end
+  end
+
   describe "review_reasons_for" do
     let(:match) { FactoryBot.create(:pos_registration_match) }
     let(:reasons) { described_class.review_reasons_for(match.bike, match.pos_bike) }

@@ -99,12 +99,16 @@ class Blog < ApplicationRecord
       "bike-index-membership"
     end
 
+    def store_slug
+      "bike-index-store"
+    end
+
     def e_vehicle_acknowledgment_faq
       "e-vehicle-acknowledgment-faq"
     end
 
     def top_level_routed
-      [membership_slug, why_donate_slug].freeze
+      [membership_slug, why_donate_slug, store_slug].freeze
     end
 
     # matches ALL content tag ids

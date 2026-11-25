@@ -1821,6 +1821,22 @@ en:
           left_organization: You've left %{org_name}
           unable_to_leave: 'Unable to leave %{org_name}: contact support@bikeindex.org
             for help'
+      pos_registration_matches:
+        redirect_by_status:
+          already_combined: These are already combined into one registration.
+          already_kept_separate: You told us these are different, so they're staying
+            separate.
+          cant_combine_here: >-
+            These registrations can't be combined here. Email support@bikeindex.org
+            if you need help.
+          combining: We're combining these into one registration. It takes a minute.
+          combining_thanks: >-
+            Thanks! We're combining your %{bike_type}'s registrations into one. It
+            takes a minute.
+          couldnt_combine: >-
+            We couldn't combine these, so they're still separate. Email support@bikeindex.org
+            if you need help.
+          kept_separate: Thanks, we'll keep them as separate registrations.
       update:
         current_password_doesnt_match: Current password doesn't match, it's required
           for updating your password.
@@ -2177,6 +2193,8 @@ en:
         whoops_it_appears_you_have_forgotten_your: Whoops! It appears you have forgotten
           your Bike Index password!
       subject: Instructions to reset your password
+    pos_registration_match_email:
+      subject: Is this the same %{bike_type}?
     recovered_from_link:
       html:
         marked_recovered_by: 'Marked recovered by:'
@@ -3767,6 +3785,9 @@ en:
       Index
     sessions_create: Log in to Bike Index
     sessions_new: Log in to Bike Index
+    shop_index: >-
+      Bike Index cap and registration stickers. Every purchase helps keep the registry
+      free.
     stolen_index: Bike Index helps recover your stolen bike
     stolen_merging: >-
       StolenBicycleRegistry.com merged with Bike Index in 2014 to become the largest
@@ -3824,6 +3845,7 @@ en:
     search_registrations_index: Search results
     sessions_create: Log in
     sessions_new: Log in
+    shop_index: Shop - Bike Index
     stolen_index: Bike registry
     strava_search_index: Bike Index Strava Search
     users_accept_terms: Terms of use - Bike Index
@@ -3962,33 +3984,6 @@ en:
       your_username_is_the_url_for_your_sharing: >-
         Your username is the URL for your sharing page and the bike embed form. Update
         it if you care about those things.
-    show:
-      add_a_bike: Add a bike
-      add_a_lock: Add a lock
-      bikes: bikes
-      combination: Combination
-      edit: edit
-      header_title: "%{current_user_name} on Bike Index"
-      key_serial: Key Serial
-      lock_type: Lock Type
-      locks: locks
-      manufacturer: Manufacturer
-      membership_subtitle: Thank you for being a Bike Index %{level} member!
-      next: Next steps
-      register_new_items: Register new items
-      registered: Registered
-      sorry_your_bike_was_stolen: >-
-        We're sorry your %{bikes_last_type} was stolen, but hopefully, with everyone
-        able to search for it, you'll get it back!
-      tell_us_more_about_yourself: Tell us more about yourself.
-      thanks_for_adding_your_bike: Awesome! We're pumped you added a %{bikes_last_type}
-        to the Index.
-      to_bike_index_thanks_for_signing_up: to Bike Index. Thanks for signing up!
-      update_your_profile: Update your profile
-      updated: Updated
-      welcome: Welcome
-      you_have_no_registered_bikes: You have no registered bikes
-      you_have_no_registered_locks: You have no registered locks
   news:
     index:
       bike_index_blog: Bike Index Blog

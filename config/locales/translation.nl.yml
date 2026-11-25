@@ -2249,6 +2249,20 @@ nl:
           left_organization: Je hebt %{org_name} verlaten.
           unable_to_leave: 'Kan %{org_name} niet verlaten: neem contact op met support@bikeindex.org
             voor hulp.'
+      pos_registration_matches:
+        redirect_by_status:
+          already_combined: Deze zijn al samengevoegd in één registratie.
+          already_kept_separate: U vertelde ons dat dit verschillende zaken zijn,
+            dus blijven ze gescheiden.
+          cant_combine_here: Deze registraties kunnen hier niet worden gecombineerd.
+            Stuur een e-mail naar support@bikeindex.org als u hulp nodig heeft.
+          combining: We voegen deze samen tot één registratie. Dat duurt maar een
+            minuut.
+          combining_thanks: Bedankt! We voegen de registraties van %{bike_type} samen
+            tot één. Dat duurt even.
+          couldnt_combine: We konden deze niet samenvoegen, dus ze blijven gescheiden.
+            Stuur een e-mail naar support@bikeindex.org als je hulp nodig hebt.
+          kept_separate: Dank u, we zullen ze als aparte registraties bewaren.
     search:
       registrations:
         set_interpreted_params:
@@ -2520,6 +2534,8 @@ nl:
       html:
         this_email_is_about_the_bike_type_register: Deze e-mail gaat over de %{bike_type}
           geregistreerd op Bike Index op %{date}
+    pos_registration_match_email:
+      subject: Is dit dezelfde %{bike_type}?
   info:
     about:
       about_bike_index: Over Bike Index
@@ -3641,6 +3657,8 @@ nl:
     landing_pages_for_bike_shops: Bike Index koppelt zich aan uw kassasysteem en registreert
       automatisch elke fiets die u verkoopt. Gratis voor winkels en klanten, en we
       verkopen of delen nooit klantgegevens.
+    shop_index: Bike Index pet en registratiestickers. Elke aankoop helpt het registratiesysteem
+      gratis te houden.
   meta_titles:
     bikes_index: Zoekresultaten
     bikes_new: Registreer een fiets!
@@ -3700,6 +3718,7 @@ nl:
     organization_signup_show: Voeg uw organisatie toe aan Bike Index
     organization_signup_update: Voeg uw organisatie toe aan Bike Index
     organization_signup_welcome: "%{organization} is actief"
+    shop_index: Winkel - Fietsindex
   organized:
     ambassador_dashboards:
       getting_started:
@@ -4816,153 +4835,6 @@ nl:
     payments:
       enter_the_minimum_amount: Voer een bedrag groter dan 1 in
       select_or_enter_amount: Selecteer of voer een bedrag in
-  my_accounts:
-    show:
-      add_a_bike: Voeg een fiets toe
-      add_a_lock: Voeg een slot toe
-      bikes: fietsen
-      combination: Combinatie
-      edit: Bewerken
-      key_serial: Sleutel serienummer
-      lock_type: Slottype
-      locks: sloten
-      manufacturer: Fabrikant
-      next: Volgende stappen
-      register_new_items: Registreer nieuwe items
-      sorry_your_bike_was_stolen: Het spijt ons dat uw %{bikes_last_type} is gestolen,
-        maar hopelijk krijgt u hem terug, als iedereen er naar kan zoeken.
-      tell_us_more_about_yourself: Vertel ons meer over uzelf.
-      thanks_for_adding_your_bike: Geweldig! We zijn blij dat u een %{bikes_last_type}
-        heeft toegevoegd aan de index.
-      to_bike_index_thanks_for_signing_up: naar Bike Index. Bedankt voor het aanmelden!
-      update_your_profile: update uw profiel
-      welcome: Welkom
-      you_have_no_registered_bikes: U heeft geen geregistreerde fietsen
-      you_have_no_registered_locks: U heeft geen geregistreerde sloten
-      registered: Geregistreerd
-      updated: Bijgewerkt
-      header_title: "%{current_user_name} op Fietsindex"
-      membership_subtitle: Bedankt dat u lid bent van Bike Index %{level}!
-    edit:
-      save_changes: Wijzigingen opslaan
-      edit_pages: 'Accountpagina''s bewerken:'
-    password:
-      better_password: beter
-      for_password_update: Voor wachtwoordupdate
-      new_password: Nieuw wachtwoord
-      new_password_confirmation: Bevestiging van nieuwe wachtwoord
-      password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
-        is %{better_password_link}.
-      reset_password: Reset wachtwoord
-    root:
-      add_additional_email: Voeg extra e-mail toe
-      add_new_phone_number: Voeg een nieuw telefoonnummer toe
-      additional_email: Extra E-mail
-      any_use_of_your_personal_information_html: Elk gebruik van uw persoonlijke informatie
-        valt onder de voorwaarden van onze %{privacy_policy}. We verkopen, verhandelen
-        of verhuren uw persoonlijke gegevens niet aan derden.
-      choose_language: Kies een taal
-      confirmed_emails: Bevestigde e-mails
-      daily_hot_sheet_notifications_html: Ontvang dagelijks <em>%{org_name}</em> %{hot_sheets_link}
-      give_us_permission_html: Geef ons toestemming om contact met u op te nemen als
-        we denken dat uw fiets is gestolen, <em>zelfs als deze niet als gestolen is
-        gemarkeerd -</em> <strong>%{why_you_should_link}</strong>
-      have_multiple_emails: Heeft u meerdere e-mails? Consolideer ze hier in één account
-      make_primary_email: Maak primaire e-mail
-      notifications_email: Dit is de e-mail waarnaar we meldingen sturen
-      personal_information_for_user: Persoonlijke informatie voor %{user_name}
-      preferred_language: Voorkeurstaal
-      primary_email: primaire email
-      receive_the_bike_index_newsletter: Ontvang de Bike Index-nieuwsbrief
-      remove_email: E-mail verwijderen
-      remove_number: nummer verwijderen
-      resend_confirmation: Opnieuw verzenden Bevestiging
-      stolen_hot_sheets: Gestolen Bike Hot Sheets
-      unconfirmed: niet bevestigd!
-      unconfirmed_emails: Niet-bevestigde e-mails
-      verified: Geverifieerd
-      why_you_should_text: Lees waarom u zou moeten
-      absolutely_no_notifications: Absoluut geen e-mail
-      no_notifications_explanation: blokkeert alle e-mail behalve wachtwoordresets
-        en diefstalmeldingen (u ontvangt bijvoorbeeld geen nieuwe registratie-e-mails
-        meer)
-      time_single_format: Alleen showdata
-      time_single_format_small: "(niet vandaag, gisteren, enz.)"
-      preferred_unit_system: Eenheden
-      unit_system_automatic: Automatisch, vanaf uw locatie
-      unit_system_imperial: Imperiaal (mijlen, inches)
-      unit_system_metric: Metrisch (kilometers, millimeters)
-    sharing:
-      choose_file: Kies bestand...
-      create_page: Creëer pagina
-      create_public_page: Maak een openbare pagina
-      example_url: http://example.com
-      my_awesome_link: Mijn geweldige link
-      no_personal_site: Geen persoonlijke site
-      no_please_dont_create_me_a_page: Nee, maak alsjeblieft geen pagina voor me
-      no_twitter: Geen Twitter
-      page_text: Paginatekst
-      page_title: Pagina titel
-      personal_site_url: Persoonlijke site-URL
-      preview_page: voorbeeldpagina
-      profile_avatar: Profiel avatar
-      sharing_and_personal_page_settings: Instellingen voor delen en persoonlijke
-        pagina
-      show_personal_site: Persoonlijke site weergeven
-      show_personal_website: Persoonlijke website tonen
-      show_twitter: Twitter weergeven
-      the_bike_index_can_create_a_page: Met de fietsindex kunt u een pagina maken
-        met al uw fietsen met alle informatie die u wilt delen. Het is je persoonlijke
-        pagina.
-      this_users_bikes: De fietsen van deze gebruiker
-      title_for_link: Titel voor link
-      twitter_handle: Twitter account
-      your_username_is_the_url_for_your_sharing: Uw gebruikersnaam is de URL voor
-        uw deelpagina en het embed-formulier van de fiets. Update het als je om die
-        dingen geeft.
-      instagram_handle: Instagram-handvat
-      no_instagram: Geen Instagram
-      show_instagram: Toon Instagram
-      will_not_show_up: Uw website wordt niet weergegeven omdat u niet op 'persoonlijke
-        website weergeven' heeft geklikt
-    registration_organizations:
-      affiliation: "%{org_name} aansluiting"
-      all_bikes_with_organization: Al uw fietsen zijn geregistreerd bij deze organisatie
-      allow_organization_to_edit_bikes_html: Sta %{org_name_em} toe om je fietsen
-        te bewerken
-      and_other_bikes_count: en %{other_bikes_count} andere fietsen.
-      bike: Fiets
-      mailing_address: Postadres
-      phone: Telefoon
-      register_all_with: Registreer al je fietsen bij deze organisatie
-      registered_with: aangemeld met
-      registration_organization_information: Beheer de organisaties waarbij uw fietsen
-        zijn geregistreerd.
-      registration_organizations: Registratie organisaties
-      student_id: Student-ID
-      update_your_address_on_html: Werk uw adres bij in %{user_settings_link}
-      update_your_phone_on_html: Update je telefoon in %{user_settings_link}
-      when_not_selected: Indien niet aangevinkt, beheer via de pagina "Groepen en
-        organisaties" van elke fiets.
-    delete_account:
-      delete_account: Account verwijderen
-      delete_my_account: Verwijder mijn account en al mijn geregistreerde fietsen
-      delete_warning_html: "<strong>Waarschuwing!</strong> Deze actie kan niet ongedaan
-        gemaakt worden!"
-      modal_title: Weet u zeker dat u uw account wilt verwijderen?
-      nevermind: Laat maar
-    messages:
-      form:
-        body_placeholder: Voeg wat berichttekst toe
-        message: bericht
-        new_message: Nieuw bericht
-        reply_to_message: Reageer op bericht
-        send_message: Verstuur bericht
-        already_sold: 'Let op: dit %{item_type} is %{listing_status} geweest.'
-      index:
-        marketplace_messages: Marktplaatsberichten
-    color_scheme:
-      appearance: Verschijning
   bikes_edit:
     accessories:
       add_a_component: Voeg een component toe
@@ -5230,6 +5102,127 @@ nl:
       strava_gear: Strava-uitrusting
       sync_not_finished: De synchronisatie met Strava is nog niet voltooid, dus mogelijk
         worden niet alle fietsen weergegeven.
+  my_accounts:
+    edit:
+      save_changes: Wijzigingen opslaan
+      edit_pages: 'Accountpagina''s bewerken:'
+    password:
+      better_password: beter
+      for_password_update: Voor wachtwoordupdate
+      new_password: Nieuw wachtwoord
+      new_password_confirmation: Bevestiging van nieuwe wachtwoord
+      password_helper_text_html: Wachtwoord moet minimaal 12 tekens lang zijn. Langer
+        is %{better_password_link}.
+      reset_password: Reset wachtwoord
+    root:
+      add_additional_email: Voeg extra e-mail toe
+      add_new_phone_number: Voeg een nieuw telefoonnummer toe
+      additional_email: Extra E-mail
+      any_use_of_your_personal_information_html: Elk gebruik van uw persoonlijke informatie
+        valt onder de voorwaarden van onze %{privacy_policy}. We verkopen, verhandelen
+        of verhuren uw persoonlijke gegevens niet aan derden.
+      choose_language: Kies een taal
+      confirmed_emails: Bevestigde e-mails
+      daily_hot_sheet_notifications_html: Ontvang dagelijks <em>%{org_name}</em> %{hot_sheets_link}
+      give_us_permission_html: Geef ons toestemming om contact met u op te nemen als
+        we denken dat uw fiets is gestolen, <em>zelfs als deze niet als gestolen is
+        gemarkeerd -</em> <strong>%{why_you_should_link}</strong>
+      have_multiple_emails: Heeft u meerdere e-mails? Consolideer ze hier in één account
+      make_primary_email: Maak primaire e-mail
+      notifications_email: Dit is de e-mail waarnaar we meldingen sturen
+      personal_information_for_user: Persoonlijke informatie voor %{user_name}
+      preferred_language: Voorkeurstaal
+      primary_email: primaire email
+      receive_the_bike_index_newsletter: Ontvang de Bike Index-nieuwsbrief
+      remove_email: E-mail verwijderen
+      remove_number: nummer verwijderen
+      resend_confirmation: Opnieuw verzenden Bevestiging
+      stolen_hot_sheets: Gestolen Bike Hot Sheets
+      unconfirmed: niet bevestigd!
+      unconfirmed_emails: Niet-bevestigde e-mails
+      verified: Geverifieerd
+      why_you_should_text: Lees waarom u zou moeten
+      absolutely_no_notifications: Absoluut geen e-mail
+      no_notifications_explanation: blokkeert alle e-mail behalve wachtwoordresets
+        en diefstalmeldingen (u ontvangt bijvoorbeeld geen nieuwe registratie-e-mails
+        meer)
+      time_single_format: Alleen showdata
+      time_single_format_small: "(niet vandaag, gisteren, enz.)"
+      preferred_unit_system: Eenheden
+      unit_system_automatic: Automatisch, vanaf uw locatie
+      unit_system_imperial: Imperiaal (mijlen, inches)
+      unit_system_metric: Metrisch (kilometers, millimeters)
+    sharing:
+      choose_file: Kies bestand...
+      create_page: Creëer pagina
+      create_public_page: Maak een openbare pagina
+      example_url: http://example.com
+      my_awesome_link: Mijn geweldige link
+      no_personal_site: Geen persoonlijke site
+      no_please_dont_create_me_a_page: Nee, maak alsjeblieft geen pagina voor me
+      no_twitter: Geen Twitter
+      page_text: Paginatekst
+      page_title: Pagina titel
+      personal_site_url: Persoonlijke site-URL
+      preview_page: voorbeeldpagina
+      profile_avatar: Profiel avatar
+      sharing_and_personal_page_settings: Instellingen voor delen en persoonlijke
+        pagina
+      show_personal_site: Persoonlijke site weergeven
+      show_personal_website: Persoonlijke website tonen
+      show_twitter: Twitter weergeven
+      the_bike_index_can_create_a_page: Met de fietsindex kunt u een pagina maken
+        met al uw fietsen met alle informatie die u wilt delen. Het is je persoonlijke
+        pagina.
+      this_users_bikes: De fietsen van deze gebruiker
+      title_for_link: Titel voor link
+      twitter_handle: Twitter account
+      your_username_is_the_url_for_your_sharing: Uw gebruikersnaam is de URL voor
+        uw deelpagina en het embed-formulier van de fiets. Update het als je om die
+        dingen geeft.
+      instagram_handle: Instagram-handvat
+      no_instagram: Geen Instagram
+      show_instagram: Toon Instagram
+      will_not_show_up: Uw website wordt niet weergegeven omdat u niet op 'persoonlijke
+        website weergeven' heeft geklikt
+    registration_organizations:
+      affiliation: "%{org_name} aansluiting"
+      all_bikes_with_organization: Al uw fietsen zijn geregistreerd bij deze organisatie
+      allow_organization_to_edit_bikes_html: Sta %{org_name_em} toe om je fietsen
+        te bewerken
+      and_other_bikes_count: en %{other_bikes_count} andere fietsen.
+      bike: Fiets
+      mailing_address: Postadres
+      phone: Telefoon
+      register_all_with: Registreer al je fietsen bij deze organisatie
+      registered_with: aangemeld met
+      registration_organization_information: Beheer de organisaties waarbij uw fietsen
+        zijn geregistreerd.
+      registration_organizations: Registratie organisaties
+      student_id: Student-ID
+      update_your_address_on_html: Werk uw adres bij in %{user_settings_link}
+      update_your_phone_on_html: Update je telefoon in %{user_settings_link}
+      when_not_selected: Indien niet aangevinkt, beheer via de pagina "Groepen en
+        organisaties" van elke fiets.
+    delete_account:
+      delete_account: Account verwijderen
+      delete_my_account: Verwijder mijn account en al mijn geregistreerde fietsen
+      delete_warning_html: "<strong>Waarschuwing!</strong> Deze actie kan niet ongedaan
+        gemaakt worden!"
+      modal_title: Weet u zeker dat u uw account wilt verwijderen?
+      nevermind: Laat maar
+    messages:
+      form:
+        body_placeholder: Voeg wat berichttekst toe
+        message: bericht
+        new_message: Nieuw bericht
+        reply_to_message: Reageer op bericht
+        send_message: Verstuur bericht
+        already_sold: 'Let op: dit %{item_type} is %{listing_status} geweest.'
+      index:
+        marketplace_messages: Marktplaatsberichten
+    color_scheme:
+      appearance: Verschijning
   bike_versions:
     index:
       primary_colors: Primaire kleuren
@@ -5482,6 +5475,17 @@ nl:
           winkel die ze vertrouwen. Het is gratis voor u en voor hen, en we verkopen
           of delen nooit klantgegevens.
         why_shops_heading: Waarom winkels Bike Index gebruiken
+      pos_registration_match:
+        combine_them: Door ze te combineren, blijft er één registratie over voor uw
+          %{bike_type}, met uw foto's en de gegevens die u hebt ingevoerd.
+        if_theyre_different: Als ze verschillen, kunt u ons dat op dezelfde pagina
+          laten weten.
+        is_this_the_same: Is dit dezelfde %{bike_type}?
+        pos_registered_it: Je hebt een %{bike_type} geregistreerd die de winkel waar
+          je hem kocht al op jouw naam had geregistreerd, met hetzelfde serienummer.
+        review_and_combine: Bekijk en combineer
+        shop_registered_it_html: Je hebt een %{bike_type} geregistreerd die <strong>%{shop_name}</strong>
+          al op jouw naam had geregistreerd toen je hem kocht, met hetzelfde serienummer.
     ui:
       definition_list:
         row:
@@ -5608,6 +5612,7 @@ nl:
         hidden_for_unauthorized_users: verborgen voor onbevoegde gebruikers
         made_without_serial: gemaakt zonder serie
         unknown: Onbekend
+        serial_number: 'Serienummer: %{serial}'
       registration_status_badge:
         abandoned: Er is melding gemaakt van een ogenschijnlijk verlaten locatie,
           waar het niet thuishoort.
@@ -5637,6 +5642,15 @@ nl:
       org:
         impound_current_location:
           same_as_impounded_from: hetzelfde als in beslag genomen van
+      registration_dates:
+        registered: Geregistreerd
+        registered_abbreviation: R
+        registered_at: Geregistreerd bij
+        updated: Bijgewerkt
+        updated_abbreviation: U
+        updated_at: Bijgewerkt op
+      vehicle_type_badges:
+        e_vehicle: E-voertuig
     pages:
       messages:
         thread_show:
@@ -6474,10 +6488,8 @@ nl:
             one: "%{count} activiteit gesynchroniseerd"
             other: "%{count} activiteiten gesynchroniseerd"
           connect_with_strava: Maak verbinding met Strava
-          connected_to_strava: Gekoppeld aan Strava
           disconnect_confirm: Weet je zeker dat je de Strava-verbinding wilt verbreken?
             Hierdoor worden alle gesynchroniseerde activiteiten verwijderd.
-          disconnect_strava: Ontkoppel van Strava
           downloaded: gedownload
           integrate_your_bikes_with_strava: Koppel je fietsen aan Strava en synchroniseer
             je fietsactiviteiten.
@@ -6491,25 +6503,55 @@ nl:
           sync_running_in_background: De synchronisatie is op de achtergrond bezig.
             Deze pagina wordt automatisch bijgewerkt.
           syncing_activities: Activiteiten synchroniseren...
+          connected: Aangesloten
+          disconnect: Verbinding verbreken
+          link_bikes: Link-fietsen
+          syncing: Synchroniseren
         show:
           bike_box:
             add_a_photo: Voeg een foto toe
-            add_it_now: Voeg het nu toe!
             bike_sticker: Fiets sticker
             edit_registration: Bewerken %{bike_type}
+            list_for_sale: Lijst te koop
+            user_hidden: Verborgen voor andere gebruikers
+            impound_claim_html: "%{status} claimt %{claimed_bike}"
+            report_stolen: Gestolen merk
+            this_claimed_bike_type: dit %{kind} %{bike_type}
+            update_listing: Lijst bijwerken
+          bike_alerts:
+            add_it_now: Voeg het nu toe!
             generally_connect_to_org: Sommige van uw fietsen zijn geassocieerd met
               %{org_name}, maar deze niet. Over het algemeen sluit u al uw fietsen
               aan op %{org_name} -
             ignore_this_suggestion: Negeer deze suggestie
-            list_for_sale: Lijst te koop
-            location: Plaats
-            mark_stolen: Markeer %{bike_type} gestolen
-            primary_colors: Primaire kleuren
-            registered: Geregistreerd
-            serial: Serie
-            update_marketplace_listing: Update marktplaatsvermelding!
-            updated: Bijgewerkt
-            user_hidden: Verborgen voor andere gebruikers
+          add_a_lock: "+ Een slot toevoegen"
+          add_a_lock_empty: Voeg een slot toe
+          bike_index_is_free: Bike Index is gratis omdat fietsers zoals jij een bijdrage
+            leveren.
+          bikes: Bikes
+          combination: Combinatie
+          donate: Schenken
+          donations_keep_the_registry_running: Wij zijn een non-profitorganisatie.
+            Donaties zorgen ervoor dat het register blijft bestaan en gestolen fietsen
+            weer bij hun eigenaar terechtkomen.
+          edit: Bewerken
+          header_title: "%{current_user_name} op Fietsindex"
+          helps_shops_and_police: Helpt winkels en de politie contact met u op te
+            nemen als er een fiets wordt gevonden.
+          key_serial: Sleutel serienummer
+          locks: Sloten
+          membership_subtitle: Bedankt dat u lid bent van Bike Index %{level}!
+          no_bikes_registered_yet: Er zijn nog geen fietsen geregistreerd.
+          no_locks_description: Noteer de sleutel en de cijfercode van uw slot, zodat
+            u een verloren sleutel kunt vervangen.
+          no_locks_registered_yet: Nog geen sloten geregistreerd
+          register_a_bike: "+ Registreer een fiets"
+          register_a_bike_empty: Registreer een fiets
+          registered: Geregistreerd
+          tell_us_more_about_yourself: Vertel ons meer over uzelf.
+          update_profile: Profiel bijwerken
+          updated: Bijgewerkt
+          your_registrations: Uw registraties
         memberships:
           show:
             complimentary: Bike Index heeft je dit lidmaatschap aangeboden, dus je
@@ -6529,6 +6571,20 @@ nl:
             you_pay_the_current_price: U betaalt de huidige prijs voor %{level}.
             your_membership: Uw lidmaatschap
             your_price: Uw prijs
+        pos_registration_matches:
+          show:
+            combining_keeps: Door ze te combineren blijft de winkelregistratie van
+              uw %{bike_type} behouden, inclusief uw foto's en de door u ingevoerde
+              gegevens. Uw aparte registratie wordt verwijderd.
+            is_this_the_same: Is dit dezelfde %{bike_type}?
+            no_theyre_different: Nee, ze zijn verschillend.
+            pos_registered_it: De winkel waar je je %{bike_type} hebt gekocht, had
+              deze al op jouw naam geregistreerd met hetzelfde serienummer.
+            registered_when_you_bought_it: Geregistreerd toen je het kocht.
+            shop_registered_it: "%{shop_name} had al een %{bike_type} met hetzelfde
+              serienummer op uw naam geregistreerd toen u deze kocht."
+            yes_combine_them: Ja, combineer ze.
+            your_registration: Uw registratie
       sales:
         new_form:
           record_sale: Recordverkoop
@@ -8761,6 +8817,46 @@ nl:
             out_of_links_html: We hebben alle mogelijke activeringslinks voor %{name}
               verstuurd, maar geen enkele is bij %{email} aangekomen. Neem contact
               op met support@bikeindex.org, dan lossen we het op.
+      shop:
+        index:
+          bulk_order_email_subject: Grote bestelling stickers
+          bulk_orders_html: "%{contact_link} voor bulkbestellingen."
+          caped_cap_alt: De Caped Registrant-pet, lichtblauwe stripfiguurprint met
+            paarse rand.
+          caped_cap_description: Onze striptekening, allemaal op een wielerpet. Bellen
+            rinkelen, sloten klikken en het schild met cape houdt de wacht. Paarse
+            rand.
+          caped_cap_name: De Caped Registrant-cap
+          contact_us: Contacteer ons
+          cycling_cap: Fietsmuts
+          for_riders_and_shops: Voor motorrijders en winkels
+          for_shops: Voor winkels
+          gear_that_helps_get_bikes_home: Uitrusting die helpt om fietsen thuis te
+            krijgen.
+          lede: Bike Index is een gratis, non-profit register. Elke pet en sticker
+            die je koopt, zorgt ervoor dat het gratis blijft voor fietsers overal
+            ter wereld.
+          mission: Wij zijn een 501(c)(3) non-profitorganisatie. De opbrengst van
+            de verkoop financiert het register, de meldingen van gestolen fietsen
+            en het partnernetwerk dat fietsers helpt hun fiets terug te vinden.
+          shop_the_gear: Koop de uitrusting
+          sticker_alt: Poster met de titel "Hoe voorkom je dat je fiets gestolen wordt?",
+            waarop de kentekensticker te zien is.
+          sticker_description: Plak de sticker op je frame, scan de QR-code en je
+            fiets is binnen ongeveer twee minuten geregistreerd. Mocht je fiets ooit
+            kwijt raken of gestolen worden, dan kan de vinder de sticker scannen en
+            zien dat hij van jou is. Fietsenwinkels kunnen ze ook op voorraad hebben,
+            voor nieuwe fietsen, tweedehands fietsen en fietsen die voor onderhoud
+            binnenkomen.
+          sticker_name: Bike Index registratiestickers
+          suggested_retail: Adviesprijs
+          the_bike_index_shop: De Bike Index-winkel
+          wholesale_pricing_available: Groothandelsprijzen beschikbaar
+          your_purchase_keeps_bike_index_free: Met uw aankoop blijft Bike Index gratis.
+        product:
+          view: Weergave
+          view_on_the_shop: Bekijk %{name} in de Bike Index-winkel (opent in een nieuw
+            tabblad)
     shared_blocks:
       footer:
         about: Over
@@ -8936,13 +9032,11 @@ nl:
           removed_from: Verwijderd uit de fietsindex
           serial: Serie
         bike_card:
-          e_vehicle: E-voertuig
           member_listing: Lid van Bike Index
           member_listing_tooltip: Deze verkoper is lid van Bike Index.
           not_registered_with: Niet geregistreerd bij %{org_name}
           registered_with: Geregistreerd bij %{org_name}
         bike_list_item:
-          e_vehicle: E-voertuig
           member_listing: Lid van Bike Index
           member_listing_tooltip: Deze verkoper is lid van Bike Index.
           not_registered_with: Niet geregistreerd bij %{org_name}

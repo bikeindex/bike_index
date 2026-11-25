@@ -2270,6 +2270,19 @@ nb:
           left_organization: Du har forlatt %{org_name}
           unable_to_leave: 'Kan ikke forlate %{org_name}: kontakt support@bikeindex.org
             for hjelp'
+      pos_registration_matches:
+        redirect_by_status:
+          already_combined: Disse er allerede samlet i én registrering.
+          already_kept_separate: Du fortalte oss at disse er forskjellige, så de forblir
+            separate.
+          cant_combine_here: Disse registreringene kan ikke kombineres her. Send en
+            e-post til support@bikeindex.org hvis du trenger hjelp.
+          combining: Vi slår disse sammen til én registrering. Det tar et minutt.
+          combining_thanks: Takk! Vi slår sammen registreringene til %{bike_type}-en
+            din til én. Det tar et minutt.
+          couldnt_combine: Vi kunne ikke kombinere disse, så de er fortsatt separate.
+            Send en e-post til support@bikeindex.org hvis du trenger hjelp.
+          kept_separate: Takk, vi beholder dem som separate registreringer.
     oauth:
       applications:
         ensure_app_owner!:
@@ -2742,6 +2755,8 @@ nb:
           blitt med.
         welcome_to_bike_index: Velkommen til Bike Index
       subject: Velkommen til Bike Index!
+    pos_registration_match_email:
+      subject: Er dette den samme %{bike_type}?
   feedbacks:
     form:
       email_address: Epostadresse
@@ -3888,6 +3903,8 @@ nb:
     landing_pages_for_bike_shops: Bike Index kobler seg til kasseapparatet ditt og
       registrerer automatisk alle sykler du selger. Gratis for butikker og kunder,
       og vi selger eller deler aldri kundedata.
+    shop_index: Sykkelregisterlokk og registreringsklistremerker. Hvert kjøp bidrar
+      til å holde registeret fritt.
   meta_titles:
     bikes_index: Søkeresultater
     bikes_new: Registrer en sykkel!
@@ -3947,6 +3964,7 @@ nb:
     organization_signup_show: Legg til organisasjonen din i Bike Index
     organization_signup_update: Legg til organisasjonen din i Bike Index
     organization_signup_welcome: "%{organization} er aktiv"
+    shop_index: Butikk - Sykkelindeks
   money:
     currencies:
       en: USD
@@ -4053,33 +4071,6 @@ nb:
       your_username_is_the_url_for_your_sharing: Brukernavnet ditt er URL-en til delingssiden
         din og innbyggingsskjemaet for sykkel. Oppdater den hvis du bryr deg om disse
         tingene.
-    show:
-      add_a_bike: Legg til en sykkel
-      add_a_lock: Legg til en lås
-      bikes: sykler
-      combination: Kombinasjon
-      edit: Endre
-      key_serial: Nøkkelserie
-      lock_type: Lås type
-      locks: låser
-      manufacturer: Produsent
-      next: Neste skritt
-      register_new_items: Registrer nye varer
-      registered: Registrert
-      sorry_your_bike_was_stolen: Vi beklager at %{bikes_last_type} ble stjålet, men
-        forhåpentligvis, med alle som kan søke etter den, får du den tilbake!
-      tell_us_more_about_yourself: Fortell oss mer om deg selv.
-      thanks_for_adding_your_bike: Rått! Vi er glade for at du la til en %{bikes_last_type}
-        til indeksen.
-      to_bike_index_thanks_for_signing_up: til sykkelindeks. Takk for at du registrerte
-        deg!
-      update_your_profile: Oppdater profilen din
-      updated: Oppdatert
-      welcome: Velkommen
-      you_have_no_registered_bikes: Du har ingen registrerte sykler
-      you_have_no_registered_locks: Du har ingen registrerte låser
-      header_title: "%{current_user_name} på Bike Index"
-      membership_subtitle: Takk for at du er medlem av Bike Index %{level}!
     delete_account:
       delete_account: Slett konto
       delete_my_account: Slett kontoen min og alle mine registrerte sykler
@@ -5317,6 +5308,17 @@ nb:
           de stoler på. Det er gratis for deg og for dem, og vi selger eller deler
           aldri kundedata.
         why_shops_heading: Hvorfor butikker bruker Bike Index
+      pos_registration_match:
+        combine_them: Ved å kombinere dem beholdes én registrering for din %{bike_type},
+          med bildene dine og detaljene du skrev inn.
+        if_theyre_different: Hvis de er forskjellige, kan du fortelle oss det på samme
+          side.
+        is_this_the_same: Er dette den samme %{bike_type}?
+        pos_registered_it: Du registrerte en %{bike_type} som butikken du kjøpte den
+          fra allerede hadde registrert på deg, med samme serienummer.
+        review_and_combine: Gjennomgå og kombiner
+        shop_registered_it_html: Du registrerte en %{bike_type} som <strong>%{shop_name}</strong>
+          allerede hadde registrert på deg da du kjøpte den, med samme serienummer.
     ui:
       definition_list:
         row:
@@ -5443,6 +5445,7 @@ nb:
         hidden_for_unauthorized_users: skjult for uautoriserte brukere
         made_without_serial: laget uten serie
         unknown: ukjent
+        serial_number: 'Serienummer: %{serial}'
       registration_status_badge:
         abandoned: Rapportert som forlatt, der den ikke burde stå igjen
         for_sale: Registrert og beskyttet, lagt ut for salg av eieren
@@ -5470,6 +5473,15 @@ nb:
       org:
         impound_current_location:
           same_as_impounded_from: det samme som beslaglagt fra
+      registration_dates:
+        registered: Registrert
+        registered_abbreviation: R
+        registered_at: Registrert kl
+        updated: Oppdatert
+        updated_abbreviation: U
+        updated_at: Oppdatert kl.
+      vehicle_type_badges:
+        e_vehicle: Elbil
     pages:
       messages:
         thread_show:
@@ -6284,10 +6296,8 @@ nb:
             one: "%{count} aktivitet synkronisert"
             other: "%{count} aktiviteter synkronisert"
           connect_with_strava: Koble til Strava
-          connected_to_strava: Koblet til Strava
           disconnect_confirm: Er du sikker på at du vil koble fra Strava? Dette vil
             fjerne alle synkroniserte aktiviteter.
-          disconnect_strava: Koble fra Strava
           downloaded: nedlastet
           integrate_your_bikes_with_strava: Integrer syklene dine med Strava og synkroniser
             sykkelaktivitetene dine.
@@ -6299,25 +6309,53 @@ nb:
           sync_running_in_background: Synkroniseringen kjører i bakgrunnen. Denne
             siden oppdateres automatisk.
           syncing_activities: Synkroniserer aktiviteter ...
+          connected: Tilkoblet
+          disconnect: Frakople
+          link_bikes: Link-sykler
+          syncing: Synkronisering
         show:
           bike_box:
             add_a_photo: Legg til et bilde
-            add_it_now: Legg det til nå!
             bike_sticker: Sykkel-klistremerke
             edit_registration: Rediger %{bike_type}
+            list_for_sale: Liste til salgs
+            user_hidden: Skjult for andre brukere
+            impound_claim_html: "%{status} krav på %{claimed_bike}"
+            report_stolen: Merke stjålet
+            this_claimed_bike_type: denne %{kind} %{bike_type}
+            update_listing: Oppdater oppføring
+          bike_alerts:
+            add_it_now: Legg det til nå!
             generally_connect_to_org: Noen av syklene dine er assosiert med %{org_name},
               men denne er det ikke. Vanligvis bør du koble alle syklene dine til
               %{org_name} -
             ignore_this_suggestion: Ignorer dette forslaget
-            list_for_sale: Liste til salgs
-            location: plassering
-            mark_stolen: Merke %{bike_type} stjålet
-            primary_colors: Primærfarger
-            registered: Registrert
-            serial: Serienummer
-            update_marketplace_listing: Oppdater markedsplassoppføringen!
-            updated: Oppdatert
-            user_hidden: Skjult for andre brukere
+          add_a_lock: "+ Legg til en lås"
+          add_a_lock_empty: Legg til en lås
+          bike_index_is_free: Bike Index er gratis fordi syklister som deg bidrar.
+          bikes: Sykler
+          combination: Kombinasjon
+          donate: Donere
+          donations_keep_the_registry_running: Vi er en ideell organisasjon. Donasjoner
+            holder registeret i gang og stjålne sykler kommer hjem.
+          edit: Endre
+          header_title: "%{current_user_name} på Bike Index"
+          helps_shops_and_police: Hjelper butikker og politiet med å nå deg hvis en
+            sykkel blir funnet.
+          key_serial: Nøkkelserie
+          locks: Låser
+          membership_subtitle: Takk for at du er medlem av Bike Index %{level}!
+          no_bikes_registered_yet: Ingen sykler registrert ennå
+          no_locks_description: Noter ned låsens nøkkel og kombinasjon, slik at du
+            kan erstatte en mistet nøkkel.
+          no_locks_registered_yet: Ingen låser registrert ennå
+          register_a_bike: "+ Registrer en sykkel"
+          register_a_bike_empty: Registrer en sykkel
+          registered: Registrert
+          tell_us_more_about_yourself: Fortell oss mer om deg selv.
+          update_profile: Oppdater profil
+          updated: Oppdatert
+          your_registrations: Dine registreringer
         memberships:
           show:
             complimentary: Bike Index ga deg dette medlemskapet, så du betaler ikke
@@ -6337,6 +6375,20 @@ nb:
             you_pay_the_current_price: Du betaler gjeldende pris for %{level}.
             your_membership: Ditt medlemskap
             your_price: Din pris
+        pos_registration_matches:
+          show:
+            combining_keeps: Ved å kombinere dem beholdes butikkens registrering av
+              din %{bike_type}, med bildene dine og detaljene du skrev inn. Din separate
+              registrering fjernes.
+            is_this_the_same: Er dette den samme %{bike_type}?
+            no_theyre_different: Nei, de er forskjellige
+            pos_registered_it: Butikken du kjøpte din %{bike_type} fra hadde allerede
+              registrert den til deg med samme serienummer.
+            registered_when_you_bought_it: Registrert da du kjøpte den
+            shop_registered_it: "%{shop_name} hadde allerede registrert en %{bike_type}
+              til deg med samme serienummer da du kjøpte den."
+            yes_combine_them: Ja, kombiner dem
+            your_registration: Din registrering
       sales:
         new_form:
           record_sale: Rekordsalg
@@ -8433,6 +8485,43 @@ nb:
             out_of_links_html: Vi har sendt alle aktiveringslenkene vi kan for %{name},
               og ingen av dem gikk til %{email}. Kontakt support@bikeindex.org, så
               ordner vi det.
+      shop:
+        index:
+          bulk_order_email_subject: Storbestilling av klistremerker
+          bulk_orders_html: "%{contact_link} for bulkbestillinger."
+          caped_cap_alt: The Caped Registrant-capsen, lyseblå tegneserietrykk med
+            lilla brem
+          caped_cap_description: Vår tegneseriekunst, over hele en sykkellue. Klokker
+            ringer, låser klikker, og det kappekledde skjoldet holder vakt. Lilla
+            brem.
+          caped_cap_name: Capsen med registrant
+          contact_us: Kontakt oss
+          cycling_cap: Sykkelhette
+          for_riders_and_shops: For ryttere og butikker
+          for_shops: For butikker
+          gear_that_helps_get_bikes_home: Utstyr som hjelper med å få sykler hjem.
+          lede: Bike Index er et gratis, ideell register. Hver caps og klistremerke
+            du kjøper gjør det gratis for syklister overalt.
+          mission: Vi er en ideell organisasjon med 501(c)(3)-status. Salget finansierer
+            registeret, varslene om stjålne sykler og partnernettverket som hjelper
+            syklister med å finne syklene sine.
+          shop_the_gear: Handle utstyret
+          sticker_alt: Plakat med registreringsklistremerke om hvordan du unngår å
+            få sykkelen din stjålet
+          sticker_description: Fest den på rammen, skann QR-koden, så er sykkelen
+            din registrert på omtrent to minutter. Hvis sykkelen din noen gang blir
+            mistet eller stjålet, kan alle som finner den skanne klistremerket og
+            se at den tilhører deg. Sykkelbutikker kan også ha dem på lager, for nye
+            salg, brukte sykler og sykler inn til service.
+          sticker_name: Klistremerker for registrering av sykkelindeks
+          suggested_retail: Foreslått detaljhandel
+          the_bike_index_shop: Bike Index-butikken
+          wholesale_pricing_available: Engrospriser tilgjengelig
+          your_purchase_keeps_bike_index_free: Kjøpet ditt forblir gratis for Bike
+            Index.
+        product:
+          view: Utsikt
+          view_on_the_shop: Vis %{name} i Bike Index-butikken (åpnes i en ny fane)
     shared_blocks:
       footer:
         about: Om
@@ -8606,13 +8695,11 @@ nb:
           removed_from: Fjernet fra sykkelindeksen
           serial: Serienummer
         bike_card:
-          e_vehicle: Elbil
           member_listing: Medlem av sykkelindeksen
           member_listing_tooltip: Denne selgeren er medlem av Bike Index
           not_registered_with: Ikke registrert hos %{org_name}
           registered_with: Registrert hos %{org_name}
         bike_list_item:
-          e_vehicle: Elbil
           member_listing: Medlem av sykkelindeksen
           member_listing_tooltip: Denne selgeren er medlem av Bike Index
           not_registered_with: Ikke registrert hos %{org_name}
