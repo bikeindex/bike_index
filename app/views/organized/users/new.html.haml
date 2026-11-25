@@ -1,15 +1,14 @@
 - organization_id = current_organization.to_param
 - restricted = current_organization.restrict_invitations?
-%p
-  = link_to organization_users_path(organization_id:), class: "twlink" do
-    %span{"aria-hidden": "true"} ←
-    = t(".back_to_users")
+- sent = current_organization.sent_invitation_count
+- remaining = current_organization.remaining_invitation_count
+= render partial: "back_link"
 
 = render(UI::Header::Component.new(text: t(".invite_users_heading"), html_class: "uncap"))
 - if restricted
   %p
-    = t(".invited_so_far_html", count: current_organization.sent_invitation_count, number: number_display(current_organization.sent_invitation_count))
-    = t(".invitations_remaining_html", count: number_display(current_organization.remaining_invitation_count))
+    = t(".invited_so_far_html", count: sent, number: number_display(sent))
+    = t(".invitations_remaining_html", count: number_display(remaining))
 - if current_organization.enabled?("passwordless_users")
   %p= t(".automatic_passwordless")
 - if current_organization.user_email_domain.present?
@@ -18,8 +17,8 @@
 
 - form_data = {controller: "org--invite-form", "org--invite-form-emails-count-value": t(".emails_count").to_json,
   "org--invite-form-send-label-value": t(".send_invitation"), "org--invite-form-send-many-label-value": t(".send_invitations"),
-  "org--invite-form-not-valid-value": t(".not_valid_email"), "org--invite-form-left-value": t(".only_invitations_left").to_json}
-- form_data["org--invite-form-remaining-value"] = current_organization.remaining_invitation_count if restricted
+  "org--invite-form-not-valid-value": t(".not_valid_email"), "org--invite-form-left-value": t(".only_invitations_left").to_json,
+  "org--invite-form-remaining-value": (remaining if restricted)}
 = form_for @organization_role, { as: :organization_role, url: organization_users_path(organization_id:), action: "create", html: {data: form_data} } do |f|
   = render(UI::Alerts::ObjectError::Component.new(object: @organization_role, name: t(".organization_role")))
 
@@ -34,9 +33,7 @@
       %p{class: "tw:mt-1 tw:mb-0 tw:hidden tw:text-sm tw:text-red-600 tw:dark:text-red-400", data: {"org--invite-form-target": "invalid"}}
     = render partial: "card", locals: {title: t(".emails"), body: emails}
 
-    - role = capture do
-      = render partial: "organization_role_fields", locals: {f:}
-    = render partial: "card", locals: {title: t(".role"), body: role}
+    = render partial: "card", locals: {title: t(".role"), body: render(partial: "organization_role_fields", locals: {f:})}
 
   %div{class: "tw:mt-6 tw:flex tw:flex-wrap tw:items-center tw:gap-4"}
     = render(UI::Button::Component.new(text: t(".send_invitation"), color: :primary, type: "submit", data: {"org--invite-form-target": "submit"}))

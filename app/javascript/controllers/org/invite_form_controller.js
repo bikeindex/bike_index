@@ -32,20 +32,13 @@ export default class extends Controller {
     this.emailsTarget.classList.toggle('tw:border-red-600!', invalid.length > 0 || over)
     this.invalidTarget.textContent = invalid.length ? this.notValidValue.replace('%{emails}', invalid.join(', ')) : ''
     this.limitTarget.textContent = over ? this.pluralize(this.leftValue, this.remainingValue) : ''
-    this.toggle(this.invalidTarget, invalid.length > 0)
-    this.toggle(this.limitTarget, over)
+    collapse(invalid.length > 0 ? 'show' : 'hide', this.invalidTarget)
+    collapse(over ? 'show' : 'hide', this.limitTarget)
     this.submitTarget.disabled = count === 0 || invalid.length > 0 || over
     this.submitTarget.textContent = count > 1 ? this.sendManyLabelValue.replace('%{count}', count) : this.sendLabelValue
   }
 
   pluralize (templates, count) {
     return (count === 1 ? templates.one : templates.other).replace('%{count}', count)
-  }
-
-  // Only on a change, so typing doesn't restart the animation
-  toggle (element, show) {
-    if (element.classList.contains('tw:hidden') !== show) return
-
-    collapse(show ? 'show' : 'hide', element)
   }
 }

@@ -1,0 +1,4 @@
+%p
+  = link_to organization_users_path(organization_id: current_organization.to_param), class: "twlink" do
+    %span{"aria-hidden": "true"} ←
+    = t(".manage_users")

@@ -4483,8 +4483,9 @@ en:
         stickers: Stickers
         unclaimed: Unclaimed
     users:
+      back_link:
+        manage_users: Manage users
       edit:
-        back_to_users: Manage users
         confirm_removal: >-
           Are you sure you want to remove %{user_name} from %{org_name}? They will
           still be able to use their personal account.
@@ -4528,7 +4529,6 @@ en:
           Your organization is set up with automatic passwordless log in. Emails you
           invite will be able to sign in by using the "Emailed sign in link" button
           on the sign in page.
-        back_to_users: Manage users
         emails: Emails
         emails_count:
           one: "%{count} email"

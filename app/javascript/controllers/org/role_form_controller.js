@@ -4,15 +4,8 @@ import { Controller } from '@hotwired/stimulus'
 export default class extends Controller {
   static targets = ['submit']
 
-  connect () {
-    this.savedRole = this.checkedRole()
-  }
-
   check () {
-    this.submitTarget.disabled = this.checkedRole() === this.savedRole
-  }
-
-  checkedRole () {
-    return this.element.querySelector('input[type=radio]:checked')?.value
+    const radios = [...this.element.querySelectorAll('input[type=radio]')]
+    this.submitTarget.disabled = radios.every((radio) => radio.checked === radio.defaultChecked)
   }
 }

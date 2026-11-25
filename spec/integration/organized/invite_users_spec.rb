@@ -24,6 +24,12 @@ RSpec.describe "Organized user invitations", :js, type: :system do
     expect(page).to have_content("Not a valid email: Name, <first@example.com>")
     fill_in "multiple_emails_invited", with: "first@example.com."
     expect(page).to have_content("Not a valid email: first@example.com.")
+    # The message hides once the email is fixed, and has to come back for the next mistake
+    fill_in "multiple_emails_invited", with: "first@example.com"
+    expect(page).to have_no_content("Not a valid email")
+    fill_in "multiple_emails_invited", with: "first@example.com, oops"
+    expect(page).to have_content("Not a valid email: oops")
+
     fill_in "multiple_emails_invited", with: "first@example.com FIRST@example.com"
     expect(page).to have_content("1 email")
     expect(page).to have_button("Send invitation", disabled: false)

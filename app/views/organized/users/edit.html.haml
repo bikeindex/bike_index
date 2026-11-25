@@ -2,10 +2,7 @@
 - role_id = @organization_role.id
 - name = @organization_role.invited_display_name
 - own_role = @organization_role.user == current_user
-%p
-  = link_to organization_users_path(organization_id:), class: "twlink" do
-    %span{"aria-hidden": "true"} ←
-    = t(".back_to_users")
+= render partial: "back_link"
 
 %div{class: "tw:mb-6 tw:flex tw:flex-wrap tw:items-start tw:justify-between tw:gap-4"}
   %div
@@ -25,8 +22,9 @@
           = render(UI::Time::Component.new(time: @organization_role.claimed_at, format: :localize_time_precise))
         - else
           = t(".has_not_signed_up_html", name:)
-      - list.with_row(label: t(".last_login"), if: @organization_role.user.present?, value: render(UI::Time::Component.new(time: @organization_role.user&.last_login_at, format: :localize_time_precise)))
-      - list.with_row(label: t(".last_login_ip"), if: @organization_role.user.present?, value: (render(UI::Code::Inline::Component.new(text: @organization_role.user.last_login_ip)) if @organization_role.user&.last_login_ip.present?))
+      - if @organization_role.user.present?
+        - list.with_row(label: t(".last_login"), value: render(UI::Time::Component.new(time: @organization_role.user.last_login_at, format: :localize_time_precise)))
+        - list.with_row(label: t(".last_login_ip"), value: (render(UI::Code::Inline::Component.new(text: @organization_role.user.last_login_ip)) if @organization_role.user.last_login_ip.present?))
   = render partial: "card", locals: {title: t(".details"), body: details, padded: false}
 
   = form_for @organization_role, { as: :organization_role, url: organization_user_path(id: role_id, organization_id:), action: "update", html: {data: {controller: "org--role-form", action: "change->org--role-form#check"}} } do |f|
