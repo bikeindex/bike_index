@@ -47,15 +47,16 @@ module Pages
           end
 
           # Cache the counts rather than the markup: which tab is active varies per screen and
-          # comes from an unvalidated param, so it can't go in a cache key
+          # comes from an unvalidated param, so it can't go in a cache key. Ignoring a duplicate
+          # group doesn't touch the bike, so its count is read live
           def tab_counts
-            @tab_counts ||= Rails.cache.fetch(["admin_bike_tab_counts-2", @bike]) do
-              {duplicates: @bike.duplicate_bike_groups.count, messages: @bike.messages_count,
+            @tab_counts ||= Rails.cache.fetch(["admin_bike_tab_counts-3", @bike]) {
+              {messages: @bike.messages_count,
                listings: @bike.marketplace_listings.count, ownerships: @bike.ownerships.count,
                stickers: @bike.bike_stickers.count, theft_alerts: @bike.theft_alerts.count,
                recoveries: @bike.recovered_records.count,
                impound: @bike.impound_records.count + ImpoundClaim.involving_bike_id(@bike.id).count}
-            end
+            }.merge(duplicates: @bike.duplicate_bike_groups.count)
           end
 
           def stolen_tab

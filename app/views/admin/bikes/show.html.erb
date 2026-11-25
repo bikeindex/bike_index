@@ -20,7 +20,7 @@
 <% when "duplicates" %>
   <%# The tab counts active groups; ignored ones still list here, to un-ignore %>
   <% grouped_segments = @bike.normalized_serial_segments.joins(:duplicate_bike_group)
-       .includes(duplicate_bike_group: :bikes).order("duplicate_bike_groups.ignore, duplicate_bike_groups.id") %>
+       .includes(:duplicate_bike_group).order("duplicate_bike_groups.ignore, duplicate_bike_groups.id") %>
 
   <% grouped_segments.each do |grouped_segment| %>
     <% duplicate_group = grouped_segment.duplicate_bike_group %>
@@ -48,8 +48,11 @@
       </span>
     </div>
 
-    <%= render Pages::Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes, sort_state:,
-          no_show_header: true, show_serial: true) %>
+    <%# An ignored group can be a placeholder serial shared by thousands, so only active ones list their bikes %>
+    <% unless duplicate_group.ignore? %>
+      <%= render Pages::Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes, sort_state:,
+            no_show_header: true, show_serial: true) %>
+    <% end %>
   <% end %>
 
   <% if grouped_segments.none? %>

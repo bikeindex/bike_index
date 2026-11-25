@@ -168,18 +168,26 @@ RSpec.describe Admin::BikesController, type: :request do
       end
 
       it "lists ignored groups after active ones, to un-ignore, and counts the active ones" do
+        duplicates_count = -> { Capybara.string(response.body).find("a[href=\"#{base_url}/#{bike.id}?active_tab=duplicates\"]", match: :first).find("small").text.strip }
         get "#{base_url}/#{bike.id}?active_tab=duplicates"
         expect(response.code).to eq("200")
-        expect(bike.duplicate_bike_groups).to eq([active_group])
+        expect(duplicates_count.call).to eq "1"
         body = Capybara.string(response.body)
         expect(body).to have_link("ignore ACTIVE123", exact: true) { it[:onclick].include?("Ignore it?") }
         expect(body).to have_button("un-ignore IGNORED123", exact: true)
         expect(response.body.index("ACTIVE123")).to be < response.body.index("IGNORED123")
+        # Ignored groups don't list their bikes
+        expect(body).to have_css("tbody tr", text: /\b#{other_bike.id}\b/, count: 1)
 
-        ignored_group.update!(ignore: false)
-        active_group.update!(ignore: true)
+        put "#{base_url}/ignore_duplicate_toggle", params: {id: active_group.id}
+        expect(active_group.reload.ignore).to be_truthy
         get "#{base_url}/#{bike.id}?active_tab=duplicates"
+        expect(duplicates_count.call).to eq "0"
         expect(Capybara.string(response.body)).to have_button("un-ignore ACTIVE123", exact: true)
+
+        put "#{base_url}/ignore_duplicate_toggle", params: {id: ignored_group.id}
+        get "#{base_url}/#{bike.id}?active_tab=duplicates"
+        expect(duplicates_count.call).to eq "1"
       end
     end
 
