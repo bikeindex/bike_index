@@ -31,6 +31,8 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
       let!(:bike_organization) { FactoryBot.create(:bike_organization, bike:) }
       let!(:customer_contact) { FactoryBot.create(:customer_contact, bike:) }
       let!(:notification) { FactoryBot.create(:notification, user:, bike:, kind: :finished_registration) }
+      let!(:vehicle_specification) { VehicleSpecification.create!(vehicle: bike, bikebook_market: "CA") }
+      let!(:pos_vehicle_specification) { VehicleSpecification.create!(vehicle: pos_bike, bikebook_market: "US") }
       before do
         bike.update!(frame_model: "Roadster", year: 2024, description: "Red basket", propulsion_type: "pedal-assist")
         pos_bike.update!(year: 2023, marked_user_hidden: true)
@@ -47,6 +49,8 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
         expect([component, bike_sticker, bike_organization, customer_contact, notification].map { it.reload.bike_id })
           .to eq([pos_bike.id] * 5)
         expect(pos_bike.current_ownership.reload).to have_attributes(claimed: true, registration_info: {"phone" => "7183839292"})
+        expect(pos_bike.reload.vehicle_specification).to eq vehicle_specification
+        expect(VehicleSpecification.exists?(pos_vehicle_specification.id)).to be_falsey
         expect(match.reload).to have_attributes(status: "merged", merged_at: be_within(1.minute).of(Time.current))
         expect(Bike.unscoped.find(bike.id).deleted_at).to be_present
         expect(CallbackJobs::AfterBikeSaveJob.jobs.map { it["args"] }).to include([bike.id], [pos_bike.id])
