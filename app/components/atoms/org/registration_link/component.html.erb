@@ -1,6 +1,6 @@
 <%= render UI::Card::Component.new(additional_classes: card_classes) do %>
   <div class="tw:flex tw:flex-col tw:gap-4" data-controller="ui--collapse">
-    <%= render UI::Header::Component.new(text: translation(".your_public_registration_link"), tag: :h2, html_class: "tw:mb-0!") %>
+    <%= render UI::Header::Component.new(text: translation(".your_public_registration_link"), tag: :h2, html_class: "uncap tw:mt-0! tw:mb-0!") %>
 
     <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-3">
       <code
@@ -28,8 +28,9 @@
 
     <div
       class="
-        tw:hidden! tw:flex-wrap tw:items-center tw:gap-5 tw:rounded-lg
-        tw:border tw:border-gray-200 tw:p-4 tw:dark:border-gray-700
+        tw:hidden! tw:flex tw:flex-wrap tw:items-center tw:gap-5
+        tw:rounded-lg tw:border tw:border-gray-200 tw:p-4
+        tw:dark:border-gray-700
       "
       data-ui--collapse-target="content"
     >

@@ -6,7 +6,7 @@
 <%= render(UI::Card::Component.new(additional_classes: "tw:rounded-lg! tw:p-7!")) do %>
   <%= form_with(url: switches_organization_registrations_path(organization_id: @organization.to_param),
       data: {turbo: false, controller: "org--register-settings"}) do %>
-    <%= render UI::Header::Component.new(text: translation(".form_options"), tag: :h2) %>
+    <%= render UI::Header::Component.new(text: translation(".form_options"), tag: :h2, html_class: "uncap tw:mt-0!") %>
 
     <div class="tw:divide-y tw:divide-gray-200 tw:dark:divide-gray-700">
       <div class="tw:gap-x-6 tw:pb-6 tw:sm:grid tw:sm:grid-cols-3">
