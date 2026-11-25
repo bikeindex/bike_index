@@ -21,7 +21,10 @@
     <%= translation(".frame_size") %><%= optional_badge %>
   </span>
 
-  <div class="tw:mt-2 tw:mb-2">
+  <div
+    class="tw:mt-2 tw:mb-2 tw:transition-opacity"
+    data-register--frame-size-target="chips"
+  >
     <%= render UI::Forms::RadioButtonGroup::Component.new(name: "bike[frame_size]", full_width: true,
         selected: bike["frame_size"],
         html_options: {data: {"register--frame-size-target": "chip", action: "change->register--frame-size#pickChip"}},
@@ -33,7 +36,10 @@
       <%= translation(".or") %>
     </span>
 
-    <div class="tw:flex tw:flex-1 tw:items-center">
+    <div
+      class="tw:flex tw:flex-1 tw:items-center tw:transition-opacity"
+      data-register--frame-size-target="measure"
+    >
       <%= render UI::Forms::Input::Component.new(form_builder: @form, attribute: :frame_size_number, kind: :number_field,
           html_options: {value: bike["frame_size_number"], step: 0.5, min: 0, placeholder: translation(".enter_size"),
             class: "tw:rounded-r-none",
