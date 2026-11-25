@@ -869,6 +869,15 @@ RSpec.describe BikeServices::Creator do
         expect(b_param.bike).to include("serial_number" => "Some serial", "primary_frame_color_id" => color.id,
           "cycle_type" => "cargo-rear", "stock_photo_url" => "https://bikebook.bikeindex.org/specialized/2025/haul-st.png")
       end
+
+      context "registered from Canada, with no address" do
+        before { b_param.update(params: b_param.params.merge("registrant_country" => "CA")) }
+
+        it "adds its Canadian variant's data" do
+          instance.send(:add_bike_book_data, b_param)
+          expect(b_param.reload.bike["description"]).to include("up to 100 km")
+        end
+      end
     end
   end
 

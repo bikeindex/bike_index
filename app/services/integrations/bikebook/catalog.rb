@@ -33,22 +33,28 @@ module Integrations
         model(id)&.then { {title: "#{it["manufacturer"]} #{it["model"]}", description: it["description"], image_url: it["stock_photo"]} }
       end
 
-      # The model's record, nil for one the catalog hasn't. Raises Unreachable while the catalog doesn't answer. Cached
-      # apart from its far larger block, under the manifest's digest: a cached one needs no manifest read, and an updated
-      # catalog re-keys them all
-      def model(id)
+      # The model's record, its `market`'s variant where the catalog has one keyed id@market, nil for a model it hasn't.
+      # Raises Unreachable while the catalog doesn't answer. Cached apart from its far larger block, under the manifest's
+      # digest: a cached one needs no manifest read, and an updated catalog re-keys them all
+      def model(id, market: nil)
         return unless id.to_s.match?(MODEL_ID)
         raise Unreachable unless head
 
-        record = cached(["bikebook_catalog/model", head["digest"], id], expires_in: 1.day) do
+        record = cached(["bikebook_catalog/model", head["digest"], id, market].compact, expires_in: 1.day) do
           block = (manifest || raise(Unreachable)).dig("blocks", id[MODEL_ID, 1])
-          block && read(block)["models"][id] || {}
+          models = block ? read(block)["models"] : {}
+          models["#{id}@#{market}"] || models[id] || {}
         end
         (record || raise(Unreachable)).presence
       end
 
-      # The catalog's market for a country's ISO code: it lists an EU member's models under the EU
-      def market(iso) = EbikeRuleServices::Places::EU_MEMBERS.include?(iso) ? "EU" : iso
+      # The catalog's market for a country's ISO code: it lists an EU member's models under the EU. The US for one that's
+      # unknown, as Cloudflare's CF-IPCountry is XX, or T1 over Tor, when it can't tell
+      def market(iso)
+        return "US" if iso.blank? || %w[XX T1].include?(iso)
+
+        EbikeRuleServices::Places::EU_MEMBERS.include?(iso) ? "EU" : iso
+      end
 
       # The index's models, nil while the catalog doesn't answer. Too big to cache, and read by a job, outside rack-timeout
       def index_models(path)

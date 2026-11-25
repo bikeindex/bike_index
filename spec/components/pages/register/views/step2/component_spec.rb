@@ -64,6 +64,30 @@ RSpec.describe Pages::Register::Views::Step2::Component, type: :component do
     end
   end
 
+  describe "the model field" do
+    let(:lookup) { "[data-controller='register--model-lookup']" }
+
+    it "is a text field" do
+      render_step_2
+      expect(page).to have_field("bike[frame_model]", type: "text")
+      expect(page).to_not have_css(lookup)
+    end
+
+    context "for a manufacturer with Bike Book models" do
+      let(:manufacturer) { Manufacturer.friendly_find("Specialized") }
+      let(:params) { super().deep_merge(bike: {manufacturer_id: manufacturer.id, frame_model: "Haul ST"}) }
+      before { sync_bikebook_models }
+
+      it "starts as a text field keeping what was entered, for a catalog search of the manufacturer's models" do
+        render_step_2
+        expect(page).to have_css(lookup)
+        expect(page.find(lookup)).to have_field("bike[frame_model]", type: "text", with: "Haul ST")
+        # in the market of a registrant Cloudflare can't place
+        expect(rendered_content).to include('data-hw-combobox-async-src-value="/bikebook?manufacturer=specialized&amp;market=US&amp;')
+      end
+    end
+  end
+
   describe "the phone field" do
     def phone_field = status_field("phone")
 

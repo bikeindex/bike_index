@@ -1061,6 +1061,17 @@ RSpec.describe RegisterController, type: :request do
         expect(response.body).to_not include "Finish reporting your stolen"
       end
 
+      context "with a model picked from Bike Book" do
+        before { sync_bikebook_models }
+
+        it "saves the model's name rather than the catalog id its combobox posts, and the country it's registered from" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.merge(frame_model: "m/specialized/2025/haul-st@CA")},
+            headers: {"HTTP_CF_IPCOUNTRY" => "CA"}
+          expect(b_param.reload.bike["frame_model"]).to eq "Haul ST"
+          expect(b_param.params["registrant_country"]).to eq "CA"
+        end
+      end
+
       context "with a photo" do
         let(:blob) do
           ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join("spec/fixtures/bike.jpg")),

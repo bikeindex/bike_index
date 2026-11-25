@@ -235,7 +235,7 @@ class RegisterController < ApplicationController
     BikeServices::Register.save_step_2(@b_param, user: current_user,
       image: params.dig(:bike, :image), image_signed_id: params.dig(:bike, :image_signed_id),
       bike_params: update_params, register_with_organization: params[:register_with_organization],
-      additional: params[:additional])
+      additional: params[:additional], registrant_country: request.env["HTTP_CF_IPCOUNTRY"])
   end
 
   def start_page(flow:)

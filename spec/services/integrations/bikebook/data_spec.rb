@@ -34,6 +34,14 @@ RSpec.describe Integrations::Bikebook::Data do
       end
     end
 
+    context "in a market without a variant" do
+      let(:options) { {manufacturer_id:, frame_model: "Haul ST", year: 2025, market: "MX"} }
+
+      it "returns the model" do
+        expect(result[:bike][:description]).to include("60 miles")
+      end
+    end
+
     context "with a bike" do
       let(:options) { FactoryBot.create(:bike, manufacturer: Manufacturer.friendly_find("Aventon"), frame_model: "Level 2", year: 2023) }
 

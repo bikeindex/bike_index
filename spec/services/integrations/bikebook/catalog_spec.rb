@@ -125,9 +125,27 @@ RSpec.describe Integrations::Bikebook::Catalog do
     end
   end
 
+  describe "market" do
+    it "is the catalog's market for a country, the US for one Cloudflare can't place" do
+      expect([nil, "XX", "T1", "US", "CA", "DE"].map { described_class.market(it) }).to eq %w[US US US US CA EU]
+    end
+  end
+
   describe "model" do
     it "is the model's record" do
       expect(described_class.model("m/segway/2025/gt3-pro")).to include("id" => "m/segway/2025/gt3-pro", "motors" => be_present)
+    end
+
+    it "is its market's variant where the catalog has one, reading the block once a lookup" do
+      reads = 0
+      WebMock.stub_request(:get, "#{described_class::URL}models/specialized/2025.json").to_return do
+        reads += 1
+        {body: BikebookCatalogHelpers::FIXTURES.join("models/specialized/2025.json").read}
+      end
+      haul_st = "m/specialized/2025/haul-st"
+      expect(described_class.model(haul_st, market: "CA")["description"]).to include("up to 100 km")
+      expect(described_class.model(haul_st, market: "MX")["description"]).to include("60 miles")
+      expect(reads).to eq 2
     end
 
     it "is nil for what isn't a model's id, without reading or caching anything for it" do

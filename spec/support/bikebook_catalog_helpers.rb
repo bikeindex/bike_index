@@ -41,8 +41,9 @@ module BikebookCatalogHelpers
     WebMock.stub_request(:get, "#{url}#{Integrations::Bikebook::Catalog::MANIFEST}").to_return(body: manifest.to_json)
   end
 
-  # For the browser's and the server's both, with no stock photos, which render their placeholder
-  def serve_bikebook_catalog(manifest_status: 200)
+  # For the browser's and the server's both, with no stock photos, which render their placeholder - or with `photos`,
+  # each one a fixture photo
+  def serve_bikebook_catalog(manifest_status: 200, photos: false)
     stub_bikebook_catalog
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}**", ->(route, request) {
@@ -51,7 +52,11 @@ module BikebookCatalogHelpers
         route.fulfill(status:, headers: {"access-control-allow-origin" => "*", "content-type" => "application/json"},
           body: (status == 200) ? FIXTURES.join(path).read : "")
       })
-      playwright_page.context.route(%r{^https://bikebook\.bikeindex\.org/}, ->(route, _request) { route.abort })
+      playwright_page.context.route(%r{^https://bikebook\.bikeindex\.org/}, ->(route, _request) {
+        next route.abort unless photos
+
+        route.fulfill(contentType: "image/jpeg", body: Rails.root.join("spec/fixtures/bike_photo-landscape.jpeg").binread)
+      })
     end
   end
 
