@@ -4682,8 +4682,8 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 CREATE TABLE public.vehicle_specifications (
     id bigint NOT NULL,
-    vehicle_type character varying NOT NULL,
-    vehicle_id bigint NOT NULL,
+    bike_obj_type character varying NOT NULL,
+    bike_obj_id bigint NOT NULL,
     bikebook_model_id bigint,
     bikebook_market character varying,
     created_at timestamp(6) without time zone NOT NULL,
@@ -8174,17 +8174,17 @@ CREATE INDEX index_users_on_username ON public.users USING btree (username) WHER
 
 
 --
+-- Name: index_vehicle_specifications_on_bike_obj; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_vehicle_specifications_on_bike_obj ON public.vehicle_specifications USING btree (bike_obj_type, bike_obj_id);
+
+
+--
 -- Name: index_vehicle_specifications_on_bikebook_model_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_vehicle_specifications_on_bikebook_model_id ON public.vehicle_specifications USING btree (bikebook_model_id);
-
-
---
--- Name: index_vehicle_specifications_on_vehicle; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_vehicle_specifications_on_vehicle ON public.vehicle_specifications USING btree (vehicle_type, vehicle_id);
 
 
 --

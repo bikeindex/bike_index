@@ -77,7 +77,7 @@ class BikeVersion < ApplicationRecord
 
   belongs_to :owner, class_name: "User" # Direct association, unlike bike
 
-  has_one :vehicle_specification, as: :vehicle
+  has_one :vehicle_specification, as: :bike_obj
 
   validates :name, presence: true, uniqueness: {scope: [:bike_id, :owner_id]}
 

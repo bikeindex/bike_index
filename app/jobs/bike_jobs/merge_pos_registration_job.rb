@@ -21,7 +21,7 @@ module BikeJobs
     MERGED_COLUMNS = %w[address_records.bike_id b_params.created_bike_id bike_organization_notes.bike_id
       bike_organizations.bike_id bike_stickers.bike_id graduated_notifications.primary_bike_id
       impound_claims.bike_submitting_id public_images.imageable_id sales.item_id strava_gears.item_id
-      vehicle_specifications.vehicle_id].freeze
+      vehicle_specifications.bike_obj_id].freeze
     # Columns that can point at a bike, left on the deleted registration
     LEFT_COLUMNS = {
       "ownerships.bike_id" => "the POS registration's ownership takes the owner's registration info",
