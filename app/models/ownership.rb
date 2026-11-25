@@ -308,7 +308,12 @@ class Ownership < ApplicationRecord
     # TODO: post #2110 doing this - I'm not sure if it's a good idea...
     if current && id.present?
       bike&.update_column :current_ownership_id, id
-      prior_ownerships.current.each { |o| o.update(current: false) }
+      prior_ownerships.current.each do |ownership|
+        ownership.update(current: false)
+        # Resolves their alerts about the bike. AfterBikeSaveJob updates whoever made the
+        # transfer, which isn't always the previous owner (an admin, an organization)
+        CallbackJobs::AfterUserChangeJob.perform_async(ownership.user_id) if ownership.user_id.present?
+      end
     end
     # Note: this has to be performed later; we create ownerships and then delete them, in BikeServices::Creator
     # We need to be sure we don't accidentally send email for ownerships that will be deleted

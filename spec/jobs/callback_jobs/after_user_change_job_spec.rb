@@ -328,6 +328,40 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
     end
   end
 
+  describe "bikes deleted or transferred away" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:, street: " ") }
+    let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record:, user:) }
+    let(:bike_registered) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    let(:b_param) do
+      FactoryBot.create(:b_param, creator: user, origin: "register_flow", created_bike_id: bike_registered.id,
+        params: {bike: {manufacturer_id: 1, owner_email: user.email}})
+    end
+    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment_pending, b_param:, bike: bike_registered) }
+
+    it "resolves their alerts" do
+      bike.update(updated_at: Time.current)
+      instance.perform(user.id)
+      expect(user.reload.alert_slugs).to eq %w[stolen_bike_without_location theft_alert_without_photo unfinished_registration]
+
+      superuser = FactoryBot.create(:superuser)
+      Sidekiq::Job.clear_all
+      BikeServices::OwnershipTransferer.find_or_create(bike, updator: superuser,
+        new_owner_email: "new-owner@example.com")
+      expect(described_class.jobs.map { it["args"].first }).to eq [user.id]
+      BikeJobs::BikeDeleterJob.new.perform(bike_registered.id)
+
+      instance.perform(user.id)
+      expect(user.reload.alert_slugs).to eq []
+      # Isn't recreated for the theft alert, which stays the user's
+      instance.perform(user.id)
+      expect(user.user_alerts.active.count).to eq 0
+      expect(user.user_alerts.resolved.pluck(:kind)).to match_array %w[stolen_bike_without_location
+        theft_alert_without_photo unfinished_registration]
+    end
+  end
+
   describe "ownerships" do
     let(:user) { FactoryBot.create(:user, name: "Old name") }
     let(:new_name) { "A Name For a User" }

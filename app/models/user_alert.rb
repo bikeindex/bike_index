@@ -129,12 +129,21 @@ class UserAlert < ApplicationRecord
   def self.update_unfinished_registrations(user)
     user.b_params.unfinished_registrations
       .each { |b_param| update_unfinished_registration(user:, b_param:) }
+    resolve_finished_registrations(user)
+  end
 
-    # Expiry is silent, and CleanBParamsJob deletes without callbacks, so those alerts
-    # never reach the after_commit that would resolve them
+  # Expiry is silent, CleanBParamsJob deletes without callbacks, and deleting or
+  # transferring the bike doesn't touch the b_param - so those alerts never reach the
+  # after_commit that would resolve them
+  def self.resolve_finished_registrations(user)
     user.user_alerts.active.unfinished_registration.includes(:alertable)
       .reject { |user_alert| user_alert.alertable&.unfinished_registration?(user) }
       .each(&:resolve!)
+  end
+
+  # Deleted and transferred bikes leave user.bikes, which is all the other updates revisit
+  def self.resolve_without_bike(user, bike_ids: user.bike_ids)
+    user.user_alerts.active.where.not(bike_id: nil).where.not(bike_id: bike_ids).each(&:resolve!)
   end
 
   def self.update_unfinished_registration(user:, b_param:)

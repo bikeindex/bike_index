@@ -52,6 +52,8 @@ module CallbackJobs
 
       # Above the returns below - anyone can walk away mid-registration
       UserAlert.update_unfinished_registrations(user)
+      bike_ids = user.bike_ids
+      UserAlert.resolve_without_bike(user, bike_ids:)
 
       # Ignore alerts below for superusers
       if user.superuser?
@@ -59,7 +61,7 @@ module CallbackJobs
         return
       end
 
-      user.theft_alerts.each do |theft_alert|
+      user.theft_alerts.where(bike_id: bike_ids).each do |theft_alert|
         UserAlert.update_theft_alert_without_photo(user: user, theft_alert: theft_alert)
       end
 
