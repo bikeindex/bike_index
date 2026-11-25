@@ -43,19 +43,8 @@ owner_emails = %w[
 
 creator = BikeServices::Creator.new
 
-def org_bike_params(owner_email:, creation_organization_id: Organization.find_by_name("Brakebills").id, manufacturer_id: nil)
-  manufacturer_id ||= SeedHelpers.weighted_frame_maker_id
-  {
-    cycle_type: "bike",
-    propulsion_type: "foot-pedal",
-    serial_number: (0...10).map { rand(65..90).chr }.join,
-    manufacturer_id:,
-    primary_frame_color_id: Color.pluck(:id).sample,
-    rear_tire_narrow: "true",
-    handlebar_type: HandlebarType.slugs.first,
-    owner_email:,
-    creation_organization_id: creation_organization_id.to_s
-  }.merge(org_registration_info(owner_email:))
+def org_bike_params(owner_email:, creation_organization_id: Organization.find_by_name("Brakebills").id, **attributes)
+  SeedHelpers.bike_params(owner_email:, creation_organization_id: creation_organization_id.to_s, **org_registration_info(owner_email:), **attributes)
 end
 
 def org_registration_info(owner_email:)
@@ -70,9 +59,9 @@ def org_registration_info(owner_email:)
   }
 end
 
-def seed_org_bike(creator:, user:, owner_email:, creation_organization_id: Organization.find_by_name("Brakebills").id, **bike_attrs)
+def seed_org_bike(creator:, user:, owner_email:, **bike_attrs)
   SeedHelpers.tick
-  b_param = BParam.create!(creator: user, params: {bike: org_bike_params(owner_email:, creation_organization_id:).merge(bike_attrs)})
+  b_param = BParam.create!(creator: user, params: {bike: org_bike_params(owner_email:, **bike_attrs)})
   b_param.origin = "organization_form"
   bike = creator.create_bike(b_param)
   raise "Bike creation failed: #{b_param.bike_errors}" if bike.errors.any?
@@ -81,12 +70,12 @@ end
 
 # Register an unknown-serial bike together with its parking notification, the way
 # the organized "unregistered" flow does (no ProcessParkingNotificationJob email).
-def seed_unregistered_parking_notification(creator:, member:, owner_email:, loc:, kind:, region_record_id:, country_id:, manufacturer_id: nil, year: nil)
+def seed_unregistered_parking_notification(creator:, member:, owner_email:, loc:, kind:, region_record_id:, country_id:, **bike_attrs)
   SeedHelpers.tick
   b_param = BParam.create!(
     creator: member,
     params: {
-      bike: org_bike_params(owner_email:, manufacturer_id:).merge(serial_number: "unknown", year:),
+      bike: org_bike_params(owner_email:, serial_number: "unknown", **bike_attrs),
       parking_notification: {kind:, street: loc[:street], city: loc[:city], postal_code: loc[:postal_code], region_record_id:, country_id:, skip_geocoding: true}
     }
   )
