@@ -170,7 +170,7 @@ const bikeShapes = (frame, context, detail) => {
   const { bmx, stem, clamp } = cockpit(frame, context)
   // a BMX's or dirt jumper's saddle slammed down on and along its top tube
   const slammed = SLAMMED_SADDLE.test(data.primary_activity)
-  const top = plus(seatTop, scale(seat, slammed ? 30 : 170))
+  const top = plus(seatTop, scale(seat, slammed ? 60 : 170))
   const saddled = [tube(seatTop, seatBottom), post(seatTop, top), saddle(top, 150, slammed ? unit(minus(headTop, seatTop)) : [1, 0])]
   const { front, back, under, tail } = bench(frame, { fig })
   const riser = atHeight(headTop, steering, fig('handlebar_height'))

@@ -1597,7 +1597,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     JS
     # level, but for its back raised square to it
     expect(saddles.last).to eq([170, -4])
-    expect(saddles.first(3)).to all(match([30, be > 10]))
+    expect(saddles.first(3)).to all(match([60, be > 10]))
     # a step-through frame drawn as one, but where its type detail is drawn its own way, as a bench seat is
     details = page.evaluate_script(<<~JS)
       import('bikebook/cycle_drawings').then(({ drawingViews }) => [{ frame: { top_tube: 'step_through' } }, { frame: { top_tube: 'sloping' } },
