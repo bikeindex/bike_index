@@ -43,6 +43,14 @@ RSpec.describe ApplicationComponent, type: :component do
   end
 
   describe "cache digests" do
+    it "builds one digest for every locale" do
+      ActionView::LookupContext::DetailsKey.clear
+      digests = %i[en nl].map { |locale| I18n.with_locale(locale) { SharedBlocks::Footer::Component.cache_digest } }
+
+      expect(digests.uniq.count).to eq 1
+      expect(ActionView::LookupContext::DetailsKey.digest_caches.count).to eq 1
+    end
+
     # What the tracker misses goes stale with the key still moving for its siblings, so
     # nothing else catches it. A source scan is the oracle here: anything the markup
     # reaches has to be in the tree, via a `# Template Dependency:` comment wherever the
