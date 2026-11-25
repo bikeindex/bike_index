@@ -1381,14 +1381,14 @@ RSpec.describe "Bike Book", :js, type: :system do
     # the geometry is each one's size, and less of it is red
     expect(find("[aria-label='Sizes & geometry comparison'] tr", text: "Reach")).to have_css("td", text: /\A425\.5.+−74\.7/m)
       .and have_css(".tw\\:text-red-700", text: "−74.7")
-    # in centimeters alone, without an imperial viewer's feet and inches
-    expect(find("[aria-label='Sizes & geometry comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d.]+\W*cm(\s*[−+][\d.]+\W*cm|\s*-)?\z/))
+    # in mm, as geometry charts list it
+    expect(find("[aria-label='Sizes & geometry comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d,.]+\W*mm(\s*[−+][\d.]+\W*mm|\s*-)?\z/))
     # the wheelbase out to each wheel's edge, below it and in its units, and as with it, less of it is red. Its payload
     # limit closes it, neither size listing a weight
     expect(all("[aria-label='Sizes & geometry comparison'] th[scope='row']").map(&:text).last(4)).to match(["Standover", "Wheelbase", /\AOverall length \(est\.\)/, "Max payload (rider + cargo)"])
     overall_length = find("[aria-label='Sizes & geometry comparison'] tr", text: "Overall length")
-    expect(overall_length.all("td").map(&:text)).to match([/\A203\.5\W*cm\z/, /\A194\.3\W*cm\s*−9\.2\W*cm\z/])
-    expect(overall_length).to have_css(".tw\\:text-red-700", text: "−9.2")
+    expect(overall_length.all("td").map(&:text)).to match([/\A2,035\W*mm\z/, /\A1,943\W*mm\s*−92\W*mm\z/])
+    expect(overall_length).to have_css(".tw\\:text-red-700", text: "−92")
     # each one's drawing at the same scale and on the same ground, so they line up across the cards
     view_boxes = all("section[aria-label$=' sizes'] figure svg").map { it["viewBox"].split.map(&:to_i) }
     expect(view_boxes.size).to eq 2
@@ -1583,6 +1583,21 @@ RSpec.describe "Bike Book", :js, type: :system do
       })
     JS
     expect(flat_bars).to eq([0, 1, 0, 2, 1])
+    # a BMX's and a dirt jumper's saddle slammed down on its top tube and tipped along it, any other's up its post and level
+    saddles = page.evaluate_script(<<~JS)
+      import('bikebook/cycle_drawings').then(({ drawingViews, minus }) => {
+        const size = { geometry: { stack: 600, reach: 390, head_angle: 70, seat_angle: 73, chainstay: 420, wheelbase: 1080, bb_drop: 10, seat_tube_ct: 380 } }
+        const saddle = (primary_activity) => {
+          const [post, [back, nose]] = drawingViews({ type: 'bike', data: { wheels: [{ bsd: 559, tire_width: 60, position: ['front', 'rear'] }], primary_activity }, size })
+            .views[0].shapes.flat(Infinity).filter(({ seat }) => seat).map(({ points }) => points.slice(-2))
+          return [Math.round(Math.hypot(...minus(post[1], post[0]))), Math.round(Math.atan2(...minus(nose, back).reverse()) * 180 / Math.PI)]
+        }
+        return [saddle('bmx-freestyle'), saddle('dj'), saddle('dj-slopestyle'), saddle('mtb-trail-all-mountain')]
+      })
+    JS
+    # level, but for its back raised square to it
+    expect(saddles.last).to eq([170, -4])
+    expect(saddles.first(3)).to all(match([60, be > 10]))
     # a step-through frame drawn as one, but where its type detail is drawn its own way, as a bench seat is
     details = page.evaluate_script(<<~JS)
       import('bikebook/cycle_drawings').then(({ drawingViews }) => [{ frame: { top_tube: 'step_through' } }, { frame: { top_tube: 'sloping' } },
@@ -1703,7 +1718,7 @@ RSpec.describe "Bike Book", :js, type: :system do
         return [length({ wheels }, { geometry }), length({}, { geometry }), length({ wheels }, data.sizes[0]), shown, [...captions, bmx], typical, type, overview]
       })()
     JS
-    expect(longtail).to match([[1960, false, true], nil, [2261, true, false], [/\A226\.1\W*cm \?\z/, "This value is specified"],
+    expect(longtail).to match([[1960, false, true], nil, [2261, true, false], [/\A2,261\W*mm \?\z/, "This value is specified"],
       ["Light purple figures are calculated from the listed ones", "S drawn", "Gray figures aren't listed, so they're estimated from typical values on BMX bikes."], %w[stem_length bb_drop fork_rake],
       ["Front wheel", "Vehicle type Cargo Bike Rear Cargo Bike · Kids & Women's · Front box · Step-through"],
       ["Vehicle type Cargo Bike Rear Cargo Bike", "Primary activity — Kids & Women's Cargo"]])
@@ -1760,24 +1775,29 @@ RSpec.describe "Bike Book", :js, type: :system do
       .and have_css(".tw\\:text-red-700.tw\\:font-bold", exact_text: "−")
       .and have_css("button[aria-label='650 B wheels are smaller diameter than 700 C']")
       .and have_css(".tw\\:text-gray-500", text: /\A−8\W*mm\z/)
-    # wheelbase in centimeters, with feet and inches after, which its difference leaves off
-    expect(find("[aria-label='Sizes & geometry comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d.]+\W*cm\s*\(\d'\s*\d+"\)(\s*[−+][\d.]+\W*cm|\s*-)?\z/))
-    # whose feet and inches are themselves the tooltip's trigger, which spells them out
-    wheelbase = find("[aria-label='Sizes & geometry comparison'] tr", text: "Wheelbase").first("td")
-    expect(wheelbase).to have_no_button("?")
-    wheelbase.find("button", text: /\A\d'\s*\d+"\z/).click
-    expect(wheelbase).to have_css("[role='tooltip']", text: /\A\d+ feet, [\d.]+ inch(es)?\z/, visible: true)
-    # feet and inches marks aren't muted as other units are
-    expect(wheelbase.find("button", text: /\A\d'\s*\d+"\z/)).to have_no_css(".tw\\:text-gray-400")
-    # a dimension's tooltip spells out its feet and inches, its metric after
+    # wheelbase in mm alone, as geometry charts list it, without an imperial viewer's feet and inches
+    expect(find("[aria-label='Sizes & geometry comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d,.]+\W*mm(\s*[−+][\d.]+\W*mm|\s*-)?\z/))
+    # a dimension's tooltip spells out its feet and inches, its metric after, as a rider's height's does, whose feet and
+    # inches are themselves the tooltip's trigger
     dimension = page.evaluate_script(<<~JS)
       (async () => {
         const [{ VehiclePresenter }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
           import('bikebook/render'), #{vocabulary_fetch}])
-        const imperial = fragmentOf(new VehiclePresenter(vocabulary).dimensions({ length: 762 })).querySelector('.tw\\\\:imperial\\\\:inline [role="tooltip"]')
+        const presenter = new VehiclePresenter(vocabulary)
+        const height = Object.assign(document.createElement('div'), { id: 'rider-height' })
+        height.append(fragmentOf(presenter.measurement(1930, 'mm', 'rider_height')))
+        document.querySelector('main').append(height)
+        const imperial = fragmentOf(presenter.dimensions({ length: 762 })).querySelector('.tw\\\\:imperial\\\\:inline [role="tooltip"]')
         return imperial.textContent.replace(/\\s+/g, ' ').trim()
       })()
     JS
+    height = find("#rider-height")
+    expect(height).to have_no_button("?")
+    feet_and_inches = height.find("button", text: /\A\d'\s*\d+"\z/)
+    feet_and_inches.click
+    expect(height).to have_css("[role='tooltip']", text: /\A6 feet, 4 inches\s+193\W*cm\z/, visible: true)
+    # feet and inches marks aren't muted as other units are
+    expect(feet_and_inches).to have_no_css(".tw\\:text-gray-400")
     expect(dimension).to eq "Length: 2 feet, 6 inches (76.2 cm)"
   end
 
