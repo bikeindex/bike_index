@@ -10,6 +10,9 @@
 #  updated_at    :datetime         not null
 #
 class DuplicateBikeGroup < ApplicationRecord
+  IGNORE_CONFIRM = "Ignoring drops this group from the active review list and from each bike's duplicate count. " \
+    "It can be un-ignored from a bike's duplicates tab. Ignore it?"
+
   has_many :normalized_serial_segments
   has_many :bikes, through: :normalized_serial_segments
   # A merge deletes the new registration, which can remove the group; the match outlives it

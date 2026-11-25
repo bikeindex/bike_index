@@ -31,6 +31,7 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       }.to change(BikeJobs::PrepareDuplicateReviewJob.jobs, :count).by 1
       expect(response.code).to eq "200"
       expect(response).to render_template(:preparing)
+      expect(response.body).to include('data-controller="reload"', "tw:animate-spin")
 
       BikeJobs::PrepareDuplicateReviewJob.drain
       get base_url, params: {search_kind: "large_group"}
@@ -62,6 +63,7 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect { get base_url }.not_to change(BikeJobs::PrepareDuplicateReviewJob.jobs, :count)
       expect(response).to render_template(:preparing)
       expect(response.body).to include("Preparing the review queues failed")
+      expect(response.body).not_to include('data-controller="reload"')
     end
 
     it "filters by organization, matching none for an unknown one" do
@@ -165,6 +167,17 @@ RSpec.describe Admin::DuplicateBikesController, type: :request do
       expect(response.code).to eq "200"
       expect(assigns(:duplicate_groups)).to eq [duplicate_group]
       expect(Capybara.string(response.body)).to have_text("1 Matching")
+    end
+
+    it "finds a serial's groups, ignored ones included when asked" do
+      duplicate_group = DuplicateBikeGroup.create(ignore: true)
+      pair.each { NormalizedSerialSegment.create(bike: it, duplicate_bike_group: duplicate_group, segment: "WTU123456") }
+      other_group = DuplicateBikeGroup.create(ignore: true)
+      pair.each { NormalizedSerialSegment.create(bike: it, duplicate_bike_group: other_group, segment: "WTU12345") }
+      get base_url, params: {search_view: "segments", search_serial: "wtu 123456"}
+      expect(assigns(:duplicate_groups)).to eq []
+      get base_url, params: {search_view: "segments", search_serial: "wtu 123456", search_ignored: "all"}
+      expect(assigns(:duplicate_groups)).to eq [duplicate_group]
     end
   end
 

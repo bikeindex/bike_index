@@ -51,7 +51,8 @@
     Serial-segment group #<%= @duplicate_group.id %>:
     <strong><%= @duplicate_group.ignore? ? "Ignored" : "Active" %></strong> ·
     <%= render(UI::ButtonLink::Component.new(text: @duplicate_group.ignore? ? "Un-ignore group" : "Ignore group", method: :put,
-          href: ignore_duplicate_toggle_admin_bikes_path(id: @duplicate_group.id), color: :link, html_class: "tw:text-sm")) %>
+          href: ignore_duplicate_toggle_admin_bikes_path(id: @duplicate_group.id), color: :link, html_class: "tw:text-sm",
+          confirm: (DuplicateBikeGroup::IGNORE_CONFIRM unless @duplicate_group.ignore?))) %>
   </div>
 <% end %>
 
