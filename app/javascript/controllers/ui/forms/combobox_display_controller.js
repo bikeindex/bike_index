@@ -29,11 +29,12 @@ export default class extends Controller {
 
   // keyup catches arrow-key navigation, which sets the value without an input
   // event; click catches the handle clearing the selection, which deselects
-  // silently; form-persist assigns a restored selection with no event of its own
+  // silently; preselection catches free text, which an async filter can commit
+  // after the blur; form-persist assigns a restored selection with no event of its own
   events () {
     return [
       [this.input, 'input'], [this.input, 'keyup'], [this.input, 'blur'],
-      [this.element, 'click'], [this.element, 'hw-combobox:selection'],
+      [this.element, 'click'], [this.element, 'hw-combobox:selection'], [this.element, 'hw-combobox:preselection'],
       [window, 'form-persist:restored']
     ]
   }

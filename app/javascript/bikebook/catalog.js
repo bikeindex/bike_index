@@ -87,10 +87,20 @@ export async function mountCatalogCombobox (loading, template, slot, { display, 
   // with an async source the server can only prefill the id, which the gem would display
   const shown = named?.replace(CURRENT_MARK, '') ?? display
   if (shown) combobox.dataset.hwComboboxPrefilledDisplayValue = shown
-  // the option rich_display shows, ahead of the listbox's for the pick, which has its photo and price. Outside the
-  // listbox, the gem never lists it
-  if (named) {
-    combobox.before(fragmentOf(html`<span hidden role="option" data-value=${value} data-autocompletable-as=${shown}>${pickName(named)}</span>`))
+  // the option rich_display shows, ahead of the listbox's for the pick, whose photo and second line overflow the
+  // field. Outside the listbox, the gem never lists it
+  if (richPick) {
+    const picked = document.createElement('span')
+    const name = (value, display, typed) => renderInto(picked, value
+      ? html`<span hidden role="option" data-value=${value} data-autocompletable-as=${typed}>${pickName(display)}</span>`
+      : nothing)
+    if (named) name(value, named, shown)
+    combobox.before(picked)
+    // on the combobox itself, so it's renamed before the bubbling event reaches rich_display. Typed text is only
+    // preselected
+    const rename = ({ detail }) => name(!detail.isNewAndAllowed && detail.value, detail.display, detail.display)
+    combobox.addEventListener('hw-combobox:preselection', rename)
+    combobox.addEventListener('hw-combobox:selection', rename)
   }
   localSources.set(combobox, new CatalogComboboxSource(catalog))
   slot.replaceChildren(fragment)

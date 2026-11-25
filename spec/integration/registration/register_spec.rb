@@ -359,6 +359,21 @@ RSpec.describe "Register flow", :js, type: :system do
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
     photo = "img[src$='/specialized/2025/haul-st.png']"
     expect(page).to have_css(photo, visible: :all)
+    # The field names the pick on a line, rather than as the option's photo and price
+    overlay = "[data-controller~='register--model-lookup'] [data-ui--forms--combobox-display-target='overlay']"
+    expect(page).to have_css(overlay, exact_text: "Specialized Haul ST current")
+    expect(page).to have_no_css("#{overlay} img", visible: :all)
+
+    # Typed over, it's the text that submits, so the pick's name and photo go
+    type_into(model, "Haul ST custom")
+    find("h1", text: "Add your bike").click
+    expect(page).to have_no_css(overlay)
+    expect(page).to have_no_css(photo, visible: :all)
+    expect(page).to have_field("bike_frame_model", with: "Haul ST custom")
+
+    type_into(model, "haul")
+    retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
+    expect(page).to have_css(photo, visible: :all)
 
     # Restored from the draft, the pick shows its name and photo rather than the catalog id it submits
     visit page.current_url

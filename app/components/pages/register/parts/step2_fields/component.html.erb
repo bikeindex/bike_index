@@ -7,7 +7,7 @@
 
 <%= render(UI::Forms::Group::Component.new(form_builder: @form, attribute: :frame_model, label_text: translation(".model"), html_options: model_options)) do %>
   <% if bikebook_models? %>
-    <%= tag.div(data: {controller: "register--model-lookup", action: "hw-combobox:selection->register--model-lookup#pick form-persist:restored@window->register--model-lookup#pick",
+    <%= tag.div(data: {controller: "register--model-lookup", action: "hw-combobox:preselection->register--model-lookup#pick hw-combobox:selection->register--model-lookup#pick form-persist:restored@window->register--model-lookup#pick",
       "register--model-lookup-manifest-url-value": Integrations::Bikebook::Catalog::MANIFEST_URL}) do %>
       <%# Stamped once the catalog loads, so the combobox searches it from its first keystroke %>
       <template data-register--model-lookup-target="combobox">
