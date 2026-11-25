@@ -12,6 +12,8 @@ RSpec.describe Integrations::Bikebook::Data do
       expect(result[:bike]).to match(cycle_type: "cargo-rear", paint_description: nil, description: /\AWhatever you’re into.* 60 miles/,
         rear_wheel_bsd: 406, stock_photo_url: "https://bikebook.bikeindex.org/specialized/2025/haul-st.png")
       expect(result[:components].count).to eq 32
+      expect(result[:vehicle_specification]).to eq({bikebook_model_id: BikebookModel.find_by!(catalog_id: "m/specialized/2025/haul-st").id,
+                                                    bikebook_market: "US"}.as_json)
       expect(result[:components]).to include({component_type: "Grips/Tape", description: "Globe closed end slip on type, 155mm",
                                               manufacturer: "Globe", front: false, rear: false}.as_json)
       expect(result[:components]).to include({component_type: "Brake", manufacturer: "Tektro", front: true, rear: true,
@@ -31,6 +33,7 @@ RSpec.describe Integrations::Bikebook::Data do
 
       it "returns the variant" do
         expect(result[:bike][:description]).to include("up to 100 km")
+        expect(result[:vehicle_specification][:bikebook_market]).to eq "CA"
       end
     end
 
