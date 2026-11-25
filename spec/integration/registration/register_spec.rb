@@ -171,10 +171,10 @@ RSpec.describe "Register flow", :js, type: :system do
     fill_in_verified "bike[frame_size_number]", with: "18"
     find_field("bike[frame_size_number]").send_keys(:tab)
     expect(page).to have_select("bike[frame_size_unit]", selected: "inches")
-    expect(page).to have_content("Looks like you entered the wrong unit.")
+    expect(page).to have_content("We think that is in inches not cm, so we switched it.")
     click_button "Change back to cm"
     expect(page).to have_select("bike[frame_size_unit]", selected: "cm")
-    expect(page).to have_no_content("Looks like you entered the wrong unit.")
+    expect(page).to have_no_content("so we switched it")
     find("label", text: "M", exact_text: true).click
     select "inches", from: "bike[frame_size_unit]"
     check "Missing serial"

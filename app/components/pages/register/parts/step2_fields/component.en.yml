@@ -33,7 +33,6 @@ en:
             information_for_org: Information for %{org_name}
             is_a_handmade_frame: Is a handmade frame
             it_probably_has_a_serial_number: It probably has a serial number.
-            looks_like_wrong_unit: Looks like you entered the wrong unit.
             missing_serial: Missing serial
             model: Model
             model_placeholder: e.g. Marlin 7
@@ -73,6 +72,9 @@ en:
             stolen: Stolen
             stolen_description: This %{cycle_type} has been stolen
             student_id: Student ID
+            switched_to_cm: We think that is in cm not inches, so we switched it.
+            switched_to_inches: We think that is in inches not cm, so we switched
+              it.
             very_very_few_bikes_html: >-
               Very <em>very</em> few %{cycle_types} are made without serials. Unless
               this %{cycle_type}:

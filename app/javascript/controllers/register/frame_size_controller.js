@@ -6,7 +6,7 @@ import { collapse } from 'utils/collapse_utils'
 // Frame size is either an ordinal chip (XS-XL) or a number - picking one clears
 // the other so only a single size is submitted.
 export default class extends Controller {
-  static targets = ['chip', 'number', 'unit', 'wrongUnit', 'revert']
+  static targets = ['chip', 'number', 'unit', 'wrongUnit']
 
   pickChip () {
     this.numberTarget.value = ''
@@ -26,9 +26,8 @@ export default class extends Controller {
     const unit = size >= 30 ? 'cm' : 'in' // Bike#clean_frame_size's split
     if (unit === this.unitTarget.value) return
 
-    this.revertTargets.forEach(button => collapse(button.value === unit ? 'hide' : 'show', button, 0))
     this.unitTarget.value = unit
-    collapse('show', this.wrongUnitTarget)
+    this.wrongUnitTargets.forEach(message => collapse(message.dataset.unit === unit ? 'hide' : 'show', message))
   }
 
   // Dispatched so form-persist saves it, and pickUnit hides the message
@@ -38,6 +37,6 @@ export default class extends Controller {
   }
 
   pickUnit () {
-    collapse('hide', this.wrongUnitTarget)
+    collapse('hide', this.wrongUnitTargets)
   }
 }
