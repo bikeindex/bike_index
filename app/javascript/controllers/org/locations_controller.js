@@ -9,6 +9,7 @@ import { clearCombobox, selectComboboxValue } from 'utils/hw_combobox_patch'
 // found by data-slot within it. A new card is always unsaved; discarding one removes it.
 const RING = ['tw:ring-2', 'tw:ring-blue-400']
 const NOT_SUBMITTED_FIELD = /\[(_destroy|id)\]$/
+const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g
 
 export default class extends Controller {
   static targets = ['location', 'grid', 'template', 'mapCheckbox', 'mapBar', 'mapBadge', 'mapActions', 'summary']
@@ -31,7 +32,8 @@ export default class extends Controller {
   }
 
   add () {
-    const html = this.templateTarget.innerHTML.replaceAll('__INDEX__', this.nextIndex++)
+    const index = this.nextIndex++
+    const html = this.uniqueIds(this.templateTarget.innerHTML.replaceAll('__INDEX__', index), index)
     this.gridTarget.insertAdjacentHTML('beforeend', html)
     const location = this.gridTarget.lastElementChild
     location.querySelector('[data-slot=name]').focus()
@@ -82,6 +84,11 @@ export default class extends Controller {
   }
 
   // private
+
+  // The state combobox renders its option ids as UUIDs, which every clone of the template would share
+  uniqueIds (html, index) {
+    return html.replace(UUID, (id) => `${id}-${index}`)
+  }
 
   locationFor (event) {
     return event.currentTarget.closest('[data-new-record]')
@@ -212,7 +219,8 @@ export default class extends Controller {
   }
 
   refreshMap (duration) {
-    if (!this.hasMapBarTarget) return
+    // A locked map has the bar, for Add location, but no checkbox, badge or Save to drive
+    if (!this.hasMapCheckboxTarget) return
 
     this.setRing(this.mapBarTarget, this.mapDirty)
     this.setShown(this.mapBadgeTarget, this.mapDirty, 0)

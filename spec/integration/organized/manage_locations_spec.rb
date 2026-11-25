@@ -5,8 +5,9 @@ require "rails_helper"
 RSpec.describe "Organized manage locations", :js, type: :system do
   let(:organization) do
     FactoryBot.create(:organization_with_organization_features, name: "Brakebills", show_on_map: true,
-      enabled_feature_slugs: %w[impound_bikes])
+      lock_show_on_map:, enabled_feature_slugs: %w[impound_bikes])
   end
+  let(:lock_show_on_map) { false }
   let(:user) { FactoryBot.create(:organization_admin, organization:) }
   let!(:main_shop) { FactoryBot.create(:location, :with_address_record, organization:, name: "Main shop") }
   let!(:south_shop) { FactoryBot.create(:location, :with_address_record, organization:, name: "South shop") }
@@ -78,7 +79,12 @@ RSpec.describe "Organized manage locations", :js, type: :system do
 
     # An added location is new until it's discarded, which drops it
     click_button "Add location"
-    expect(page).to have_css("[data-org--locations-target='location']", count: 3)
+    click_button "Add location"
+    expect(page).to have_css("[data-org--locations-target='location']", count: 4)
+    # The state combobox's option ids are cloned with the template, and have to stay unique
+    ids = all("[id]", visible: :all).map { it[:id] }
+    expect(ids.tally.select { |_id, count| count > 1 }).to be_empty
+    within(location_card(3)) { click_button "Discard" }
     within(location_card(2)) do
       expect(page).to have_text("New")
       expect(page).to have_field("Location name", with: "Brakebills")
@@ -101,5 +107,17 @@ RSpec.describe "Organized manage locations", :js, type: :system do
 
     expect(page).to have_content("updated successfully")
     expect(organization.reload.locations.pluck(:name)).to eq(["Main shop renamed"])
+  end
+
+  context "with the partner map setting locked" do
+    let(:lock_show_on_map) { true }
+
+    it "has no map checkbox, and still tracks changes and adds locations" do
+      expect(page).to have_no_field(map_label)
+      within(location_card(0)) { fill_in "Location name", with: "Main shop renamed" }
+      expect(page).to have_text("Unsaved changes to 1 location")
+      click_button "Add location"
+      expect(page).to have_text("Unsaved changes to 2 locations")
+    end
   end
 end
