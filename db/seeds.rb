@@ -40,9 +40,6 @@ SeedHelpers.with_clock do
 end
 require File.expand_path("db/seeds/seed_counts", Rails.root)
 
-# Reads the published catalog, and is a no-op when it doesn't answer, so an offline seed still finishes
-BikebookModelsSyncJob.new.perform
-
 # Load the search autocomplete (Redis) from the seeded manufacturers/colors/etc.
 # so it matches the database. Without this, a freshly seeded app (e.g. a review
 # app on first boot) has manufacturers in the DB but an empty autocomplete, which

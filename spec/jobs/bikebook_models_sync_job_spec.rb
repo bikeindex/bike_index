@@ -48,6 +48,26 @@ RSpec.describe BikebookModelsSyncJob, type: :job do
     end
   end
 
+  describe "enqueue_unsynced" do
+    before { stub_const("#{described_class}::SYNC_ON_BIKE_CREATION", true) }
+    let(:bike_params) do
+      {serial_number: "XYZ", manufacturer_id: specialized.id, primary_frame_color_id: FactoryBot.create(:color).id,
+       owner_email: "owner@example.com"}
+    end
+    let(:b_param) { BParam.create(creator: FactoryBot.create(:user), params: {bike: bike_params}) }
+
+    it "is enqueued by a bike's creation until the models have synced" do
+      BikebookModel.delete_all
+      expect(BikeServices::Creator.new.create_bike(b_param).id).to be_present
+      expect(described_class.jobs.count).to eq 1
+
+      described_class.drain
+      expect(BikebookModel.count).to eq 30
+      described_class.enqueue_unsynced
+      expect(described_class.jobs.count).to eq 0
+    end
+  end
+
   context "with the catalog unreachable" do
     before { stub_bikebook_catalog(status: 500) }
 
