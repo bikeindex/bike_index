@@ -2,14 +2,11 @@ import { Controller } from '@hotwired/stimulus'
 import { collapse } from 'utils/collapse_utils'
 import { clearCombobox, selectComboboxValue } from 'utils/hw_combobox_patch'
 
-// Connects to data-controller='org--locations' on the locations form
-//
-// Every Save button submits the same form, so this only tracks what differs from the page load:
-// a card's fields against a snapshot, the map checkbox against its default. A card's pieces are
-// found by data-slot within it. A new card is always unsaved; discarding one removes it.
+// A new card is always unsaved, and discarding one removes it
 const RING = ['tw:ring-2', 'tw:ring-blue-400']
 const NOT_SUBMITTED_FIELD = /\[(_destroy|id)\]$/
 const UUID = /[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}/g
+const COUNTRY_SELECT = '[data-ui--forms--address-group-target=country]'
 
 export default class extends Controller {
   static targets = ['location', 'grid', 'template', 'mapCheckbox', 'mapBar', 'mapBadge', 'mapActions', 'summary']
@@ -24,10 +21,11 @@ export default class extends Controller {
   initialize () {
     this.nextIndex = Date.now()
     this.snapshots = new WeakMap()
+    this.listFormat = new Intl.ListFormat(document.documentElement.lang || undefined, { type: 'conjunction' })
   }
 
-  locationTargetConnected (location) {
-    this.snapshots.set(location, this.snapshot(location))
+  connect () {
+    this.locationTargets.forEach((location) => this.snapshots.set(location, this.snapshot(location)))
     this.refreshAll(0)
   }
 
@@ -38,6 +36,7 @@ export default class extends Controller {
     const location = this.gridTarget.lastElementChild
     location.querySelector('[data-slot=name]').focus()
     location.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    this.refreshAll()
   }
 
   changed (event) {
@@ -114,38 +113,37 @@ export default class extends Controller {
       .filter((field) => !NOT_SUBMITTED_FIELD.test(field.name))
   }
 
-  valueOf (field) {
+  currentValue (field) {
     return field.type === 'checkbox' ? field.checked : field.value
   }
 
   snapshot (location) {
-    return this.fields(location).map((field) => this.valueOf(field))
+    return this.fields(location).map((field) => this.currentValue(field))
   }
 
   isDirty (location) {
     if (this.isNew(location) || this.isRemoved(location)) return true
 
-    // A card that hasn't connected yet has no snapshot, and nothing edited
     const saved = this.snapshots.get(location)
-    return !!saved && this.fields(location).some((field, index) => this.valueOf(field) !== saved[index])
+    return this.fields(location).some((field, index) => this.currentValue(field) !== saved[index])
   }
 
   // The country first, since changing it toggles the state and region fields and clears the state
   restore (location) {
     const saved = this.snapshots.get(location)
+    const isCountry = (field) => field.matches(COUNTRY_SELECT)
     const entries = this.fields(location).map((field, index) => [field, saved[index]])
-    const isCountry = ([field]) => field.matches('select') && !field.closest('.hw-combobox')
-    const ordered = [...entries.filter(isCountry), ...entries.filter((entry) => !isCountry(entry))]
+      .sort(([first], [second]) => isCountry(second) - isCountry(first))
 
-    ordered.forEach(([field, value]) => {
+    entries.forEach(([field, value]) => {
       const combobox = field.closest('.hw-combobox')
       if (combobox) return value ? selectComboboxValue(combobox, value) : clearCombobox(combobox)
 
+      const changed = this.currentValue(field) !== value
       if (field.type === 'checkbox') field.checked = value
       else field.value = value
-      if (isCountry([field])) field.dispatchEvent(new Event('change', { bubbles: true }))
+      if (changed && isCountry(field)) field.dispatchEvent(new Event('change', { bubbles: true }))
     })
-    this.syncImpound(location, null)
   }
 
   // The default can't outlive its impound location, and there's only one of it
@@ -174,35 +172,40 @@ export default class extends Controller {
     return location.querySelector(`[data-slot=${name}]`)
   }
 
-  refreshAll (duration = undefined) {
-    const locations = this.locationTargets.filter((location) => location.isConnected)
+  refreshAll (duration) {
+    const locations = this.locationTargets
     const removable = locations.filter((location) => !this.isRemoved(location)).length > 1
-    locations.forEach((location) => this.refresh(location, removable, duration))
+    const showOnMap = this.showOnMap
+    const dirtyCount = locations.filter((location) => this.refresh(location, { removable, showOnMap, duration })).length
     this.refreshMap(duration)
-    this.refreshSummary(locations)
+    this.refreshSummary(dirtyCount)
   }
 
-  refresh (location, removable, duration) {
+  // Returns whether the location has changes, removal counting as one
+  refresh (location, { removable, showOnMap, duration }) {
     const removed = this.isRemoved(location)
-    const dirty = this.isDirty(location) && !removed
+    const changed = this.isDirty(location)
+    const dirty = changed && !removed
+    const title = this.titleOf(location)
     const checked = (name) => this.slot(location, name)?.checked
     const impound = checked('impound-check')
     const defaultImpound = impound && checked('default-check')
 
     this.setShown(this.slot(location, 'active'), !removed, duration)
     this.setShown(this.slot(location, 'removed'), removed, duration)
-    this.slot(location, 'removed-name').textContent = this.titleOf(location)
-    this.slot(location, 'title').textContent = this.titleOf(location)
+    this.slot(location, 'removed-name').textContent = title
+    this.slot(location, 'title').textContent = title
 
     this.setRing(location, dirty)
     this.setShown(this.slot(location, 'badge-dirty'), dirty, 0)
     this.setShown(this.slot(location, 'unsaved-row'), dirty, duration)
-    this.setShown(this.slot(location, 'badge-map'), this.showOnMap && checked('public'), 0)
+    this.setShown(this.slot(location, 'badge-map'), showOnMap && checked('public'), 0)
     this.setShown(this.slot(location, 'badge-impound'), impound && !defaultImpound, 0)
     this.setShown(this.slot(location, 'badge-default-impound'), defaultImpound, 0)
-    this.setShown(this.slot(location, 'public-row'), this.showOnMap, duration)
+    this.setShown(this.slot(location, 'public-row'), showOnMap, duration)
     this.setShown(this.slot(location, 'default-row'), impound, duration)
     this.setShown(this.slot(location, 'remove'), removable, 0)
+    return changed
   }
 
   setRing (element, on) {
@@ -222,19 +225,18 @@ export default class extends Controller {
     // A locked map has the bar, for Add location, but no checkbox, badge or Save to drive
     if (!this.hasMapCheckboxTarget) return
 
-    this.setRing(this.mapBarTarget, this.mapDirty)
-    this.setShown(this.mapBadgeTarget, this.mapDirty, 0)
-    this.setShown(this.mapActionsTarget, this.mapDirty, duration)
+    const dirty = this.mapDirty
+    this.setRing(this.mapBarTarget, dirty)
+    this.setShown(this.mapBadgeTarget, dirty, 0)
+    this.setShown(this.mapActionsTarget, dirty, duration)
   }
 
-  refreshSummary (locations) {
-    const changed = locations.filter((location) => this.isDirty(location)).length
+  refreshSummary (dirtyCount) {
     const parts = []
-    if (changed) parts.push(changed === 1 ? this.oneLocationValue : this.locationsValue.replace('%{count}', changed))
+    if (dirtyCount) parts.push(dirtyCount === 1 ? this.oneLocationValue : this.locationsValue.replace('%{count}', dirtyCount))
     if (this.mapDirty) parts.push(this.mapSettingValue)
 
-    const list = new Intl.ListFormat(document.documentElement.lang || undefined, { type: 'conjunction' })
-    this.summaryTarget.textContent = this.summaryValue.replace('%{changes}', list.format(parts))
+    this.summaryTarget.textContent = this.summaryValue.replace('%{changes}', this.listFormat.format(parts))
     this.setShown(this.summaryTarget, parts.length > 0, 0)
   }
 }

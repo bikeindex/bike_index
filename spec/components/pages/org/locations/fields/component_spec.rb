@@ -33,7 +33,7 @@ RSpec.describe Pages::Org::Locations::Fields::Component, type: :component do
     expect(component).to have_button("Remove")
     expect(component.css("[data-slot='destroy']").length).to eq 1
 
-    expect(component.at_css("[data-slot='unsaved-row']")["class"]).to include("tw:hidden")
+    expect(slot("unsaved-row")["class"]).to include("tw:hidden")
     expect(slot("badge-dirty")["class"]).to include("tw:hidden")
     expect(slot("badge-impound")["class"]).to include("tw:hidden")
     expect(slot("default-row")["class"]).to include("tw:hidden")

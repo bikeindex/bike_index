@@ -4,17 +4,14 @@ module Pages
   module Org
     module Locations
       module Show
-        # The locations settings page. Every Save button submits the one form; the org--locations
-        # controller adds the unsaved indicators, add and remove. Its own add is why this doesn't
-        # use UI::Forms::NestedFields, whose add button can't sit in the map bar.
+        # Not UI::Forms::NestedFields: its add button can't sit in the map bar, and a removed
+        # location collapses to a strip with Undo rather than hiding
         class Component < ApplicationComponent
-          # The blank record's index, which org--locations swaps for a distinct one per added location
           CHILD_INDEX = "__INDEX__"
 
           def initialize(organization:, current_country_id:)
             @organization = organization
             @current_country_id = current_country_id
-            @organization.locations.build if @organization.locations.load.empty?
           end
 
           private
@@ -24,7 +21,7 @@ module Pages
           end
 
           def form_data
-            {controller: "org--locations", action: "input->org--locations#changed change->org--locations#changed hw-combobox:selection->org--locations#changed",
+            {controller: "org--locations", action: "input->org--locations#changed hw-combobox:selection->org--locations#changed",
              "org--locations-show-on-map-value": @organization.show_on_map,
              "org--locations-summary-value": translation(".unsaved_summary"),
              "org--locations-one-location-value": translation(".one_location"),
@@ -32,17 +29,22 @@ module Pages
              "org--locations-map-setting-value": translation(".partner_map_setting")}
           end
 
-          def fields_args = {organization: @organization, current_country_id: @current_country_id}
+          # The organization's own, so a new location starts from its other addresses
+          def new_location = Location.new(organization_id: @organization.id)
 
+          # An organization without locations gets a blank one, unsaved
           def saved_fields(form_builder)
-            form_builder.fields_for(:locations) do |builder|
-              render(Pages::Org::Locations::Fields::Component.new(form_builder: builder, **fields_args))
-            end
+            location_fields(form_builder, @organization.locations.presence || [new_location])
           end
 
           def blank_fields(form_builder)
-            form_builder.fields_for(:locations, Location.new, child_index: CHILD_INDEX) do |builder|
-              render(Pages::Org::Locations::Fields::Component.new(form_builder: builder, **fields_args))
+            location_fields(form_builder, new_location, child_index: CHILD_INDEX)
+          end
+
+          def location_fields(form_builder, *records, **options)
+            form_builder.fields_for(:locations, *records, **options) do |builder|
+              render(Pages::Org::Locations::Fields::Component.new(form_builder: builder, organization: @organization,
+                current_country_id: @current_country_id))
             end
           end
 

@@ -42,14 +42,16 @@
           </div>
 
           <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-            <div class="tw:hidden" data-org--locations-target="mapActions">
-              <div class="tw:flex tw:items-center tw:gap-2">
-                <%= render(UI::Button::Component.new(text: translation(".discard"), color: :link_gray,
-                      data: {action: "click->org--locations#discardMap"})) %>
+            <% unless @organization.lock_show_on_map %>
+              <div class="tw:hidden" data-org--locations-target="mapActions">
+                <div class="tw:flex tw:items-center tw:gap-2">
+                  <%= render(UI::Button::Component.new(text: translation(".discard"), color: :link_gray,
+                        data: {action: "click->org--locations#discardMap"})) %>
 
-                <%= render(UI::Button::Component.new(text: translation(".save"), color: :primary, size: :callout_sm, type: "submit")) %>
+                  <%= render(UI::Button::Component.new(text: translation(".save"), color: :primary, size: :callout_sm, type: "submit")) %>
+                </div>
               </div>
-            </div>
+            <% end %>
 
             <%= render(UI::Button::Component.new(text: add_label, color: :primary, size: :callout_sm,
                   data: {action: "click->org--locations#add"})) %>
