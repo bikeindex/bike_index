@@ -42,14 +42,6 @@
     }
   }
 
-  .locations-where-and-add {
-    padding-bottom: $vertical-height;
-
-    .btn {
-      margin-top: -6px;
-    }
-  }
-
   // Text heavy organization forms (e.g. manage_impounding/edit) look weird with line-height: 2
   // So provide a way to reduce the line height
   // This class should be added to .form-group.row
@@ -58,40 +50,6 @@
     // To make the labels line up, we have to remove the top margin
     .org-form-label {
       margin-top: 0;
-    }
-  }
-
-  .locations-fieldset-wrapper {
-    @extend .row;
-    .card-block {
-      width: 100%;
-    }
-
-    fieldset {
-      display: flex;
-    }
-    // For some reason, after uncollapsing, the checkbox margin gets messed up
-    .checkbox label {
-      margin-left: 0.25rem;
-    }
-  }
-
-  .remove-control {
-    input {
-      display: none;
-    }
-
-    label {
-      display: block;
-      text-align: right;
-      float: right;
-      width: auto;
-      color: $link-color;
-      cursor: pointer;
-
-      &:hover {
-        text-decoration: underline;
-      }
     }
   }
 }

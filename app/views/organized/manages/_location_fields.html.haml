@@ -1,63 +1,13 @@
--# Note - this has to have a separate div with collapse, because the fieldset breaks styles
--# The collapse class is what the slideup is called on
 - organization ||= @organization || current_organization
 - default_name ||= organization.name
 - f.object.name ||= default_name
 
 - f.object.address_record = f.object.find_or_build_address_record(current_country_id:)
 
--# This is primarily used for the new form
--# BUT! We didn't use to require location, so it's included in the main manage page for orgs without locations
-- initial_location_form ||= false
-
-- if initial_location_form
-  .form-group.row
-    %label.org-form-label
-      = f.label :street, t(".address")
-    .col-sm-8
-      = f.fields_for :address_record do |address_form|
-        = render(Pages::Org::LocationAddressFields::Component.new(form_builder: address_form, show_label: false))
-
-
-- else
-  .col-md-6.collapse.in
-    %fieldset.card.location-card
-      .card-block
-        .row
-          .col-sm-6
-            .form-group
-              = f.label :name, t(".location_name")
-              = f.text_field :name, placeholder: t(".name"), required: true, class: "form-control location-name-field"
-          .col-sm-6
-            .form-group
-              = f.label :phone, t(".phone_number")
-              = f.text_field :phone, class: "form-control"
-
-        = f.fields_for :address_record do |address_form|
-          = render(Pages::Org::LocationAddressFields::Component.new(form_builder: address_form))
-
-        .row
-          .col-xs-6
-            .collapse.publiclyVisibilyCheck{class: (organization.show_on_map ? "in" : "")}
-              .checkbox
-                = f.check_box :publicly_visible
-                = f.label :publicly_visible
-          .col-xs-6
-            .remove-control.collapse.in
-              - if f.object.destroy_forbidden?
-                .text-right
-                  %em.small.less-strong
-                    required for impounded bikes
-              - else
-                = f.check_box :_destroy, class: "removeFieldsCheck"
-                = f.label :_destroy, t(".remove"), class: "remove_fields"
-        - if organization.enabled?("impound_bikes")
-          .checkbox.mb-0.mt-2
-            = f.check_box :impound_location, class: "impoundLocationCheck"
-            = f.label :impound_location, class: "d-inline" do
-              Impound location
-              %em.small.less-strong
-                &nbsp;If #{organization.short_name} has multiple locations where impounded bikes go and wants to track them
-          .checkbox.mb-0.defaultImpoundLocationCheckWrapper.collapse
-            = f.check_box :default_impound_location, class: "defaultImpoundLocationCheck"
-            = f.label :default_impound_location
+-# We didn't use to require location, so it's included in the main manage page for orgs without locations
+.form-group.row
+  %label.org-form-label
+    = f.label :street, t(".address")
+  .col-sm-8
+    = f.fields_for :address_record do |address_form|
+      = render(Pages::Org::LocationAddressFields::Component.new(form_builder: address_form, show_label: false))

@@ -63,7 +63,7 @@
   - if @organization.locations.first.blank?
     - @organization.locations.build
     = f.fields_for :locations do |builder|
-      = render "organized/manages/location_fields", f: builder, initial_location_form: true
+      = render "organized/manages/location_fields", f: builder
     .mb-5
 
   .form-group.row.avatar-upload-wrapper

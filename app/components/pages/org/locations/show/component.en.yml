@@ -1,0 +1,21 @@
+---
+en:
+  components:
+    pages:
+      org:
+        locations:
+          show:
+            add_location: Add location
+            bike_index_partner_map: Bike Index partner map
+            breadcrumb: Breadcrumb
+            discard: Discard
+            display_org_on_map_html: Display <em>%{org_name}</em> on %{map_link}
+            location_settings_html: "<em>%{org_name}</em> location settings"
+            locations: "%{count} locations"
+            locations_title: Locations
+            manage: Manage
+            one_location: 1 location
+            partner_map_setting: partner map setting
+            save: Save
+            unsaved: Unsaved
+            unsaved_summary: Unsaved changes to %{changes}

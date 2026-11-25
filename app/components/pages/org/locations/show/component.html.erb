@@ -1,0 +1,88 @@
+<div class="tw:flex tw:flex-col tw:gap-7">
+  <div>
+    <nav
+      class="
+        tw:mb-2 tw:flex tw:items-center tw:gap-2 tw:text-sm tw:text-gray-500
+        tw:dark:text-gray-400
+      "
+      aria-label="<%= translation(".breadcrumb") %>"
+    >
+      <%= link_to(translation(".manage"), organization_manage_path(organization_id: @organization.to_param), class: "twlink") %>
+      <span aria-hidden="true">/</span>
+      <span aria-current="page"><%= translation(".locations_title") %></span>
+    </nav>
+
+    <%= render(UI::Header::Component.new(text: translation(".location_settings_html", org_name: @organization.name),
+          html_class: "uncap tw:mb-0! tw:[&_em]:text-blue-600 tw:[&_em]:not-italic tw:dark:[&_em]:text-blue-400")) %>
+  </div>
+
+  <%= form_with(model: @organization, url: form_url, data: form_data) do |f| %>
+    <%= hidden_field_tag :locations_page, true %>
+
+    <div class="tw:flex tw:flex-col tw:gap-7">
+      <%# The ring goes on a wrapper, since UI::Card takes classes but not data attributes %>
+      <div
+        class="tw:rounded-sm tw:transition-shadow tw:duration-300"
+        data-org--locations-target="mapBar"
+      >
+        <%= render(UI::Card::Component.new(additional_classes: "tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-4 tw:px-5! tw:py-4!")) do %>
+          <div class="tw:flex tw:flex-1 tw:items-center tw:gap-3">
+            <% unless @organization.lock_show_on_map %>
+              <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :show_on_map,
+                    html_options: {data: {"org--locations-target": "mapCheckbox"}})) do %>
+                <span class="tw:[&_em]:font-bold tw:[&_em]:not-italic">
+                  <%= translation(".display_org_on_map_html", org_name: @organization.name, map_link: partner_map_link) %>
+                </span>
+              <% end %>
+
+              <span class="tw:hidden" data-org--locations-target="mapBadge">
+                <%= render(UI::Badge::Component.new(text: translation(".unsaved"), color: :yellow)) %>
+              </span>
+            <% end %>
+          </div>
+
+          <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+            <div class="tw:hidden" data-org--locations-target="mapActions">
+              <div class="tw:flex tw:items-center tw:gap-2">
+                <%= render(UI::Button::Component.new(text: translation(".discard"), color: :link_gray,
+                      data: {action: "click->org--locations#discardMap"})) %>
+
+                <%= render(UI::Button::Component.new(text: translation(".save"), color: :primary, size: :callout_sm, type: "submit")) %>
+              </div>
+            </div>
+
+            <%= render(UI::Button::Component.new(text: add_label, color: :primary, size: :callout_sm,
+                  data: {action: "click->org--locations#add"})) %>
+          </div>
+        <% end %>
+      </div>
+
+      <div
+        class="
+          tw:grid
+          tw:grid-cols-[repeat(auto-fill,minmax(min(100%,480px),1fr))]
+          tw:items-start tw:gap-6
+        "
+        data-org--locations-target="grid"
+      >
+        <%= saved_fields(f) %>
+      </div>
+
+      <%= tag.template(blank_fields(f), data: {"org--locations-target": "template"}) %>
+
+      <div
+        class="
+          tw:flex tw:flex-wrap tw:items-center tw:gap-4 tw:border-t
+          tw:border-gray-200 tw:pt-6 tw:dark:border-gray-700
+        "
+      >
+        <%= render(UI::Button::Component.new(text: translation(".save"), color: :primary, size: :callout, type: "submit")) %>
+
+        <span
+          class="tw:hidden tw:text-gray-500 tw:dark:text-gray-400"
+          data-org--locations-target="summary"
+        ></span>
+      </div>
+    </div>
+  <% end %>
+</div>
