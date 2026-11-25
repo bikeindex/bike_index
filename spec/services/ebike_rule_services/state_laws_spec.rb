@@ -32,7 +32,7 @@ RSpec.describe EbikeRuleServices::StateLaws do
     it "is nil once a read of the laws fails, for the rest of the request and after" do
       expect(described_class.version).to eq "vocabulary.json"
       Rails.cache.delete(["bikebook_catalog/state_laws_with_rule_categories", 3, "vocabulary.json"])
-      Rails.cache.delete(["bikebook_catalog/file", 2, "vocabulary.json"])
+      Rails.cache.delete(["bikebook_catalog/file", 2, "vocabulary.json", "e_vehicle_classifications"])
       WebMock.stub_request(:get, vocabulary_url).to_return(status: 503)
       Integrations::Bikebook::Catalog::Reads.reset
       expect(described_class.version).to eq "vocabulary.json"

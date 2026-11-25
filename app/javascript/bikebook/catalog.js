@@ -126,18 +126,18 @@ export class CatalogComboboxSource {
 
   async #render (combobox, page, { inputType, primed, signal }) {
     const generation = this.#generation
-    const { total, filteredCount, unfiltered, models, nextPage } = await this.catalog.search(this.params, page, this.catalog.kit.per_page)
+    const { kit, currencies } = this.catalog.vocabulary
+    const { total, filteredCount, unfiltered, models, nextPage } = await this.catalog.search(this.params, page, kit.per_page)
     if (signal?.aborted || (page && generation !== this.#generation) || !combobox.element.isConnected) return
 
     const forId = combobox.element.dataset.asyncId
     const listbox = combobox._actingListbox
     const picked = String(this.params.vehicle_models ?? '').split(',')
-    const { kit, vocabulary } = this.catalog
     const options = models.map((model) => comboboxOption({
       model,
       selected: picked.includes(model.id),
       placeholderUrl: kit.placeholder_url,
-      currencies: vocabulary.currencies,
+      currencies,
       market: this.params.market,
       configurations: kit.model_configurations
     }))

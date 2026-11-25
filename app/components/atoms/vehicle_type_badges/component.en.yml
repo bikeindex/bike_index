@@ -1,0 +1,6 @@
+---
+en:
+  components:
+    atoms:
+      vehicle_type_badges:
+        e_vehicle: E-vehicle

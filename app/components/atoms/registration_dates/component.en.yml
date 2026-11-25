@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    atoms:
+      registration_dates:
+        registered: Registered
+        registered_abbreviation: R
+        registered_at: Registered at
+        updated: Updated
+        updated_abbreviation: U
+        updated_at: Updated at

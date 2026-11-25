@@ -11,6 +11,8 @@ RSpec.describe "Bike Book", :js, type: :system do
   # Page-wide, the filters' ~160 hidden options cost Capybara a round trip each, a pass outlasting its wait
   def vehicle_option = "#vehicle_models-hw-listbox [role='option']"
 
+  def vocabulary_fetch = "fetch('#{Integrations::Bikebook::Catalog::URL}vocabulary.json').then((response) => response.json())"
+
   def on_phone
     size = page.current_window.size
     page.current_window.resize_to(390, 844)
@@ -291,13 +293,12 @@ RSpec.describe "Bike Book", :js, type: :system do
     # differ, each one's tire max on a line under it, and each end's travel once one is suspended, its specs under its heading in one tooltip
     classes = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { basics }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/basics'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehiclePresenter }, { basics }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/basics'), import('bikebook/render'), #{vocabulary_fetch}])
         const wheels = (front, rear, tire, [frontMax, rearMax] = []) =>
           [{ bsd: front, tire_width: tire, tire_width_max: frontMax, position: ['front'] }, { bsd: rear, tire_width: tire, tire_width_max: rearMax, position: ['rear'] }]
         const lines = (cell) => { cell.querySelectorAll('br').forEach((br) => br.replaceWith('|')); return cell.textContent.split('|').map((line) => line.replace(/\\s+/g, ' ').trim()) }
-        const rowsOf = (datas) => [...fragmentOf(basics({ presenter: new VehiclePresenter(kit, vocabulary), vehicles: datas.map((data, index) => ({ value: String(index), data })), removePath: () => '/bikebook' }))
+        const rowsOf = (datas) => [...fragmentOf(basics({ presenter: new VehiclePresenter(vocabulary), vehicles: datas.map((data, index) => ({ value: String(index), data })), removePath: () => '/bikebook' }))
           .querySelectorAll('tbody tr')]
         const rows = rowsOf([{ model: 'Electric', type: 'cargo', motors: [{ rated_power: 250 }], wheels: wheels(622, 584, undefined, [50, 60]), suspension: { front: { travel: 120 } } },
           { model: 'Acoustic', type: 'bike', wheels: wheels(622, 622, 40, [45, 45]) }])
@@ -314,11 +315,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a description over 200 characters is cut at a word, its paragraphs kept, and one within them is whole
     excerpts = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { basics }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/basics'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehiclePresenter }, { basics }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/basics'), import('bikebook/render'), #{vocabulary_fetch}])
         const description = (text) => {
-          const rendered = fragmentOf(basics({ presenter: new VehiclePresenter(kit, vocabulary), vehicles: [{ value: '0', data: { model: 'One', description: text } }], removePath: () => '/bikebook' }))
+          const rendered = fragmentOf(basics({ presenter: new VehiclePresenter(vocabulary), vehicles: [{ value: '0', data: { model: 'One', description: text } }], removePath: () => '/bikebook' }))
           const excerpt = rendered.querySelector('tbody [data-controller~="ui--collapse"] > div')
           return excerpt ? [...excerpt.querySelectorAll('p')].map((paragraph) => paragraph.textContent) : rendered.querySelector('tbody button') == null
         }
@@ -488,10 +488,9 @@ RSpec.describe "Bike Book", :js, type: :system do
     # compared with the other's
     in_the_box = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { componentsOf, modelViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
-        const presenter = new VehiclePresenter(kit, vocabulary)
+        const [{ VehiclePresenter }, { componentsOf, modelViewer }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), #{vocabulary_fetch}])
+        const presenter = new VehiclePresenter(vocabulary)
         const included = (detail, description) => ({ type: 'included-not-installed', type_detail: detail, description })
         const saddle = { type: 'saddle', description: 'Comfort' }
         const vehicles = [{ key: 'a', data: { model: 'A', components: [saddle, included('Pedals', 'Platform'), included(undefined, 'Reflector kit')] } },
@@ -518,21 +517,19 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(battery).to have_css("dl > div", text: /\ACapacity\s*672\W*Wh, 48\W*V Li-ion\z/)
     expect(page.evaluate_script(<<~JS)).to match([["Options", /\Aalso 500, 625\W*Wh\z/], ["Charging time", "4 h 30 min"], ["Removable", "Yes"]])
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { motorSection }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/motor_section'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehiclePresenter }, { motorSection }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/motor_section'), import('bikebook/render'), #{vocabulary_fetch}])
         const motor = { battery: { capacity_options: [500, 625], charging_time: 270, removable: true } }
-        const rendered = fragmentOf(motorSection({ presenter: new VehiclePresenter(kit, vocabulary), heading: 'Motor', motor, others: [] }))
+        const rendered = fragmentOf(motorSection({ presenter: new VehiclePresenter(vocabulary), heading: 'Motor', motor, others: [] }))
         return [...rendered.querySelector('h3').parentElement.querySelectorAll('dl > div')].map((row) => [...row.children].map((each) => each.textContent.replace(/\\s+/g, ' ').trim()))
       })()
     JS
     without_motor = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const url = new URL('/bikebook?view=motors', window.location.href)
-        const rendered = fragmentOf(new VehicleViewer(kit, vocabulary).render([{ value: 'm/surly/2018/0', data: { model: 'Acoustic' } }], url, null))
+        const rendered = fragmentOf(new VehicleViewer(vocabulary).render([{ value: 'm/surly/2018/0', data: { model: 'Acoustic' } }], url, null))
         return [...rendered.querySelectorAll('nav[aria-label="Views"] a')].map((tab) => [tab.textContent.trim(), tab.hasAttribute('aria-current')])
       })()
     JS
@@ -556,9 +553,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     # no fixture is composite, which the catalog names "Carbon or Composite"
     material = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'), catalog('kit.json'), catalog('vocabulary.json')])
-        return new VehiclePresenter(kit, vocabulary).named(kit.schemas.vehicle, { frame: { material: 'composite' } }).frame.material
+        const [{ VehiclePresenter }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'), #{vocabulary_fetch}])
+        return new VehiclePresenter(vocabulary).named(vocabulary.kit.schemas.vehicle, { frame: { material: 'composite' } }).frame.material
       })()
     JS
     expect(material).to eq "Carbon/Composite"
@@ -566,9 +562,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     # the widest tire a position takes, a wheel the build doesn't come with included
     wheels = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { wheelsAt }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehiclePresenter }, { wheelsAt }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), #{vocabulary_fetch}])
         const data = { wheels: [
           { position: ['front', 'rear'], sizes: ['S'], bsd: 584, tire_width: 28 },
           { position: ['front'], sizes: ['M', 'L'], bsd: 622, tire_width: 28, tire_width_max: 32, cassette_interface: 'Shimano HG', dropout: 'vertical', axle: 'thru_axle', axle_diameter: 12 },
@@ -576,7 +571,7 @@ RSpec.describe "Bike Book", :js, type: :system do
           { position: ['front', 'rear'], configured: false, bsd: 584, tire_width_max: 50 }
         ] }
         const text = (content) => fragmentOf(content).textContent.replace(/\\s+/g, ' ').trim()
-        const presenter = new VehiclePresenter(kit, vocabulary)
+        const presenter = new VehiclePresenter(vocabulary)
         const [medium, small] = [{ name: 'M' }, { name: 'S' }].map((size) => wheelsAt(presenter, data, size))
         const summary = (wheel) => wheel.parts.map(([, , content]) => text(content)).join(', ')
         return [summary(medium.front), medium.front.maxTire, medium.rear.maxTire, summary(small.front)]
@@ -586,12 +581,11 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a groupset is a line of the drivetrain's, its maker named once, and electronic shifting alone marked against the first's
     groupsets = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const vehicles = [['GRX RX610 1X12S', false], ['Shimano GRX RX610 1X12S', true], ['SHIMANO GRX RX822 1X12S', false]].map(([description, electronic], index) =>
           ({ value: `m/shimano/2026/${index}`, display: String(index), data: { model: String(index), groupset: { manufacturer: 'Shimano', description, electronic } } }))
-        const viewers = fragmentOf(new VehicleViewer(kit, vocabulary).render(vehicles, new URL(window.location.href), null))
+        const viewers = fragmentOf(new VehicleViewer(vocabulary).render(vehicles, new URL(window.location.href), null))
         return [...viewers.querySelectorAll('article')].map((article) => {
           const row = [...article.querySelectorAll('section')].find((each) => /^drivetrain/i.test(each.textContent.trim())).querySelector('dd')
           return [row.textContent.replace(/\s+/g, ' ').trim(), [...row.querySelectorAll('[class~="tw:spec-diff"]')].map((each) => each.textContent.trim())]
@@ -603,12 +597,11 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a motor linked by its market's unit names the market, and its assist speed is its market's, in mph for a US model
     motors = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const bike = (markets, id, speed) => ({ model: 'E', markets, motors: [{ manufacturer: 'Bosch', model: 'Performance Line CX (BDU384Y)', id,
           operating_modes: [{ mode: 'assist', availability: 'stock', max_speed: speed }] }] })
-        const rows = (data) => [...fragmentOf(new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/e', data }], new URL('/bikebook?view=motors', window.location.href), null))
+        const rows = (data) => [...fragmentOf(new VehicleViewer(vocabulary).render([{ value: 'm/x/2026/e', data }], new URL('/bikebook?view=motors', window.location.href), null))
           .querySelectorAll('section section dl > div')].map((row) => row.textContent.replace(/\\s+/g, ' ').trim()).filter((row) => /^(Motor|Max speed)/.test(row))
         return [rows(bike(['US'], 'c/bosch/2025/bdu384y-us', 32.2)), rows(bike(['EU'], 'c/bosch/2025/bdu384y-eu', 25)), rows(bike(['JP'], 'c/bosch/2025/bdu384y', 24))]
       })()
@@ -620,11 +613,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # own lists more
     bare_mode = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const bike = (throttle) => ({ model: 'E', motors: [{ rated_power: 250, operating_modes: [{ mode: 'throttle', e_vehicle_classifications: ['evc/us/class-2'], ...throttle }] }] })
-        const throttles = (vehicles) => [...fragmentOf(new VehicleViewer(kit, vocabulary).render(vehicles, new URL('/bikebook?view=motors', window.location.href), null))
+        const throttles = (vehicles) => [...fragmentOf(new VehicleViewer(vocabulary).render(vehicles, new URL('/bikebook?view=motors', window.location.href), null))
           .querySelectorAll('section[aria-label$=" motors"]')].map((card) => [...card.querySelectorAll('section section h3')]
           .map((heading) => heading.parentElement.textContent.replace(/\\s+/g, ' ').trim()))
         const bare = bike({ availability: 'stock' })
@@ -637,13 +629,12 @@ RSpec.describe "Bike Book", :js, type: :system do
     # an end's spring and lockout, said where they're notable, and a coil-compatible frame
     specs = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const data = { model: 'Enduro', frame: { material: 'aluminum', coil_compatible: true }, groupset: { manufacturer: 'SRAM', series: 'GX', description: 'GX Eagle AXS', electronic: true },
           drivetrain: ['1-front', '12-rear'], gearing: { front: [32], rear: [10, 52] },
           suspension: { front: { travel: 170, spring: 'air', lockout: true }, rear: { travel: 160, shock_length: 157.5, shock_stroke: 62.5, spring: 'coil' } } }
-        const viewer = new VehicleViewer(kit, vocabulary)
+        const viewer = new VehicleViewer(vocabulary)
         const render = (view) => fragmentOf(viewer.render([{ value: 'm/x/2026/enduro', data }], new URL(`/bikebook?view=${view}`, window.location.href), null))
         const text = (element) => element.textContent.replace(/\\s+/g, ' ').trim()
         const rows = (root, heading) => [...[...root.querySelectorAll('section')].find((each) => new RegExp(`^${heading}`, 'i').test(text(each.querySelector('h2') ?? each)))
@@ -995,14 +986,13 @@ RSpec.describe "Bike Book", :js, type: :system do
     # earlier year had, the years that share one together, but 2023's, the same as 2026's, each to choose too
     page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ render }, { VehiclePresenter }, { basics }, { kit }, vocabulary] = await Promise.all([import('lit-html'), import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/basics'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ render }, { VehiclePresenter }, { basics }, vocabulary] = await Promise.all([import('lit-html'), import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/basics'), #{vocabulary_fetch}])
         const colorway = (name) => ({ name, color_code: '#000000' })
         const years = [{ year: 2026, colorways: [colorway('Black')] }, { year: 2025, colorways: [colorway('Black'), colorway('Red'), { name: 'Bare', colors: ['silver'] }] },
           { year: 2024, colorways: [] }, { year: 2023, colorways: [{ ...colorway('Black'), stock_photo: 'black_2023.png' }] }, { year: 2022, colorways: [colorway('Red')] },
           { year: 2021, colorways: [colorway('Red')] }]
-        const presenter = new VehiclePresenter(kit, { ...vocabulary, paint_colors: { 'Silver, gray or bare metal': '#bbb' } })
+        const presenter = new VehiclePresenter({ ...vocabulary, paint_colors: { 'Silver, gray or bare metal': '#bbb' } })
         // each its own key, as a radio group spans the document
         Object.entries({ 'colorway-check': undefined, 'colorway-picked': '2022 Red' }).forEach(([id, picked]) => {
           const container = Object.assign(document.createElement('div'), { id })
@@ -1478,11 +1468,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # differs enough
     sized = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, { kit }, vocabulary] = await Promise.all([
+        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, vocabulary] = await Promise.all([
           import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_overlay'), import('lit-html'),
-          catalog('kit.json'), catalog('vocabulary.json')])
-        const presenter = new VehiclePresenter(kit, vocabulary)
+          #{vocabulary_fetch}])
+        const presenter = new VehiclePresenter(vocabulary)
         const geometry = { reach: 450, stack: 620, head_angle: 64, chainstay: 445, bb_drop: 20, seat_angle: 77, head_tube: 120, fork_rake: 44 }
         const road = { model: 'Road', sizes: [{ name: 'M', geometry }], wheels: [{ bsd: 622, tire_width: 25, position: ['front', 'rear'] }] }
         const mullet = { model: 'Mullet', sizes: ['S', 'L', 'XL'].map((name) => ({ name, geometry })), wheels: [
@@ -1508,11 +1497,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # one frame to draw is drawn alone, and the overlay says what the other is missing, as it does with none to draw
     lone = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, { kit }, vocabulary] = await Promise.all([
+        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, vocabulary] = await Promise.all([
           import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_overlay'), import('lit-html'),
-          catalog('kit.json'), catalog('vocabulary.json')])
-        const presenter = new VehiclePresenter(kit, vocabulary)
+          #{vocabulary_fetch}])
+        const presenter = new VehiclePresenter(vocabulary)
         const geometry = { reach: 450, stack: 620, head_angle: 64, chainstay: 445, bb_drop: 20, seat_angle: 77, head_tube: 120, fork_rake: 44 }
         const road = { model: 'Road', sizes: [{ name: 'M', geometry }], wheels: [{ bsd: 622, tire_width: 25, position: ['front', 'rear'] }] }
         const bare = { model: 'Bare', sizes: [{ name: 'M' }] }
@@ -1530,11 +1518,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a frame's stem left out is said only beside another's that's drawn
     stems = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, { kit }, vocabulary] = await Promise.all([
+        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, vocabulary] = await Promise.all([
           import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_overlay'), import('lit-html'),
-          catalog('kit.json'), catalog('vocabulary.json')])
-        const presenter = new VehiclePresenter(kit, vocabulary)
+          #{vocabulary_fetch}])
+        const presenter = new VehiclePresenter(vocabulary)
         const geometry = { reach: 450, stack: 620, head_angle: 64, chainstay: 445, bb_drop: 20, seat_angle: 77, head_tube: 120, fork_rake: 44 }
         const road = (model, extra = {}) => ({ model, sizes: [{ name: 'M', geometry: { ...geometry, ...extra } }], wheels: [{ bsd: 622, tire_width: 25, position: ['front', 'rear'] }] })
         return [[road('Stemmed', { stem_length: 80 }), road('Stemless')], [road('Stemless'), road('Also stemless')]].map((datas) => {
@@ -1551,15 +1538,14 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a cargo bike's cargo area on its size's card, its length lettered as its drawing measures it along the deck
     cargo = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryCard }, { cycleDrawing }, { render }, { kit }, vocabulary] = await Promise.all([
+        const [{ VehiclePresenter }, { geometryCard }, { cycleDrawing }, { render }, vocabulary] = await Promise.all([
           import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_card'), import('bikebook/templates/vehicles/cycle_drawing'),
-          import('lit-html'), catalog('kit.json'), catalog('vocabulary.json')])
+          import('lit-html'), #{vocabulary_fetch}])
         const data = { type: 'cargo', cargo: { length: 600, width: 500, volume: 120 }, sizes: [{ name: 'One Size', geometry: { wheelbase: 1800 } }] }
-        const { legend } = cycleDrawing({ type: data.type, data, size: data.sizes[0], kit })
+        const { legend } = cycleDrawing({ type: data.type, data, size: data.sizes[0], kit: vocabulary.kit })
         const letters = new Map(legend.filter(({ letter }) => letter).map(({ key, letter }) => [key, letter]))
         const container = document.createElement('div')
-        render(geometryCard({ presenter: new VehiclePresenter(kit, vocabulary), size: data.sizes[0], others: [], letters, cargo: data.cargo }), container)
+        render(geometryCard({ presenter: new VehiclePresenter(vocabulary), size: data.sizes[0], others: [], letters, cargo: data.cargo }), container)
         const heading = [...container.querySelectorAll('h4')].find((each) => each.textContent === 'Cargo')
         return [legend.find(({ key }) => key === 'cargo.length'), heading.nextElementSibling.textContent]
       })()
@@ -1607,11 +1593,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # standover above the bottom bracket, short, with a tooltip saying what it's above
     standover = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryCard }, { render }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/geometry_card'), import('lit-html'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehiclePresenter }, { geometryCard }, { render }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/geometry_card'), import('lit-html'), #{vocabulary_fetch}])
         const container = document.createElement('div')
-        render(geometryCard({ presenter: new VehiclePresenter(kit, vocabulary), size: { name: 'M', geometry: { standover_above_bb: 235 } }, others: [] }), container)
+        render(geometryCard({ presenter: new VehiclePresenter(vocabulary), size: { name: 'M', geometry: { standover_above_bb: 235 } }, others: [] }), container)
         const label = [...container.querySelectorAll('dt')].find((each) => each.textContent.includes('Standover'))
         return [label.querySelector('button').innerText, label.textContent.replace(/\\s+/g, ' ').trim(),
           [...label.nextElementSibling.children].map((each) => each.textContent.replace(/\\s+/g, ' ').trim())]
@@ -1626,11 +1611,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # catalog's own labels write it. A fork's thru axle as it's sold
     fit = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryCard }, { runningGearOf }, { fragmentOf }, { render }, { kit }, vocabulary] = await Promise.all([
+        const [{ VehiclePresenter }, { geometryCard }, { runningGearOf }, { fragmentOf }, { render }, vocabulary] = await Promise.all([
           import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_card'), import('bikebook/templates/vehicles/model_viewer'),
-          import('bikebook/render'), import('lit-html'), catalog('kit.json'), catalog('vocabulary.json')])
-        const presenter = new VehiclePresenter(kit, vocabulary)
+          import('bikebook/render'), import('lit-html'), #{vocabulary_fetch}])
+        const presenter = new VehiclePresenter(vocabulary)
         const container = document.createElement('div')
         document.body.append(container)
         render(geometryCard({ presenter, size: { name: 'M', geometry: {
@@ -1683,18 +1667,17 @@ RSpec.describe "Bike Book", :js, type: :system do
     # comparison opens with each one's type, target riders and type detail, where they differ. A BMX's typical figures are a BMX's
     longtail = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { renderInto }, { cycleDrawing }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), import('bikebook/templates/vehicles/cycle_drawing'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { renderInto }, { cycleDrawing }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), import('bikebook/templates/vehicles/cycle_drawing'), #{vocabulary_fetch}])
         const wheels = [{ bsd: 559, tire_width: 65, position: ['front', 'rear'] }]
         const geometry = { reach: 401, stack: 646, chainstay: 613, head_tube: 222, wheelbase: 1271, head_angle: 70, seat_angle: 73 }
         const length = (data, size) => {
-          const found = cycleDrawing({ type: 'cargo-rear', data, size, kit }).legend.find(({ key }) => key === 'dimensions.length')
+          const found = cycleDrawing({ type: 'cargo-rear', data, size, kit: vocabulary.kit }).legend.find(({ key }) => key === 'dimensions.length')
           return found && [found.value, found.listed, found.calculated]
         }
         const data = { model: 'Curry', type: 'cargo-rear', wheels, sizes: [{ name: 'One Size', geometry: { dimensions: { length: 2261 } } }] }
         const container = document.body.appendChild(document.createElement('div'))
-        const render = (vehicle) => renderInto(container, new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/curry', data: vehicle }],
+        const render = (vehicle) => renderInto(container, new VehicleViewer(vocabulary).render([{ value: 'm/x/2026/curry', data: vehicle }],
           new URL('/bikebook?view=geometry&vehicle_models=m/x/2026/curry', window.location.href), null))
         render(data)
         const alone = container.querySelector('tbody th').innerText
@@ -1708,14 +1691,14 @@ RSpec.describe "Bike Book", :js, type: :system do
         render({ model: 'Jumper', type: 'bike', primary_activity: 'bmx', wheels: [{ bsd: 406, tire_width: 61, position: ['front', 'rear'] }],
           sizes: [{ name: '21" TT', geometry: { bb_height: 292, chainstay: 335, fork_rake: 28, head_angle: 75, seat_angle: 71, stem_length: 48, top_tube_effective: 533 } }] })
         const bmx = container.querySelector('figcaption').textContent.split('. ').at(-1)
-        renderInto(container, new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/curry', data }, { value: 'm/x/2026/step', data: { ...data, type: 'cargo', type_detail: 'front-box', frame: { top_tube: 'step_through' }, target_riders: ['kid', 'woman'] } }],
+        renderInto(container, new VehicleViewer(vocabulary).render([{ value: 'm/x/2026/curry', data }, { value: 'm/x/2026/step', data: { ...data, type: 'cargo', type_detail: 'front-box', frame: { top_tube: 'step_through' }, target_riders: ['kid', 'woman'] } }],
           new URL('/bikebook?view=geometry&vehicle_models=m/x/2026/curry,m/x/2026/step', window.location.href), null))
         const type = [alone, container.querySelector('tbody tr').innerText.replace(/\\s+/g, ' ').trim()]
-        renderInto(container, new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/curry', data }, { value: 'm/x/2026/step', data: { ...data, type: 'cargo', primary_activity: 'cargo', target_riders: ['kid', 'woman'] } }],
+        renderInto(container, new VehicleViewer(vocabulary).render([{ value: 'm/x/2026/curry', data }, { value: 'm/x/2026/step', data: { ...data, type: 'cargo', primary_activity: 'cargo', target_riders: ['kid', 'woman'] } }],
           new URL('/bikebook?vehicle_models=m/x/2026/curry,m/x/2026/step', window.location.href), null))
         const overview = ['Vehicle type', 'Primary activity'].map((label) => [...container.querySelectorAll('tbody tr')].find((each) => each.innerText.startsWith(label)).innerText.replace(/\\s+/g, ' ').trim())
         container.remove()
-        const typical = cycleDrawing({ type: 'cargo-rear', data: { wheels }, size: { geometry }, kit }).legend
+        const typical = cycleDrawing({ type: 'cargo-rear', data: { wheels }, size: { geometry }, kit: vocabulary.kit }).legend
           .filter(({ listed, calculated }) => !listed && !calculated).map(({ key }) => key)
         return [length({ wheels }, { geometry }), length({}, { geometry }), length({ wheels }, data.sizes[0]), shown, [...captions, bmx], typical, type, overview]
       })()
@@ -1789,10 +1772,9 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a dimension's tooltip spells out its feet and inches, its metric after
     dimension = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
-        const imperial = fragmentOf(new VehiclePresenter(kit, vocabulary).dimensions({ length: 762 })).querySelector('.tw\\\\:imperial\\\\:inline [role="tooltip"]')
+        const [{ VehiclePresenter }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/render'), #{vocabulary_fetch}])
+        const imperial = fragmentOf(new VehiclePresenter(vocabulary).dimensions({ length: 762 })).querySelector('.tw\\\\:imperial\\\\:inline [role="tooltip"]')
         return imperial.textContent.replace(/\\s+/g, ' ').trim()
       })()
     JS
@@ -2048,12 +2030,11 @@ RSpec.describe "Bike Book", :js, type: :system do
     # limits, a row per load, a size's own after the one for every size
     payloads = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { renderInto }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { renderInto }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const riders = [{ load: 'rider', weight: 150 }, { load: 'rider', weight: 180, sizes: ['L'] }]
         const data = { model: 'Hauler', type: 'cargo', sizes: [{ name: 'S' }, { name: 'L' }], weight_limits: riders }
-        const viewer = new VehicleViewer(kit, vocabulary)
+        const viewer = new VehicleViewer(vocabulary)
         const container = document.body.appendChild(document.createElement('div'))
         const text = (element) => element.innerText.replace(/\\s+/g, ' ').trim()
         const row = (view, vehicle, label) => {
@@ -2097,12 +2078,11 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a mount's type spelled out
     frame = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { renderInto }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { renderInto }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const container = document.body.appendChild(document.createElement('div'))
         const data = { model: 'Tourer', type: 'bike', frame: { mounts: [{ type: 'top-tube-bag' }] } }
-        renderInto(container, new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/tourer', data }], new URL('/bikebook?view=all&vehicle_models=m/x/2026/tourer', window.location.href), null))
+        renderInto(container, new VehicleViewer(vocabulary).render([{ value: 'm/x/2026/tourer', data }], new URL('/bikebook?view=all&vehicle_models=m/x/2026/tourer', window.location.href), null))
         const shown = [...container.querySelectorAll('section')].find((section) => /^frame$/i.test(section.querySelector('h2')?.innerText)).innerText
         container.remove()
         return shown
@@ -2409,7 +2389,7 @@ RSpec.describe "Bike Book", :js, type: :system do
         const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value]])) }
         const model = (id, electric, handlebar_type, suspension, activity = 'commuting') => ({ id, electric, handlebar_type, suspension, vehicle_type: 'bike', model_configuration: 'complete', manufacturer: id, group_key: id, primary_activity: activity, markets: ['US'], variants: [] })
         const urban = [{ slug: 'commuting', family: 'urban' }]
-        const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: 5, fields: { ...fields, ...extra } }, activities)
+        const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: #{Integrations::Bikebook::Catalog::FORMAT}, fields: { ...fields, ...extra } }, activities)
         const score = scoring([model('e', true), model('other_e', true), model('acoustic', false)], { battery_size: [500, 500, null] })
         const propulsions = [() => true, ({ electric }) => !electric].map((included) => score('e', settingsFrom(new URLSearchParams()), included).models.map(({ id }) => id))
         const materials = scoring([model('a', false), model('steel', false), model('aluminum', false)], { frame_material: ['aluminum', 'steel', 'aluminum'] })
@@ -2508,20 +2488,20 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_css("#similar-results", wait: 10)
 
     # the index failing, whichever lands first
-    kit = hold_bikebook_catalog_file("kit.*")
+    vocabulary = hold_bikebook_catalog_file("vocabulary.*")
     failed = "#vehicle-viewers > [role='status']:first-child"
     not_found = {status: 404, headers: {"access-control-allow-origin" => "*"}, body: ""}
     visit compared
     index.pop(timeout: 10).fulfill(**not_found)
     expect(page).to have_text("The catalog didn't load.", wait: 10).and have_button("Try again")
-    kit.pop(timeout: 10).fallback
+    vocabulary.pop(timeout: 10).fallback
     expect(page).to have_css("#vehicle-viewers tr", wait: 10)
     expect(page).to have_css(failed, text: "The catalog didn't load.")
     expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
 
     # tried again, the vehicles in ahead of the failure this time
     click_on "Try again"
-    kit.pop(timeout: 10).fallback
+    vocabulary.pop(timeout: 10).fallback
     expect(page).to have_css("#vehicle-viewers tr", wait: 10)
     index.pop(timeout: 10).fulfill(**not_found)
     expect(page).to have_css(failed, text: "The catalog didn't load.", wait: 10)
@@ -2534,7 +2514,7 @@ RSpec.describe "Bike Book", :js, type: :system do
 
     # and again once the index answers, in the view it's moved to
     click_on "Try again"
-    kit.pop(timeout: 10).fallback
+    vocabulary.pop(timeout: 10).fallback
     index.pop(timeout: 10).fallback
     expect(vehicle_field).to be_visible
     expect(page).to have_no_css(failed)
