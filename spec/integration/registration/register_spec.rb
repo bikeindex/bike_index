@@ -168,8 +168,18 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "+ Add another color"
     type_into("#bike_tertiary_frame_color_id", "Green")
     click_combobox_option("Green")
+    fill_in_verified "bike[frame_size_number]", with: "18"
+    find_field("bike[frame_size_number]").send_keys(:tab)
+    expect(page).to have_select("bike[frame_size_unit]", selected: "inches")
+    expect(page).to have_content("That looks like inches not cm, so we switched it.")
+    expect(find("label", text: "M", exact_text: true)).to have_ancestor("div", style: {opacity: "0.6"})
+    click_button "Change back"
+    expect(page).to have_select("bike[frame_size_unit]", selected: "cm")
+    expect(page).to have_no_content("so we switched it")
     find("label", text: "M", exact_text: true).click
-    select "cm", from: "bike[frame_size_unit]"
+    expect(find_field("bike[frame_size_number]")).to have_ancestor("div", style: {opacity: "0.6"})
+    expect(find("label", text: "M", exact_text: true)).to have_no_ancestor("div", style: {opacity: "0.6"})
+    select "inches", from: "bike[frame_size_unit]"
     check "Missing serial"
     # Hidden rather than removed, so "unknown" still submits
     expect(page).to have_no_field("bike[serial_number]")
@@ -199,8 +209,9 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_field("bike_tertiary_frame_color_id", with: "Green")
     expect(page).to have_no_button("+ Add another color")
     expect(find("input[name='bike[frame_size]'][value='m']", visible: :all)).to be_checked
+    expect(find_field("bike[frame_size_number]")).to have_ancestor("div", style: {opacity: "0.6"})
     # A select always has a value, so it restores from the draft rather than the server default
-    expect(page).to have_select("bike[frame_size_unit]", selected: "cm")
+    expect(page).to have_select("bike[frame_size_unit]", selected: "inches")
     # The restored missing serial hides the input again and re-reveals the made-without link
     expect(page).to have_no_field("bike[serial_number]")
     expect(page).to have_field("bike[serial_number]", with: "unknown", visible: :all)
