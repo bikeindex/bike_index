@@ -1585,12 +1585,12 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(flat_bars).to eq([0, 1, 0, 2, 1])
     # a BMX's and a dirt jumper's saddle slammed down on its top tube and tipped along it, any other's up its post and level
     saddles = page.evaluate_script(<<~JS)
-      import('bikebook/cycle_drawings').then(({ drawingViews }) => {
+      import('bikebook/cycle_drawings').then(({ drawingViews, minus }) => {
         const size = { geometry: { stack: 600, reach: 390, head_angle: 70, seat_angle: 73, chainstay: 420, wheelbase: 1080, bb_drop: 10, seat_tube_ct: 380 } }
         const saddle = (primary_activity) => {
           const [post, [back, nose]] = drawingViews({ type: 'bike', data: { wheels: [{ bsd: 559, tire_width: 60, position: ['front', 'rear'] }], primary_activity }, size })
             .views[0].shapes.flat(Infinity).filter(({ seat }) => seat).map(({ points }) => points.slice(-2))
-          return [Math.round(Math.hypot(...post[1].map((each, index) => each - post[0][index]))), Math.round(Math.atan2(nose[1] - back[1], nose[0] - back[0]) * 180 / Math.PI)]
+          return [Math.round(Math.hypot(...minus(post[1], post[0]))), Math.round(Math.atan2(...minus(nose, back).reverse()) * 180 / Math.PI)]
         }
         return [saddle('bmx-freestyle'), saddle('dj'), saddle('dj-slopestyle'), saddle('mtb-trail-all-mountain')]
       })
@@ -1784,8 +1784,7 @@ RSpec.describe "Bike Book", :js, type: :system do
         const [{ VehiclePresenter }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
           import('bikebook/render'), #{vocabulary_fetch}])
         const presenter = new VehiclePresenter(vocabulary)
-        const height = document.createElement('div')
-        height.id = 'rider-height'
+        const height = Object.assign(document.createElement('div'), { id: 'rider-height' })
         height.append(fragmentOf(presenter.measurement(1930, 'mm', 'rider_height')))
         document.querySelector('main').append(height)
         const imperial = fragmentOf(presenter.dimensions({ length: 762 })).querySelector('.tw\\\\:imperial\\\\:inline [role="tooltip"]')
@@ -1794,10 +1793,11 @@ RSpec.describe "Bike Book", :js, type: :system do
     JS
     height = find("#rider-height")
     expect(height).to have_no_button("?")
-    height.find("button", text: /\A\d'\s*\d+"\z/).click
+    feet_and_inches = height.find("button", text: /\A\d'\s*\d+"\z/)
+    feet_and_inches.click
     expect(height).to have_css("[role='tooltip']", text: /\A6 feet, 4 inches\s+193\W*cm\z/, visible: true)
     # feet and inches marks aren't muted as other units are
-    expect(height.find("button", text: /\A\d'\s*\d+"\z/)).to have_no_css(".tw\\:text-gray-400")
+    expect(feet_and_inches).to have_no_css(".tw\\:text-gray-400")
     expect(dimension).to eq "Length: 2 feet, 6 inches (76.2 cm)"
   end
 
