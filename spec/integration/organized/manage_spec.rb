@@ -35,4 +35,12 @@ RSpec.describe "Organized manage", :js, type: :system do
     expect(organization.avatar?).to be_truthy
     expect(organization.avatar_identifier).to eq "bike.jpg"
   end
+
+  it "reveals the delete button when terminating the account" do
+    visit "/o/#{organization.to_param}/manage"
+
+    expect(page).to have_no_link("Delete organization")
+    click_on "I would like to terminate my account with Bike Index"
+    expect(page).to have_link("Delete organization")
+  end
 end

@@ -11,13 +11,10 @@
 - initial_location_form ||= false
 
 - if initial_location_form
-  .form-group.row
-    %label.org-form-label
-      = f.label :street, t(".address")
-    .col-sm-8
-      = f.fields_for :address_record do |address_form|
-        = render(Pages::Org::LocationAddressFields::Component.new(form_builder: address_form, show_label: false))
-
+  %div
+    = f.label :street, t(".address"), class: "twlabel"
+    = f.fields_for :address_record do |address_form|
+      = render(Pages::Org::LocationAddressFields::Component.new(form_builder: address_form, show_label: false))
 
 - else
   .col-md-6.collapse.in
