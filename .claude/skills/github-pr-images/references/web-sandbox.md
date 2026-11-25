@@ -26,12 +26,15 @@ failed after the whole capture round — leaving a comment that can never hold i
 
 1. Make sure the `## Screenshots` comment exists — when it doesn't, create it with
    `add_issue_comment` and a body of just `## Screenshots` — then **update** it with
-   `update_issue_comment` to this body:
+   `update_issue_comment` to this body, shaped like the real one — images inside table
+   cells. #4921's lone `<img>` line passed and its real table body was rewritten:
 
    ```
    ## Screenshots
 
-   <img alt="probe" src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook.png" width="40" />
+   | Desktop | Mobile |
+   | --- | --- |
+   | <img src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook.png" width="40"> | <img src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook.png" width="20"> |
    ```
 
 2. Read it back with `get_comments`. It posted if the body still holds a literal
@@ -99,8 +102,8 @@ Find it by `get_me`'s login and a body starting `## Screenshots`, paging through
 
 `add_issue_comment` appends a Claude Code attribution footer the `pr` skill forbids —
 the tell is the session id in its link — and can backtick the URL inside an `<img src>`
-too (#4474), leaving an image with no `src`. `update_issue_comment` adds no footer but
-can rewrite URLs too (#4821) — so create the comment with `## Screenshots` alone, put
+too (#4474), leaving an image with no `src`. `update_issue_comment` can append it too (#4921) and
+can rewrite URLs (#4821) — so create the comment with `## Screenshots` alone, put
 the body in with an update once the probe has passed, then read it back.
 
 ## Verifying
