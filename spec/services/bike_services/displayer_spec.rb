@@ -482,6 +482,25 @@ RSpec.describe BikeServices::Displayer do
     end
   end
 
+  describe "photos" do
+    let(:bike) { FactoryBot.create(:bike, :with_image, stock_photo_url:) }
+    let(:stock_photo_url) { nil }
+    let(:result) { described_class.photos(bike.reload) }
+
+    it "is its own photos" do
+      expect(result.map(&:stock)).to eq([false])
+    end
+
+    context "with a stock photo" do
+      let(:stock_photo_url) { "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/12_codacomp_bl.jpg" }
+
+      it "ends with the stock photo, small from the legacy bucket" do
+        expect(result.map(&:stock)).to eq([false, true])
+        expect(result.last).to have_attributes(url: stock_photo_url, small_url: "https://bikebook.s3.amazonaws.com/uploads/Fr/10251/small_12_codacomp_bl.jpg", alt: nil)
+      end
+    end
+  end
+
   describe "header_image_urls" do
     let(:bike) { Bike.new }
     let(:result) { described_class.header_image_urls(bike) }

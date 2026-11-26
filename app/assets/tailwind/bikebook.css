@@ -16,16 +16,6 @@
     font-size: inherit;
   }
 
-  /* The model viewer's JSON fills the column beside its card on desktop, rather than
-   * scrolling inside a box of its own */
-  .twjson-panel .highlightjs-json {
-    @apply tw:lg:absolute tw:lg:inset-0;
-  }
-
-  .twjson-panel .highlightjs-json pre {
-    @apply tw:max-h-[70vh] tw:lg:h-full tw:lg:max-h-none;
-  }
-
   /* A component group's table, which a card narrower than its five columns stacks, a row to each component - its
    * columns style their cells. Important over the table's own cell borders, widths and padding */
   .bikebook-components {

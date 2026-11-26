@@ -1,0 +1,7 @@
+---
+en:
+  components:
+    atoms:
+      stock_photo_badge:
+        stock: Stock
+        stock_photo_of: Stock photo of a %{model}

@@ -73,6 +73,7 @@ en:
             stolen: Stolen
             stolen_description: This %{cycle_type} has been stolen
             student_id: Student ID
+            unknown_model_year: We don't have the details for that year of that model.
             very_very_few_bikes_html: >-
               Very <em>very</em> few %{cycle_types} are made without serials. Unless
               this %{cycle_type}:
