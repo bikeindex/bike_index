@@ -59,7 +59,7 @@ module Integrations
       def matching(options, market)
         return if options[:frame_model].blank?
 
-        BikebookModel.matching(manufacturer_id: options[:manufacturer_id], name: options[:frame_model], year: options[:year].to_i, market:)
+        Integrations::Bikebook::ModelSearch.matching(manufacturer_id: options[:manufacturer_id], name: options[:frame_model], year: options[:year].to_i, market:)
       end
 
       conceal :matching
