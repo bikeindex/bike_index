@@ -30,49 +30,33 @@
 
   <div class="tw:grid tw:gap-6 tw:lg:grid-cols-3">
     <div class="tw:contents tw:lg:col-span-2 tw:lg:flex tw:lg:flex-col tw:lg:gap-6">
-      <% archive_images = @bike.public_images.select(&:image_url) %>
+      <% archive_photos = BikeServices::Displayer.photos(@bike) %>
 
-      <% if archive_images.any? || @bike.stock_photo_url.present? %>
+      <% if archive_photos.any? %>
         <%= render(UI::Card::Component.new) do %>
           <h2 class="tw:tweyebrow">
             <%= translation(".photo_archive") %>
           </h2>
 
           <ul class="tw:mt-3 tw:flex tw:flex-wrap tw:gap-3">
-            <% archive_images.each do |public_image| %>
-              <li>
-                <a
-                  href="<%= public_image.image_url %>"
-                  target="_blank"
-                  rel="noopener"
-                  class="
-                    tw:block tw:size-24 tw:overflow-hidden tw:rounded-lg
-                    tw:border tw:border-gray-200 tw:transition
-                    tw:hover:border-[#715eb2] tw:dark:border-gray-700
-                  "
-                >
-                  <%= image_tag(public_image.image_url(:small), alt: public_image.image_alt, class: "tw:size-full tw:object-cover") %>
-                </a>
-              </li>
-            <% end %>
-
-            <% if @bike.stock_photo_url.present? %>
-              <%# The badge beside the link rather than in it, as it's a tooltip's button %>
+            <% archive_photos.each do |photo| %>
+              <%# A stock photo's badge goes beside the link rather than in it, as it's a tooltip's button %>
               <li class="tw:relative">
                 <a
-                  href="<%= @bike.stock_photo_url %>"
+                  href="<%= photo.url %>"
                   target="_blank"
                   rel="noopener"
                   class="
-                    tw:block tw:size-24 tw:overflow-hidden tw:rounded-lg
-                    tw:border tw:border-gray-200 tw:bg-white tw:transition
-                    tw:hover:border-[#715eb2] tw:dark:border-gray-700
+                    tw:block tw:size-24 tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:transition tw:hover:border-[#715eb2] tw:dark:border-gray-700
+                    <%= "tw:bg-white" if photo.stock %>
                   "
                 >
-                  <%= image_tag(@bike.stock_photo_url, alt: translation(".stock_photo", bike_type: @bike.type_titleize), class: "tw:size-full tw:object-contain") %>
+                  <%= image_tag(photo.small_url, alt: photo.alt || translation(".stock_photo", bike_type: @bike.type_titleize), class: ["tw:size-full", photo.stock ? "tw:object-contain" : "tw:object-cover"]) %>
                 </a>
 
-                <%= render(Atoms::StockPhotoBadge::Component.new(bike: @bike, display: :word, html_class: "tw:absolute tw:bottom-1 tw:left-1")) %>
+                <% if photo.stock %>
+                  <%= render(Atoms::StockPhotoBadge::Component.new(bike: @bike, display: :word, html_class: "tw:absolute tw:bottom-1 tw:left-1")) %>
+                <% end %>
               </li>
             <% end %>
           </ul>

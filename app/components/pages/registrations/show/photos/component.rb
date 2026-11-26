@@ -20,7 +20,7 @@ module Pages
             title = hero_title
             return if badge.blank? && title.blank?
 
-            content_tag(:div, safe_join([badge, title].compact), class: "tw:pointer-events-none tw:absolute tw:inset-x-0 tw:bottom-0")
+            content_tag(:div, safe_join([badge, title]), class: "tw:pointer-events-none tw:absolute tw:inset-x-0 tw:bottom-0")
           end
 
           def hero_title
@@ -34,6 +34,8 @@ module Pages
 
           # The gallery's starts hidden, as it opens on the vehicle's own photo
           def stock_badge(gallery: false)
+            return if @bike.stock_photo_url.blank?
+
             tag.div(render(Atoms::StockPhotoBadge::Component.new(bike: @bike)),
               class: ["tw:px-2 tw:pb-2", ("tw:hidden" if gallery)],
               data: ({"registrations--show--photos-target": "stockBadge"} if gallery))
@@ -51,9 +53,9 @@ module Pages
             @bike.public_images.first
           end
 
-          def thumbnail_images
-            @thumbnail_images ||= @bike.public_images.select(&:image_url)
-          end
+          def photos = @photos ||= BikeServices::Displayer.photos(@bike)
+
+          def bike_photo_alt = translation(".bike_photo", bike_type: @bike.type_titleize)
 
           def has_photos?
             bike_image_url.present? && bike_image.present?

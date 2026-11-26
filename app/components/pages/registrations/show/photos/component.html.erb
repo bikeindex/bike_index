@@ -14,7 +14,7 @@
       >
         <%= image_tag(
           bike_image_url,
-          alt: translation(".bike_photo", bike_type: @bike.type_titleize),
+          alt: bike_photo_alt,
           data: {"registrations--show--photos-target": "main", action: "error->registrations--show--photos#disableLink"},
           class: "tw:aspect-4/3 tw:w-full tw:object-contain",
         ) %>
@@ -22,17 +22,19 @@
         <%= hero_overlay(stock_badge(gallery: true)) %>
       </a>
 
-      <% if thumbnail_images.size + (@bike.stock_photo_url.present? ? 1 : 0) > 1 %>
+      <% if photos.many? %>
         <ul class="tw:flex tw:flex-wrap tw:gap-2">
-          <% thumbnail_images.each_with_index do |public_image, index| %>
-            <li>
+          <% photos.each_with_index do |photo, index| %>
+            <%# A stock photo's badge goes beside the button rather than in it, as it's a tooltip's button %>
+            <li class="tw:relative">
               <button
                 type="button"
                 data-registrations--show--photos-target="thumbnail"
                 data-action="click->registrations--show--photos#select"
-                data-large-url="<%= public_image.image_url(:large) %>"
-                data-original-url="<%= public_image.image_url %>"
-                data-photo-alt="<%= public_image.image_alt %>"
+                data-large-url="<%= photo.large_url %>"
+                data-original-url="<%= photo.url %>"
+                data-photo-alt="<%= photo.alt || bike_photo_alt %>"
+                data-stock="<%= photo.stock %>"
                 aria-current="<%= index == 0 %>"
                 class="
                   tw:cursor-pointer tw:overflow-hidden tw:rounded-sm
@@ -40,33 +42,12 @@
                   tw:aria-[current=true]:border-blue-500
                 "
               >
-                <%= image_tag public_image.image_url(:small), alt: public_image.image_alt, class: "tw:h-16 tw:w-16 tw:object-cover" %>
-              </button>
-            </li>
-          <% end %>
-
-          <% if @bike.stock_photo_url.present? %>
-            <%# The badge beside the button rather than in it, as it's a tooltip's button %>
-            <li class="tw:relative">
-              <button
-                type="button"
-                data-registrations--show--photos-target="thumbnail"
-                data-action="click->registrations--show--photos#select"
-                data-large-url="<%= @bike.stock_photo_url %>"
-                data-original-url="<%= @bike.stock_photo_url %>"
-                data-photo-alt="<%= translation(".bike_photo", bike_type: @bike.type_titleize) %>"
-                data-stock="true"
-                aria-current="false"
-                class="
-                  tw:cursor-pointer tw:overflow-hidden tw:rounded-sm
-                  tw:border-2 tw:border-transparent
-                  tw:aria-[current=true]:border-blue-500
-                "
-              >
-                <%= image_tag @bike.stock_photo_url, alt: translation(".bike_photo", bike_type: @bike.type_titleize), class: "tw:h-16 tw:w-16 tw:bg-white tw:object-contain" %>
+                <%= image_tag photo.small_url, alt: photo.alt || bike_photo_alt, class: ["tw:h-16 tw:w-16", photo.stock ? "tw:bg-white tw:object-contain" : "tw:object-cover"] %>
               </button>
 
-              <%= render(Atoms::StockPhotoBadge::Component.new(bike: @bike, display: :word, html_class: "tw:absolute tw:bottom-1 tw:left-1")) %>
+              <% if photo.stock %>
+                <%= render(Atoms::StockPhotoBadge::Component.new(bike: @bike, display: :word, html_class: "tw:absolute tw:bottom-1 tw:left-1")) %>
+              <% end %>
             </li>
           <% end %>
 
@@ -83,7 +64,7 @@
         tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-2xl tw:dark:bg-gray-900
       "
     >
-      <%= image_tag(@bike.stock_photo_url, alt: translation(".bike_photo", bike_type: @bike.type_titleize), class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
+      <%= image_tag(@bike.stock_photo_url, alt: bike_photo_alt, class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
 
       <%= hero_overlay(stock_badge) %>
     </div>
@@ -97,7 +78,7 @@
         tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-2xl tw:dark:bg-gray-900
       "
     >
-      <%= helpers.bike_placeholder_image_tag(alt: translation(".bike_photo", bike_type: @bike.type_titleize), class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
+      <%= helpers.bike_placeholder_image_tag(alt: bike_photo_alt, class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
 
       <%= hero_overlay %>
     </div>

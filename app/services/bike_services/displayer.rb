@@ -8,6 +8,7 @@ module BikeServices
     REG_FIELDS = %w[address bike_sticker extra_registration_number organization_affiliation
       phone student_id].freeze
     LEGACY_STOCK_PHOTO_HOST = "https://bikebook.s3.amazonaws.com/"
+    Photo = Data.define(:url, :large_url, :small_url, :alt, :stock)
 
     # Whether a registration form should ask for one of the organization's additional
     # fields. Pass the user only when the registration is their own - what their account
@@ -90,15 +91,26 @@ module BikeServices
       bike.address_record&.street.present? || bike.creation_organization&.enabled?("reg_address")
     end
 
-    # Whether the photo it shows is its model's stock photo, as it has none of its own
+    # Whether its thumbnail is the stock photo, rather than one of its own
     def stock_photo?(bike) = bike.thumb_path.blank? && bike.stock_photo_url.present?
 
-    def thumb_image_url(bike)
-      return bike.thumb_path if bike.thumb_path.present?
+    def thumb_image_url(bike) = bike.thumb_path.presence || small_stock_photo_url(bike)
+
+    def small_stock_photo_url(bike)
       # Only the legacy bucket has small_ versions; the Bike Book catalog's photos are a single size
       return bike.stock_photo_url.presence unless bike.stock_photo_url&.start_with?(LEGACY_STOCK_PHOTO_HOST)
 
       bike.stock_photo_url.sub(%r{/(?=[^/]+\z)}, "/small_")
+    end
+
+    # Its own public photos, then its model's stock photo - which has no alt
+    def photos(bike)
+      own = bike.public_images.select(&:image_url).map do |image|
+        Photo.new(url: image.image_url, large_url: image.image_url(:large), small_url: image.image_url(:small), alt: image.image_alt, stock: false)
+      end
+      return own if bike.stock_photo_url.blank?
+
+      own + [Photo.new(url: bike.stock_photo_url, large_url: bike.stock_photo_url, small_url: small_stock_photo_url(bike), alt: nil, stock: true)]
     end
 
     def header_image_urls(bike)

@@ -25,22 +25,18 @@ module Atoms
 
       def call
         tag.span(class: @html_class) do
-          next pill if @display == :full
+          next pill(description) if @display == :full
 
-          render(UI::Tooltip::Component.new(text: description)) { pill }
+          render(UI::Tooltip::Component.new(text: description)) { pill(translation(".stock")) }
         end
       end
 
       private
 
-      def pill = tag.span(text, class: "#{CLASSES} #{DISPLAY_CLASSES[@display]}")
+      def pill(text) = tag.span(text, class: "#{CLASSES} #{DISPLAY_CLASSES[@display]}")
 
       def description
         translation(".stock_photo_of", model: [@bike.year, @bike.frame_model].compact_blank.join(" "))
-      end
-
-      def text
-        (@display == :full) ? description : translation(".stock")
       end
     end
   end

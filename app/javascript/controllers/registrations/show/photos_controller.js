@@ -26,7 +26,7 @@ export default class extends Controller {
       this.linkTarget.classList.remove('tw:cursor-default')
     }
     this.thumbnailTargets.forEach((el) => el.setAttribute('aria-current', el === thumbnail))
-    if (this.hasStockBadgeTarget) collapse(thumbnail.dataset.stock ? 'show' : 'hide', this.stockBadgeTarget, 0)
+    if (this.hasStockBadgeTarget) collapse(thumbnail.dataset.stock === 'true' ? 'show' : 'hide', this.stockBadgeTarget, 0)
   }
 
   // A broken main image drops its enclosing link: without an href an <a> isn't a
