@@ -1,6 +1,5 @@
 # frozen_string_literal: true
 
-# The Bike Book model a Bike or BikeVersion was registered as
 # == Schema Information
 #
 # Table name: vehicle_specifications
@@ -19,6 +18,7 @@
 #  index_vehicle_specifications_on_bike_obj           (bike_obj_type,bike_obj_id) UNIQUE
 #  index_vehicle_specifications_on_bikebook_model_id  (bikebook_model_id)
 #
+# The Bike Book model a Bike or BikeVersion was registered as
 class VehicleSpecification < ApplicationRecord
   belongs_to :bike_obj, polymorphic: true
   belongs_to :bikebook_model, -> { with_deleted }

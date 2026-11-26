@@ -63,7 +63,7 @@ This has to happen before the cleanup below, which diffs against `origin/main`.
 
 ### Simplify, lint, and conform to AGENTS.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `AGENTS.md`, its audits — spec, documentation, churn, comment, backfill and, when the branch adds them, asset, controller, component and markup (the `use-existing-markup` skill) — and the cycle-type translation and product-name checks. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, and the `code-review-bike-index` skill — the `AGENTS.md` conformance pass and every convention audit. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
 
 ### Freshen stale migration timestamps
 
@@ -82,7 +82,7 @@ Run in parallel:
 
 Diff against `origin/main`, not the local base branch — in a Conductor worktree the local base often lags the remote, which would inflate or stale the diff. If you skipped **Prepare the branch**, `git fetch origin` first. If the branch has no commits ahead of `origin/main`, stop and tell the user.
 
-**`rtk proxy` the `git log`** — rtk's hook strips merge commits from `git log --oneline`, so the merge **Prepare the branch** just made is absent and the branch reads as though it never merged.
+**The log has to show merge commits** — the merge **Prepare the branch** just made among them. Plain `git log` does. `rtk git log` doesn't, so if the merge you just made is missing, rtk's hook rewrote the command — re-run it as `rtk proxy git log`.
 
 `gh pr view` exits non-zero with "no pull requests found" when the branch has none — that's the answer to the create-or-update question below, not a broken command, and it's the normal case on a first run.
 
