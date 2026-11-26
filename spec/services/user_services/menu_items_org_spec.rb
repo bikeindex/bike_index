@@ -153,7 +153,7 @@ RSpec.describe UserServices::MenuItemsOrg do
         expect(e_vehicles[:children]).to eq([
           link_item("Audits", "/o/#{slug}/model_audits", match_paths: "/o/#{slug}/model_audits/**"),
           link_item("E-bike rules", "/ebike-rules", match_paths: "/ebike-rules/**"),
-          link_item("E-Vehicle education", "/o/#{slug}/education_course_acknowledgments")
+          link_item("Education Acknowledgments", "/o/#{slug}/education_course_acknowledgments")
         ])
       end
 
@@ -248,7 +248,7 @@ RSpec.describe UserServices::MenuItemsOrg do
       end
 
       it "drops audits from the e-vehicles group" do
-        expect(e_vehicles[:children].map { |child| child[:label] }).to eq(["E-bike rules", "E-Vehicle education"])
+        expect(e_vehicles[:children].map { |child| child[:label] }).to eq(["E-bike rules", "Education Acknowledgments"])
       end
     end
 

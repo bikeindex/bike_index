@@ -16,7 +16,7 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
       let(:current_organization) do
         FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["education_courses"])
       end
-      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization) }
+      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization, created_at: 3.days.ago) }
       let(:education_course) { FactoryBot.create(:education_course_active, organization: current_organization) }
       let!(:acknowledgment) do
         FactoryBot.create(:education_course_acknowledgment, education_course:, bike:,
@@ -26,29 +26,45 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
       let!(:default_acknowledgment) do
         FactoryBot.create(:education_course_acknowledgment, owner_email: "defaulted@example.com",
           education_course: FactoryBot.create(:education_course_default_active),
-          bike: FactoryBot.create(:bike_organized, creation_organization: current_organization))
+          bike: FactoryBot.create(:bike_organized, creation_organization: current_organization, created_at: 2.days.ago))
       end
       let!(:pending) do
         FactoryBot.create(:education_course_acknowledgment_pending, education_course:, owner_email: "pending@example.com",
-          bike: FactoryBot.create(:bike_organized, creation_organization: current_organization))
+          bike: FactoryBot.create(:bike_organized, creation_organization: current_organization, created_at: 1.day.ago))
       end
       let!(:other_organization_acknowledgment) do
         FactoryBot.create(:education_course_acknowledgment, owner_email: "elsewhere@example.com",
           bike: FactoryBot.create(:bike_organized))
       end
 
-      it "lists the completed acknowledgments on the organization's bikes" do
+      def emails = %w[agreed defaulted pending].select { response.body.include?("#{it}@example.com") }
+
+      def email_order = emails.sort_by { response.body.index("#{it}@example.com") }
+
+      it "lists the acknowledgments on the organization's bikes, unfinished ones too" do
         get base_url
         expect(response).to be_ok
-        expect(response.body).to include("E-Vehicle education")
-        expect(response.body).to include("agreed@example.com", "defaulted@example.com")
+        expect(response.body).to include("E-Vehicle Education Acknowledgments", "Unfinished")
+        expect(response.body).to match(/3<\/span> matching acknowledgments/)
         expect(response.body).to include("/bikes/#{bike.id}?organization_id=#{current_organization.to_param}")
-        expect(response.body).to_not include("pending@example.com")
         expect(response.body).to_not include("elsewhere@example.com")
-        expect(response.body.index("defaulted@example.com")).to be < response.body.index("agreed@example.com")
+        expect(email_order).to eq %w[pending defaulted agreed]
 
         get base_url, params: {sort: "acknowledged_at", direction: "asc"}
-        expect(response.body.index("agreed@example.com")).to be < response.body.index("defaulted@example.com")
+        expect(email_order).to eq %w[agreed defaulted pending]
+
+        get base_url, params: {sort: "owner_email", direction: "asc"}
+        expect(email_order).to eq %w[agreed defaulted pending]
+
+        get base_url, params: {search_status: "acknowledged"}
+        expect(emails).to eq %w[agreed defaulted]
+
+        get base_url, params: {search_status: "unfinished"}
+        expect(emails).to eq %w[pending]
+
+        # The period is of the registrations
+        get base_url, params: {period: "custom", start_time: 50.hours.ago.to_i}
+        expect(emails).to eq %w[defaulted pending]
       end
     end
   end

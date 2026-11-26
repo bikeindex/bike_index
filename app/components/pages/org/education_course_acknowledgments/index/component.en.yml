@@ -5,9 +5,12 @@ en:
       org:
         education_course_acknowledgments:
           index:
-            completed_at: Completed
-            completed_count_html: Completed by %{count}
+            acknowledged: Acknowledged
+            all: All
             course: Course
-            header: E-Vehicle education
+            header: E-Vehicle Education Acknowledgments
+            matching_count_html: "%{count} matching acknowledgments"
             owner_email: Owner email
+            registered: Registered
             registration: Registration
+            unfinished: Unfinished
