@@ -49,13 +49,16 @@ const manufacturerPage = (vehicle) => {
 // A year's colorways by their paint, not their photos
 const paint = (year) => JSON.stringify(array(year.colorways).map(({ name, colors, color_code: code }) => [name, colors, code]))
 
-// the newest colorways, to choose between where there are several, and behind a link that shows them, each paint the
-// earlier years had, but the newest's, all of them choices once there are any, the `picked` one chosen and shown
-const colors = (presenter, vehicle, key, picked) => {
-  const [[newest] = [], ...earlier] = Map.groupBy(colorwayYears(vehicle), paint).values()
-  if (!newest) return null
+// The years sharing a paint, oldest first
+const yearsHeading = (years) => html`<div class="tw:text-xs tw:font-bold tw:tabular-nums">${years.map(({ year }) => year).toReversed().join(', ')}</div>`
 
-  const latest = array(newest.colorways)
+// The newest colorways, a choice where there are several; behind "View previous years colors", each paint's years and
+// every earlier paint. The `picked` one is chosen and shown
+const colors = (presenter, vehicle, key, picked) => {
+  const [newestYears, ...earlier] = Map.groupBy(colorwayYears(vehicle), paint).values()
+  if (!newestYears) return null
+
+  const latest = array(newestYears[0].colorways)
   const selected = chosenColorway(vehicle, picked).value
   // a toggle scrolling out to its cell's edges where one's name is wider than it
   const toggle = (each, year) => html`<div class="twgutter-bleed tw:overflow-x-auto tw:[--gutter:--spacing(2.5)]">${radioButtonGroup({
@@ -66,10 +69,11 @@ const colors = (presenter, vehicle, key, picked) => {
   })}</div>`
   if (earlier.length === 0) return latest.length > 1 ? toggle(latest) : colorways(presenter, latest)
 
-  const open = !latest.some((each, index) => colorwayValue(each, index) === selected)
-  return html`<div class="tw:space-y-2" data-controller="ui--collapse">${toggle(latest)}<div class="${open ? '' : 'tw:hidden'} tw:space-y-2"
-    data-ui--collapse-target="content">${earlier.map((years) => html`<div class="tw:space-y-1"><div class="tw:text-xs tw:font-bold tw:tabular-nums">${
-      years.map(({ year }) => year).toReversed().join(', ')}</div>${toggle(array(years[0].colorways), years[0].year)}</div>`)}</div><div>${
+  const hidden = latest.some((each, index) => colorwayValue(each, index) === selected) ? 'tw:hidden' : ''
+  return html`<div class="tw:space-y-2" data-controller="ui--collapse"><div class="tw:space-y-1"><div class=${hidden}
+    data-ui--collapse-target="content">${yearsHeading(newestYears)}</div>${toggle(latest)}</div><div class="${hidden} tw:space-y-2"
+    data-ui--collapse-target="content">${earlier.map((years) => html`<div class="tw:space-y-1">${yearsHeading(years)}${
+      toggle(array(years[0].colorways), years[0].year)}</div>`)}</div><div>${
       collapse({ color: 'link_gray', htmlClass: 'tw:text-sm tw:aria-expanded:hidden', content: 'View previous years colors' })}</div></div>`
 }
 
@@ -149,8 +153,7 @@ const compared = (vehicles, fields, frames, sectionClasses, corner) => html`<sec
       return {
         label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${removeLink({
           label: `Remove ${[vehicle.manufacturer, vehicle.model].filter(present).join(' ')}`,
-          href: vehicle.removeHref,
-          corner: true
+          href: vehicle.removeHref
         })}${vehicle.title}`,
         classes: 'tw:px-2.5! tw:py-2! tw:align-top',
         headerClasses: `tw:relative ${border.top}`,

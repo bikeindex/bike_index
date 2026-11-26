@@ -3,12 +3,12 @@ import { Turbo } from '@hotwired/turbo-rails'
 import { CatalogComboboxSource, loadCatalog, renderCounts } from 'bikebook/catalog'
 import { addComparison, hydrate, loadingShell, pickedVehicles, picksShell, rescoredSimilar, unpickedVehicles } from 'bikebook/hydrate'
 import { keepPermanent, renderInto } from 'bikebook/render'
-import { readable, replaceUrl } from 'bikebook/replace_url'
+import { readable } from 'bikebook/replace_url'
 import { NARROWING, comparing, searching } from 'bikebook/query'
 import { collapse } from 'utils/collapse_utils'
 import { SearchLog } from 'bikebook/search_log'
 import { storePreferredSize } from 'bikebook/sizes'
-import { changedVehicles, realigned, vehicleIds, withColorway, withJson, withSize } from 'bikebook/vehicle_models'
+import { changedVehicles, realigned, vehicleIds, withColorway, withSize } from 'bikebook/vehicle_models'
 import { renderClassCards, withClassifications } from 'bikebook/templates/vehicles/class_cards'
 import { uuid } from 'bikebook/templates/helpers'
 
@@ -162,11 +162,6 @@ export default class extends Controller {
   // A vehicle's colorway, in place of the history entry it's picked on
   pickColorway ({ target, params: { vehicle } }) {
     this.#go(withColorway(new URL(window.location.href), vehicle, target.value), [window.scrollX, window.scrollY], { replace: true })
-  }
-
-  // A vehicle's JSON opened or closed, in place
-  toggleJson ({ type, params: { vehicle } }) {
-    replaceUrl(withJson(new URL(window.location.href), vehicle, type === 'ui--collapse:shown'))
   }
 
   // A filter changes in place, which with nothing picked the featured models and their count follow, and the picked
