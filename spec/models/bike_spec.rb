@@ -74,6 +74,22 @@ RSpec.describe Bike, type: :model do
       end
     end
 
+    describe ".previous_owner" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      let(:bike_transferred) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      let(:bike_returned) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      before do
+        FactoryBot.create(:ownership, bike: bike_transferred)
+        FactoryBot.create(:ownership, bike: bike_returned)
+        FactoryBot.create(:ownership_claimed, bike: bike_returned, creator: user)
+      end
+
+      it "excludes bikes the user owns again" do
+        expect(Bike.previous_owner(user.id).pluck(:id)).to eq([bike_transferred.id])
+      end
+    end
+
     describe ".currently_stolen_in" do
       context "given no matching state or country" do
         it "returns none" do
