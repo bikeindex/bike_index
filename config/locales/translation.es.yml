@@ -2318,6 +2318,19 @@ es:
           left_organization: Has salido %{org_name}
           unable_to_leave: 'No se puede salir de %{org_name}: contacte con support@bikeindex.org
             para obtener ayuda.'
+      pos_registration_matches:
+        redirect_by_status:
+          already_combined: Estos ya están combinados en un solo registro.
+          already_kept_separate: Nos dijiste que son diferentes, así que se mantendrán
+            separados.
+          cant_combine_here: Estas inscripciones no se pueden combinar aquí. Si necesita
+            ayuda, envíe un correo electrónico a support@bikeindex.org.
+          combining: Vamos a combinarlos en un solo registro. Tardará un minuto.
+          combining_thanks: "¡Gracias! Estamos combinando los registros de %{bike_type}
+            en uno solo. Tardará un minuto."
+          couldnt_combine: No pudimos combinarlos, así que siguen estando separados.
+            Si necesita ayuda, envíe un correo electrónico a support@bikeindex.org.
+          kept_separate: Gracias, las mantendremos como registros separados.
     oauth:
       applications:
         ensure_app_owner!:
@@ -2824,6 +2837,8 @@ es:
           unido."
         welcome_to_bike_index: Bienvenido a Bike Index
       subject: "¡Bienvenido a Bike Index!"
+    pos_registration_match_email:
+      subject: "¿Es este el mismo %{bike_type}?"
   feedbacks:
     form:
       email_address: Dirección de correo electrónico
@@ -4070,6 +4085,8 @@ es:
     landing_pages_for_bike_shops: Bike Index se conecta a tu sistema de punto de venta
       y registra automáticamente cada bicicleta que vendes. Es gratis para tiendas
       y clientes, y nunca vendemos ni compartimos datos de clientes.
+    shop_index: Gorra y pegatinas de registro de Bike Index. Cada compra ayuda a mantener
+      el registro gratuito.
   meta_titles:
     bikes_index: Resultados de la búsqueda
     bikes_new: "¡Inscribe una bicicleta!"
@@ -4129,6 +4146,7 @@ es:
     organization_signup_show: Añade tu organización al Índice de Bicicletas
     organization_signup_update: Añade tu organización al Índice de Bicicletas
     organization_signup_welcome: "%{organization} está activo"
+    shop_index: Tienda - Índice de bicicletas
   money:
     currencies:
       en: Dólar estadounidense
@@ -4242,32 +4260,6 @@ es:
       your_username_is_the_url_for_your_sharing: Tu nombre de usuario es la URL de
         tu página para compartir y del formulario para insertar la bicicleta. Actualízalo
         si te interesa.
-    show:
-      add_a_bike: Añade una bicicleta
-      add_a_lock: Agregar un candado
-      bikes: bicicletas
-      combination: Combinación
-      edit: Editar
-      key_serial: Clave de serie
-      lock_type: Tipo de cerradura
-      locks: cabellos
-      manufacturer: Fabricante
-      next: Próximos pasos
-      register_new_items: Registrar nuevos artículos
-      registered: Registrado
-      sorry_your_bike_was_stolen: Lamentamos que te hayan robado tu %{bikes_last_type},
-        pero esperamos que, con la ayuda de todos para buscarlo, lo recuperes.
-      tell_us_more_about_yourself: Cuéntanos más sobre ti.
-      thanks_for_adding_your_bike: "¡Genial! Nos alegra que hayas añadido un %{bikes_last_type}
-        al índice."
-      to_bike_index_thanks_for_signing_up: a Bike Index. ¡Gracias por registrarte!
-      update_your_profile: Actualiza tu perfil
-      updated: Actualizado
-      welcome: Bienvenido
-      you_have_no_registered_bikes: No tienes bicicletas registradas.
-      you_have_no_registered_locks: No tienes cerraduras registradas.
-      header_title: "%{current_user_name} en Índice de Bicicletas"
-      membership_subtitle: "¡Gracias por ser miembro de Bike Index %{level}!"
     delete_account:
       delete_account: Eliminar cuenta
       delete_my_account: Eliminar mi cuenta y todas mis bicicletas registradas.
@@ -5565,6 +5557,17 @@ es:
           se convierte en un lugar de confianza. Es gratis tanto para ti como para
           ellos, y nunca vendemos ni compartimos datos de clientes.
         why_shops_heading: "¿Por qué las tiendas utilizan Bike Index?"
+      pos_registration_match:
+        combine_them: Al combinarlos, se mantiene un único registro para su %{bike_type},
+          con sus fotos y los detalles que ingresó.
+        if_theyre_different: Si son diferentes, puedes indicárnoslo en la misma página.
+        is_this_the_same: "¿Es este el mismo %{bike_type}?"
+        pos_registered_it: Usted registró un %{bike_type} que la tienda donde lo compró
+          ya había registrado a su nombre, con el mismo número de serie.
+        review_and_combine: Revisar y combinar
+        shop_registered_it_html: Usted registró un %{bike_type} que <strong>%{shop_name}</strong>
+          ya había registrado a su nombre cuando lo compró, con el mismo número de
+          serie.
     ui:
       definition_list:
         row:
@@ -5692,6 +5695,7 @@ es:
         hidden_for_unauthorized_users: oculto para usuarios no autorizados
         made_without_serial: hecho sin número de serie
         unknown: desconocido
+        serial_number: 'Número de serie: %{serial}'
       registration_status_badge:
         abandoned: Se informó que parecía estar abandonado, donde no debería estar.
         for_sale: Registrado y protegido, puesto a la venta por su propietario.
@@ -5720,6 +5724,18 @@ es:
       org:
         impound_current_location:
           same_as_impounded_from: igual que incautado de
+      registration_dates:
+        registered: Registrado
+        registered_abbreviation: R
+        registered_at: Registrado en
+        updated: Actualizado
+        updated_abbreviation: U
+        updated_at: Actualizado en
+      vehicle_type_badges:
+        e_vehicle: Vehículo eléctrico
+      stock_photo_badge:
+        stock: Existencias
+        stock_photo_of: Foto de archivo de un %{model}
     pages:
       messages:
         thread_show:
@@ -6033,6 +6049,7 @@ es:
             title: "%{bike_type} detalles"
             vehicle_type: Tipo de vehículo
             year: Año
+            view_stock_on_bikebook: Ver stock %{bike_type} en Bike Book
           bike_index_card:
             activity: Actividad
             frame_material: Material del marco
@@ -6217,8 +6234,6 @@ es:
           photos:
             add_photo: Añadir foto
             bike_photo: "%{bike_type} foto"
-            color_may_not_match: "¡El color puede no coincidir!"
-            stock_photo: Foto de archivo de un %{year} %{model}
           primary_colors:
             primary_color:
               one: Color primario
@@ -6279,6 +6294,7 @@ es:
             not_registered_phone_message: No se dispone de otros datos de contacto
               del propietario, ya que este %{bike_type} no está registrado en su organización.
             show_phone: Mostrar teléfono
+            stock_photo: "%{bike_type} foto de archivo"
           marketplace_listing_card:
             condition: Condición
             contact_seller: Contacta con el vendedor
@@ -6558,10 +6574,8 @@ es:
             one: actividad sincronizada
             other: actividades sincronizadas
           connect_with_strava: Conéctate con Strava
-          connected_to_strava: Conectado a Strava
           disconnect_confirm: "¿Seguro que quieres desconectar Strava? Esto eliminará
             todas las actividades sincronizadas."
-          disconnect_strava: Desconectar Strava
           downloaded: descargado
           integrate_your_bikes_with_strava: Integra tus bicicletas con Strava y sincroniza
             tus actividades ciclistas.
@@ -6575,25 +6589,55 @@ es:
           sync_running_in_background: La sincronización se está ejecutando en segundo
             plano. Esta página se actualizará automáticamente.
           syncing_activities: Sincronizando actividades...
+          connected: Conectado
+          disconnect: Desconectar
+          link_bikes: Bicicletas de enlace
+          syncing: Sincronización
         show:
           bike_box:
             add_a_photo: Añade una foto
-            add_it_now: "¡Añádelo ahora!"
             bike_sticker: Pegatina para bicicleta
             edit_registration: Editar %{bike_type}
+            list_for_sale: Listado para la venta
+            user_hidden: Oculto para otros usuarios
+            impound_claim_html: "%{status} afirman %{claimed_bike}"
+            report_stolen: Marca robada
+            this_claimed_bike_type: este %{kind} %{bike_type}
+            update_listing: Actualizar listado
+          bike_alerts:
+            add_it_now: "¡Añádelo ahora!"
             generally_connect_to_org: Algunas de tus bicicletas están asociadas con
               %{org_name}, pero esta no. En general, debes conectar todas tus bicicletas
               a %{org_name}.
             ignore_this_suggestion: Ignora esta sugerencia.
-            list_for_sale: Listado para la venta
-            location: Ubicación
-            mark_stolen: Marca %{bike_type} robada
-            primary_colors: Colores primarios
-            registered: Registrado
-            serial: De serie
-            update_marketplace_listing: "¡Actualiza tu anuncio en el mercado!"
-            updated: Actualizado
-            user_hidden: Oculto para otros usuarios
+          add_a_lock: "+ Añadir un candado"
+          add_a_lock_empty: Agregar un candado
+          bike_index_is_free: Bike Index es gratuito gracias a la colaboración de
+            ciclistas como tú.
+          bikes: bicicletas
+          combination: Combinación
+          donate: Donar
+          donations_keep_the_registry_running: Somos una organización sin ánimo de
+            lucro. Las donaciones permiten que el registro siga funcionando y que
+            las bicicletas robadas regresen a sus dueños.
+          edit: Editar
+          header_title: "%{current_user_name} en Índice de Bicicletas"
+          helps_shops_and_police: Ayuda a las tiendas y a la policía a contactarte
+            si encuentran una bicicleta.
+          key_serial: Clave serial
+          locks: Cabellos
+          membership_subtitle: "¡Gracias por ser miembro de Bike Index %{level}!"
+          no_bikes_registered_yet: Aún no hay bicicletas registradas
+          no_locks_description: Anota la llave y la combinación de tu cerradura para
+            que puedas reemplazarla si pierdes la llave.
+          no_locks_registered_yet: Aún no se han registrado cerraduras
+          register_a_bike: "+ Registrar una bicicleta"
+          register_a_bike_empty: Registre su bicicleta
+          registered: Registrado
+          tell_us_more_about_yourself: Cuéntanos más sobre ti.
+          update_profile: Actualizar perfil
+          updated: Actualizado
+          your_registrations: Sus registros
         memberships:
           show:
             complimentary: Bike Index te regaló esta membresía, así que no tienes
@@ -6613,6 +6657,20 @@ es:
             you_pay_the_current_price: Usted paga el precio actual por %{level}.
             your_membership: Tu membresía
             your_price: Tu precio
+        pos_registration_matches:
+          show:
+            combining_keeps: Al combinarlos, se conserva el registro de la tienda
+              de tu %{bike_type}, con tus fotos y los datos que ingresaste. Tu registro
+              individual se elimina.
+            is_this_the_same: "¿Es este el mismo %{bike_type}?"
+            no_theyre_different: No, son diferentes
+            pos_registered_it: La tienda donde compraste tu %{bike_type} ya lo había
+              registrado a tu nombre con el mismo número de serie.
+            registered_when_you_bought_it: Registrado cuando lo compraste
+            shop_registered_it: "%{shop_name} ya te había registrado un %{bike_type}
+              con el mismo número de serie cuando lo compraste."
+            yes_combine_them: Sí, combínalos
+            your_registration: Su registro
       sales:
         new_form:
           record_sale: Venta récord
@@ -6884,6 +6942,11 @@ es:
             wheres_my_serial: "¿Dónde está mi número de serie?"
             without_serial: Este %{cycle_type} se hizo sin número de serie.
             without_serial_number: Este %{cycle_type} se fabricó sin número de serie.
+            change_back: Volver a cambiar
+            looks_like_cm: Parece que son centímetros, no pulgadas, así que lo cambiamos.
+            looks_like_inches: Parece que son pulgadas, no centímetros, así que lo
+              cambiamos.
+            unknown_model_year: No tenemos los detalles de ese año de ese modelo.
           color_fields:
             add_another_color: Añade otro color
             color: Color
@@ -7135,6 +7198,8 @@ es:
             de IA: obtengan los datos allí en lugar de desde esta página.'
           load_failed: El catálogo no se cargó.
           try_again: Intentar otra vez
+          any_target_riders: Cualquier ciclista objetivo
+          target_riders: Jinetes de Target
         donate_strip:
           donate: Donar
           pitch: Este fantástico producto es posible gracias a la organización sin
@@ -7164,10 +7229,10 @@ es:
           loading_catalog: Cargando el catálogo…
           lookup_label: Ver el archivo de clasificación de un modelo o vehículo eléctrico.
           search_placeholder: Buscar por fabricante o modelo…
+          view_on_github: Ver este archivo en GitHub
         schema:
           unreachable: El repositorio de Bike Book no responde. Inténtalo de nuevo
             en un minuto.
-          view_on_github: Ver este archivo en GitHub
       ebike_rules:
         class_tile:
           class: Clase
@@ -7614,8 +7679,6 @@ es:
           class_n: Clase %{n}
           class_unknown_in_bike_book_label: Bike Book no indica su clase ni su velocidad
             máxima, así que compruebe la clase en su etiqueta.
-          classes_not_permitted: Es una bicicleta eléctrica %{classes}, lo cual no
-            está permitido.
           classes_not_recognized_in:
             one: La clase %{n} no se reconoce en %{state}.
             other: Las clases %{n} no se reconocen en %{state}.
@@ -7680,6 +7743,8 @@ es:
           watts_to_check_html: Compruebe que su motor tenga una potencia nominal de
             %{cap}W o inferior.
           watts_within_cap_html: El motor %{watts}W está dentro de la tapa
+          classes_not_permitted_in: Es una bicicleta eléctrica %{classes}, que no
+            está permitida en %{state}.
       memberships:
         new:
           become_a_member: Hazte miembro
@@ -8873,6 +8938,47 @@ es:
             out_of_links_html: Hemos enviado todos los enlaces de activación posibles
               para %{name}, pero ninguno llegó a %{email}. Ponte en contacto con support@bikeindex.org
               y lo solucionaremos.
+      shop:
+        index:
+          bulk_order_email_subject: Pedido de pegatinas al por mayor
+          bulk_orders_html: "%{contact_link} para pedidos al por mayor."
+          caped_cap_alt: La gorra del Registrante Enmascarado, estampado de cómic
+            azul claro con visera morada.
+          caped_cap_description: Nuestro cómic ilustrado en una gorra de ciclista.
+            Suenan las campanillas, se abren los candados y el escudo con capa vigila.
+            Visera morada.
+          caped_cap_name: La gorra del Registrante con Capa
+          contact_us: Contacta
+          cycling_cap: gorra de ciclismo
+          for_riders_and_shops: Para ciclistas y tiendas
+          for_shops: Para tiendas
+          gear_that_helps_get_bikes_home: Equipo que ayuda a llevar las bicicletas
+            a casa.
+          lede: Bike Index es un registro gratuito y sin ánimo de lucro. Cada gorra
+            y pegatina que compres contribuye a que siga siendo gratuito para ciclistas
+            de todo el mundo.
+          mission: Somos una organización sin fines de lucro 501(c)(3). Las ventas
+            financian el registro, las alertas de bicicletas robadas y la red de socios
+            que ayuda a los ciclistas a recuperar sus bicicletas.
+          shop_the_gear: Compra el equipo
+          sticker_alt: 'Cómo evitar que te roben la bicicleta: cartel que muestra
+            la pegatina de matriculación.'
+          sticker_description: Pégala en el cuadro, escanea el código QR y tu bicicleta
+            quedará registrada en unos dos minutos. Si alguna vez pierdes o te roban
+            la bicicleta, quien la encuentre podrá escanear la pegatina y comprobar
+            que te pertenece. Las tiendas de bicicletas también pueden tenerlas disponibles
+            para bicicletas nuevas, de segunda mano y para bicicletas que necesiten
+            mantenimiento.
+          sticker_name: Pegatinas de registro del Índice de Bicicletas
+          suggested_retail: Precio minorista sugerido
+          the_bike_index_shop: La tienda Bike Index
+          wholesale_pricing_available: Precios al por mayor disponibles
+          your_purchase_keeps_bike_index_free: Tu compra permite que Bike Index siga
+            siendo gratuito.
+        product:
+          view: Vista
+          view_on_the_shop: Ver %{name} en la tienda Bike Index (se abre en una pestaña
+            nueva)
     shared_blocks:
       footer:
         about: Acerca
@@ -9049,13 +9155,11 @@ es:
           removed_from: Eliminado del índice de bicicletas
           serial: De serie
         bike_card:
-          e_vehicle: Vehículo eléctrico
           member_listing: Miembro de Bike Index
           member_listing_tooltip: Este vendedor es miembro de Bike Index.
           not_registered_with: No está registrado con %{org_name}
           registered_with: Registrado con %{org_name}
         bike_list_item:
-          e_vehicle: Vehículo eléctrico
           member_listing: Miembro de Bike Index
           member_listing_tooltip: Este vendedor es miembro de Bike Index.
           not_registered_with: No está registrado con %{org_name}

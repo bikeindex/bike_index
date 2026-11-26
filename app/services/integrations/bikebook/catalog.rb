@@ -10,7 +10,7 @@ module Integrations
       LOCAL_PATH = "/bikebook_catalog"
       URL = "https://bikebook-catalog.bikeindex.org/catalog/"
       # the published format bikebook/catalog_worker.js and similarity.js read
-      FORMAT = 5
+      FORMAT = 6
       MANIFEST = "manifest.#{FORMAT}.json"
       MANIFEST_URL = LOCAL_DIRECTORY ? "#{LOCAL_PATH}/#{MANIFEST}" : "#{URL}#{MANIFEST}"
       GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
@@ -33,21 +33,37 @@ module Integrations
         model(id)&.then { {title: "#{it["manufacturer"]} #{it["model"]}", description: it["description"], image_url: it["stock_photo"]} }
       end
 
-      # The model's record, nil for one the catalog hasn't. Raises Unreachable while the catalog doesn't answer. Cached
-      # apart from its far larger block, under the manifest's digest: a cached one needs no manifest read, and an updated
-      # catalog re-keys them all
-      def model(id)
+      # The model's record, its `market`'s variant where the catalog has one keyed id@market, nil for a model it hasn't.
+      # Raises Unreachable while the catalog doesn't answer. Cached apart from its far larger block, under the manifest's
+      # digest: a cached one needs no manifest read, and an updated catalog re-keys them all
+      def model(id, market: nil)
         return unless id.to_s.match?(MODEL_ID)
         raise Unreachable unless head
 
-        record = cached(["bikebook_catalog/model", head["digest"], id], expires_in: 1.day) do
+        record = cached(["bikebook_catalog/model", head["digest"], id, market].compact, expires_in: 1.day) do
           block = (manifest || raise(Unreachable)).dig("blocks", id[MODEL_ID, 1])
-          block && read(block)["models"][id] || {}
+          models = block ? read(block)["models"] : {}
+          models["#{id}@#{market}"] || models[id] || {}
         end
         (record || raise(Unreachable)).presence
       end
 
-      # vehicle_models' entries: each vehicle's id, then in braces what's picked for it, m/trek/2026/marlin-5{size:M}{json}.
+      # The catalog's market for a country's ISO code: it lists an EU member's models under the EU. The US for one that's
+      # unknown, as Cloudflare's CF-IPCountry is XX, or T1 over Tor, when it can't tell
+      def market(iso)
+        return "US" if iso.blank? || %w[XX T1].include?(iso)
+
+        EbikeRuleServices::Places::EU_MEMBERS.include?(iso) ? "EU" : iso
+      end
+
+      # The index's models, nil while the catalog doesn't answer. Too big to cache, and read by a job, outside rack-timeout
+      def index_models(path)
+        read(path, timeout: 60)["models"]
+      rescue *FAILURES
+        nil
+      end
+
+      # vehicle_models' entries: each vehicle's id, then in braces what's picked for it, m/trek/2026/marlin-5{size:M}.
       # A name's commas are inside its braces
       def vehicle_entries(vehicle_models) = vehicle_models.to_s.scan(/(?:[^,{]|\{[^}]*\})+/)
 
@@ -60,15 +76,14 @@ module Integrations
       # nil while the catalog doesn't answer
       def manifest = manifest_part(:manifest)
 
-      # The file the catalog's laws and classifications are in, whose name is a digest of them
+      # The vocabulary file, whose name is a digest of its contents
       def vocabulary = head&.dig("vocabulary")
+
+      # What's at `keys` in the vocabulary, cached without the rest of the file. nil while the catalog doesn't answer
+      def vocabulary_dig(*keys) = vocabulary&.then { file(it, *keys) }
 
       # Whether the catalog answers in the format /bikebook reads
       def readable? = head&.dig("format") == FORMAT
-
-      # A published file, nil while the catalog doesn't answer. Its name is a digest of its contents,
-      # so it keeps while it's published
-      def file(path) = cached(["bikebook_catalog/file", 2, path], expires_in: 1.week) { read(path) }
 
       # Each schema document's fields, with the count of models holding each value and a few of them, and the file's
       # name, which carries a digest of its contents. nil while the catalog doesn't answer or names none
@@ -97,6 +112,12 @@ module Integrations
       # private below here
       #
 
+      # A published file, or what's at `keys` in it, nil while the catalog doesn't answer. Its name is a digest of its
+      # contents, so it keeps while it's published
+      def file(path, *keys)
+        cached(["bikebook_catalog/file", 2, path, *keys], expires_in: 1.week) { read(path).then { keys.empty? ? it : it.dig(*keys) } }
+      end
+
       # The head and the manifest are cached apart but always written together, so neither lags the catalog by more
       # than the 5 minutes each keeps
       def manifest_part(part)
@@ -117,6 +138,7 @@ module Integrations
         once(:fetched_manifest) do
           body = body(MANIFEST)
           manifest = JSON.parse(body)
+          BikebookModelsSyncJob.enqueue_for(manifest["index"])
           {head: manifest.slice("format", "vocabulary").merge("digest" => Digest::SHA256.hexdigest(body)), manifest:}
         rescue *FAILURES
           nil
@@ -125,15 +147,17 @@ module Integrations
 
       def once(key) = Reads.values.fetch(key) { Reads.values[key] = yield }
 
-      def read(path) = JSON.parse(body(path))
-
-      def body(path) = LOCAL_DIRECTORY ? File.read(File.join(LOCAL_DIRECTORY, path)) : connection.get(path).body
+      def read(path, **) = JSON.parse(body(path, **))
 
       # An uncached file can take over 5s to start answering. A page waits on up to three - the manifest, the
       # vocabulary and a model's block - which give up inside rack-timeout's 30s unless a body trickles in
-      def connection = Faraday.new(url: URL, request: {open_timeout: 2, timeout: 7}) { it.response :raise_error }
+      def body(path, timeout: 7)
+        return File.read(File.join(LOCAL_DIRECTORY, path)) if LOCAL_DIRECTORY
 
-      conceal :manifest_part, :manifest_key, :fetched_manifest, :once, :read, :body, :connection
+        Faraday.new(url: URL, request: {open_timeout: 2, timeout:}) { it.response :raise_error }.get(path).body
+      end
+
+      conceal :file, :manifest_part, :manifest_key, :fetched_manifest, :once, :read, :body
     end
   end
 end

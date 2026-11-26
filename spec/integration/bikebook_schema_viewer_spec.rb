@@ -7,6 +7,8 @@ RSpec.describe "Bike Book schema viewer", :js, type: :system do
 
   def toggle(path) = find("details[data-schema-path='#{path}'] > summary").click
 
+  let(:photo) { "[data-bikebook--schema-lookup-target='photo']" }
+
   def lookup = find_field("View a model's or e-vehicle classification's file", disabled: false, wait: 10)
 
   it "keeps what's opened and what's ordered by count in the URL, while it shows, and renders a model searched for" do
@@ -42,12 +44,15 @@ RSpec.describe "Bike Book schema viewer", :js, type: :system do
     expect(field.value).to eq "Segway GT3 Pro"
     # shown as /bikebook's chip shows it, a current model's badge after its name
     expect(page).to have_css("[data-ui--forms--combobox-display-target='overlay']", exact_text: "Segway GT3 Pro current")
+    # and its stock photo below
+    expect(page).to have_css("#{photo} img[src$='/segway/2025/gt3-pro.png']", visible: :all)
     # a click selects the pick, to type another over
     field.click
     field.send_keys("haul")
     retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
     expect(page).to have_current_path("/bikebook_schemas/m/specialized/2025/haul-st")
     expect(page).to have_css("pre", text: %("manufacturer": "Specialized",))
+    expect(page).to have_css("#{photo} img[src$='/specialized/2025/haul-st.png']", visible: :all)
 
     # Escape closes a search without picking from it, back to the pick
     field = lookup
@@ -65,5 +70,6 @@ RSpec.describe "Bike Book schema viewer", :js, type: :system do
     field.send_keys(:backspace)
     expect(page).to have_current_path("/bikebook_schemas?document=vehicle_model")
     expect(page).to have_css("[data-schema-path='type']").and have_no_css("pre")
+    expect(page).to have_no_css("#{photo} img", visible: :all)
   end
 end

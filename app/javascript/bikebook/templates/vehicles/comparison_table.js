@@ -46,7 +46,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
     label: html`Overall length (est.) ${tooltip({ text: `Overall length is ${OVERALL_LENGTH_ESTIMATE}` })}`,
     read: (vehicle) => {
       const listed = frames[named.indexOf(vehicle)]?.wheels
-      return specified(vehicle) ?? (listed ? presenter.rounded(sum(Object.values(listed))) : null)
+      return specified(vehicle) ?? (listed ? Math.round(sum(Object.values(listed))) : null)
     },
     format: (value, vehicle) => isNumber(specified(vehicle)) ? html`${show(wheelbase, value, vehicle)} ${tooltip({ text: 'This value is specified' })}` : null
   }

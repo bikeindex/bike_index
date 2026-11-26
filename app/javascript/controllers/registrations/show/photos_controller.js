@@ -1,13 +1,14 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='registrations--show--photos'
 // Swaps the large photo in [data-registrations--show--photos-target=main] to match
 // the clicked [data-registrations--show--photos-target=thumbnail], points the
 // enclosing link at the selected photo's original, and marks the selected
-// thumbnail aria-current.
+// thumbnail aria-current. The stock photo, the last thumbnail, shows its badge over the large photo.
 // A broken main image drops its enclosing link so it isn't clickable.
 export default class extends Controller {
-  static targets = ['main', 'link', 'thumbnail']
+  static targets = ['main', 'link', 'thumbnail', 'stockBadge']
 
   connect () {
     // The error event may have fired before this controller connected
@@ -25,6 +26,7 @@ export default class extends Controller {
       this.linkTarget.classList.remove('tw:cursor-default')
     }
     this.thumbnailTargets.forEach((el) => el.setAttribute('aria-current', el === thumbnail))
+    if (this.hasStockBadgeTarget) collapse(thumbnail.dataset.stock === 'true' ? 'show' : 'hide', this.stockBadgeTarget, 0)
   }
 
   // A broken main image drops its enclosing link: without an href an <a> isn't a

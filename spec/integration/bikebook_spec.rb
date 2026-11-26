@@ -11,6 +11,8 @@ RSpec.describe "Bike Book", :js, type: :system do
   # Page-wide, the filters' ~160 hidden options cost Capybara a round trip each, a pass outlasting its wait
   def vehicle_option = "#vehicle_models-hw-listbox [role='option']"
 
+  def vocabulary_fetch = "fetch('#{Integrations::Bikebook::Catalog::URL}vocabulary.json').then((response) => response.json())"
+
   def on_phone
     size = page.current_window.size
     page.current_window.resize_to(390, 844)
@@ -112,15 +114,15 @@ RSpec.describe "Bike Book", :js, type: :system do
     tips = "[aria-label='How to use Bike Book']"
     expect(page).to have_css(tips).and have_link("Trek Marlin 5 vs Specialized Rockhopper Sport", href: %r{vehicle_models=m/trek/2026/marlin-5-gen-3,})
     # and, filtered or not, some of the catalog to start from, cheapest first: each a cycle but a unicycle or trike (so no
-    # Kris Holm or Roll Trike) with a photo (so no Reactive Adaptations), complete (so no Roll 2), priced at $600 or more
-    # (so no Roll 3, unpriced, or Roll 1) in the visitor's currency (so no Sirrus 2, in francs), not a kid's (so no Jett
-    # 24), each e-bike a class legal where the visitor is (so no Segway GT3 Pro or Sur-Ron), none over $10,000
-    # (so no Crux 5 S-Level), the women's Ruby Sport and the cheapest e-bike
+    # Kris Holm or Haven Trio 7) with a photo (so no Reactive Adaptations), complete (so no P.Fix), priced at $600 or more
+    # (so no Fuse Four, unpriced, or Polygon) in the visitor's currency (so no Bianchi, in francs), not a kid's (so no
+    # Commencal), each e-bike a class legal where the visitor is (so no Segway GT3 Pro or Sur-Ron), none over $10,000
+    # (so no Crux 5 S-Level), the women's Gravity Swift and the cheapest e-bike
     expect(page).to have_text("39 models to compare.")
     expect(page).to have_css("[aria-label='Models to compare'] a", count: 12)
     picks = featured_ids
-    expect(picks).to include("m/specialized/2025/ruby-sport", "m/aventon/2024/soltera-2-5")
-    expect(picks.grep(%r{\Am/(kris-holm|reactive-adaptations|segway|sur-ron)/|jett-24|crux|roll-[123]|roll-trike|sirrus-2})).to be_empty
+    expect(picks).to include("m/gravity/2026/swift-21-ltd", "m/aventon/2024/soltera-2-5")
+    expect(picks.grep(%r{\Am/(kris-holm|haven|reactive-adaptations|polygon|bianchi|commencal-bikes|segway|sur-ron)/|p-fix|fuse-four|crux})).to be_empty
     expect(featured_prices).to eq featured_prices.sort
     # others each page load, which a few tries make sure of, as the fixture's few models could repeat
     reloaded = 3.times.lazy.map do
@@ -143,7 +145,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     # which a filter changes in place
     check "Human powered (Acoustic)"
     expect(page).to have_text("15 models match your filters.")
-    expect(featured_ids).to eq %w[m/specialized/2025/ruby-sport]
+    expect(featured_ids).to eq %w[m/gravity/2026/swift-21-ltd]
     # the one the rules leave, which no rotation changes
     expect(page).to have_no_button("rotate samples")
     # and the same ones again as it's undone
@@ -283,7 +285,6 @@ RSpec.describe "Bike Book", :js, type: :system do
       "vehicle_models=m/aventon/2026/level-4-rec-step-through,m/aventon/2025/level-3", "vehicle_models=m/aventon/2026/level-4-rec-step-through",
       "count=1&q=level-2-step&vehicle_models=m/aventon/2026/level-4-rec-step-through",
       "vehicle_models=m/aventon/2026/level-4-rec-step-through,m/aventon/2022/level-2-step-through"]
-    expect(page).to have_no_css("article")
     # what differs is only marked further down
     expect(find("[aria-label='Overview comparison']")).to have_no_css(".tw\\:spec-diff")
     # beside an e-vehicle, one without a motor says it isn't one rather than missing its class, and an unlisted
@@ -291,13 +292,12 @@ RSpec.describe "Bike Book", :js, type: :system do
     # differ, each one's tire max on a line under it, and each end's travel once one is suspended, its specs under its heading in one tooltip
     classes = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { basics }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/basics'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehiclePresenter }, { basics }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/basics'), import('bikebook/render'), #{vocabulary_fetch}])
         const wheels = (front, rear, tire, [frontMax, rearMax] = []) =>
           [{ bsd: front, tire_width: tire, tire_width_max: frontMax, position: ['front'] }, { bsd: rear, tire_width: tire, tire_width_max: rearMax, position: ['rear'] }]
         const lines = (cell) => { cell.querySelectorAll('br').forEach((br) => br.replaceWith('|')); return cell.textContent.split('|').map((line) => line.replace(/\\s+/g, ' ').trim()) }
-        const rowsOf = (datas) => [...fragmentOf(basics({ presenter: new VehiclePresenter(kit, vocabulary), vehicles: datas.map((data, index) => ({ value: String(index), data })), removePath: () => '/bikebook' }))
+        const rowsOf = (datas) => [...fragmentOf(basics({ presenter: new VehiclePresenter(vocabulary), vehicles: datas.map((data, index) => ({ value: String(index), data })), removePath: () => '/bikebook' }))
           .querySelectorAll('tbody tr')]
         const rows = rowsOf([{ model: 'Electric', type: 'cargo', motors: [{ rated_power: 250 }], wheels: wheels(622, 584, undefined, [50, 60]), suspension: { front: { travel: 120 } } },
           { model: 'Acoustic', type: 'bike', wheels: wheels(622, 622, 40, [45, 45]) }])
@@ -314,11 +314,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a description over 200 characters is cut at a word, its paragraphs kept, and one within them is whole
     excerpts = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { basics }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/basics'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehiclePresenter }, { basics }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/basics'), import('bikebook/render'), #{vocabulary_fetch}])
         const description = (text) => {
-          const rendered = fragmentOf(basics({ presenter: new VehiclePresenter(kit, vocabulary), vehicles: [{ value: '0', data: { model: 'One', description: text } }], removePath: () => '/bikebook' }))
+          const rendered = fragmentOf(basics({ presenter: new VehiclePresenter(vocabulary), vehicles: [{ value: '0', data: { model: 'One', description: text } }], removePath: () => '/bikebook' }))
           const excerpt = rendered.querySelector('tbody [data-controller~="ui--collapse"] > div')
           return excerpt ? [...excerpt.querySelectorAll('p')].map((paragraph) => paragraph.textContent) : rendered.querySelector('tbody button') == null
         }
@@ -445,7 +444,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_css("[data-comparison] section[aria-label$=' components']", count: 2)
     # topped in no frame's color, which is the geometry's
     expect(page).to have_no_css("section[aria-label$=' components'].tw\\:border-t-4")
-    expect(page).to have_no_css("article").and have_no_css("[aria-label='Components comparison']")
+    expect(page).to have_no_css("[aria-label='Components comparison']")
     # each with the overview's × in its top right corner
     corners = page.evaluate_script(<<~JS)
       [...document.querySelectorAll("section[aria-label$=' components']")].map((card) => {
@@ -484,14 +483,12 @@ RSpec.describe "Bike Book", :js, type: :system do
     end
     expect(ranks.flatten.tally).to include(0 => 4, 1 => be_positive, 2 => be_positive)
     expect(ranks).to all(satisfy { |rows| rows == rows.sort })
-    # what's in the box listed by its detail and description after the parts, on a full card too, rather than in a row
-    # compared with the other's
+    # what's in the box listed by its detail and description after the parts, rather than in a row compared with the other's
     in_the_box = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { componentsOf, modelViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
-        const presenter = new VehiclePresenter(kit, vocabulary)
+        const [{ VehiclePresenter }, { componentsOf }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), #{vocabulary_fetch}])
+        const presenter = new VehiclePresenter(vocabulary)
         const included = (detail, description) => ({ type: 'included-not-installed', type_detail: detail, description })
         const saddle = { type: 'saddle', description: 'Comfort' }
         const vehicles = [{ key: 'a', data: { model: 'A', components: [saddle, included('Pedals', 'Platform'), included(undefined, 'Reflector kit')] } },
@@ -503,11 +500,10 @@ RSpec.describe "Bike Book", :js, type: :system do
             [...box.nextElementSibling.querySelectorAll('li')].map((item) => item.textContent.trim())]
         }
         const cards = componentsOf({ presenter, vehicles, others: (key) => key === 'a' ? [] : [vehicles[0].data] })
-        return [read(cards.get('a')), read(cards.get('b')), read(modelViewer({ presenter, data: vehicles[0].data, others: [] }))]
+        return [read(cards.get('a')), read(cards.get('b'))]
       })()
     JS
-    expect(in_the_box).to eq([[["Saddle||||Comfort"], ["Pedals Platform", "Reflector kit"]], [["Saddle||||Comfort"], ["Pedals Clipless"]],
-      [["Saddle||||Comfort"], ["Pedals Platform", "Reflector kit"]]])
+    expect(in_the_box).to eq([[["Saddle||||Comfort"], ["Pedals Platform", "Reflector kit"]], [["Saddle||||Comfort"], ["Pedals Clipless"]]])
     # and their motors and batteries, a tab only an e-vehicle gets
     click_link "Motor & Battery"
     expect(page).to have_css("[data-comparison] section[aria-label$=' motors']", count: 2)
@@ -518,47 +514,38 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(battery).to have_css("dl > div", text: /\ACapacity\s*672\W*Wh, 48\W*V Li-ion\z/)
     expect(page.evaluate_script(<<~JS)).to match([["Options", /\Aalso 500, 625\W*Wh\z/], ["Charging time", "4 h 30 min"], ["Removable", "Yes"]])
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { motorSection }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/motor_section'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehiclePresenter }, { motorSection }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/motor_section'), import('bikebook/render'), #{vocabulary_fetch}])
         const motor = { battery: { capacity_options: [500, 625], charging_time: 270, removable: true } }
-        const rendered = fragmentOf(motorSection({ presenter: new VehiclePresenter(kit, vocabulary), heading: 'Motor', motor, others: [] }))
+        const rendered = fragmentOf(motorSection({ presenter: new VehiclePresenter(vocabulary), heading: 'Motor', motor, others: [] }))
         return [...rendered.querySelector('h3').parentElement.querySelectorAll('dl > div')].map((row) => [...row.children].map((each) => each.textContent.replace(/\\s+/g, ' ').trim()))
       })()
     JS
     without_motor = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const url = new URL('/bikebook?view=motors', window.location.href)
-        const rendered = fragmentOf(new VehicleViewer(kit, vocabulary).render([{ value: 'm/surly/2018/0', data: { model: 'Acoustic' } }], url, null))
+        const rendered = fragmentOf(new VehicleViewer(vocabulary).render([{ value: 'm/surly/2018/0', data: { model: 'Acoustic' } }], url, null))
         return [...rendered.querySelectorAll('nav[aria-label="Views"] a')].map((tab) => [tab.textContent.trim(), tab.hasAttribute('aria-current')])
       })()
     JS
-    expect(without_motor).to eq([["Overview", true], ["Sizes & geometry", false], ["Components", false], ["All", false]])
-    click_link "All"
-    expect(page).to have_css("[data-comparison] article", count: 2)
-    # each card's ID a copy away beside its name, as on the Overview, rather than a row of its own
-    expect(page).to have_css("[data-comparison] article header button[aria-label^='Copy ID (m/']", count: 2)
-      .and have_no_css("[data-comparison] article dt", exact_text: "ID")
-    # the full cards alone, without the other views' tables or the overlay
-    expect(page).to have_no_css("table:not(article table)").and have_no_css("[aria-label='Geometry overlay']")
-    expect(page).to have_current_path(/[?&]view=all\b/)
+    expect(without_motor).to eq([["Overview", true], ["Sizes & geometry", false], ["Components", false]])
+    click_link "Components"
     # the size picked an entry of its own
     expect(history_length.call).to eq entries + 1
     # what differs is marked, not what it's called, and of a list just the items that differ
-    expect(all("article").last).to have_css("dd .tw\\:spec-diff").and have_no_css("dt .tw\\:spec-diff")
-    front_wheel = all("article").last.find("section", text: /\AWheels/i).find("dd", match: :first)
+    component_cards = -> { all("[data-comparison] section[aria-label$=' components']", count: 2) }
+    expect(component_cards.call.last).to have_css("dd .tw\\:spec-diff").and have_no_css("dt .tw\\:spec-diff")
+    front_wheel = component_cards.call.last.find("section", text: /\AWheels/i).find("dd", match: :first)
     # the tire's narrower, and the axle's tooltip has less in it; the wheel size is the same
     expect(front_wheel.all(".tw\\:spec-diff").map(&:text)).to match([/\A2\.1\W+in tire/, /\Athru axle/])
-    expect(all("article").first).to have_no_css(".tw\\:spec-diff")
+    expect(component_cards.call.first).to have_no_css("dd .tw\\:spec-diff")
     # no fixture is composite, which the catalog names "Carbon or Composite"
     material = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'), catalog('kit.json'), catalog('vocabulary.json')])
-        return new VehiclePresenter(kit, vocabulary).named(kit.schemas.vehicle, { frame: { material: 'composite' } }).frame.material
+        const [{ VehiclePresenter }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'), #{vocabulary_fetch}])
+        return new VehiclePresenter(vocabulary).named(vocabulary.kit.schemas.vehicle, { frame: { material: 'composite' } }).frame.material
       })()
     JS
     expect(material).to eq "Carbon/Composite"
@@ -566,9 +553,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     # the widest tire a position takes, a wheel the build doesn't come with included
     wheels = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { wheelsAt }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehiclePresenter }, { wheelsAt }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/model_viewer'), import('bikebook/render'), #{vocabulary_fetch}])
         const data = { wheels: [
           { position: ['front', 'rear'], sizes: ['S'], bsd: 584, tire_width: 28 },
           { position: ['front'], sizes: ['M', 'L'], bsd: 622, tire_width: 28, tire_width_max: 32, cassette_interface: 'Shimano HG', dropout: 'vertical', axle: 'thru_axle', axle_diameter: 12 },
@@ -576,7 +562,7 @@ RSpec.describe "Bike Book", :js, type: :system do
           { position: ['front', 'rear'], configured: false, bsd: 584, tire_width_max: 50 }
         ] }
         const text = (content) => fragmentOf(content).textContent.replace(/\\s+/g, ' ').trim()
-        const presenter = new VehiclePresenter(kit, vocabulary)
+        const presenter = new VehiclePresenter(vocabulary)
         const [medium, small] = [{ name: 'M' }, { name: 'S' }].map((size) => wheelsAt(presenter, data, size))
         const summary = (wheel) => wheel.parts.map(([, , content]) => text(content)).join(', ')
         return [summary(medium.front), medium.front.maxTire, medium.rear.maxTire, summary(small.front)]
@@ -586,14 +572,13 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a groupset is a line of the drivetrain's, its maker named once, and electronic shifting alone marked against the first's
     groupsets = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const vehicles = [['GRX RX610 1X12S', false], ['Shimano GRX RX610 1X12S', true], ['SHIMANO GRX RX822 1X12S', false]].map(([description, electronic], index) =>
           ({ value: `m/shimano/2026/${index}`, display: String(index), data: { model: String(index), groupset: { manufacturer: 'Shimano', description, electronic } } }))
-        const viewers = fragmentOf(new VehicleViewer(kit, vocabulary).render(vehicles, new URL(window.location.href), null))
-        return [...viewers.querySelectorAll('article')].map((article) => {
-          const row = [...article.querySelectorAll('section')].find((each) => /^drivetrain/i.test(each.textContent.trim())).querySelector('dd')
+        const viewers = fragmentOf(new VehicleViewer(vocabulary).render(vehicles, new URL('/bikebook?view=components', window.location.href), null))
+        return [...viewers.querySelectorAll('section[aria-label$=" components"]')].map((card) => {
+          const row = [...card.querySelectorAll('section')].find((each) => /^drivetrain/i.test(each.textContent.trim())).querySelector('dd')
           return [row.textContent.replace(/\s+/g, ' ').trim(), [...row.querySelectorAll('[class~="tw:spec-diff"]')].map((each) => each.textContent.trim())]
         })
       })()
@@ -603,12 +588,11 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a motor linked by its market's unit names the market, and its assist speed is its market's, in mph for a US model
     motors = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const bike = (markets, id, speed) => ({ model: 'E', markets, motors: [{ manufacturer: 'Bosch', model: 'Performance Line CX (BDU384Y)', id,
           operating_modes: [{ mode: 'assist', availability: 'stock', max_speed: speed }] }] })
-        const rows = (data) => [...fragmentOf(new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/e', data }], new URL('/bikebook?view=motors', window.location.href), null))
+        const rows = (data) => [...fragmentOf(new VehicleViewer(vocabulary).render([{ value: 'm/x/2026/e', data }], new URL('/bikebook?view=motors', window.location.href), null))
           .querySelectorAll('section section dl > div')].map((row) => row.textContent.replace(/\\s+/g, ' ').trim()).filter((row) => /^(Motor|Max speed)/.test(row))
         return [rows(bike(['US'], 'c/bosch/2025/bdu384y-us', 32.2)), rows(bike(['EU'], 'c/bosch/2025/bdu384y-eu', 25)), rows(bike(['JP'], 'c/bosch/2025/bdu384y', 24))]
       })()
@@ -620,11 +604,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # own lists more
     bare_mode = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const bike = (throttle) => ({ model: 'E', motors: [{ rated_power: 250, operating_modes: [{ mode: 'throttle', e_vehicle_classifications: ['evc/us/class-2'], ...throttle }] }] })
-        const throttles = (vehicles) => [...fragmentOf(new VehicleViewer(kit, vocabulary).render(vehicles, new URL('/bikebook?view=motors', window.location.href), null))
+        const throttles = (vehicles) => [...fragmentOf(new VehicleViewer(vocabulary).render(vehicles, new URL('/bikebook?view=motors', window.location.href), null))
           .querySelectorAll('section[aria-label$=" motors"]')].map((card) => [...card.querySelectorAll('section section h3')]
           .map((heading) => heading.parentElement.textContent.replace(/\\s+/g, ' ').trim()))
         const bare = bike({ availability: 'stock' })
@@ -637,20 +620,19 @@ RSpec.describe "Bike Book", :js, type: :system do
     # an end's spring and lockout, said where they're notable, and a coil-compatible frame
     specs = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const data = { model: 'Enduro', frame: { material: 'aluminum', coil_compatible: true }, groupset: { manufacturer: 'SRAM', series: 'GX', description: 'GX Eagle AXS', electronic: true },
           drivetrain: ['1-front', '12-rear'], gearing: { front: [32], rear: [10, 52] },
           suspension: { front: { travel: 170, spring: 'air', lockout: true }, rear: { travel: 160, shock_length: 157.5, shock_stroke: 62.5, spring: 'coil' } } }
-        const viewer = new VehicleViewer(kit, vocabulary)
+        const viewer = new VehicleViewer(vocabulary)
         const render = (view) => fragmentOf(viewer.render([{ value: 'm/x/2026/enduro', data }], new URL(`/bikebook?view=${view}`, window.location.href), null))
         const text = (element) => element.textContent.replace(/\\s+/g, ' ').trim()
         const rows = (root, heading) => [...[...root.querySelectorAll('section')].find((each) => new RegExp(`^${heading}`, 'i').test(text(each.querySelector('h2') ?? each)))
           .querySelectorAll('dl > div')].map((row) => [text(row.querySelector('dt')), text(row.querySelector('dd'))])
-        const all = render('all')
+        const components = render('components')
         const overview = [...render('basics').querySelectorAll("[aria-label='Overview'] tbody tr")].map((row) => [text(row.querySelector('th')), text(row.querySelector('td'))])
-        return { overview: overview.map(([label]) => label), groupset: overview.find(([label]) => label === 'Groupset')[1], suspension: rows(all, 'suspension'), frame: rows(all, 'frame') }
+        return { overview: overview.map(([label]) => label), groupset: overview.find(([label]) => label === 'Groupset')[1], suspension: rows(components, 'suspension'), frame: rows(components, 'frame') }
       })()
     JS
     expect(specs["overview"]).to eq(["Frame material", "Suspension front/rear", "Groupset"])
@@ -660,7 +642,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(specs["frame"]).to include(["Coil compatible", "Yes"])
 
     find("[aria-label='Remove Aventón Level 2 Step-Through']").click
-    expect(page).to have_css("article", count: 1)
+    expect(page).to have_css("section[aria-label$=' components']", count: 1)
     expect(page).to have_no_css("[data-comparison]")
     expect(page).to have_css(".hw-combobox__chip", count: 1)
     # one model still gets the table and the overlay, its frame alone
@@ -669,23 +651,11 @@ RSpec.describe "Bike Book", :js, type: :system do
 
     logged_count = logged.count
     page.go_back
-    expect(page).to have_css("article", count: 2)
+    expect(page).to have_css("section[aria-label$=' components']", count: 2)
     expect(page).to have_css(".hw-combobox__chip", count: 2)
     # a history step is no new search, though its render re-runs its combobox's
     page.evaluate_script("new Promise((resolve) => setTimeout(resolve, 1100))")
     expect(logged.count).to eq logged_count
-
-    # The JSON panel opens beside its card, and only its card's, which stays open as the page renders again
-    json_open = -> { all("[aria-label='Toggle JSON']").map { it["aria-expanded"] } }
-    first("[aria-label='Toggle JSON']").click
-    expect(page).to have_css(".twjson-panel code", text: '"model": "Level 4 REC Step-Through"')
-    expect(page).to have_current_path(%r{[?&]vehicle_models=m/aventon/2026/level-4-rec-step-through\{json\},m/aventon/2022/level-2-step-through\{size:M/L\}(&|\z)})
-    expect(json_open.call).to eq(%w[true false])
-    click_link "Overview"
-    expect(page).to have_css("[aria-label='Overview comparison']")
-    click_link "All"
-    expect(page).to have_css(".twjson-panel code", text: '"model": "Level 4 REC Step-Through"')
-    expect(json_open.call).to eq(%w[true false])
 
     # By keyboard, the panel's own More filters takes the focus that opening it hides, and closing hands it back
     trigger = "[role='button'][aria-controls='vehicle-filters']"
@@ -699,9 +669,9 @@ RSpec.describe "Bike Book", :js, type: :system do
     find("#{trigger}:focus").send_keys(:enter)
     # the classes are the US market's, which the visitor's country isn't
     expect(page).to have_no_field("US Class 2")
-    # its own models, and none of a maker's sold elsewhere, as it sells a Kris Holm
+    # its own models, and none of a maker's sold elsewhere, as it sells a Polygon
     choose_option("Market", "United States")
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(38 matching models)")
     # a class matches the models carrying it, and out of class the catalog's own marker
     check "US Class 2"
     expect(page).to have_css("#vehicle-models-count", exact_text: "(18 matching models)")
@@ -712,7 +682,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_no_link("Clear filters")
     uncheck "US Class 2"
     uncheck "Out of Class"
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(24 matching models)")
     expect(page).to have_field("Human powered (Acoustic)", checked: false, disabled: false).and have_checked_field("e-Vehicle (motorized)")
     # as on /ebike-rules, a state on the three US classes keeps them and one with its own shows those,
     # each matching the models in its groups, leaving the other jurisdiction's unchecked
@@ -733,7 +703,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     clear_jurisdiction
     expect(page).to have_no_field("Low-Speed Electric Bicycle")
     expect(page).to have_unchecked_field("US Class 2").and have_unchecked_field("Out of Class")
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(23 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(24 matching models)")
     # a US class's tooltip names it, its description citing no IDs beside the one it shows
     find("button[aria-label='US Class 1 e-bike']").click
     expect(page).to have_css("[role='tooltip'] h3", exact_text: "US Class 1 e-bike", visible: true)
@@ -743,23 +713,21 @@ RSpec.describe "Bike Book", :js, type: :system do
     choose "Any market", allow_label_click: true
     expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)")
     find_field("Manufacturers").click
-    find("#manufacturer-hw-listbox [role='option']", text: "Kris Holm (6)").click
+    find("#manufacturer-hw-listbox [role='option']", text: "Kris Holm (5)").click
     # picked by a click, it closes the list but keeps the focus, for another pick
     expect(page).to have_css("#manufacturer:focus[aria-expanded='false']")
     expect(page).to have_css("[data-async-id='manufacturer'] .hw-combobox__chip", text: "Kris Holm")
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(6 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(5 matching models)")
     # checked propulsions match any of them
     check "e-Vehicle (motorized)"
     expect(page).to have_css("#vehicle-models-count", exact_text: "(0 matching models)")
     check "Human powered (Acoustic)"
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(6 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(5 matching models)")
     expect(page).to have_current_path(/electric=0,1/)
     # a view's tab, written before the filters changed, keeps them and the open panel
     click_link "Components"
     expect(page).to have_current_path(/[?&]view=components\b/).and have_current_path(/electric=0,1/)
     expect(page).to have_checked_field("Human powered (Acoustic)").and have_css("[data-async-id='manufacturer'] .hw-combobox__chip", text: "Kris Holm")
-    click_link "All"
-    expect(page).to have_css("[data-comparison] article", count: 2)
 
     # closed, the applied filters can be cleared all at once, keeping the picks and view
     click_on "More filters", match: :first
@@ -767,7 +735,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     click_link "Clear filters"
     expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)")
     expect(page).to have_no_link("Clear filters").and have_no_css("[aria-label='Applied filters'] li")
-    expect(page).to have_css(".hw-combobox__chip", count: 2).and have_css("[data-comparison] article", count: 2)
+    expect(page).to have_css(".hw-combobox__chip", count: 2).and have_css("[data-comparison] section[aria-label$=' components']", count: 2)
     expect(page).to have_no_current_path(/manufacturer|electric/)
     # by frame material, which the comparison lists, and handlebar type
     click_on "More filters", match: :first
@@ -790,7 +758,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     # any market's models, as the clears above kept it
     expect(page).to have_css("#vehicle-models-count", exact_text: "(39 matching models)")
     choose "Only United States", allow_label_click: true
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(37 matching models)")
     check "US Class 2"
     expect(page).to have_css("#vehicle-models-count", exact_text: "(18 matching models)")
     expect(page).to have_no_link("Clear filters")
@@ -809,7 +777,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     page.current_window.resize_to(1440, 900)
     five = %w[m/aventon/2026/level-4-rec-step-through m/aventon/2022/level-2-step-through m/segway/2025/gt3-pro
       m/specialized/2025/haul-st m/sur-ron/2026/ultra-bee-hp-x].join(",")
-    card_rows = -> { page.evaluate_script("new Set([...document.querySelectorAll('article')].map((card) => Math.round(card.getBoundingClientRect().top))).size") }
+    card_rows = -> { page.evaluate_script(%(new Set([...document.querySelectorAll("section[aria-label$=' components']")].map((card) => Math.round(card.getBoundingClientRect().top))).size)) }
     scrolls_sideways = -> { page.evaluate_script("document.querySelector('[data-comparison] > div').scrollWidth > window.innerWidth") }
     # past three, the overview reaches past the page's column, which the search spans
     visit bikebook_path(vehicle_models: five)
@@ -836,23 +804,18 @@ RSpec.describe "Bike Book", :js, type: :system do
       })()
     JS
     expect(table_fit).to match([be >= 1248, false])
-    click_link "All"
-    expect(page).to have_css("[data-comparison] article", count: 5)
+    click_link "Components"
+    expect(page).to have_css("[data-comparison] section[aria-label$=' components']", count: 5)
     expect(card_rows.call).to eq 1
-    expect(scrolls_sideways.call).to be true
-    # of a year the first lacks just the year, and of a drivetrain just the chip it lacks
-    haul = find("article h1", text: "Haul ST").ancestor("article")
-    marked = ->(heading, selector) { haul.find("h2", text: heading).ancestor("section").all(selector).map { it.text.strip } }
-    expect(marked.call(/\Amodel years\z/i, "tr:last-child td.tw\\:spec-diff")).to eq(["2025"])
-    expect(marked.call(/\Adrivetrain\z/i, "span.tw\\:rounded-sm.tw\\:spec-diff")).to eq(["9 Rear"])
+    # of a drivetrain just the chip the first lacks
+    haul = find("section[aria-label='Specialized Haul ST components']")
+    expect(haul.find("h2", text: /\Adrivetrain\z/i).find(:xpath, "..").all("span.tw\\:rounded-sm.tw\\:spec-diff").map { it.text.strip }).to eq(["9 Rear"])
 
     # and on a phone too, rather than stacking
     page.current_window.resize_to(390, 844)
     expect(card_rows.call).to eq 1
     expect(scrolls_sideways.call).to be true
     # each neighbor of a centered card still showing
-    click_link "Components"
-    expect(page).to have_css("[data-comparison] section[aria-label$=' components']", count: 5)
     expect(neighbors_showing(find("[data-comparison] > div"), 1)).to all(be > 10)
     page.current_window.resize_to(1920, 1080)
 
@@ -872,7 +835,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     page.driver.with_playwright_page { it.on("request", ->(request) { logged << request.url.split("?").last if request.url.include?(search_bikebook_path) }) }
     visit bikebook_path
     # its own models and those of makers it sells none of, but for e-vehicles
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(7 matching models)", wait: 10)
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(12 matching models)", wait: 10)
     # its Canadian model, under the US model's row, which is all the index lists of it
     type_into(vehicle_field, "haul")
     expect(page).to have_css(vehicle_option, count: 1).and have_css("#{vehicle_option}[data-value='m/specialized/2025/haul-st@CA']")
@@ -880,8 +843,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     # beside its activity, whether it's electric
     expect(find(vehicle_option)).to have_css("span", exact_text: "⚡")
     # nor a maker's sold elsewhere, where it sells its own
-    type_into(vehicle_field, "kh24")
-    expect(page).to have_css(vehicle_option, count: 1).and have_css("#{vehicle_option}[data-value='m/kris-holm/2023/kh24']")
+    type_into(vehicle_field, "cascade 3")
+    expect(page).to have_css(vehicle_option, count: 1).and have_css("#{vehicle_option}[data-value='m/polygon/2018/cascade-3']")
     expect(find(vehicle_option)).to have_no_text("⚡")
     # the URL says the search shows, but not what's typed or the visitor's own market
     expect(page).to have_current_path("/bikebook?search=1")
@@ -902,7 +865,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     # by name rather than the catalog's order, which is by code, and only those with models
     # each with its code, as a state's shown, rather than a count; any market is how it narrows rather than one of them
     markets = all("#market-hw-listbox [role='option']").map(&:text)
-    expect(markets).to eq ["Canada (CA)", "China (CN)", "United Arab Emirates (AE)", "United States (US)"]
+    expect(markets).to eq ["Canada (CA)", "Switzerland (CH)", "United States (US)"]
     find_field("Market").send_keys(:escape)
     # named for the visitor's market
     expect(page).to have_checked_field("Prefer vehicles sold in Canada", visible: :all)
@@ -914,10 +877,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(logged.last).to end_with "&market_scope=any&q=Specialized+Haul+ST+%28current%29"
     # its own models alone
     choose "Only Canada", allow_label_click: true
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(6 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(2 matching models)")
     type_into(find_field("Market"), "united")
     find("#market-hw-listbox [role='option']", text: "United States (US)").click
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(37 matching models)")
     # and then for the one picked
     expect(page).to have_checked_field("Only United States", visible: :all).and have_field("Prefer vehicles sold in United States", visible: :all)
     expect(page).to have_current_path(/[?&]market=US\b/)
@@ -928,7 +891,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a cleared market is the visitor's again once a filter changes, as the URL leaving it out reads
     find_field("Market").send_keys(*Array.new("United States (US)".length, :backspace), :escape)
     find(:label, "Prefer vehicles sold in United States").click
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(7 matching models)")
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(12 matching models)")
     expect(page).to have_checked_field("Prefer vehicles sold in Canada", visible: :all).and have_no_current_path(/[?&]market=/)
 
     # an older link's every market is any of the visitor's
@@ -945,7 +908,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     # and a visitor Cloudflare can't place searches the US
     page.driver.with_playwright_page { it.set_extra_http_headers("CF-IPCountry" => "XX") }
     visit bikebook_path
-    expect(page).to have_css("#vehicle-models-count", exact_text: "(33 matching models)", wait: 10)
+    expect(page).to have_css("#vehicle-models-count", exact_text: "(38 matching models)", wait: 10)
 
     # on a phone, a colorway toggle off the overview's edge scrolls with it rather than widening the page
     window_size = page.current_window.size
@@ -991,18 +954,17 @@ RSpec.describe "Bike Book", :js, type: :system do
     tip = colors.find("[role='tooltip']", visible: true)
     expect(tip.all("span.tw\\:block").map { it.text.squish }).to eq(["Code: #545056", "Colors: Black"])
     expect(tip).to have_css("code", exact_text: "#545056").and have_css("span[aria-hidden][style='background: #000']", visible: :all)
-    # one colorway its newest year chosen alone, and behind a link that hides itself once it shows them, each paint an
-    # earlier year had, the years that share one together, but 2023's, the same as 2026's, each to choose too
+    # one colorway its newest year chosen alone, and behind a link that hides itself once it shows them, each paint's
+    # years, the years that share one together, 2023 with 2026, and each earlier paint to choose too
     page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ render }, { VehiclePresenter }, { basics }, { kit }, vocabulary] = await Promise.all([import('lit-html'), import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/basics'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ render }, { VehiclePresenter }, { basics }, vocabulary] = await Promise.all([import('lit-html'), import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/basics'), #{vocabulary_fetch}])
         const colorway = (name) => ({ name, color_code: '#000000' })
         const years = [{ year: 2026, colorways: [colorway('Black')] }, { year: 2025, colorways: [colorway('Black'), colorway('Red'), { name: 'Bare', colors: ['silver'] }] },
           { year: 2024, colorways: [] }, { year: 2023, colorways: [{ ...colorway('Black'), stock_photo: 'black_2023.png' }] }, { year: 2022, colorways: [colorway('Red')] },
           { year: 2021, colorways: [colorway('Red')] }]
-        const presenter = new VehiclePresenter(kit, { ...vocabulary, paint_colors: { 'Silver, gray or bare metal': '#bbb' } })
+        const presenter = new VehiclePresenter({ ...vocabulary, paint_colors: { 'Silver, gray or bare metal': '#bbb' } })
         // each its own key, as a radio group spans the document
         Object.entries({ 'colorway-check': undefined, 'colorway-picked': '2022 Red' }).forEach(([id, picked]) => {
           const container = Object.assign(document.createElement('div'), { id })
@@ -1018,13 +980,13 @@ RSpec.describe "Bike Book", :js, type: :system do
       click_on "View previous years colors"
       expect(page).to have_no_button("View previous years colors")
       # one without a code, Bike Index's swatches of its colors in its swatch's place, and no tooltip
-      expect(page).to have_text(/\ABlack\s*\?\s*2025\s*Black\s*\?\s*Red\s*\?\s*Bare\s*2021, 2022\s*Red\s*\?\z/)
+      expect(page).to have_text(/\A2023, 2026\s*Black\s*\?\s*2025\s*Black\s*\?\s*Red\s*\?\s*Bare\s*2021, 2022\s*Red\s*\?\z/)
       expect(page).to have_css("span:has(> span[aria-hidden][style='background: #bbb'])", text: /\ABare\z/)
     end
     # an earlier year's colorway chosen, they're shown from the start
     within(find("#colorway-picked tr", text: /\AColorway/).find("td")) do
       expect(page).to have_no_button("View previous years colors")
-      expect(page).to have_text(/2021, 2022\s*Red\s*\?\z/)
+      expect(page).to have_text(/\A2023, 2026\s*Black\s*\?.*2021, 2022\s*Red\s*\?\z/m)
       expect(radios.call).to eq(["Black", "2025 Black", "2025 Red", "2025 Bare", "2022 Red*"])
     end
     page.evaluate_script("['colorway-check', 'colorway-picked'].forEach((id) => document.getElementById(id).remove())")
@@ -1065,32 +1027,31 @@ RSpec.describe "Bike Book", :js, type: :system do
   it "titles a model picked alone for it, and drops the canonical as the page changes" do
     serve_bikebook_catalog
     canonical = "link[rel='canonical']"
-    visit bikebook_path(vehicle_models: "m/aventon/2026/level-4-rec-step-through", view: "all")
-    expect(page).to have_css("article h1", text: "Level 4 REC Step-Through", wait: 10)
-    # its block leaves out its maker's primary market, which the index has
-    expect(page).to have_css("div", text: /\AMarkets\s*United States\z/)
+    shown = "#vehicle-viewers [aria-label^='Remove ']"
+    visit bikebook_path(vehicle_models: "m/aventon/2026/level-4-rec-step-through", view: "components")
+    expect(page).to have_css("section[aria-label='Aventón Level 4 REC Step-Through components']", wait: 10)
     expect(page).to have_title(/\AAventón Level 4 REC Step-Through/)
     expect(page).to have_css(canonical, visible: :all)
     # opened alone, its search hidden behind a tab of its type's, which shows it in place
     expect(page).to have_no_field("Select a bike, choose multiple to compare them")
-    expect(all("nav[aria-label='Views'] a").map(&:text).last(2)).to eq(["All", "Search other bikes"])
+    expect(all("nav[aria-label='Views'] a").map(&:text).last(2)).to eq(["Motor & Battery", "Search other bikes"])
     entries = page.evaluate_script("history.length")
     click_link "Search other bikes"
     expect(vehicle_field).to be_visible
     expect(vehicle_field).to match_css(":focus")
     expect(page).to have_no_link("Search other bikes")
-    expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level-4-rec-step-through&view=all&search=1&vehicle_type=bike")
+    expect(page).to have_current_path("/bikebook?vehicle_models=m/aventon/2026/level-4-rec-step-through&view=components&search=1&vehicle_type=bike")
     expect(page).to have_css("[aria-label='Applied filters'] li", exact_text: "Vehicle types: Bike", visible: :all)
     # a step of its own, which back undoes, unlike a view's tab
     expect(page.evaluate_script("history.length")).to eq entries + 1
 
     type_into(vehicle_field, "level-2-step")
     retry_on_detach { find(vehicle_option, text: "Aventón Level 2 Step-Through").click }
-    expect(page).to have_css("[data-comparison] article", count: 2)
+    expect(page).to have_css("#vehicle-viewers [data-comparison] [aria-label^='Remove ']", count: 2)
     expect(page).to have_no_css(canonical, visible: :all)
 
     page.go_back
-    expect(page).to have_css("article", count: 1)
+    expect(page).to have_css(shown, count: 1)
     # and onto the entry it landed on, which Turbo stamped as it started, rendered without a request as the others are
     requested = []
     page.driver.with_playwright_page { it.on("request", ->(request) { requested << request.url if URI(request.url).path == bikebook_path }) }
@@ -1100,18 +1061,18 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(vehicle_field).to be_visible
     expect(requested).to be_empty
     find("[aria-label='Remove Aventón Level 4 REC Step-Through']").click
-    expect(page).to have_no_css("article")
+    expect(page).to have_no_css(shown)
     expect(page).to have_title("Bike Book", exact: true)
 
     # pasted and entered at once, an id is picked, though its search answers after the Enter
     vehicle_field.set("m/aventon/2026/level-4-rec-step-through")
     vehicle_field.send_keys(:enter)
-    expect(page).to have_css("article h1", text: "Level 4 REC Step-Through")
-    expect(page).to have_current_path("/bikebook?view=all&search=1&vehicle_type=bike&vehicle_models=m/aventon/2026/level-4-rec-step-through")
+    expect(page).to have_css("section[aria-label='Aventón Level 4 REC Step-Through components']")
+    expect(page).to have_current_path("/bikebook?view=components&search=1&vehicle_type=bike&vehicle_models=m/aventon/2026/level-4-rec-step-through")
 
     # the Bike Book mark goes back to the empty search
     find("a[aria-label='Bike Book']").click
-    expect(page).to have_no_css("article")
+    expect(page).to have_no_css(shown)
     expect(page).to have_current_path("/bikebook?search=1")
 
     # Filters with nothing picked say what they leave, and lead into the list or back to the filters
@@ -1156,8 +1117,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     # an e-bike at $1,400 or less, even with the priciest first
     visit bikebook_path(electric: 1, sort: "price", price_dir: "desc")
     expect(page).to have_css("[aria-label='Models to compare'] a[href$='vehicle_models=m/aventon/2024/soltera-2-5']", wait: 10)
-    # outside the US, an e-bike is legal by the market's own e-bike law, which the Canadian model is under with no US class
-    visit bikebook_path(market: "CA")
+    # outside the US, the market's own e-bikes
+    visit bikebook_path(market: "CA", electric: 1)
     expect(page).to have_css("[aria-label='Models to compare'] a", text: "Specialized Haul ST", wait: 10)
     visit bikebook_path(primary_activity: "atb-gravel", price_max: 1500)
     expect(page).to have_text("No models match your filters.", wait: 10)
@@ -1391,14 +1352,14 @@ RSpec.describe "Bike Book", :js, type: :system do
     # the geometry is each one's size, and less of it is red
     expect(find("[aria-label='Sizes & geometry comparison'] tr", text: "Reach")).to have_css("td", text: /\A425\.5.+−74\.7/m)
       .and have_css(".tw\\:text-red-700", text: "−74.7")
-    # in centimeters alone, without an imperial viewer's feet and inches
-    expect(find("[aria-label='Sizes & geometry comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d.]+\W*cm(\s*[−+][\d.]+\W*cm|\s*-)?\z/))
+    # in mm, as geometry charts list it
+    expect(find("[aria-label='Sizes & geometry comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d,.]+\W*mm(\s*[−+][\d.]+\W*mm|\s*-)?\z/))
     # the wheelbase out to each wheel's edge, below it and in its units, and as with it, less of it is red. Its payload
     # limit closes it, neither size listing a weight
     expect(all("[aria-label='Sizes & geometry comparison'] th[scope='row']").map(&:text).last(4)).to match(["Standover", "Wheelbase", /\AOverall length \(est\.\)/, "Max payload (rider + cargo)"])
     overall_length = find("[aria-label='Sizes & geometry comparison'] tr", text: "Overall length")
-    expect(overall_length.all("td").map(&:text)).to match([/\A203\.5\W*cm\z/, /\A194\.3\W*cm\s*−9\.2\W*cm\z/])
-    expect(overall_length).to have_css(".tw\\:text-red-700", text: "−9.2")
+    expect(overall_length.all("td").map(&:text)).to match([/\A2,035\W*mm\z/, /\A1,943\W*mm\s*−92\W*mm\z/])
+    expect(overall_length).to have_css(".tw\\:text-red-700", text: "−92")
     # each one's drawing at the same scale and on the same ground, so they line up across the cards
     view_boxes = all("section[aria-label$=' sizes'] figure svg").map { it["viewBox"].split.map(&:to_i) }
     expect(view_boxes.size).to eq 2
@@ -1410,10 +1371,8 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_css("[aria-label='Sizes & geometry comparison']", wait: 10)
     expect_size.call("Current ADV", "Extra Large")
     expect_size.call("Current EXP", "Small")
-    click_link "All"
-    expect(page).to have_css("[data-comparison] article", count: 2)
     # each one's sizes ring its size
-    card = ->(model) { find("article h1", exact_text: model).ancestor("article") }
+    card = ->(model) { find("section[aria-label='Aventón #{model} sizes']") }
     current_size = ->(model) { card.call(model).all("[aria-current='true'] h3", visible: :all).map { it.text(:all) } }
     expect(current_size.call("Current ADV")).to eq(["Extra Large"])
     expect(current_size.call("Current EXP")).to eq(["Small"])
@@ -1429,8 +1388,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     centering = ->(model) {
       page.evaluate_script(<<~JS)
         (() => {
-          const article = [...document.querySelectorAll('article')].find((each) => each.querySelector('h1')?.textContent.trim() === #{model.to_json})
-          const scroller = article.querySelector('[data-controller~="ui--tabs"]')
+          const scroller = document.querySelector(`section[aria-label="Aventón ${#{model.to_json}} sizes"] [data-controller~="ui--tabs"]`)
           const [outer, inner] = [scroller, scroller.querySelector('[aria-current="true"]')].map((element) => element.getBoundingClientRect())
           const centered = scroller.scrollLeft + inner.left + inner.width / 2 - (outer.left + outer.width / 2)
           const reachable = Math.min(Math.max(centered, 0), scroller.scrollWidth - scroller.clientWidth)
@@ -1449,7 +1407,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     scrolled = page.evaluate_script("window.scrollY")
     remove.click
     expect(page).to have_css(".hw-combobox__chip", count: 1)
-    expect(page).to have_no_css("[aria-label$='comparison']")
+    expect(page).to have_no_css("[data-comparison]")
     expect(page.evaluate_script("window.scrollY")).to be > 0
     reachable = page.evaluate_script("Math.min(#{scrolled}, document.documentElement.scrollHeight - window.innerHeight)")
     expect(page.evaluate_script("window.scrollY")).to be_within(2).of(reachable)
@@ -1459,7 +1417,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     # Small's riders are Soltera's Small's, though its top tube is nearer Soltera's Medium
     type_into(vehicle_field, "soltera")
     retry_on_detach { find(vehicle_option, text: "Aventón Soltera 3 ADV").click }
-    expect(page).to have_css("[data-comparison] article", count: 2)
+    expect(page).to have_css("[data-comparison] section[aria-label$=' sizes']", count: 2)
     # no groupset listed, so its gear count alone, one chainring by one cog a singlespeed, the rest of its drivetrain in the tooltip
     click_link "Overview"
     groupsets = find("[aria-label='Overview comparison'] tr", text: /\AGroupset/).all("td").map { it.text(:all).squish }
@@ -1478,11 +1436,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # differs enough
     sized = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, { kit }, vocabulary] = await Promise.all([
+        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, vocabulary] = await Promise.all([
           import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_overlay'), import('lit-html'),
-          catalog('kit.json'), catalog('vocabulary.json')])
-        const presenter = new VehiclePresenter(kit, vocabulary)
+          #{vocabulary_fetch}])
+        const presenter = new VehiclePresenter(vocabulary)
         const geometry = { reach: 450, stack: 620, head_angle: 64, chainstay: 445, bb_drop: 20, seat_angle: 77, head_tube: 120, fork_rake: 44 }
         const road = { model: 'Road', sizes: [{ name: 'M', geometry }], wheels: [{ bsd: 622, tire_width: 25, position: ['front', 'rear'] }] }
         const mullet = { model: 'Mullet', sizes: ['S', 'L', 'XL'].map((name) => ({ name, geometry })), wheels: [
@@ -1508,11 +1465,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # one frame to draw is drawn alone, and the overlay says what the other is missing, as it does with none to draw
     lone = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, { kit }, vocabulary] = await Promise.all([
+        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, vocabulary] = await Promise.all([
           import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_overlay'), import('lit-html'),
-          catalog('kit.json'), catalog('vocabulary.json')])
-        const presenter = new VehiclePresenter(kit, vocabulary)
+          #{vocabulary_fetch}])
+        const presenter = new VehiclePresenter(vocabulary)
         const geometry = { reach: 450, stack: 620, head_angle: 64, chainstay: 445, bb_drop: 20, seat_angle: 77, head_tube: 120, fork_rake: 44 }
         const road = { model: 'Road', sizes: [{ name: 'M', geometry }], wheels: [{ bsd: 622, tire_width: 25, position: ['front', 'rear'] }] }
         const bare = { model: 'Bare', sizes: [{ name: 'M' }] }
@@ -1530,11 +1486,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a frame's stem left out is said only beside another's that's drawn
     stems = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, { kit }, vocabulary] = await Promise.all([
+        const [{ VehiclePresenter }, { geometryOverlay, overlayFrames }, { render }, vocabulary] = await Promise.all([
           import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_overlay'), import('lit-html'),
-          catalog('kit.json'), catalog('vocabulary.json')])
-        const presenter = new VehiclePresenter(kit, vocabulary)
+          #{vocabulary_fetch}])
+        const presenter = new VehiclePresenter(vocabulary)
         const geometry = { reach: 450, stack: 620, head_angle: 64, chainstay: 445, bb_drop: 20, seat_angle: 77, head_tube: 120, fork_rake: 44 }
         const road = (model, extra = {}) => ({ model, sizes: [{ name: 'M', geometry: { ...geometry, ...extra } }], wheels: [{ bsd: 622, tire_width: 25, position: ['front', 'rear'] }] })
         return [[road('Stemmed', { stem_length: 80 }), road('Stemless')], [road('Stemless'), road('Also stemless')]].map((datas) => {
@@ -1551,15 +1506,14 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a cargo bike's cargo area on its size's card, its length lettered as its drawing measures it along the deck
     cargo = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryCard }, { cycleDrawing }, { render }, { kit }, vocabulary] = await Promise.all([
+        const [{ VehiclePresenter }, { geometryCard }, { cycleDrawing }, { render }, vocabulary] = await Promise.all([
           import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_card'), import('bikebook/templates/vehicles/cycle_drawing'),
-          import('lit-html'), catalog('kit.json'), catalog('vocabulary.json')])
+          import('lit-html'), #{vocabulary_fetch}])
         const data = { type: 'cargo', cargo: { length: 600, width: 500, volume: 120 }, sizes: [{ name: 'One Size', geometry: { wheelbase: 1800 } }] }
-        const { legend } = cycleDrawing({ type: data.type, data, size: data.sizes[0], kit })
+        const { legend } = cycleDrawing({ type: data.type, data, size: data.sizes[0], kit: vocabulary.kit })
         const letters = new Map(legend.filter(({ letter }) => letter).map(({ key, letter }) => [key, letter]))
         const container = document.createElement('div')
-        render(geometryCard({ presenter: new VehiclePresenter(kit, vocabulary), size: data.sizes[0], others: [], letters, cargo: data.cargo }), container)
+        render(geometryCard({ presenter: new VehiclePresenter(vocabulary), size: data.sizes[0], others: [], letters, cargo: data.cargo }), container)
         const heading = [...container.querySelectorAll('h4')].find((each) => each.textContent === 'Cargo')
         return [legend.find(({ key }) => key === 'cargo.length'), heading.nextElementSibling.textContent]
       })()
@@ -1597,6 +1551,21 @@ RSpec.describe "Bike Book", :js, type: :system do
       })
     JS
     expect(flat_bars).to eq([0, 1, 0, 2, 1])
+    # a BMX's and a dirt jumper's saddle slammed down on its top tube and tipped along it, any other's up its post and level
+    saddles = page.evaluate_script(<<~JS)
+      import('bikebook/cycle_drawings').then(({ drawingViews, minus }) => {
+        const size = { geometry: { stack: 600, reach: 390, head_angle: 70, seat_angle: 73, chainstay: 420, wheelbase: 1080, bb_drop: 10, seat_tube_ct: 380 } }
+        const saddle = (primary_activity) => {
+          const [post, [back, nose]] = drawingViews({ type: 'bike', data: { wheels: [{ bsd: 559, tire_width: 60, position: ['front', 'rear'] }], primary_activity }, size })
+            .views[0].shapes.flat(Infinity).filter(({ seat }) => seat).map(({ points }) => points.slice(-2))
+          return [Math.round(Math.hypot(...minus(post[1], post[0]))), Math.round(Math.atan2(...minus(nose, back).reverse()) * 180 / Math.PI)]
+        }
+        return [saddle('bmx-freestyle'), saddle('dj'), saddle('dj-slopestyle'), saddle('mtb-trail-all-mountain')]
+      })
+    JS
+    # level, but for its back raised square to it
+    expect(saddles.last).to eq([170, -4])
+    expect(saddles.first(3)).to all(match([60, be > 10]))
     # a step-through frame drawn as one, but where its type detail is drawn its own way, as a bench seat is
     details = page.evaluate_script(<<~JS)
       import('bikebook/cycle_drawings').then(({ drawingViews }) => [{ frame: { top_tube: 'step_through' } }, { frame: { top_tube: 'sloping' } },
@@ -1607,11 +1576,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # standover above the bottom bracket, short, with a tooltip saying what it's above
     standover = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryCard }, { render }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/templates/vehicles/geometry_card'), import('lit-html'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehiclePresenter }, { geometryCard }, { render }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/templates/vehicles/geometry_card'), import('lit-html'), #{vocabulary_fetch}])
         const container = document.createElement('div')
-        render(geometryCard({ presenter: new VehiclePresenter(kit, vocabulary), size: { name: 'M', geometry: { standover_above_bb: 235 } }, others: [] }), container)
+        render(geometryCard({ presenter: new VehiclePresenter(vocabulary), size: { name: 'M', geometry: { standover_above_bb: 235 } }, others: [] }), container)
         const label = [...container.querySelectorAll('dt')].find((each) => each.textContent.includes('Standover'))
         return [label.querySelector('button').innerText, label.textContent.replace(/\\s+/g, ' ').trim(),
           [...label.nextElementSibling.children].map((each) => each.textContent.replace(/\\s+/g, ' ').trim())]
@@ -1626,11 +1594,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     # catalog's own labels write it. A fork's thru axle as it's sold
     fit = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { geometryCard }, { runningGearOf }, { fragmentOf }, { render }, { kit }, vocabulary] = await Promise.all([
+        const [{ VehiclePresenter }, { geometryCard }, { runningGearOf }, { fragmentOf }, { render }, vocabulary] = await Promise.all([
           import('bikebook/vehicle_presenter'), import('bikebook/templates/vehicles/geometry_card'), import('bikebook/templates/vehicles/model_viewer'),
-          import('bikebook/render'), import('lit-html'), catalog('kit.json'), catalog('vocabulary.json')])
-        const presenter = new VehiclePresenter(kit, vocabulary)
+          import('bikebook/render'), import('lit-html'), #{vocabulary_fetch}])
+        const presenter = new VehiclePresenter(vocabulary)
         const container = document.createElement('div')
         document.body.append(container)
         render(geometryCard({ presenter, size: { name: 'M', geometry: {
@@ -1683,18 +1650,17 @@ RSpec.describe "Bike Book", :js, type: :system do
     # comparison opens with each one's type, target riders and type detail, where they differ. A BMX's typical figures are a BMX's
     longtail = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { renderInto }, { cycleDrawing }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), import('bikebook/templates/vehicles/cycle_drawing'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { renderInto }, { cycleDrawing }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), import('bikebook/templates/vehicles/cycle_drawing'), #{vocabulary_fetch}])
         const wheels = [{ bsd: 559, tire_width: 65, position: ['front', 'rear'] }]
         const geometry = { reach: 401, stack: 646, chainstay: 613, head_tube: 222, wheelbase: 1271, head_angle: 70, seat_angle: 73 }
         const length = (data, size) => {
-          const found = cycleDrawing({ type: 'cargo-rear', data, size, kit }).legend.find(({ key }) => key === 'dimensions.length')
+          const found = cycleDrawing({ type: 'cargo-rear', data, size, kit: vocabulary.kit }).legend.find(({ key }) => key === 'dimensions.length')
           return found && [found.value, found.listed, found.calculated]
         }
         const data = { model: 'Curry', type: 'cargo-rear', wheels, sizes: [{ name: 'One Size', geometry: { dimensions: { length: 2261 } } }] }
         const container = document.body.appendChild(document.createElement('div'))
-        const render = (vehicle) => renderInto(container, new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/curry', data: vehicle }],
+        const render = (vehicle) => renderInto(container, new VehicleViewer(vocabulary).render([{ value: 'm/x/2026/curry', data: vehicle }],
           new URL('/bikebook?view=geometry&vehicle_models=m/x/2026/curry', window.location.href), null))
         render(data)
         const alone = container.querySelector('tbody th').innerText
@@ -1708,19 +1674,19 @@ RSpec.describe "Bike Book", :js, type: :system do
         render({ model: 'Jumper', type: 'bike', primary_activity: 'bmx', wheels: [{ bsd: 406, tire_width: 61, position: ['front', 'rear'] }],
           sizes: [{ name: '21" TT', geometry: { bb_height: 292, chainstay: 335, fork_rake: 28, head_angle: 75, seat_angle: 71, stem_length: 48, top_tube_effective: 533 } }] })
         const bmx = container.querySelector('figcaption').textContent.split('. ').at(-1)
-        renderInto(container, new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/curry', data }, { value: 'm/x/2026/step', data: { ...data, type: 'cargo', type_detail: 'front-box', frame: { top_tube: 'step_through' }, target_riders: ['kid', 'woman'] } }],
+        renderInto(container, new VehicleViewer(vocabulary).render([{ value: 'm/x/2026/curry', data }, { value: 'm/x/2026/step', data: { ...data, type: 'cargo', type_detail: 'front-box', frame: { top_tube: 'step_through' }, target_riders: ['kid', 'woman'] } }],
           new URL('/bikebook?view=geometry&vehicle_models=m/x/2026/curry,m/x/2026/step', window.location.href), null))
         const type = [alone, container.querySelector('tbody tr').innerText.replace(/\\s+/g, ' ').trim()]
-        renderInto(container, new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/curry', data }, { value: 'm/x/2026/step', data: { ...data, type: 'cargo', primary_activity: 'cargo', target_riders: ['kid', 'woman'] } }],
+        renderInto(container, new VehicleViewer(vocabulary).render([{ value: 'm/x/2026/curry', data }, { value: 'm/x/2026/step', data: { ...data, type: 'cargo', primary_activity: 'cargo', target_riders: ['kid', 'woman'] } }],
           new URL('/bikebook?vehicle_models=m/x/2026/curry,m/x/2026/step', window.location.href), null))
         const overview = ['Vehicle type', 'Primary activity'].map((label) => [...container.querySelectorAll('tbody tr')].find((each) => each.innerText.startsWith(label)).innerText.replace(/\\s+/g, ' ').trim())
         container.remove()
-        const typical = cycleDrawing({ type: 'cargo-rear', data: { wheels }, size: { geometry }, kit }).legend
+        const typical = cycleDrawing({ type: 'cargo-rear', data: { wheels }, size: { geometry }, kit: vocabulary.kit }).legend
           .filter(({ listed, calculated }) => !listed && !calculated).map(({ key }) => key)
         return [length({ wheels }, { geometry }), length({}, { geometry }), length({ wheels }, data.sizes[0]), shown, [...captions, bmx], typical, type, overview]
       })()
     JS
-    expect(longtail).to match([[1960, false, true], nil, [2261, true, false], [/\A226\.1\W*cm \?\z/, "This value is specified"],
+    expect(longtail).to match([[1960, false, true], nil, [2261, true, false], [/\A2,261\W*mm \?\z/, "This value is specified"],
       ["Light purple figures are calculated from the listed ones", "S drawn", "Gray figures aren't listed, so they're estimated from typical values on BMX bikes."], %w[stem_length bb_drop fork_rake],
       ["Front wheel", "Vehicle type Cargo Bike Rear Cargo Bike · Kids & Women's · Front box · Step-through"],
       ["Vehicle type Cargo Bike Rear Cargo Bike", "Primary activity — Kids & Women's Cargo"]])
@@ -1777,25 +1743,29 @@ RSpec.describe "Bike Book", :js, type: :system do
       .and have_css(".tw\\:text-red-700.tw\\:font-bold", exact_text: "−")
       .and have_css("button[aria-label='650 B wheels are smaller diameter than 700 C']")
       .and have_css(".tw\\:text-gray-500", text: /\A−8\W*mm\z/)
-    # wheelbase in centimeters, with feet and inches after, which its difference leaves off
-    expect(find("[aria-label='Sizes & geometry comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d.]+\W*cm\s*\(\d'\s*\d+"\)(\s*[−+][\d.]+\W*cm|\s*-)?\z/))
-    # whose feet and inches are themselves the tooltip's trigger, which spells them out
-    wheelbase = find("[aria-label='Sizes & geometry comparison'] tr", text: "Wheelbase").first("td")
-    expect(wheelbase).to have_no_button("?")
-    wheelbase.find("button", text: /\A\d'\s*\d+"\z/).click
-    expect(wheelbase).to have_css("[role='tooltip']", text: /\A\d+ feet, [\d.]+ inch(es)?\z/, visible: true)
-    # feet and inches marks aren't muted as other units are
-    expect(wheelbase.find("button", text: /\A\d'\s*\d+"\z/)).to have_no_css(".tw\\:text-gray-400")
-    # a dimension's tooltip spells out its feet and inches, its metric after
+    # wheelbase in mm alone, as geometry charts list it, without an imperial viewer's feet and inches
+    expect(find("[aria-label='Sizes & geometry comparison'] tr", text: "Wheelbase").all("td").map(&:text)).to all(match(/\A[\d,.]+\W*mm(\s*[−+][\d.]+\W*mm|\s*-)?\z/))
+    # a dimension's tooltip spells out its feet and inches, its metric after, as a rider's height's does, whose feet and
+    # inches are themselves the tooltip's trigger
     dimension = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehiclePresenter }, { fragmentOf }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
-        const imperial = fragmentOf(new VehiclePresenter(kit, vocabulary).dimensions({ length: 762 })).querySelector('.tw\\\\:imperial\\\\:inline [role="tooltip"]')
+        const [{ VehiclePresenter }, { fragmentOf }, vocabulary] = await Promise.all([import('bikebook/vehicle_presenter'),
+          import('bikebook/render'), #{vocabulary_fetch}])
+        const presenter = new VehiclePresenter(vocabulary)
+        const height = Object.assign(document.createElement('div'), { id: 'rider-height' })
+        height.append(fragmentOf(presenter.measurement(1930, 'mm', 'rider_height')))
+        document.querySelector('main').append(height)
+        const imperial = fragmentOf(presenter.dimensions({ length: 762 })).querySelector('.tw\\\\:imperial\\\\:inline [role="tooltip"]')
         return imperial.textContent.replace(/\\s+/g, ' ').trim()
       })()
     JS
+    height = find("#rider-height")
+    expect(height).to have_no_button("?")
+    feet_and_inches = height.find("button", text: /\A\d'\s*\d+"\z/)
+    feet_and_inches.click
+    expect(height).to have_css("[role='tooltip']", text: /\A6 feet, 4 inches\s+193\W*cm\z/, visible: true)
+    # feet and inches marks aren't muted as other units are
+    expect(feet_and_inches).to have_no_css(".tw\\:text-gray-400")
     expect(dimension).to eq "Length: 2 feet, 6 inches (76.2 cm)"
   end
 
@@ -1845,10 +1815,10 @@ RSpec.describe "Bike Book", :js, type: :system do
       expect_template(UI::IconChevron::Component.new, "bikebook/templates/ui/icon_chevron#iconChevron", "undefined")
 
       expect_template(UI::Tabs::Component.new(nav_label: "Views", turbo: true, margin_classes: "tw:mt-2", tabs: [
-        ComponentStructs::Shapes.tab("Overview", "/bikebook", active: true), ComponentStructs::Shapes.tab("All", "/bikebook?view=all", count: 1200)
+        ComponentStructs::Shapes.tab("Overview", "/bikebook", active: true), ComponentStructs::Shapes.tab("Components", "/bikebook?view=components", count: 1200)
       ]), "bikebook/templates/ui/tabs#tabs", <<~JS)
         { navLabel: 'Views', turbo: true, marginClasses: 'tw:mt-2',
-          tabs: [{ label: 'Overview', href: '/bikebook', active: true }, { label: 'All', href: '/bikebook?view=all', count: 1200 }] }
+          tabs: [{ label: 'Overview', href: '/bikebook', active: true }, { label: 'Components', href: '/bikebook?view=components', count: 1200 }] }
       JS
 
       expect_template(UI::CopyButton::Component.new(value: "m/trek/2025/fetch", label: "Copy ID"),
@@ -1886,9 +1856,6 @@ RSpec.describe "Bike Book", :js, type: :system do
       expect_template(UI::Code::Inline::Component.new(text: "m/trek/2025/fetch"), "bikebook/templates/ui/code/inline#codeInline", "{ text: 'm/trek/2025/fetch' }")
       expect_template(UI::Code::Inline::Component.new(text: "m/trek/2025/fetch", small: true, word_break: false),
         "bikebook/templates/ui/code/inline#codeInline", "{ text: 'm/trek/2025/fetch', small: true, wordBreak: false }")
-      expect_template(UI::Code::Json::Component.new(data: {model: "Level 2", years: [2022]}, small: true, no_max_height: true),
-        "bikebook/templates/ui/code/json#codeJson", "{ data: { model: 'Level 2', years: [2022] }, small: true, noMaxHeight: true }")
-      expect_template(UI::Code::Json::Component.new(data: {}), "bikebook/templates/ui/code/json#codeJson", "{ data: {} }")
 
       expect_template(UI::DefinitionList::Container::Component.new.with_content("<div>row</div>".html_safe),
         "bikebook/templates/ui/definition_list/container#definitionListContainer", "{ content: html`<div>row</div>` }")
@@ -1947,37 +1914,32 @@ RSpec.describe "Bike Book", :js, type: :system do
 
   it "merges motors that match but for their drive wheel, and names the operating modes' e-vehicle classifications" do
     serve_bikebook_catalog
-    visit bikebook_path(vehicle_models: "m/segway/2025/gt3-pro", view: "all")
+    visit bikebook_path(vehicle_models: "m/segway/2025/gt3-pro", view: "motors")
 
-    motor = find("section", text: /front and rear motor/i, wait: 10)
+    motor = find("section[aria-label$=' motors'] section", text: /front and rear motor/i, wait: 10)
     expect(motor).to have_css("div", text: /Drive wheel\s*Front, Rear/)
-    expect(motor.ancestor("article")).to have_css("div", text: /\AElectric Certification\W*Certification unknown\z/)
+    expect(find("section[aria-label$=' motors']")).to have_css("div", text: /\AElectric Certification\W*Certification unknown\z/)
     expect(page).to have_no_css("h2", text: /\A(Front|Rear) motor\z/i)
-    expect(page).to have_css("section div", text: /\AFolding\s*Stem fold\z/)
     expect(page).to have_css("[role='button']", text: "Compare similar e-scooters to GT3 Pro")
+    click_link "Components"
+    expect(page).to have_css("section div", text: /\AFolding\s*Stem fold\z/)
     click_link "Overview"
     # with nothing to lay it over, no overlay
     expect(page).to have_no_css("[aria-label='Geometry overlay']")
 
-    # beside a vehicle that has none, a mode's classification
-    visit bikebook_path(vehicle_models: "m/sur-ron/2026/ultra-bee-hp-x,m/segway/2025/gt3-pro", view: "all")
-    classification = find("section div", text: /\AE-vehicle class\s*Off-Highway Motorcycle \?\z/, wait: 10)
-    # whose search, the first not a cycle, has no e-bike classes to filter by
+    # an e-moto beside one that isn't classified, whose search, the first not a cycle, has no e-bike classes to filter by
+    visit bikebook_path(vehicle_models: "m/sur-ron/2026/ultra-bee-hp-x,m/segway/2025/gt3-pro")
+    expect(page).to have_css("[aria-label='Overview comparison'] tr", text: /\AE-vehicle class/, wait: 10)
     click_on "More filters", match: :first
     expect(page).to have_field("Human powered (Acoustic)").and have_no_field("US Class 2")
     click_on "More filters", match: :first
     expect(page).to have_no_css("#vehicle-filters")
-    expect(classification).to have_xpath("ancestor::section[.//dt[text()='Propulsion']]")
     expect(page).to have_no_css("dt", exact_text: "Classifications")
-    expect(page).to have_css("div", text: /\ARider age\s*18\W*–\W*60\W*yr\z/, visible: :all)
     # each suspended end, including one that states nothing
-    suspension = ->(title) { find("article h1", text: title).ancestor("article").find("h2", text: /\Asuspension\z/i).ancestor("section") }
-    expect(suspension.call("Ultra Bee")).to have_css("div", text: /\AFront\s*241\W*mm\z/).and have_css("div", text: /\ARear\s*320\W*×\W*85\W*mm 3\.35in\z/)
+    click_link "Components"
+    suspension = ->(title) { find("section[aria-label$='#{title} components']").find("h2", text: /\Asuspension\z/i).find(:xpath, "..") }
+    expect(suspension.call("Ultra Bee HP X")).to have_css("div", text: /\AFront\s*241\W*mm\z/).and have_css("div", text: /\ARear\s*320\W*×\W*85\W*mm 3\.35in\z/)
     expect(suspension.call("GT3 Pro")).to have_css("div", text: /\AFront\s*Front: Double Wishbone Hydraulic Shock Absorber/)
-    classification.find("button", text: "?").click
-    tooltip = classification.find("[role='tooltip']", text: "An electric motorcycle built for off-highway use", visible: true)
-    expect(tooltip).to have_css("code", exact_text: "evc/off-highway-motorcycle")
-      .and have_button("Copy ID").and have_no_link
 
     # a classification's exact id is an option, whose pick shows its /ebike-rules card above the vehicles, a US class's
     # its state jurisdiction's own with its rules
@@ -2022,7 +1984,6 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_css("#classification-cards h3", exact_text: "Not an e-bike", wait: 10)
     expect(page).to have_css(".hw-combobox__chip", text: "Out of class in California")
 
-    # a class that only comes with an optional mode goes on its own line, after the mode
     visit bikebook_path(vehicle_models: "m/specialized/2025/haul-st")
     # its long description cut to its first 200 characters at a word, until it's opened
     description = find("[aria-label='Overview'] td", text: /\AWhatever you’re into/, wait: 10)
@@ -2048,12 +2009,11 @@ RSpec.describe "Bike Book", :js, type: :system do
     # limits, a row per load, a size's own after the one for every size
     payloads = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { renderInto }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { renderInto }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const riders = [{ load: 'rider', weight: 150 }, { load: 'rider', weight: 180, sizes: ['L'] }]
         const data = { model: 'Hauler', type: 'cargo', sizes: [{ name: 'S' }, { name: 'L' }], weight_limits: riders }
-        const viewer = new VehicleViewer(kit, vocabulary)
+        const viewer = new VehicleViewer(vocabulary)
         const container = document.body.appendChild(document.createElement('div'))
         const text = (element) => element.innerText.replace(/\\s+/g, ' ').trim()
         const row = (view, vehicle, label) => {
@@ -2062,7 +2022,7 @@ RSpec.describe "Bike Book", :js, type: :system do
         }
         const cargo = (view, vehicle) => row(view, vehicle, 'Cargo')
         const limits = (vehicle) => {
-          renderInto(container, viewer.render([{ value: 'm/x/2026/hauler', data: vehicle }], new URL('/bikebook?view=all&vehicle_models=m/x/2026/hauler', window.location.href), null))
+          renderInto(container, viewer.render([{ value: 'm/x/2026/hauler', data: vehicle }], new URL('/bikebook?view=components&vehicle_models=m/x/2026/hauler', window.location.href), null))
           return [...[...container.querySelectorAll('section')].find((section) => /^weight limits$/i.test(section.querySelector('h2')?.innerText)).querySelectorAll('dl > div')].map(text)
         }
         const tooltip = (row) => {
@@ -2097,27 +2057,22 @@ RSpec.describe "Bike Book", :js, type: :system do
     # a mount's type spelled out
     frame = page.evaluate_script(<<~JS)
       (async () => {
-        const catalog = (file) => fetch(`https://bikebook-catalog.bikeindex.org/catalog/${file}`).then((response) => response.json())
-        const [{ VehicleViewer }, { renderInto }, { kit }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
-          import('bikebook/render'), catalog('kit.json'), catalog('vocabulary.json')])
+        const [{ VehicleViewer }, { renderInto }, vocabulary] = await Promise.all([import('bikebook/vehicle_viewer'),
+          import('bikebook/render'), #{vocabulary_fetch}])
         const container = document.body.appendChild(document.createElement('div'))
         const data = { model: 'Tourer', type: 'bike', frame: { mounts: [{ type: 'top-tube-bag' }] } }
-        renderInto(container, new VehicleViewer(kit, vocabulary).render([{ value: 'm/x/2026/tourer', data }], new URL('/bikebook?view=all&vehicle_models=m/x/2026/tourer', window.location.href), null))
+        renderInto(container, new VehicleViewer(vocabulary).render([{ value: 'm/x/2026/tourer', data }], new URL('/bikebook?view=components&vehicle_models=m/x/2026/tourer', window.location.href), null))
         const shown = [...container.querySelectorAll('section')].find((section) => /^frame$/i.test(section.querySelector('h2')?.innerText)).innerText
         container.remove()
         return shown
       })()
     JS
     expect(frame).to include("Top tube bag")
-    click_link "All"
-    expect(page).to have_css("section div", text: /\AE-vehicle class\s*US Class 3 \?\s*w\/ optional throttle US Class 2 \?\z/, wait: 10)
-    expect(page).to have_css("dd > span.tw\\:block", text: /\Aw\/ optional throttle US Class 2/)
-    # years keyed by year, read newest first, each with its colorways, its weight limits, and its rack's interface on its mount
-    years = find("article h1", text: "Haul ST").ancestor("article").find("h2", text: /\Amodel years\z/i).ancestor("section")
-    expect(years.all("tr").map { it.first("td").text }).to eq %w[2026 2025]
-    expect(years).to have_text("Satin Obsidian").and have_text("Gloss White Mountains")
-    expect(find("h2", text: /\Aweight limits\z/i).ancestor("section")).to have_text(/Payload \(rider \+ cargo\)\W*190\W*kg/).and have_text(/Rear rack\W*60\W*kg/)
-    expect(find("h2", text: /\Aframe\z/i).ancestor("section")).to have_text("Rear rack (MIK HD)")
+    # its weight limits, and its rack's interface on its mount
+    click_link "Components"
+    haul = find("section[aria-label='Specialized Haul ST components']", wait: 10)
+    expect(haul.find("h2", text: /\Aweight limits\z/i).find(:xpath, "..")).to have_text(/Payload \(rider \+ cargo\)\W*190\W*kg/).and have_text(/Rear rack\W*60\W*kg/)
+    expect(haul.find("h2", text: /\Aframe\z/i).find(:xpath, "..")).to have_text("Rear rack (MIK HD)")
 
     # beside its Canadian model, sold outside the visitor's market, the Overview has each one's under its price, and names it after
     # whichever of them the market picked doesn't sell
@@ -2135,27 +2090,28 @@ RSpec.describe "Bike Book", :js, type: :system do
       .and have_text(/\ASpecialized\s*⚡\s*Haul ST/i)
 
     # past three markets, the rest behind how many there are in all, which goes once it shows them
-    gt3_pro = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/segway/2025.json").read)
-    gt3_pro["models"]["m/segway/2025/gt3-pro"]["markets"] = %w[AE CN GB JP KR]
+    arcadex = JSON.parse(BikebookCatalogHelpers::FIXTURES.join("models/bianchi/2026.json").read)
+    arcadex["models"]["m/bianchi/2026/arcadex-alu-yvbl4"]["markets"] = %w[CH AE CN GB JP]
     page.driver.with_playwright_page do |playwright_page|
-      playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}models/segway/2025.json", ->(route, _request) {
-        route.fulfill(status: 200, headers: {"access-control-allow-origin" => "*", "content-type" => "application/json"}, body: gt3_pro.to_json)
+      playwright_page.context.route("#{Integrations::Bikebook::Catalog::URL}models/bianchi/2026.json", ->(route, _request) {
+        route.fulfill(status: 200, headers: {"access-control-allow-origin" => "*", "content-type" => "application/json"}, body: arcadex.to_json)
       })
     end
-    visit bikebook_path(vehicle_models: "m/segway/2025/gt3-pro")
+    visit bikebook_path(vehicle_models: "m/bianchi/2026/arcadex-alu-yvbl4")
     markets = find("[aria-label='Overview'] tbody tr", text: /\AMarkets/, wait: 10)
-    expect(markets).to have_text(/\AMarkets\s*United Arab Emirates, China, United Kingdom… 5 total\z/)
+    expect(markets).to have_text(/\AMarkets\s*Switzerland, United Arab Emirates, China… 5 total\z/)
     markets.find("[role='button']", exact_text: "5 total").click
-    expect(markets).to have_text(/\AMarkets\s*United Arab Emirates, China, United Kingdom, Japan, South Korea\z/)
+    expect(markets).to have_text(/\AMarkets\s*Switzerland, United Arab Emirates, China, United Kingdom, Japan\z/)
     expect(markets).to have_no_css("[role='button']")
 
     # its Canadian model, published resolved from it: its own market, price and motor, and no US class
-    visit bikebook_path(vehicle_models: "m/specialized/2025/haul-st,m/specialized/2025/haul-st@CA", view: "all")
-    expect(page).to have_css("[data-comparison] article", count: 2, wait: 10)
-    canadian = all("article").last
-    expect(canadian).to have_css("div", text: /\AMarkets\s*Canada\z/).and have_css("span[title='Canadian Dollar']")
-      .and have_css("div", text: /\ARated power\s*500\W*W\z/).and have_no_text("US Class")
-    expect(canadian.find("h2", text: /\Amodel years\z/i).ancestor("section").all("tr").map { it.first("td").text }).to eq %w[2025]
+    visit bikebook_path(vehicle_models: "m/specialized/2025/haul-st,m/specialized/2025/haul-st@CA")
+    canadian = ->(label) { find("[aria-label='Overview comparison'] tr", text: /\A#{label}/, wait: 10).all("td").last }
+    expect(canadian.call("Markets")).to have_text(/\ACanada\z/)
+    expect(canadian.call("Price")).to have_css("span[title='Canadian Dollar']")
+    expect(canadian.call("E-vehicle class")).to have_no_text("US Class")
+    click_link "Motor & Battery"
+    expect(all("section[aria-label$=' motors']", count: 2).last).to have_css("div", text: /\ARated power\s*500\W*W\z/)
 
     # a classification's card alone keeps the search, its chip in it, and the models to compare, without the page's tips
     visit bikebook_path(classifications: "evc/us/class-3")
@@ -2257,7 +2213,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_no_css("button", text: "Compare similar bikes to Level 4 REC")
     expect(page).to have_current_path(/[?&]similar=1\b/)
     # its maker's others in, unless they're skipped
-    expect(page).to have_css("#similar-m-aventon-2025-pace-4-step-through", wait: 10)
+    expect(page).to have_css("#similar-m-aventon-2026-pace-5-rec-step-through", wait: 10)
     # hidden with the models, and above its toggle on a phone rather than beside it
     adjust = find_button("Adjust comparison algorithm")
     expect(top.call(adjust)).to be_within(5).of(top.call(find("#similar-toggle")))
@@ -2279,7 +2235,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     check "Skip bikes from the same manufacturer"
     expect(page).to have_current_path(/[?&]skip_manufacturer=1\b/).and have_text("No similar models are in the catalog.")
     uncheck "Skip bikes from the same manufacturer"
-    expect(page).to have_no_current_path(/skip_manufacturer/).and have_css("#similar-m-aventon-2025-pace-4-step-through")
+    expect(page).to have_no_current_path(/skip_manufacturer/).and have_css("#similar-m-aventon-2026-pace-5-rec-step-through")
     expect(page).to have_css("legend", text: /\AOther settings/)
     {"Only complete bikes" => "same_configuration", "Only match bikes with the same wheel size" => "same_wheels"}.each do |label, param|
       check label
@@ -2294,21 +2250,22 @@ RSpec.describe "Bike Book", :js, type: :system do
     within("#vehicle-filters") { click_link "Clear filters" }
     expect(page).to have_no_current_path(/vehicle_type/).and have_no_css("#similar-m-aventon-2025-abound-lr")
     # the closest of each model group, its own, other propulsions and other vehicle types left out, other activities in
-    expect(cards.call).to eq %w[similar-m-aventon-2025-pace-4-step-through similar-m-aventon-2025-aventure-3-step-through
-      similar-m-aventon-2024-soltera-2-5 similar-m-aventon-2024-sinch-2-5 similar-m-aventon-2026-ramblas-adv]
-    # the propulsions the filters check in place of its own - an e-bike's human powered ones, of which none are near
+    expect(cards.call).to eq %w[similar-m-aventon-2026-pace-5-rec-step-through similar-m-aventon-2025-aventure-3-step-through
+      similar-m-aventon-2024-soltera-2-5 similar-m-aventon-2026-ramblas-adv similar-m-aventon-2024-sinch-2-5]
+    # the propulsions the filters check in place of its own - an e-bike's human powered ones
     check "Human powered (Acoustic)"
-    expect(page).to have_current_path(/[?&]electric=0\b/).and have_text("No similar models are in the catalog.")
+    expect(page).to have_current_path(/[?&]electric=0\b/).and have_no_css("#similar-m-aventon-2026-pace-5-rec-step-through")
+    expect(cards.call).to eq %w[similar-m-gravity-2026-swift-21-ltd similar-m-commencal-bikes-2025-ramones-24-revoshift]
     check "e-Vehicle (motorized)"
-    expect(page).to have_current_path(/[?&]electric=0,1\b/).and have_css("#similar-m-aventon-2025-pace-4-step-through")
+    expect(page).to have_current_path(/[?&]electric=0,1\b/).and have_css("#similar-m-aventon-2026-pace-5-rec-step-through")
     uncheck "Human powered (Acoustic)"
     uncheck "e-Vehicle (motorized)"
-    expect(page).to have_no_current_path(/electric/).and have_css("#similar-m-aventon-2025-pace-4-step-through")
+    expect(page).to have_no_current_path(/electric/).and have_css("#similar-m-aventon-2026-pace-5-rec-step-through")
     # and the rest of the filters', as the note beside the other settings says
     expect(page).to have_css("legend", exact_text: "Other settings (you can also change the filters above to modify what is compared)")
     choose_option("Suspension", "Rigid")
     expect(page).to have_current_path(/[?&]suspension=rigid\b/).and have_no_css("#similar-m-aventon-2024-sinch-2-5")
-    expect(cards.call).to eq %w[similar-m-aventon-2025-pace-4-step-through similar-m-aventon-2024-soltera-2-5]
+    expect(cards.call).to eq %w[similar-m-aventon-2026-pace-5-rec-step-through similar-m-aventon-2024-soltera-2-5]
     choose_option("Frame material", "Carbon or Composite")
     expect(page).to have_text("No similar models are in the catalog.")
     within("#vehicle-filters") { click_link "Clear filters" }
@@ -2358,10 +2315,10 @@ RSpec.describe "Bike Book", :js, type: :system do
     click_link "Soltera 2.5", wait: 10
     expect(page).to have_css("[aria-label='Overview comparison'] thead th", count: 11, wait: 10)
     expect(page).to have_text("Compare up to 10 at once. Remove one to add another.")
-    expect(page).to have_css("#similar-m-aventon-2025-pace-4-step-through[aria-disabled='true']:not([href])")
+    expect(page).to have_css("#similar-m-aventon-2025-aventure-3-step-through[aria-disabled='true']:not([href])")
     # an overview photo's × takes its model out of the comparison and the combobox
     within("[aria-label='Overview comparison']") { find("[aria-label='Remove Aventón Soltera 2.5']").click }
-    expect(page).to have_css("#similar-m-aventon-2025-pace-4-step-through[href]", wait: 10)
+    expect(page).to have_css("#similar-m-aventon-2025-aventure-3-step-through[href]", wait: 10)
     expect(page).to have_css(".hw-combobox__chip", count: 9).and have_no_css(".hw-combobox__chip", text: "Soltera 2.5")
 
     # opened alone, its adjustments showing the search they're in, which it hid
@@ -2408,7 +2365,7 @@ RSpec.describe "Bike Book", :js, type: :system do
         const fields = { ...Object.fromEntries(names.map((name) => [name, [null, null, null]])), ...Object.fromEntries(Object.entries(alike).map(([name, value]) => [name, [value, value, value]])) }
         const model = (id, electric, handlebar_type, suspension, activity = 'commuting') => ({ id, electric, handlebar_type, suspension, vehicle_type: 'bike', model_configuration: 'complete', manufacturer: id, group_key: id, primary_activity: activity, markets: ['US'], variants: [] })
         const urban = [{ slug: 'commuting', family: 'urban' }]
-        const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: 5, fields: { ...fields, ...extra } }, activities)
+        const scoring = (models, extra = {}, activities = urban) => scorer(models, { format: #{Integrations::Bikebook::Catalog::FORMAT}, fields: { ...fields, ...extra } }, activities)
         const score = scoring([model('e', true), model('other_e', true), model('acoustic', false)], { battery_size: [500, 500, null] })
         const propulsions = [() => true, ({ electric }) => !electric].map((included) => score('e', settingsFrom(new URLSearchParams()), included).models.map(({ id }) => id))
         const materials = scoring([model('a', false), model('steel', false), model('aluminum', false)], { frame_material: ['aluminum', 'steel', 'aluminum'] })
@@ -2507,20 +2464,20 @@ RSpec.describe "Bike Book", :js, type: :system do
     expect(page).to have_css("#similar-results", wait: 10)
 
     # the index failing, whichever lands first
-    kit = hold_bikebook_catalog_file("kit.*")
+    vocabulary = hold_bikebook_catalog_file("vocabulary.*")
     failed = "#vehicle-viewers > [role='status']:first-child"
     not_found = {status: 404, headers: {"access-control-allow-origin" => "*"}, body: ""}
     visit compared
     index.pop(timeout: 10).fulfill(**not_found)
     expect(page).to have_text("The catalog didn't load.", wait: 10).and have_button("Try again")
-    kit.pop(timeout: 10).fallback
+    vocabulary.pop(timeout: 10).fallback
     expect(page).to have_css("#vehicle-viewers tr", wait: 10)
     expect(page).to have_css(failed, text: "The catalog didn't load.")
     expect(page).to have_field("vehicle_models", placeholder: "", disabled: true)
 
     # tried again, the vehicles in ahead of the failure this time
     click_on "Try again"
-    kit.pop(timeout: 10).fallback
+    vocabulary.pop(timeout: 10).fallback
     expect(page).to have_css("#vehicle-viewers tr", wait: 10)
     index.pop(timeout: 10).fulfill(**not_found)
     expect(page).to have_css(failed, text: "The catalog didn't load.", wait: 10)
@@ -2533,7 +2490,7 @@ RSpec.describe "Bike Book", :js, type: :system do
 
     # and again once the index answers, in the view it's moved to
     click_on "Try again"
-    kit.pop(timeout: 10).fallback
+    vocabulary.pop(timeout: 10).fallback
     index.pop(timeout: 10).fallback
     expect(vehicle_field).to be_visible
     expect(page).to have_no_css(failed)

@@ -1,0 +1,7 @@
+<% tags.each do |tag_name| %>
+  <%= hw_within_combobox_selection_chip(for_id: params[:for_id]) do %>
+    <%= render(Atoms::Admin::Badges::BugReportTag::Component.new(tag: tag_name)) do %>
+      <%= tag.span(**hw_combobox_chip_remover_attrs(display: tag_name, value: tag_name)) %>
+    <% end %>
+  <% end %>
+<% end %>

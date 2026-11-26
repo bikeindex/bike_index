@@ -1,17 +1,20 @@
 import { Controller } from '@hotwired/stimulus'
 import { Turbo } from '@hotwired/turbo-rails'
-import { catalogAt, mountCatalogCombobox } from 'bikebook/catalog'
+import { catalogAt, mountCatalogCombobox, showPickedPhoto } from 'bikebook/catalog'
 
 // Connects to data-controller='bikebook--schema-lookup'
-// /bikebook's search, picking a single model or classification, whose file a pick visits and clearing it leaves
+// /bikebook's search, picking a single model or classification, whose file a pick visits and clearing it leaves. A
+// model's stock photo shows below it
 export default class extends Controller {
-  static targets = ['combobox', 'slot']
+  static targets = ['combobox', 'slot', 'photo']
   static values = { manifestUrl: String, path: String, clearedUrl: String, display: String, failedText: String }
 
   async connect () {
-    const field = await mountCatalogCombobox(catalogAt(this.manifestUrlValue), this.comboboxTarget, this.slotTarget,
+    const loading = catalogAt(this.manifestUrlValue)
+    const field = await mountCatalogCombobox(loading, this.comboboxTarget, this.slotTarget,
       { display: this.displayValue, failedText: this.failedTextValue, richPick: true })
     this.picked = field?.value
+    if (field) showPickedPhoto(await loading, this.picked, this.photoTarget)
   }
 
   // Picking nothing - the handle's clear, or Escape once it's closed - leaves the pick. The gem announces the
