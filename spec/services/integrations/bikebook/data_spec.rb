@@ -93,6 +93,12 @@ RSpec.describe Integrations::Bikebook::Data do
 
         it { expect(result).to be_nil }
       end
+
+      context "not sold in the year" do
+        let(:options) { super().merge(year: 2019) }
+
+        it { expect(result).to be_nil }
+      end
     end
 
     context "with a bike that has one" do

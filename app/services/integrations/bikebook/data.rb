@@ -14,9 +14,9 @@ module Integrations
         nil
       end
 
-      # A bike's own, or unsaved: the manufacturer's `bikebook_model`, a catalog id or citation key picked in registration,
-      # else its model matching frame_model and year. nil without a year. market is a country's ISO code, which a citation
-      # key's market overrides
+      # A bike's own, or unsaved: the manufacturer's `bikebook_model` sold in the year, a catalog id or citation key picked
+      # in registration, else its model matching frame_model and year. nil without a year. market is a country's ISO code,
+      # which a citation key's market overrides
       def vehicle_specification(options)
         if options.is_a?(Bike)
           return options.vehicle_specification || vehicle_specification(manufacturer_id: options.manufacturer_id, year: options.year,
@@ -25,7 +25,7 @@ module Integrations
         return unless options.values_at(:manufacturer_id, :year).all?(&:present?)
 
         market = Integrations::Bikebook::Catalog.market(options[:market])
-        bikebook_models = BikebookModel.where(manufacturer_id: options[:manufacturer_id])
+        bikebook_models = BikebookModel.where(manufacturer_id: options[:manufacturer_id]).sold_in_year(options[:year].to_i)
         VehicleSpecification.cited(options[:bikebook_model], market:, bikebook_models:) ||
           matching(options, market)&.then { VehicleSpecification.new(bikebook_model: it, bikebook_market: market) }
       end
