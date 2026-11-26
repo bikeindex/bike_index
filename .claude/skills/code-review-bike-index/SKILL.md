@@ -156,12 +156,12 @@ For each, name the existing component it renders or duplicates. One that wraps a
 
 1. **Kit blocks.** Every heading with an intro paragraph is `SharedBlocks::Marketing::SectionHeading`, inside a sub-component too, and every figure over a label — a price grid in a `<dl>` as much as a stats row — is `SharedBlocks::Marketing::NumberBlocks`. "No component covers it" is never the verdict for either.
 2. **Repeated objects.** A block written out more than once — feature cards, stat tiles, steps, each a copy of the same markup with different copy — is one existing component rendered in a loop over the values: a `SharedBlocks::Marketing::*` block from `use-existing-markup`'s table, or a `UI::*` one.
-3. **Gray bands** read `SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES`, with the section adding its border sides. Where the constant is missing, add it to the wrapper.
+3. **Gray bands** read `SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES`, with the section adding its border sides.
 4. **Fonts** are the ones the wrapper loads: `tw:font-header` and the body font. Replace every `tw:font-[…]` and delete any font `<link>` the page loads itself.
 5. **A value kept in step with something outside the repo is one constant** the template reads — a price that has to match Shopify is a `PRICES` entry, not a literal where it shows.
 6. **The controller** rendering the page has `before_action :force_html_response` — `AGENTS.md`'s architecture notes say why, and a redirect into the page is what triggers it.
 7. **The preview.** The page's `component_preview.rb` renders it through `SharedBlocks::Marketing::Wrapper`, the way the controller does.
-8. **Entry points.** A page that takes over an old destination takes every way in: grep for the old route helper, the external URL and any `/info` post on the subject, and point each at the new page — an `/info` post through a `Blog` slug method and a branch in `InfoController#show`, the way `Blog.why_donate_slug` reaches `/donate` — with an anchor where a link means one section. Add the page to `config/initializers/sitemap_pages.rb`, and drop the `as:` from a redirect route whose helper nothing calls any more. `/shop` (#4821) is the pattern.
+8. **Entry points.** A page that takes over an old destination takes every way in: grep for the old route helper, the external URL and any `/info` post on the subject, and point each at the new page — an `/info` post through a `Blog` slug method and a branch in `InfoController#show`, the way `Blog.why_donate_slug` reaches `/donate`, the slug listed in `Blog.top_level_routed` to keep the post out of the sitemap — with an anchor where a link means one section. Add the page to `config/initializers/sitemap_pages.rb`, and drop the `as:` from a redirect route whose helper nothing calls any more. `/shop` (#4821) is the pattern.
 9. **Repeated text and values.** List every phrase, figure or link that says the same thing twice on the page: a heading restated by the intro under it, a stat in the hero and again in a number block, a call to action that appears twice, a sentence the closing banner repeats. Compare what the copy *says*, not only identical strings — "Register your bike for free" and "Registration is always free" are one claim. **Don't delete any of them.** Flag each set, quoting every occurrence and where it sits, for the user to choose which to keep.
 
 ## The cycle-type translation check
@@ -190,7 +190,7 @@ Fix every hit in copy. Code identifiers (`BikeIndexFormBuilder`, `BikeBookUpdate
 
 ## If a command comes back empty
 
-**The commands are plain `git`, so they run with or without rtk.** rtk 1.0.1 passes a piped `git diff` or `git log` through unchanged; an older rtk summarized a `git diff`, added a `Changes:` line to `--name-only` and dropped merges from `git log`. If a grep or count comes back empty on a branch that plainly has matches, `rtk --version` — below 1.0.1, prefix the command with `rtk proxy`.
+**The commands are plain `git`, so they run with or without rtk.** Under rtk 1.0.1 a piped `git diff` comes through unchanged. A hook that does rewrite one summarizes it, adds a `Changes:` line to `--name-only`, and drops merges from `git log` — so if a grep or count comes back empty on a branch that plainly has matches, re-run it as `rtk proxy git …`.
 
 ## The reply
 
