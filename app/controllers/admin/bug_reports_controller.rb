@@ -72,7 +72,7 @@ module Admin
     # The notification is created here, so a retried job reuses it rather than sending again
     def email
       message = params[:email_message].to_s.strip
-      bug_reports = BugReport.where(id: params[:bug_reports_selected]&.keys)
+      bug_reports = BugReport.where(id: selected_ids(:bug_reports_selected)).to_a
       unless message.present? && bug_reports.any?
         error = "Write a message and select at least one bug report"
         return respond_to do |format|
@@ -81,16 +81,16 @@ module Admin
         end
       end
 
-      bug_reports.each do |bug_report|
-        notification = Notification.create!(kind: :bug_report_reply, notifiable: bug_report, message_channel_target: bug_report.email)
-        EmailJobs::BugReportReplyJob.perform_async(notification.id, message)
+      notifications = bug_reports.map do |bug_report|
+        Notification.create!(kind: :bug_report_reply, notifiable: bug_report, user: bug_report.user, message_channel_target: bug_report.email)
       end
+      EmailJobs::BugReportReplyJob.perform_bulk(notifications.map { [it.id, message] })
       respond_to do |format|
         format.html do
           redirect_back(fallback_location: admin_bug_reports_path,
-            flash: {success: "Emailing #{bug_reports.count} bug report #{"sender".pluralize(bug_reports.count)}"})
+            flash: {success: "Emailing #{bug_reports.size} bug report #{"sender".pluralize(bug_reports.size)}"})
         end
-        format.json { render json: {emailed_bug_report_ids: bug_reports.ids} }
+        format.json { render json: {emailed_bug_report_ids: bug_reports.map(&:id)} }
       end
     end
 

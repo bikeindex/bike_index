@@ -80,7 +80,7 @@
   <% table.column(sortable: "github_pull_request", hideable: :pull_request_cell) do |bug_report| %>
     <% if bug_report.github_pull_request.present? %>
       <%= link_to "##{bug_report.github_pull_request}", bug_report.github_pull_request_url, class: "twlink" %>
-      <%= link_to search_emoji, admin_bug_reports_path(search_pull_request: bug_report.github_pull_request, search_status: "all"), class: "display-sortable-link tw:text-sm" %>
+      <%= helpers.bug_report_search_link(search_pull_request: bug_report.github_pull_request) %>
     <% end %>
   <% end %>
 <% end %>
