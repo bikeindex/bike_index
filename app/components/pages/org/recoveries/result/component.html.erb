@@ -57,6 +57,10 @@
       <% if location.present? %>
         <p class="tw:m-0 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
           <%= translation(".stolen_from", location:) %>
+
+          <% if @distance_text.present? %>
+            &middot; <%= @distance_text %>
+          <% end %>
         </p>
       <% end %>
 

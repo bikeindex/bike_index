@@ -30,6 +30,22 @@ RSpec.describe Organized::RecoveriesController, type: :request do
     expect(response.body).to include("/o/#{current_organization.to_param}/registrations")
   end
 
+  context "with a recovery in the bounding box's corner" do
+    let(:corner_bike) { FactoryBot.create(:stolen_bike) }
+
+    it "leaves it out, since it's past the radius" do
+      latitude, longitude = current_organization.reload.search_coordinates
+      # ~4.1 mi north and ~4.2 mi east: inside a 5 mile box, ~5.9 mi away
+      recover(corner_bike, 1.day.ago).update_columns(latitude: latitude + 0.06, longitude: longitude + 0.08)
+
+      get base_url, params: {search_distance: 5}
+      expect(response.body).to match(%r{>1</span> match\b})
+
+      get base_url, params: {search_distance: 10}
+      expect(response.body).to match(%r{>2</span> matches\b})
+    end
+  end
+
   context "with a bike registered with the organization" do
     before { FactoryBot.create(:bike_organization, bike: chicago_bike, organization: current_organization) }
 
@@ -40,7 +56,7 @@ RSpec.describe Organized::RecoveriesController, type: :request do
       expect(response.body).to include(chicago_bike.mnfg_name)
 
       get base_url, params: {search_only_organization: 1, period: "year"}
-      expect(response.body).to include("No recoveries match these filters")
+      expect(response.body).to include("Try a wider date range.")
 
       get base_url, params: {search_distance: 5, period: "year", search_result_view: "cards"}
       expect(response.body).to match(%r{>1</span> match\b})

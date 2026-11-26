@@ -17,6 +17,8 @@ en:
               other: "%{number} matches"
             miles_away_html: "%{number} mi away"
             model: Model
+            no_organization_recoveries: No recoveries match these filters. Try a wider
+              date range.
             no_recoveries: No recoveries match these filters. Try a wider distance
               or date range.
             of_organization: of %{org_name}
@@ -27,6 +29,7 @@ en:
             stolen: Stolen
             subtitle: Stolen bikes that made it home in your community.
             theft_location: Theft location
+            under_a_mile_away: under 1 mi away
             view_as: View as
             view_cards: Cards
             view_list: List

@@ -9,7 +9,8 @@ module Organized
       # Without coordinates there's nothing to measure a distance from
       @only_organization = !current_organization.search_coordinates_set? ||
         Binxtils::InputNormalizer.boolean(params[:search_only_organization])
-      @pagy, recoveries = pagy(:countish, matching_recoveries.reorder(recovered_at: :desc).includes(:bike),
+      @pagy, recoveries = pagy(:countish, matching_recoveries.reorder(recovered_at: :desc)
+        .includes(:bike, :region_record, :country),
         limit: 25, page: permitted_page)
 
       render Pages::Org::Recoveries::Index::Component.new(organization: current_organization,
@@ -35,11 +36,19 @@ module Organized
       recoveries = if @only_organization
         current_organization.recovered_records
       else
-        StolenRecord.recovered.within_bounding_box(
-          GeocodeHelper.bounding_box(current_organization.search_coordinates, @distance)
-        )
+        nearby_recoveries
       end
       recoveries.where(recovered_at: @time_range, bike_id: Bike.unscoped.current.select(:id))
+    end
+
+    # The box narrows by index; its corners reach past the radius, so the distance trims them
+    def nearby_recoveries
+      coordinates = current_organization.search_coordinates
+      distance_sql = Geocoder::Sql.full_distance(*coordinates, "stolen_records.latitude",
+        "stolen_records.longitude", units: :mi)
+
+      StolenRecord.recovered.within_bounding_box(GeocodeHelper.bounding_box(coordinates, @distance))
+        .where("#{distance_sql} <= ?", @distance)
     end
 
     def organized_bike_ids(recoveries)

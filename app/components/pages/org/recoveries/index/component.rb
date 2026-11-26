@@ -80,6 +80,8 @@ module Pages
 
             miles = Geocoder::Calculations.distance_between(@organization.search_coordinates,
               stolen_record.to_coordinates, units: :mi).round
+            return translation(".under_a_mile_away") if miles.zero?
+
             translation(".miles_away_html", number: number_display(miles))
           end
 

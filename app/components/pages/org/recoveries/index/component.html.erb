@@ -24,7 +24,7 @@
 </form>
 
 <div
-  class="tw:mb-4 tw:flex tw:flex-wrap tw:items-center tw:gap-x-7 tw:gap-y-2"
+  class="tw:mb-4 tw:flex tw:flex-wrap tw:items-baseline tw:gap-x-7 tw:gap-y-2"
   data-controller="org--recoveries-filters"
 >
   <% if distance_filterable? %>
@@ -56,7 +56,7 @@
   <% end %>
 </div>
 
-<div class="tw:px-5 tw:pt-4 tw:pb-6 <%= UI::Table::InCard::Component::CARD_CLASSES %>">
+<div class="tw:px-3 tw:pt-4 tw:pb-6 tw:sm:px-5 <%= UI::Table::InCard::Component::CARD_CLASSES %>">
   <div class="tw:mb-5 tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-3">
     <p class="tw:mb-0 tw:text-gray-500 tw:dark:text-gray-400">
       <%= translation(".matching_html", count: @pagy.count, number: number_display(@pagy.count)) %>
@@ -82,21 +82,21 @@
 
   <% if @recoveries.none? %>
     <p class="tw:my-8 tw:text-center tw:text-gray-500 tw:dark:text-gray-400">
-      <%= translation(".no_recoveries") %>
+      <%= @only_organization ? translation(".no_organization_recoveries") : translation(".no_recoveries") %>
     </p>
   <% elsif @result_view == :table %>
     <% organization = @organization %>
     <% distance_texts = @recoveries.to_h { [it.id, distance_text(it)] } %>
 
-    <div class="tw:-mx-5">
+    <div class="tw:-mx-3 tw:sm:-mx-5">
       <%= render(UI::Table::Base::Component.new(records: @recoveries, sort_state:)) do |table| %>
-        <% table.column(label: translation(".recovered"), sortable: "recovered_at", sort_indicator: "recovered_at") do |stolen_record| %>
+        <% table.column(label: translation(".recovered"), sortable: "recovered_at", sort_indicator: "recovered_at", classes: "tw:whitespace-nowrap") do |stolen_record| %>
           <%= link_to bike_path(stolen_record.bike, organization_id: organization.to_param), class: "twlink tw:font-bold" do %>
             <%= render(UI::Time::Component.new(time: stolen_record.recovered_at)) %>
           <% end %>
         <% end %>
 
-        <% table.column(label: translation(".stolen")) do |stolen_record| %>
+        <% table.column(label: translation(".stolen"), classes: "tw:whitespace-nowrap") do |stolen_record| %>
           <%= render(UI::Time::Component.new(time: stolen_record.date_stolen)) %>
         <% end %>
 
