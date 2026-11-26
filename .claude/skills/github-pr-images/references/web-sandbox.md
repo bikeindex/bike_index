@@ -39,6 +39,8 @@ failed after the whole capture round — leaving a comment that can never hold i
 3. **Rewritten: stop.** Don't capture, host or retry — every retry stacks another
    rewrite. Update the comment to a body with no URLs: `## Screenshots` and a line
    saying the screenshots couldn't be posted from this session (that goes through).
+   `gh api -X PATCH … -F body=@file` is rewritten the same way, and the attachments
+   upload answers 415 through the sandbox proxy (#4921), so there is no other route.
    Then tell the user the sandbox's comment tools
    rewrite URLs, so the screenshots have to be captured and attached by hand — and
    skip the rest of this file.
