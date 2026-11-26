@@ -1,0 +1,33 @@
+<% organization_id = @organization.to_param %>
+
+<div class="organized-page-header">
+  <%= render(UI::Header::Component.new(text: translation(".header"))) %>
+</div>
+
+<p class="tw:my-4">
+  <%= translation(".completed_count_html", count: helpers.number_display(@pagy.count)) %>
+</p>
+
+<%= render(UI::Table::Base::Component.new(records: @acknowledgments, render_sortable: true, sort_state: @sort_state)) do |table| %>
+  <% table.column(sortable: "acknowledged_at", label: translation(".completed_at")) do |acknowledgment| %>
+    <%= render UI::Time::Component.new(time: acknowledgment.acknowledged_at) %>
+  <% end %>
+
+  <% table.column(sortable: "owner_email", label: translation(".owner_email")) do |acknowledgment| %>
+    <%= acknowledgment.owner_email %>
+  <% end %>
+
+  <% table.column(label: translation(".registration")) do |acknowledgment| %>
+    <% if acknowledgment.bike.present? %>
+      <%= link_to helpers.organized_bike_text(acknowledgment.bike, skip_creation: true), bike_path(acknowledgment.bike, organization_id:) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(label: translation(".course")) do |acknowledgment| %>
+    <%= acknowledgment.education_course.display_name %>
+  <% end %>
+<% end %>
+
+<div class="tw:py-4">
+  <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @sort_state.search_params, size: :lg)) %>
+</div>

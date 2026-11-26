@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    pages:
+      org:
+        education_course_acknowledgments:
+          index:
+            completed_at: Completed
+            completed_count_html: Completed by %{count}
+            course: Course
+            header: E-Vehicle education
+            owner_email: Owner email
+            registration: Registration
