@@ -14,6 +14,9 @@
     <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :search_email,
       html_options: {value: params[:search_email], placeholder: "Sender email", class: "tw:w-full tw:sm:w-72"}) %>
 
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :search_pull_request,
+      html_options: {value: params[:search_pull_request], placeholder: "PR #", class: "tw:w-full tw:sm:w-24"}) %>
+
     <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :query,
       html_options: {value: params[:query], placeholder: "Search subject and body", class: "tw:w-full tw:sm:w-[32rem]"}) %>
 
@@ -22,7 +25,7 @@
 <% end %>
 
 <% searched_terms = {"receiver" => @searched_receiver, "tags" => @searched_tags.join(", "), "sender email" => params[:search_email],
-  "user" => params[:user_id], "text" => params[:query]}
+  "user" => params[:user_id], "PR" => params[:search_pull_request], "text" => params[:query]}
   .filter_map { |label, value| safe_join(["#{label}: ", render(UI::Code::Inline::Component.new(text: value))]) if value.present? } %>
 
 <% count_detail = capture do %>

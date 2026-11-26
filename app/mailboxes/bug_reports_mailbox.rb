@@ -1,5 +1,10 @@
 class BugReportsMailbox < ApplicationMailbox
+  # On our replies to a report, whose BCC to the inbox is forwarded back here
+  REPLY_HEADER = "X-Bike-Index-Bug-Report-Reply"
+
   def process
+    return if mail.header[REPLY_HEADER].present?
+
     email, from_name = BugReport.sender_from_mail(mail)
     body = body_text
     bug_report = BugReport.create!(

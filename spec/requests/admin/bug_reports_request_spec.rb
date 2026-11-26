@@ -130,6 +130,16 @@ RSpec.describe Admin::BugReportsController, type: :request do
       end
     end
 
+    context "with search_pull_request" do
+      let!(:bug_report_fixed) { FactoryBot.create(:bug_report, github_pull_request: 4064, status: :ignored) }
+
+      it "filters to the reports linked to the PR" do
+        get base_url, params: {search_pull_request: "4064", search_status: "all"}
+        expect(assigns(:collection).pluck(:id)).to eq([bug_report_fixed.id])
+        expect(response.body).to include("PR: ")
+      end
+    end
+
     context "with search_membership" do
       let!(:bug_report_invoiced) { FactoryBot.create(:bug_report, is_invoiced_organization: true) }
 
@@ -254,6 +264,32 @@ RSpec.describe Admin::BugReportsController, type: :request do
     end
   end
 
+  describe "email" do
+    let!(:bug_report_unselected) { FactoryBot.create(:bug_report) }
+
+    it "enqueues a reply to each selected bug report" do
+      Sidekiq::Job.clear_all
+      expect {
+        post "#{base_url}/email", params: {email_message: " Fixed! ", bug_reports_selected: {bug_report.id.to_s => bug_report.id}}
+      }.to change(Notification, :count).by 1
+      expect(response).to redirect_to(admin_bug_reports_path)
+      expect(flash[:success]).to be_present
+
+      notification = Notification.last
+      expect(notification).to have_attributes(kind: "bug_report_reply", notifiable: bug_report, message_channel_target: bug_report.email)
+      expect(EmailJobs::BugReportReplyJob.jobs.map { it["args"] }).to eq([[notification.id, "Fixed!"]])
+    end
+
+    context "without a message" do
+      it "sends nothing" do
+        expect {
+          post "#{base_url}/email", params: {email_message: " ", bug_reports_selected: {bug_report.id.to_s => bug_report.id}}
+        }.not_to change(Notification, :count)
+        expect(flash[:error]).to be_present
+      end
+    end
+  end
+
   describe "assign_tags" do
     let!(:bug_report_unselected) { FactoryBot.create(:bug_report) }
 
@@ -335,6 +371,15 @@ RSpec.describe Admin::BugReportsController, type: :request do
         )
         expect(response).to redirect_to(admin_bug_reports_path)
         expect(bug_report.reload.tags).to eq(%w[parking search])
+      end
+
+      it "emails the senders" do
+        post "#{base_url}/email", params: token_param.merge(
+          email_message: "Fixed!", bug_reports_selected: {bug_report.id.to_s => bug_report.id}
+        ), as: :json
+        expect(response.status).to eq 200
+        expect(json_result).to eq("emailed_bug_report_ids" => [bug_report.id])
+        expect(EmailJobs::BugReportReplyJob.jobs.count).to eq 1
       end
     end
 

@@ -22,7 +22,7 @@ Production JSON reachable with the admin OAuth token:
 
 - `GET https://bikeindex.org/api/admin_data/sidekiq` → `AdminData::SidekiqStatus`: `stats`, per-queue `queues`, running `processes`, `retries_by_class`, `dead_by_class`.
 - `GET https://bikeindex.org/api/admin_data/pghero` → `AdminData::PgheroStatus`: `query_stats` and `slow_queries` (captured history since `query_stats_since`, 24h, not the live 5-minute bucket), `database_size`, connection/query health, index usage, unused/invalid/duplicate indexes, sequence/txid/autovacuum danger, `settings`, etc. Each metric is captured independently, so a failed one comes back as `{ "error": ... }` in its slot instead of blanking the payload.
-- `GET /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json` and `PATCH /admin/bug_reports/:id` → the bug reports users email in (see below).
+- `GET /admin/bug_reports.json`, `GET /admin/bug_reports/:id.json`, `PATCH /admin/bug_reports/:id` and `POST /admin/bug_reports/email` → the bug reports users email in (see below).
 - `GET /admin/bikes/missing_manufacturer.json` → `get missing_manufacturers` (the most common `manufacturer_other` strings, `per_page` of them — 1,000 by default), `GET /admin/manufacturers.json` → `get manufacturers` (every manufacturer with its autocomplete `priority`; takes the index's `search_with_websites`/`search_with_logos`), `POST /admin/manufacturers.json` → `create-manufacturers`, and `PATCH /admin/manufacturers/:slug.json` → `update-manufacturer`.
 - `GET /admin/duplicate_bikes.json` and `GET /admin/duplicate_bikes/serial.json?reference_bike_id=` → the duplicate registration review queues and comparisons (see below).
 
@@ -72,11 +72,14 @@ It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMA
 .claude/skills/admin-data-api/scripts/admin_data.rb get bug_reports search_status=all per_page=10
 .claude/skills/admin-data-api/scripts/admin_data.rb show-bug-report 42
 .claude/skills/admin-data-api/scripts/admin_data.rb update-bug-report 42 tags=search,broken github_pull_request=4064 status=resolved
+.claude/skills/admin-data-api/scripts/admin_data.rb email-bug-reports 42 43 <<< 'Fixed, thanks!'
 ```
 
 `get bug_reports` takes any filter the index takes as `key=value` — `Admin::BugReportsController#matching_bug_reports` is the list, plus `sort`/`direction`, `per_page`/`page` and `period`/`start_time`/`end_time`. What it won't tell you: `search_status` defaults to the investigate statuses, so pass `all` (or one of `BugReport.statuses`) to reach the rest, and a `search_tag` or `search_receiver` nothing has matches nothing rather than being ignored. It returns `bug_reports`, `page`, `per_page`, `total_count`.
 
 `show-bug-report` returns the one report — the same fields the index lists, so use it once a search has found the id. `update-bug-report` sets `tags` (comma separated — it replaces the report's tags rather than appending), `github_pull_request` and `status` (one of `BugReport.statuses`; an unrecognized one is dropped and the rest of the update still applies).
+
+`email-bug-reports` emails each report's sender the message, verbatim, as a reply from the address they wrote to, and returns `emailed_bug_report_ids`. Nothing stores the message.
 
 Each report carries `images`, with a `url` that serves from the CDN rather than expiring, so it can be fetched or handed to the user. Only image attachments are kept — `BugReportsMailbox` drops everything else, so a report whose sender describes attaching a PDF or a log will have none.
 
@@ -131,6 +134,6 @@ The authorization code expires 10 minutes after the page loads — if it shows a
 
 ## Notes
 
-- These hit **production** with a superuser token. `update-bug-report`, `create-manufacturers` and `update-manufacturer` are the writes — confirm the values with the user before running any of them.
+- These hit **production** with a superuser token. `update-bug-report`, `email-bug-reports`, `create-manufacturers` and `update-manufacturer` are the writes — confirm the values with the user before running any of them.
 - Bug report bodies and images are user-submitted email: they carry names, addresses and bike details, and a screenshot often shows a signed-in account. Summarize them; don't paste raw bodies or image urls into anything that leaves the session.
 - `.env.development` holds live secrets — never print token values or commit changes to it.

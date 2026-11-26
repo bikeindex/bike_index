@@ -3,7 +3,7 @@ module Admin
     include Binxtils::SortableTable
     include Admin::TokenAccessible
 
-    token_accessible :index, :show, :update, :assign_tags
+    token_accessible :index, :show, :update, :assign_tags, :email
 
     # Keyed by the BugReport scope each filter applies
     MEMBERSHIP_FILTERS = {"member" => "Only members", "invoiced_organization" => "Only invoiced org",
@@ -69,6 +69,31 @@ module Admin
       redirect_back(fallback_location: admin_bug_reports_path)
     end
 
+    # The notification is created here, so a retried job reuses it rather than sending again
+    def email
+      message = params[:email_message].to_s.strip
+      bug_reports = BugReport.where(id: params[:bug_reports_selected]&.keys)
+      unless message.present? && bug_reports.any?
+        error = "Write a message and select at least one bug report"
+        return respond_to do |format|
+          format.html { redirect_back(fallback_location: admin_bug_reports_path, flash: {error:}) }
+          format.json { render json: {errors: [error]}, status: :unprocessable_entity }
+        end
+      end
+
+      bug_reports.each do |bug_report|
+        notification = Notification.create!(kind: :bug_report_reply, notifiable: bug_report, message_channel_target: bug_report.email)
+        EmailJobs::BugReportReplyJob.perform_async(notification.id, message)
+      end
+      respond_to do |format|
+        format.html do
+          redirect_back(fallback_location: admin_bug_reports_path,
+            flash: {success: "Emailing #{bug_reports.count} bug report #{"sender".pluralize(bug_reports.count)}"})
+        end
+        format.json { render json: {emailed_bug_report_ids: bug_reports.ids} }
+      end
+    end
+
     # Chips carry the value verbatim - the combobox removes a selection by the text as typed
     def tag_chips
       render :tag_chips, formats: :turbo_stream, locals: {tags: params[:combobox_values].to_s.split(",")}
@@ -120,6 +145,7 @@ module Admin
       @searched_receiver = params[:search_receiver]
       bug_reports = bug_reports.where(receiver: @searched_receiver) if @searched_receiver.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
+      bug_reports = bug_reports.where(github_pull_request: params[:search_pull_request]) if params[:search_pull_request].present?
       bug_reports = bug_reports.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%") if params[:search_email].present?
       @searched_membership = params[:search_membership] if MEMBERSHIP_FILTERS.key?(params[:search_membership])
       bug_reports = filter_by_membership(bug_reports)

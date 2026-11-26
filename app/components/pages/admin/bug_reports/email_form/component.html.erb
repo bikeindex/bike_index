@@ -1,0 +1,33 @@
+<% email_fields = capture do %>
+  <%# A restored draft opens the panel, so it isn't hidden behind the trigger %>
+  <div
+    class="tw:relative"
+    data-controller="ui--collapse form-persist"
+    data-form-persist-key-value="<%= storage_key %>"
+    data-action="input->form-persist#save form-persist:restored@window->ui--collapse#show"
+  >
+    <%= render(UI::Collapse::Component.new(text: @bug_report ? "Email sender" : "Email selected senders", chevron: :trailing, size: :sm)) %>
+
+    <div
+      data-ui--collapse-target="content"
+      class="tw:hidden <%= content_classes %>"
+    >
+      <%= render(UI::Forms::Group::Component.new(attribute: :email_message, label_text: "Message")) do %>
+        <%= text_area_tag :email_message, nil, rows: 8, class: "twinput tw:w-full" %>
+      <% end %>
+
+      <%# formaction, since inside the table's form this button isn't its default action %>
+      <%= render(UI::Button::Component.new(text: "Send email", color: :primary, size: :sm, type: :submit,
+        formaction: email_admin_bug_reports_path, data: {action: "form-persist#clear"})) %>
+    </div>
+  </div>
+<% end %>
+
+<% if @bug_report %>
+  <%= form_with(url: email_admin_bug_reports_path) do %>
+    <%= hidden_field_tag "bug_reports_selected[#{@bug_report.id}]", @bug_report.id %>
+    <%= email_fields %>
+  <% end %>
+<% else %>
+  <%= email_fields %>
+<% end %>
