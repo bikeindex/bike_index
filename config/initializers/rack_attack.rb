@@ -96,10 +96,6 @@ class Rack::Attack
     request.ip if request.post? && request.path == REGISTER_DIRECT_UPLOADS_PATH
   end
 
-  throttle("bikebook_corrections/ip", limit: 10, period: 1.hour) do |request|
-    request.ip if request.post? && request.path == "/bikebook/corrections"
-  end
-
   self.throttled_responder = lambda do |request|
     match_data = request.env["rack.attack.match_data"]
     retry_after = (match_data || {})[:period]

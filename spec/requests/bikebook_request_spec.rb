@@ -293,18 +293,6 @@ RSpec.describe BikebookController, type: :request do
           expect(BugReport.last).to have_attributes(subject: "Bike Book correction", body: correction[:body])
         end
       end
-
-      describe "rack_attack" do
-        include_context :rack_attack
-
-        it "throttles corrections past the hourly limit" do
-          throttled = rack_attack_throttled_response(limit: 10) do
-            post_correction
-            response
-          end
-          expect(throttled).to have_http_status(:too_many_requests)
-        end
-      end
     end
   end
 
