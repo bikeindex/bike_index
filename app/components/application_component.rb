@@ -10,10 +10,10 @@ class ApplicationComponent < ViewComponent::Base
   include ViewComponent::ExperimentallyCacheable
   include ApplicationComponentHelper
 
-  # Rails caches digests per locale and builds each under a process-wide lock. Nothing here
-  # varies by locale, so a locale-free finder builds each tree once rather than once per locale
-  def self.cache_digest(finder: nil, format: :html)
-    super(finder: finder || ActionView::LookupContext.new(ActionController::Base.view_paths, locale: []), format:)
+  # Rails keys digests by the finder's locale and builds each under a process-wide lock;
+  # no component template varies by locale
+  def self.cache_digest(finder: nil, **)
+    super(finder: finder || ActionView::LookupContext.new(ActionController::Base.view_paths, locale: []), **)
   end
 
   def raise_if_invalid_value!(attribute, value, options = {})
