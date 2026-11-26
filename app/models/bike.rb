@@ -227,6 +227,10 @@ class Bike < ApplicationRecord
   # An organization sees its own impounded bikes even when they're hidden - only chain it off the org's bikes
   scope :status_impounded_with_user_hidden, -> { unscope(where: :user_hidden).status_impounded }
   scope :current_owner, ->(user_id) { joins(:current_ownership).where(ownerships: {user_id:}) }
+  scope :previous_owner, ->(user_id) {
+    where(id: Ownership.where(user_id:, current: false).select(:bike_id))
+      .where.not(id: Ownership.current.where(user_id:).select(:bike_id))
+  }
   scope :default_includes, -> { includes(:primary_frame_color, :secondary_frame_color, :tertiary_frame_color, :current_stolen_record, :current_ownership) }
 
   scope :for_sale, -> { includes(:marketplace_listings).where(marketplace_listings: {status: :for_sale}) }
