@@ -125,13 +125,29 @@ RSpec.describe Organized::ManagesController, type: :request do
     end
 
     describe "locations" do
-      it "renders" do
+      let!(:location) { FactoryBot.create(:location, :with_address_record, organization: current_organization, name: "cool name") }
+
+      it "renders the saved locations and a blank one for the add button" do
         Country.united_states # Read replica
         get "#{base_url}/locations"
         expect(response.status).to eq(200)
-        expect(response).to render_template :locations
+        expect(response.body).to match("location settings")
+        expect(response.body).to match(/value="cool name"/)
+        expect(response.body).to match(/organization\[locations_attributes\]\[__INDEX__\]\[name\]/)
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:page_id)).to eq "organized_manage_locations"
+      end
+
+      context "without any locations" do
+        let!(:location) { nil }
+
+        it "renders a blank location" do
+          Country.united_states # Read replica
+          get "#{base_url}/locations"
+          expect(response.status).to eq(200)
+          expect(response.body).to match(/organization\[locations_attributes\]\[0\]\[name\]/)
+          expect(Location.where(organization_id: current_organization.id).count).to eq 0
+        end
       end
     end
 

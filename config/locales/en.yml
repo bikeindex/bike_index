@@ -4403,16 +4403,6 @@ en:
     manages:
       location_fields:
         address: Address
-        location_name: Location name
-        name: Name
-        phone_number: Phone number
-        remove: Remove location
-      locations:
-        add_location: Add location
-        bike_index_partner_map: Bike Index partner map
-        display_org_on_map_html: Display <em>%{org_name}</em> on %{map_link}
-        location_settings_html: "<em>%{org_name}</em> location settings"
-        save: Save
       show:
         abbreviation: Abbreviation
         contact_to_update_html: Contact %{link} to update abbreviation

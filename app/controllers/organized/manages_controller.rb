@@ -1,6 +1,8 @@
 module Organized
   class ManagesController < Organized::AdminController
     before_action :assign_organization, except: [:landing]
+    # Anything that redirects here from a Turbo submission would otherwise get the component as a stream
+    before_action :force_html_response, only: :locations
 
     def show
       @organization.ensure_auto_user
@@ -8,6 +10,7 @@ module Organized
     end
 
     def locations
+      render Pages::Org::Locations::Show::Component.new(organization: @organization, current_country_id:)
     end
 
     def update
