@@ -49,10 +49,15 @@ const manufacturerPage = (vehicle) => {
 // A year's colorways by their paint, not their photos
 const paint = (year) => JSON.stringify(array(year.colorways).map(({ name, colors, color_code: code }) => [name, colors, code]))
 
-// the newest colorways, to choose between where there are several, and behind a link that shows them, each paint the
-// earlier years had, but the newest's, all of them choices once there are any, the `picked` one chosen and shown
+// The years sharing a paint, oldest first
+const yearsHeading = (years) => html`<div class="tw:text-xs tw:font-bold tw:tabular-nums">${years.map(({ year }) => year).toReversed().join(', ')}</div>`
+
+// the newest colorways, to choose between where there are several, and behind a link that shows them with each one's
+// years, each paint the earlier years had, but the newest's, all of them choices once there are any, the `picked` one
+// chosen and shown
 const colors = (presenter, vehicle, key, picked) => {
-  const [[newest] = [], ...earlier] = Map.groupBy(colorwayYears(vehicle), paint).values()
+  const [newestYears = [], ...earlier] = Map.groupBy(colorwayYears(vehicle), paint).values()
+  const [newest] = newestYears
   if (!newest) return null
 
   const latest = array(newest.colorways)
@@ -66,10 +71,11 @@ const colors = (presenter, vehicle, key, picked) => {
   })}</div>`
   if (earlier.length === 0) return latest.length > 1 ? toggle(latest) : colorways(presenter, latest)
 
-  const open = !latest.some((each, index) => colorwayValue(each, index) === selected)
-  return html`<div class="tw:space-y-2" data-controller="ui--collapse">${toggle(latest)}<div class="${open ? '' : 'tw:hidden'} tw:space-y-2"
-    data-ui--collapse-target="content">${earlier.map((years) => html`<div class="tw:space-y-1"><div class="tw:text-xs tw:font-bold tw:tabular-nums">${
-      years.map(({ year }) => year).toReversed().join(', ')}</div>${toggle(array(years[0].colorways), years[0].year)}</div>`)}</div><div>${
+  const hidden = latest.some((each, index) => colorwayValue(each, index) === selected) ? 'tw:hidden' : ''
+  return html`<div class="tw:space-y-2" data-controller="ui--collapse"><div class="tw:space-y-1"><div class=${hidden}
+    data-ui--collapse-target="content">${yearsHeading(newestYears)}</div>${toggle(latest)}</div><div class="${hidden} tw:space-y-2"
+    data-ui--collapse-target="content">${earlier.map((years) => html`<div class="tw:space-y-1">${yearsHeading(years)}${
+      toggle(array(years[0].colorways), years[0].year)}</div>`)}</div><div>${
       collapse({ color: 'link_gray', htmlClass: 'tw:text-sm tw:aria-expanded:hidden', content: 'View previous years colors' })}</div></div>`
 }
 

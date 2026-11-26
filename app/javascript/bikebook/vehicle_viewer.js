@@ -2,7 +2,7 @@ import { html, nothing } from 'lit-html'
 import { basics } from 'bikebook/templates/vehicles/basics'
 import { withColorwayPhoto } from 'bikebook/colorways'
 import { chosenSizes } from 'bikebook/sizes'
-import { groupId, openJson, pickedColorways, pickedSizes, vehicleIds, vehicleKeys, vehiclesOf, withGroup, withoutVehicle, withSize, withVehicles } from 'bikebook/vehicle_models'
+import { groupId, pickedColorways, pickedSizes, vehicleIds, vehicleKeys, vehiclesOf, withGroup, withoutVehicle, withSize, withVehicles } from 'bikebook/vehicle_models'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
@@ -13,7 +13,7 @@ import { modelCard } from 'bikebook/templates/vehicles/model_card'
 import { modelGroup } from 'bikebook/templates/vehicles/model_group'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
-import { componentsOf, modelViewer, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
+import { componentsOf, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
 import { array, present } from 'bikebook/templates/values'
 import { searching, toQuery } from 'bikebook/query'
 import { VehiclePresenter } from 'bikebook/vehicle_presenter'
@@ -62,7 +62,6 @@ export class VehicleViewer {
     const selectedSizes = new Map(vehicles.map(({ key }, index) => [key, sizes[index]?.name]))
     const baseline = vehicles[0]
     const others = (key) => key === baseline.key ? [] : [baseline.data]
-    const json = openJson(url)
     const removePath = (index) => pathWith(withoutVehicle(url, vehicles[index].key))
     const sizePath = (key) => (name) => pathWith(withSize(url, key, name))
     // a figure's letter lights it on each drawing, card and table row, until it's clicked again
@@ -167,13 +166,7 @@ export class VehicleViewer {
         return cardRow('tw:mt-6', cards('components', 'No components listed', (data, key) => components.get(key),
           { lead: (data, key) => runningGearOf({ presenter, data, others: others(key) }) }), true)
       },
-      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, key) => motorsOf({ presenter, data, others: others(key), outOfClassId, state }))),
-      all: () => {
-        const full = vehicles.map(({ data, value, key }, index) => modelViewer({
-          presenter, data, value, key, jsonOpen: Boolean(json[key]), market: this.card.market, comparing, idSuffix: index + 1, others: others(key), removePath: removePath(index), selectedSize: selectedSizes.get(key), sizePath: sizePath(key), outOfClassId, state
-        }))
-        return cardRow('tw:mt-6', full)
-      }
+      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, key) => motorsOf({ presenter, data, others: others(key), outOfClassId, state })))
     }
     // a model opened alone, its search hidden, has a tab to show it filtered to its type: "Search other cargo bikes"
     const lone = !searching(url) && vehicles.length === 1 && vehicles[0].data
