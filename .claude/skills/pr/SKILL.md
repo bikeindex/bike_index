@@ -82,7 +82,7 @@ Run in parallel:
 
 Diff against `origin/main`, not the local base branch — in a Conductor worktree the local base often lags the remote, which would inflate or stale the diff. If you skipped **Prepare the branch**, `git fetch origin` first. If the branch has no commits ahead of `origin/main`, stop and tell the user.
 
-**`rtk proxy` the `git log`** — rtk's hook strips merge commits from `git log --oneline`, so the merge **Prepare the branch** just made is absent and the branch reads as though it never merged.
+**The log has to show merge commits** — the merge **Prepare the branch** just made among them. Plain `git log` does; on rtk below 1.0.1, whose hook dropped them, run it as `rtk proxy git log`.
 
 `gh pr view` exits non-zero with "no pull requests found" when the branch has none — that's the answer to the create-or-update question below, not a broken command, and it's the normal case on a first run.
 

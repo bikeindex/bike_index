@@ -20,9 +20,9 @@ From a session with history, hand this skill to a subagent the way `AGENTS.md`'s
 ## Find what the branch adds
 
 ```bash
-rtk proxy git diff origin/main...HEAD -U0 -- '*.erb' '*.haml' 'app/components/*.rb' |
+git diff origin/main...HEAD -U0 -- '*.erb' '*.haml' 'app/components/*.rb' |
   grep -E '^(\+\+\+ |\+\s*%[a-z]|\+.*(<[a-z]|link_to|button_to|content_tag|tag\.|tw:|inline_svg_tag|image_tag))'
-rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images app/components
+git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images app/components
 ```
 
 Nearly every template line matches `tw:`, so treat the output as a map of where to read. Read the templates whole.
@@ -32,7 +32,7 @@ Nearly every template line matches `tw:`, so treat the output as a map of where 
 A page that already renders the right component can still have bent it to fit the mockup. Diff the shared components themselves:
 
 ```bash
-rtk proxy git diff origin/main...HEAD -- app/components/ui app/components/atoms app/components/shared_blocks
+git diff origin/main...HEAD -- app/components/ui app/components/atoms app/components/shared_blocks
 ```
 
 **Every keyword argument, variant or style map the branch added there is a mockup override.** Revert that component and its spec to `origin/main` and render the default at the call site, without asking. Don't tidy the new variant up or move its classes around. That keeps it, and a variant added for one caller stays for every caller. #4678 added `boxed:` to `UI::Accordion` so one FAQ matched its mock, while every other FAQ on the site renders the default rows.

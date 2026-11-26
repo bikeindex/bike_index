@@ -21,7 +21,7 @@ From a session with history, hand this skill to a subagent the way `AGENTS.md`'s
 
 ## Scope
 
-Everything here diffs `origin/main...HEAD`, the base being `main` unless the caller names another — substitute it, since shell state doesn't carry between commands. That range sees only committed work: run after committing, or pair each audit with a pass over `rtk proxy git diff HEAD` and `git ls-files --others --exclude-standard`, or a comment you razored in the working tree still reads as present and a new file reads as absent.
+Everything here diffs `origin/main...HEAD`, the base being `main` unless the caller names another — substitute it, since shell state doesn't carry between commands. That range sees only committed work: run after committing, or pair each audit with a pass over `git diff HEAD` and `git ls-files --others --exclude-standard`, or a comment you razored in the working tree still reads as present and a new file reads as absent.
 
 **Only touch lines this branch already changed.** The exceptions are the model-comment audit, since `app/models` is clean of what it finds, and whatever files the controller and marketing page audits name a fix in.
 
@@ -34,7 +34,7 @@ Review the changed files against `AGENTS.md` (root and any nested ones in touche
 **Required, same as the comment audit below.** List the examples the branch adds:
 
 ```bash
-rtk proxy git diff origin/main...HEAD -U0 -- 'spec/**/*_spec.rb' |
+git diff origin/main...HEAD -U0 -- 'spec/**/*_spec.rb' |
   grep -E '^(\+\+\+ |\+\s*(it|scenario|specify) )'
 ```
 
@@ -63,7 +63,7 @@ that only loads when that skill triggers.
 **Required.** Read the branch's own diff and ask of each hunk what it changes about what the code does. A moved argument, a re-ordered hash, a re-wrapped line: revert it rather than defending it in review.
 
 ```bash
-rtk proxy git diff origin/main...HEAD --stat
+git diff origin/main...HEAD --stat
 ```
 
 Smallest files first — one at `+1 -1` is either the point of the branch or pure churn, and telling which takes a moment. `git checkout origin/main -- <file>` when the whole file is churn; when it rides along inside a real change, put the surrounding lines back so the diff shows only what moved.
@@ -77,13 +77,13 @@ Sweeping mechanical edits are where this collects.
 **Required, not conditional on the diff looking clean.** List the comments the branch adds or edits:
 
 ```bash
-rtk proxy git diff origin/main...HEAD -U0 -- '*.rb' '*.erb' '*.haml' '*.js' '*.ts' '*.coffee' '*.scss' '*.css' '*.rake' '*.yml' 'bin/*' |
+git diff origin/main...HEAD -U0 -- '*.rb' '*.erb' '*.haml' '*.js' '*.ts' '*.coffee' '*.scss' '*.css' '*.rake' '*.yml' 'bin/*' |
   grep -E '^(\+\+\+ |\+.*(#|//|<%#|-#|/\*))'
 ```
 
 The `+++ b/…` lines keep each hit attached to its file; the code-path filter keeps markdown headings out. It over-matches on `#{}` interpolation and catches trailing comments — the list is candidates to judge, not verdicts.
 
-**An empty result on a non-empty diff means the pathspec missed the branch, not that the branch is clean** — the same silent-pass the rtk section below describes, from a different cause. `bin/kamal_review` (no extension) and `.github/workflows/*.yml` are why `bin/*` and `*.yml` are on the list; add whatever else the branch touches and re-run rather than reading the blank as a verdict.
+**An empty result on a non-empty diff means the pathspec missed the branch, not that the branch is clean**. `bin/kamal_review` (no extension) and `.github/workflows/*.yml` are why `bin/*` and `*.yml` are on the list; add whatever else the branch touches and re-run rather than reading the blank as a verdict.
 
 Judge each against the **Comments** section of `AGENTS.md` and reach a verdict of keep / razor / delete on every line — a comment survives only by carrying a *why* the code can't. Deleting is the common outcome, razoring the next most common; leaving a block untouched should be the exception you can justify. Watch hardest for the ones you wrote to explain your own reasoning as you worked: narration of the change, mechanism the code already shows, and a second sentence justifying the first.
 
@@ -118,7 +118,7 @@ State the verdict in your reply either way, naming the stored values you checked
 **Required when the branch adds a file under `app/assets/images/`.** List them:
 
 ```bash
-rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images
+git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images
 ```
 
 Icons and images both go through the markup audit below, which checks each one for a file the repo already has. **One with no existing copy is sized to the slot it renders in.** Read its width (`sips -g pixelWidth`) against the widest it displays — its `max-w-*`, or its grid column — and name both in your reply. Wider than twice that, resize it to twice and save it as WebP, with the `image_tag` dimensions to match. #4821 shipped a 1560px PNG into a 520px column.
@@ -128,8 +128,8 @@ Icons and images both go through the markup audit below, which checks each one f
 **Required when the branch adds a Stimulus controller or wires one to new markup.** List both:
 
 ```bash
-rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/javascript/controllers
-rtk proxy git diff origin/main...HEAD -G 'data-controller|controller:' --name-only
+git diff origin/main...HEAD --name-only --diff-filter=A -- app/javascript/controllers
+git diff origin/main...HEAD -G 'data-controller|controller:' --name-only
 ```
 
 For each controller named, look for one that already does its job — a shared one in `app/javascript/controllers/ui/` or the top level, or a sibling in another namespace — and for two in the branch's namespace doing the same thing. Fold a duplicate into the shared one, an option on it rather than a second controller, and delete the copy. `bikebook--center-current` into `ui--tabs` and `bikebook--image-fallback` into `image-fallback` are the pattern. **When nothing shared exists, the branch's controller and whatever else does the same job — another controller, or an action inside another page's controller — become one shared controller**, the other page switched over to it too. Flagging the pair and keeping both is a miss. `scroll-to-hash`, which replaced the shop's and the memberships page's scroll actions, is the pattern. Name each one you kept and what it does that nothing shared covers.
@@ -139,7 +139,7 @@ For each controller named, look for one that already does its job — a shared o
 **Required when the branch adds a directory under `app/components/`.** List them:
 
 ```bash
-rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- 'app/components/**/component.rb'
+git diff origin/main...HEAD --name-only --diff-filter=A -- 'app/components/**/component.rb'
 ```
 
 For each, name the existing component it renders or duplicates. One that wraps a single `UI::*` component in chrome is that component with an argument — ask the user whether to fold it in, since a new `UI::*` argument needs their permission. `UI::BulkTableCard` into `UI::Table::InCard`'s `column_settings:` is the pattern.
@@ -169,8 +169,8 @@ For each, name the existing component it renders or duplicates. One that wraps a
 `AGENTS.md`'s Translations section has the rule; this is how to find the branch's violations:
 
 ```bash
-rtk proxy git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
-rtk proxy git diff origin/main...HEAD -- '*.rb' | grep -in '^+[^+].*errors\.add.*bike'
+git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
+git diff origin/main...HEAD -- '*.rb' | grep -in '^+[^+].*errors\.add.*bike'
 ```
 
 The second one is load-bearing: a model's `errors.add(:base, "…")` reaches a flash through `full_messages`, never passing a locale file, so the YAML grep can't see it. `Sale#seller_is_owner` interpolates the cycle type into one.
@@ -182,17 +182,15 @@ Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), 
 Copy spells the products "Bike Index" and "Bike Book" — never "BikeIndex", "Bike index", "BikeBook", "Bike book" or "Bikebook":
 
 ```bash
-rtk proxy git diff origin/main...HEAD -- '*.yml' '*.erb' '*.haml' '*.rb' '*.js' '*.md' |
+git diff origin/main...HEAD -- '*.yml' '*.erb' '*.haml' '*.rb' '*.js' '*.md' |
   grep -nE '^\+[^+].*(BikeIndex|[Bb]ike index|BikeBook|Bike book|Bikebook)'
 ```
 
 Fix every hit in copy. Code identifiers (`BikeIndexFormBuilder`, `BikeBookUpdateJob`, `Bikebook::`, `bikebook_path`) and the `BikeIndex.org` domain are fine.
 
-## Only if you have rtk: `rtk proxy` anything you grep or count
+## If a command comes back empty
 
-Skip this section if `rtk` isn't installed — nothing below applies to a plain shell.
-
-rtk's hook rewrites every `git diff` and `git log`. A `git diff` without `-U0` comes back summarized, its hunk lines indented, so `grep '^+…'` reads clean having matched nothing; `--name-only` gains a trailing `Changes:` line, so `wc -l` reports **1** for a diff that touches no matching path, and `bin/lint` takes it as a filename. `git log` loses its merge commits either way. Put `rtk proxy` on every diff you grep, count or hand to `xargs`.
+**The commands are plain `git`, so they run with or without rtk.** rtk 1.0.1 passes a piped `git diff` or `git log` through unchanged; an older rtk summarized a `git diff`, added a `Changes:` line to `--name-only` and dropped merges from `git log`. If a grep or count comes back empty on a branch that plainly has matches, `rtk --version` — below 1.0.1, prefix the command with `rtk proxy`.
 
 ## The reply
 
