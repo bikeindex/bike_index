@@ -9,7 +9,7 @@
         cache_records: ->(application) { [application.owner] },
         row_attributes: ->(application) { {id: "application_#{application.id}"} })) do |table| %>
     <% table.column(sortable: "created_at") do |application| %>
-      <%= link_to render(UI::Time::Component.new(time: application.created_at)), oauth_application_url(application) %>
+      <%= link_to render(UI::Time::Component.new(time: application.created_at)), oauth_application_url(application), class: "twlink" %>
     <% end %>
 
     <% table.column(sortable: "name", lower_right: ->(application) { tag.span(application.id, class: "only-dev-visible") }) do |application| %>
