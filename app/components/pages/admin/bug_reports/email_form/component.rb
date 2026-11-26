@@ -4,6 +4,7 @@ module Pages
   module Admin
     module BugReports
       module EmailForm
+        # Template Dependency: UI::Card::Component
         # Emails the senders of bug reports. Given a bug_report it's a form of its own for that one;
         # without, it sits inside the table's form and sends its checked rows, opening over the table
         class Component < ApplicationComponent
