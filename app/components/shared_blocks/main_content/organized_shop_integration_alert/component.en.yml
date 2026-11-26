@@ -23,6 +23,6 @@ en:
             Connect your POS and every bike you sell is registered to your customer
             on Bike Index.
           pos_callout_title: Register bikes automatically from your point of sale
-          shopify_card_body: Write the serial into the sale and the bike is registered
-            to whoever bought it.
+          shopify_card_body: Write the serial into the sale and it's registered to
+            whoever bought it.
           shopify_card_title: Shopify

@@ -75,9 +75,7 @@ class ShopifyIntegrationsController < ApplicationController
     return "Invalid OAuth state. Please try again." unless Integrations::Shopify::Client.verified_callback?(params)
     return "Invalid OAuth state. Please try again." unless params[:shop] == oauth["shop_domain"]
     return "You have to be an admin of that organization to do that." unless organization.present? && current_user.admin_of?(organization)
-    if ShopifyIntegration.where.not(organization_id: organization.id).exists?(shop_domain: oauth["shop_domain"])
-      return "#{oauth["shop_domain"]} is already connected to another organization."
-    end
+    return "#{oauth["shop_domain"]} is already connected to another organization." if ShopifyIntegration.where.not(organization:).exists?(shop_domain: oauth["shop_domain"])
 
     nil
   end

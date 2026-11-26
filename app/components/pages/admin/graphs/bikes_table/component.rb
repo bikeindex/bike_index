@@ -13,7 +13,7 @@ module Pages
           # well before Ownership.origins does
           ORIGIN_COLORS = Ownership.origins.zip(UI::Chart::Component::COLORS + %w[#4F46E5 #9333EA
             #0D9488 #CA8A04 #E11D48 #2563EB #16A34A #C026D3]).to_h.freeze
-          POS_SEARCH_KINDS = (Organization.pos_kinds - Organization.broken_pos_kinds - %w[other_pos]).freeze
+          POS_SEARCH_KINDS = Organization.pos_kinds.grep_v(/broken_|other_pos/).freeze
           IOS_VERSION_SQL = "ownerships.registration_info ->> 'ios_version'"
 
           def self.ios_version_bikes(bikes)

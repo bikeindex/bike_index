@@ -72,10 +72,9 @@ RSpec.describe ShopifyIntegrationsController, type: :request do
 
     context "the shop is connected to another organization" do
       let!(:other_integration) { FactoryBot.create(:shopify_integration, :active, shop_domain:) }
-      let(:secret) { Integrations::Shopify::Client::SHOPIFY_SECRET }
 
       def signed(params)
-        params.merge(hmac: OpenSSL::HMAC.hexdigest("sha256", secret, params.sort.map { |k, v| "#{k}=#{v}" }.join("&")))
+        params.merge(hmac: OpenSSL::HMAC.hexdigest("sha256", Integrations::Shopify::Client::SHOPIFY_SECRET, params.sort.map { |k, v| "#{k}=#{v}" }.join("&")))
       end
 
       it "leaves that connection alone" do
