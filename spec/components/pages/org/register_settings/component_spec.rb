@@ -11,6 +11,8 @@ RSpec.describe Pages::Org::RegisterSettings::Component, type: :component do
   it "renders the switches" do
     expect(component).to have_css("h1", text: "Registration form settings")
     expect(component).to have_text "These settings are just applied to your browser"
+    expect(component).to have_css("h2", text: "Your public registration link")
+    expect(component).to have_css("code", text: "http://test.host/register/#{organization.slug}")
 
     # No education course here, so nothing to leave to the registrant
     expect(switches.css("input[type=checkbox]").map { it["name"] }).to eq(%w[old_view single_page])

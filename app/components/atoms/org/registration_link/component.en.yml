@@ -1,0 +1,17 @@
+---
+en:
+  components:
+    atoms:
+      org:
+        registration_link:
+          associated_with_org_html: Registrations from this link are associated with
+            <strong>%{org_name}</strong>.
+          copied: Copied
+          copy_link: Copy link
+          download_qr_code: Download QR code
+          qr_code: QR code
+          qr_code_alt: QR code for registration link
+          qr_code_description: >-
+            Scanning this code opens the registration link. Print it on flyers or
+            post it at bike parking.
+          your_public_registration_link: Your public registration link

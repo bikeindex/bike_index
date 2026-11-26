@@ -10,8 +10,8 @@ RSpec.describe Pages::Org::Info::Show::Component, type: :component do
   it "offers to copy the registration link, and to show its QR code" do
     registration_url = "http://test.host/register/#{organization.slug}"
     expect(component).to have_text registration_url
-    expect(component).to have_css "button[data-ui--copy-button-text-value='#{registration_url}'][title='Copy registration link']"
-    expect(component).to have_link "QR code", href: "/register/#{organization.slug}.png"
+    expect(component).to have_css "button[data-ui--copy-button-text-value='#{registration_url}']", text: "Copy link"
+    expect(component).to have_link "Download QR code", href: "/register/#{organization.slug}.png"
   end
 
   it "suggests adding registrations and inviting the team while there are few of either" do

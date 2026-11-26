@@ -46,22 +46,7 @@
     <% end %>
   </div>
 
-  <%= render(UI::Card::Component.new(additional_classes: "tw:mt-10 tw:max-w-md")) do %>
-    <p class="twlabel tw:mb-1 tw:text-sm tw:font-semibold">
-      <%= translation(".your_public_registration_link") %>
-    </p>
-
-    <%= render Atoms::CopyableCode::Component.new(value: registration_url, label: translation(".copy_registration_link")) %>
-
-    <p class="tw:mt-2 tw:mb-0 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
-      <%= translation(".associated_with_org_html", org_name: @organization.name) %>
-    </p>
-
-    <p class="tw:mt-4 tw:mb-0 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
-      <%= translation(".get_qr_code_html",
-            qr_code_link: link_to(translation(".qr_code"), register_organization_path(@organization, format: :png), class: "twlink")) %>
-    </p>
-  <% end %>
+  <%= render Atoms::Org::RegistrationLink::Component.new(organization: @organization, html_class: "tw:mt-10 tw:max-w-xl") %>
 
   <% if new_passwordless_user? %>
     <p class="tw:mt-4 tw:mb-0 tw:text-gray-500 tw:dark:text-gray-400">

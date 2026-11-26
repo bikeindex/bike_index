@@ -18,6 +18,8 @@ en:
           separate_attestation_helper: >-
             They'll receive an email telling them their registration isn't finished
             with a link to finish it.
+          share_link_and_choose_options: Share your registration link and choose how
+            the registration form works.
           single_page: Single page registration form
           unregistered_notification_page: Unregistered Notification page
           update: Update
