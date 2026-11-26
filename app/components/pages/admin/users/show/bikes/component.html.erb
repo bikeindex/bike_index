@@ -12,6 +12,15 @@
       <% end %>
     </small>
   <% end %>
+  <% if previous_bikes_count.positive? %>
+    <small class="tw:text-sm">
+      -
+      <%= link_to admin_bikes_path(user_id: @user.id, search_previous_owner: true), class: "twlink" do %>
+        <%= number_display(previous_bikes_count) %>
+        <%= "bike".pluralize(previous_bikes_count) %> previously owned
+      <% end %>
+    </small>
+  <% end %>
 <% end %>
 
 <% if bikes_count.positive? %>
