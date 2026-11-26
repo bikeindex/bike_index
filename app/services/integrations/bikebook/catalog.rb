@@ -16,6 +16,8 @@ module Integrations
       GITHUB_REPO_URL = "https://github.com/bikeindex/bikebook"
       GITHUB_FILES_URL = "#{GITHUB_REPO_URL}/blob/main"
       MODEL_ID = %r{\Am/([a-z0-9-]+/\d{4})/[a-z0-9-]+(?:@[A-Z]+)?\z}
+      # a market variant's citation key is its model's catalog id, @ and its market
+      MARKET = /@([A-Z]+)\z/
 
       Unreachable = Class.new(StandardError)
       FAILURES = [Faraday::Error, JSON::ParserError, SystemCallError, Unreachable].freeze
@@ -33,20 +35,24 @@ module Integrations
         model(id)&.then { {title: "#{it["manufacturer"]} #{it["model"]}", description: it["description"], image_url: it["stock_photo"]} }
       end
 
-      # The model's record, its `market`'s variant where the catalog has one keyed id@market, nil for a model it hasn't.
-      # Raises Unreachable while the catalog doesn't answer. Cached apart from its far larger block, under the manifest's
+      # The record of a catalog id or citation key, nil for one the catalog hasn't. Raises Unreachable while it doesn't answer
+      def model(id) = model_markets(id)&.dig(id)
+
+      # The records of the model and its market variants, by citation key, nil for a model the catalog hasn't. Raises
+      # Unreachable while the catalog doesn't answer. Cached apart from their far larger block, under the manifest's
       # digest: a cached one needs no manifest read, and an updated catalog re-keys them all
-      def model(id, market: nil)
+      def model_markets(id)
         return unless id.to_s.match?(MODEL_ID)
         raise Unreachable unless head
 
-        record = cached(["bikebook_catalog/model", head["digest"], id, market].compact, expires_in: 1.day) do
+        records = cached(["bikebook_catalog/model_markets", head["digest"], base_id(id)], expires_in: 1.day) do
           block = (manifest || raise(Unreachable)).dig("blocks", id[MODEL_ID, 1])
-          models = block ? read(block)["models"] : {}
-          models["#{id}@#{market}"] || models[id] || {}
+          (block ? read(block)["models"] : {}).select { |key, _| base_id(key) == base_id(id) }
         end
-        (record || raise(Unreachable)).presence
+        (records || raise(Unreachable)).presence
       end
+
+      def base_id(id) = id.to_s.sub(MARKET, "")
 
       # The catalog's market for a country's ISO code: it lists an EU member's models under the EU. The US for one that's
       # unknown, as Cloudflare's CF-IPCountry is XX, or T1 over Tor, when it can't tell

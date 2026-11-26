@@ -1068,7 +1068,7 @@ RSpec.describe RegisterController, type: :request do
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.merge(frame_model: "m/specialized/2025/haul-st@CA")},
             headers: {"HTTP_CF_IPCOUNTRY" => "CA"}
           expect(b_param.reload.bike["frame_model"]).to eq "Haul ST"
-          expect(b_param.params["registrant_country"]).to eq "CA"
+          expect(b_param.params).to include("registrant_country" => "CA", "bikebook_model" => "m/specialized/2025/haul-st@CA")
         end
       end
 
