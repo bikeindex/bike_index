@@ -202,7 +202,7 @@ module UserServices
 
     # The rules page is public, so it only joins an organization's menu with an e-vehicle feature
     def e_vehicles_group(organization)
-      return nil unless organization.enabled?("model_audits") || organization.enabled?("education_courses")
+      return nil unless organization.any_enabled?(%w[model_audits education_courses])
 
       children = [
         enabled_link(organization, "model_audits", translation(:audits),

@@ -6,6 +6,8 @@ RSpec.describe UserServices::MenuItemsOrg do
   describe "for" do
     subject(:items) { described_class.for(organization:, current_user:) }
 
+    let(:e_vehicles) { items.find { |item| item[:key] == :e_vehicles } }
+
     define_method(:link_item) do |label, path, icon: nil, **attributes|
       {type: :link, label:, path:, icon:, **attributes}
     end
@@ -147,8 +149,6 @@ RSpec.describe UserServices::MenuItemsOrg do
       end
 
       it "puts audits, the e-bike rules and education completions under e-vehicles" do
-        e_vehicles = items.find { |item| item[:key] == :e_vehicles }
-
         expect(e_vehicles[:label]).to eq "E-Vehicles"
         expect(e_vehicles[:children]).to eq([
           link_item("Audits", "/o/#{slug}/model_audits", match_paths: "/o/#{slug}/model_audits/**"),
@@ -248,8 +248,6 @@ RSpec.describe UserServices::MenuItemsOrg do
       end
 
       it "drops audits from the e-vehicles group" do
-        e_vehicles = items.find { |item| item[:key] == :e_vehicles }
-
         expect(e_vehicles[:children].map { |child| child[:label] }).to eq(["E-bike rules", "E-Vehicle education"])
       end
     end
