@@ -4417,6 +4417,7 @@ en:
         abbreviation: Abbreviation
         contact_to_update_html: Contact %{link} to update abbreviation
         delete_organization: Delete organization
+        eyebrow: Organization settings
         i_would_like_to_terminate_my_account: I would like to terminate my account
           with Bike Index
         name: Name
@@ -4425,6 +4426,8 @@ en:
         org_settings: "%{org_name} profile settings"
         organization_logo: Organization logo
         organization_type: Organization type
+        profile: Profile
+        profile_description: How your organization appears on Bike Index.
         registration_email: Registration email
         removal_confirmation: Are you positive you want to remove %{org_name} from
           Bike Index?

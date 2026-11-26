@@ -1,106 +1,84 @@
-= render(UI::Header::Component.new(text: t(".org_settings", org_name: @organization.short_name), html_class: "uncap"))
+-# Legacy `.container p` puts a bottom margin on Group's helper text
+- helper_group_classes = "tw:[&>p]:mb-0"
+- checkbox_title_classes = "tw:block tw:text-[15px] tw:font-semibold"
+- checkbox_help_classes = "tw:mt-1 tw:block tw:text-[13px] tw:leading-normal tw:font-normal tw:text-gray-500 tw:dark:text-gray-400"
 
-= render(UI::Alerts::ObjectError::Component.new(object: @organization))
+%div{class: "tw:mx-auto tw:flex tw:max-w-240 tw:flex-col tw:gap-6 tw:px-6 tw:pt-12 tw:pb-16"}
+  %header
+    %p{class: "tw:m-0 tw:mb-1.5 tw:text-[13px] tw:font-bold tw:tracking-[0.08em] tw:uppercase tw:text-gray-500 tw:dark:text-gray-400"}
+      = t(".eyebrow")
+    %h1{class: "tw:m-0 tw:font-header tw:text-[34px] tw:leading-tight tw:font-extrabold tw:tracking-tight tw:normal-case tw:twtext-color"}
+      = t(".org_settings", org_name: @organization.short_name)
 
-= form_for @organization, {url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: "update", html: {class: "organized-form"}} do |f|
+  = render(UI::Alerts::ObjectError::Component.new(object: @organization))
 
-  .form-group.row
-    = f.label :name, t(".name"), class: "org-form-label"
-    .col-sm-4
-      = f.text_field :name, required: true, class: "form-control"
+  = form_for @organization, {url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: "update", html: {class: "organized-form tw:flex tw:flex-col tw:gap-6"}} do |f|
+    - group_defaults = {form_builder: f, optional_badge: false, wrapper_class: nil}
+    = render(Pages::Org::SettingsSection::Component.new(title: t(".profile"), description: t(".profile_description"))) do
+      = render(UI::Forms::Group::Component.new(**group_defaults, attribute: :name, label_text: t(".name"), required: true))
 
-  .form-group.row
-    = f.label :short_name, t(".abbreviation"), class: "org-form-label"
-    .col-sm-4
-      = f.text_field :short_name, class: "form-control", disabled: @organization.block_short_name_edit?
-      - if @organization.block_short_name_edit?
-        - email_link = link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org"
-        %span.below-input-help= t(".contact_to_update_html", link: email_link)
-  .form-group.row.fancy-select.unfancy
-    = f.label :embedable_user_email, class: "org-form-label" do
-      = t(".registration_email")
-    .col-sm-4
-      = f.select :embedable_user_email,
-      @organization.users.pluck(:email),
-      prompt: t(".select_email"),
-      selected: (@organization.auto_user && @organization.auto_user.email),
-      class: "form-control"
-      %span.below-input-help
-        = t(".org_email_address_html", org_name: @organization.name)
-      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :send_self_registration_email, class_name: "tw:mt-4")) do
-        = t(".send_self_registration_email_to_html", email: render(UI::Code::Inline::Component.new(text: @organization.auto_user&.email)))
-      %span.below-input-help
-        = t(".send_self_registration_email_note", email: @organization.auto_user&.email)
-        - if @organization.enabled?("parking_notifications")
-          = t(".send_self_registration_email_includes_unregistered")
+      = render(UI::Forms::Group::Component.new(**group_defaults, attribute: :short_name, label_text: t(".abbreviation"), wrapper_class: helper_group_classes, html_options: {disabled: @organization.block_short_name_edit?, class: "tw:disabled:cursor-not-allowed tw:disabled:bg-gray-100 tw:dark:disabled:bg-gray-800"})) do |group|
+        - if @organization.block_short_name_edit?
+          - email_link = link_to "gavin@bikeindex.org", "mailto:gavin@bikeindex.org", class: "twlink"
+          - group.with_helper_text do
+            = t(".contact_to_update_html", link: email_link)
 
-  - unless Organization.admin_required_kinds.include?(@organization.kind)
-    .form-group.row
-      %label.org-form-label
-        = t(".organization_type")
-      .col-sm-4
-        - select_opts = Organization.user_creatable_kinds.map { |k| [Organization.kind_humanized(k), k] }
-        = f.select :kind, options_for_select(select_opts, selected: @organization.kind), {}, class: "form-control"
+      - unless Organization.admin_required_kinds.include?(@organization.kind)
+        = render(UI::Forms::Group::Component.new(**group_defaults, attribute: :kind, label_text: t(".organization_type"))) do
+          - kind_options = Organization.user_creatable_kinds.map { |kind| [Organization.kind_humanized(kind), kind] }
+          = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :kind, option_tags: options_for_select(kind_options, selected: @organization.kind)))
 
-  - if @organization.bike_shop? && @organization.lightspeed_pos?
-    .form-group.row
-      %label.org-form-label
-        Lightspeed POS
-      .col-sm-4
-        .checkbox
-          %label{style: "line-height: 1.5em;"}
-            = f.check_box :lightspeed_register_with_phone
+      = render(UI::Forms::Group::Component.new(**group_defaults, attribute: :website))
+
+      - if @organization.locations.first.blank?
+        - @organization.locations.build
+        = f.fields_for :locations do |builder|
+          = render "organized/manages/location_fields", f: builder, initial_location_form: true
+
+      = render(UI::Forms::Group::Component.new(**group_defaults, attribute: :avatar, label_text: t(".organization_logo"), wrapper_class: helper_group_classes)) do |group|
+        - group.with_helper_text do
+          = t(".square_image")
+        = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :avatar, accept: ImageUploader.permitted_extensions))
+        = f.hidden_field :avatar_cache
+
+    - auto_user_email = @organization.auto_user&.email
+    = render(Pages::Org::SettingsSection::Component.new(title: t(".registration_email"), description: t(".org_email_address_html", org_name: @organization.name))) do
+      = f.label :embedable_user_email, t(".registration_email"), class: "twlabel tw:sr-only"
+      = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :embedable_user_email, option_tags: options_for_select(@organization.users.pluck(:email), selected: auto_user_email), options: {prompt: t(".select_email")}))
+
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :send_self_registration_email)) do
+        %span{class: checkbox_title_classes}
+          = t(".send_self_registration_email_to_html", email: render(UI::Code::Inline::Component.new(text: auto_user_email)))
+        %span{class: checkbox_help_classes}
+          = t(".send_self_registration_email_note", email: auto_user_email)
+          - if @organization.enabled?("parking_notifications")
+            = t(".send_self_registration_email_includes_unregistered")
+
+      - if @organization.bike_shop? && @organization.lightspeed_pos?
+        %div{class: "tw:border-t tw:border-gray-200 tw:pt-5 tw:dark:border-gray-700"}
+          = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :lightspeed_register_with_phone)) do
             -# not translating because POS integration isn't translated, so whatever
-            Add phone to registrations
-            %small.less-strong
+            %span{class: checkbox_title_classes}
+              Lightspeed POS: add phone to registrations
+            %span{class: checkbox_help_classes}
               if checked, bikes from Lightspeed POS will be registered with their phone number (if one is available)
 
-  .form-group.row
-    = f.label :website, class: "org-form-label"
-    .col-sm-4
-      = f.text_field :website, class: "form-control"
-
-  - if @organization.locations.first.blank?
-    - @organization.locations.build
-    = f.fields_for :locations do |builder|
-      = render "organized/manages/location_fields", f: builder, initial_location_form: true
-    .mb-5
-
-  .form-group.row.avatar-upload-wrapper
-    %label.org-form-label
-      = t(".organization_logo")
-    .col-sm-4
-      = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :avatar, accept: ImageUploader.permitted_extensions))
-      = f.hidden_field :avatar_cache
-      %span.below-input-help
-        = t(".square_image")
-
-
-  .form-group.row.mt-4
-    .form-submit-button
-      = f.submit t(".update"), class: "btn btn-success btn-lg"
-
-  .form-group.row.mt-5
-    %label.org-form-label
-      = t(".stolen_emails")
-    .col-sm-4
-      .checkbox{style: "line-height: 1.5em;"}
-        %label
-          = f.check_box :direct_unclaimed_notifications
+    = render(Pages::Org::SettingsSection::Component.new(title: t(".stolen_emails"), description: t(".unclaimed_registration_definition"))) do
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :direct_unclaimed_notifications)) do
+        %span{class: checkbox_title_classes}
           = t(".send_emails_directly")
-        %span.d-block= t(".unclaimed_registration_definition")
-        %span.below-input-help.mt-2
+        %span{class: checkbox_help_classes}
           = t(".when_checked_go_direct")
-          %em.less-strong= t(".why_no_direct_by_default")
+          %em= t(".why_no_direct_by_default")
 
-- unless current_organization.is_invoiced?
-  %hr.delete-organization-section
-  %p.text-md-center
-    %a.collapsed{href: "#", data: {toggle: "collapse", target: "#delete-organization"}}
-      = t(".i_would_like_to_terminate_my_account")
-  #delete-organization.collapse
-    .text-md-center
-      = render(UI::ButtonLink::Component.new(text: t(".delete_organization"),
-        href: organization_manage_path(id: current_organization.to_param, organization_id: current_organization.to_param),
-        method: :delete, color: :error,
-        confirm: t(".removal_confirmation", org_name: current_organization.name)))
+    %div{class: "tw:flex tw:justify-end"}
+      = render(UI::Button::Component.new(text: t(".update"), color: :primary, size: :callout, type: "submit"))
+
+  - unless current_organization.is_invoiced?
+    %div{class: "tw:mt-6 tw:flex tw:flex-col tw:items-center tw:gap-4 tw:border-t tw:border-gray-200 tw:pt-6 tw:dark:border-gray-700", data: {controller: "ui--collapse"}}
+      = render(UI::Collapse::Component.new(text: t(".i_would_like_to_terminate_my_account"), color: :link_gray))
+      %div{class: "tw:hidden", data: {"ui--collapse-target": "content"}}
+        = render(UI::ButtonLink::Component.new(text: t(".delete_organization"),
+          href: organization_manage_path(id: current_organization.to_param, organization_id: current_organization.to_param),
+          method: :delete, color: :error,
+          confirm: t(".removal_confirmation", org_name: current_organization.name)))
