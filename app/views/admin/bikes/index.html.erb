@@ -28,6 +28,19 @@
         </p>
       <% end %>
 
+      <% if @user_subject.present? %>
+        <p class="tw:mb-4">
+          <% if @previous_owner %>
+            Viewing bikes previously owned by
+            <em><%= @user_subject.display_name %></em>
+            <%= link_to "view currently owned bikes", url_for(sortable_search_params.merge(search_previous_owner: nil)), class: "twlink tw:text-sm" %>
+          <% else %>
+            <%= link_to "view bikes previously owned by", url_for(sortable_search_params.merge(search_previous_owner: true)), class: "twlink tw:text-sm" %>
+            <em><%= @user_subject.display_name %></em>
+          <% end %>
+        </p>
+      <% end %>
+
       <% if @ignored_only %>
         <p class="tw:mb-4">
           Viewing only <strong>ignored</strong> bikes
@@ -118,6 +131,7 @@
         <%= hidden_field_tag :search_pos, params[:search_pos] %>
         <%= hidden_field_tag :search_origin, params[:search_origin] %>
         <%= hidden_field_tag :search_only_creation_organization, params[:search_only_creation_organization] %>
+        <%= hidden_field_tag :search_previous_owner, params[:search_previous_owner] %>
 
         <% if show_search_statuses %>
           <%= render(Pages::Admin::Bikes::Index::SearchStatuses::Component.new(index: admin_index_state,
