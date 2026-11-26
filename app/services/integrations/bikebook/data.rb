@@ -6,27 +6,29 @@ module Integrations
     module Data
       extend Functionable
 
-      # nil for a model the catalog lacks, or while it doesn't answer. market is a country's ISO code, for its variant
-      def get_model(options)
-        if options.is_a?(Bike)
-          options = {manufacturer_id: options.manufacturer_id, year: options.year, frame_model: options.frame_model,
-                     market: options.address_record&.country_iso}
-        end
-        return unless options.values_at(:manufacturer_id, :year, :frame_model).all?(&:present?)
-
-        year = options[:year].to_i
-        market = Integrations::Bikebook::Catalog.market(options[:market])
-        bikebook_model = Integrations::Bikebook::ModelSearch.matching(manufacturer_id: options[:manufacturer_id], name: options[:frame_model], year:, market:)
-        record = bikebook_model && Integrations::Bikebook::Catalog.model(bikebook_model.catalog_id, market:)
-        record && {bike: bike_attributes(record, year), components: component_attributes(record),
-                   vehicle_specification: {bikebook_model_id: bikebook_model.id, bikebook_market: market}}.with_indifferent_access
+      # The specification's bike and component params, nil for a model the catalog lacks or while it doesn't answer
+      def get_model(specification, year:)
+        specification&.bikebook_data && {bike: specification.bikebook_data_bike_attributes(year:),
+                                         components: specification.bikebook_data_component_attributes}.with_indifferent_access
       rescue Integrations::Bikebook::Catalog::Unreachable
         nil
       end
 
-      #
-      # private below here
-      #
+      # A bike's own, or unsaved: the manufacturer's `bikebook_model` sold in the year, a catalog id or citation key picked
+      # in registration, else its model matching frame_model and year. nil without a year. market is a country's ISO code,
+      # which a citation key's market overrides
+      def vehicle_specification(options)
+        if options.is_a?(Bike)
+          return options.vehicle_specification || vehicle_specification(manufacturer_id: options.manufacturer_id, year: options.year,
+            frame_model: options.frame_model, market: options.address_record&.country_iso)
+        end
+        return unless options.values_at(:manufacturer_id, :year).all?(&:present?)
+
+        market = Integrations::Bikebook::Catalog.market(options[:market])
+        bikebook_models = BikebookModel.where(manufacturer_id: options[:manufacturer_id]).sold_in_year(options[:year].to_i)
+        VehicleSpecification.cited(options[:bikebook_model], market:, bikebook_models:) ||
+          matching(options, market)&.then { VehicleSpecification.new(bikebook_model: it, bikebook_market: market) }
+      end
 
       def bike_attributes(record, year)
         colorways = record.dig("years", year.to_s, "colorways").to_a
@@ -50,7 +52,17 @@ module Integrations
         end
       end
 
-      conceal :bike_attributes, :component_attributes
+      #
+      # private below here
+      #
+
+      def matching(options, market)
+        return if options[:frame_model].blank?
+
+        Integrations::Bikebook::ModelSearch.matching(manufacturer_id: options[:manufacturer_id], name: options[:frame_model], year: options[:year].to_i, market:)
+      end
+
+      conceal :matching
     end
   end
 end

@@ -4,7 +4,7 @@ module BikeJobs
 
     def perform(bike_id)
       bike = Bike.unscoped.find_by(id: bike_id)
-      bb_data = bike && Integrations::Bikebook::Data.get_model(bike)
+      bb_data = bike && Integrations::Bikebook::Data.get_model(Integrations::Bikebook::Data.vehicle_specification(bike), year: bike.year)
       return if bb_data.blank?
 
       bb_data["components"].each do |bb_comp|

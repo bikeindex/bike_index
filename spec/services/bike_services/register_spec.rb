@@ -308,6 +308,20 @@ RSpec.describe BikeServices::Register do
       expect(b_param.bike["secondary_frame_color_id"]).to be_blank
     end
 
+    it "keeps a model picked from Bike Book as its bikebook_model, until another typed model replaces it" do
+      sync_bikebook_models
+      save.call("frame_model" => "m/specialized/2025/haul-st@CA")
+      expect(b_param.reload.bike["frame_model"]).to eq "Haul ST"
+      expect(b_param.params["bikebook_model"]).to eq "m/specialized/2025/haul-st@CA"
+      save.call("frame_model" => "")
+      expect(b_param.reload.params["bikebook_model"]).to eq "m/specialized/2025/haul-st@CA"
+      save.call("frame_model" => "Haul ST")
+      expect(b_param.reload.params["bikebook_model"]).to eq "m/specialized/2025/haul-st@CA"
+      save.call("frame_model" => "Haul ST custom")
+      expect(b_param.reload.bike["frame_model"]).to eq "Haul ST custom"
+      expect(b_param.params["bikebook_model"]).to be_nil
+    end
+
     context "without a user_name" do
       it "saves the details but doesn't complete the step" do
         expect(described_class.save_step_2(b_param, user: nil, image: nil, image_signed_id: nil,
