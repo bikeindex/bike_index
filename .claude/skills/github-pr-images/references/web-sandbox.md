@@ -1,15 +1,11 @@
 # Hosting images from the Claude Code web sandbox
 
-SKILL.md's route can't run here: there's no `gh`, so nothing can `--attach`.
-
-So this route commits the images to the PR's branch instead, and posts through the
-GitHub MCP tools. It stands in for **all** of SKILL.md: step 1's PR lookup and step
-3's posting are the MCP calls below, the upload is one script, step 4 is `curl`.
-Unlike `--attach`, the script hands back URLs before anything is posted, so the body
-is composed with them rather than with local paths.
-
-Use it only when `$CLAUDE_CODE_REMOTE` is `true`. Elsewhere `--attach`'s
-`user-attachments` URLs are permanent and leave no commits behind.
+SKILL.md's preflight sends you here when its upload is out of reach: no `gh`, or the
+endpoint refused. This route commits the images to the PR's branch instead, and posts
+through the GitHub MCP tools. It stands in for **all** of SKILL.md: step 1's PR lookup
+and step 3's posting are the MCP calls below, the upload is one script, step 4 is
+`curl`. The script hands back URLs before anything is posted, so the body is composed
+with them rather than with local paths.
 
 ## Probe the posting before capturing
 
@@ -81,20 +77,20 @@ The images live only in that branch's history. This repo squash-merges, so they
 never reach `main` and no clone pays for them — but a deleted branch leaves them
 unreachable and eventually collectable. **Good for review, not an archive**: for
 permanence use a release asset uploaded by a workflow — the GitHub MCP tools this
-session goes through can't upload one.
+session goes through can't upload one. Say in your summary that the screenshots
+aren't archival.
 
 ## Posting, without `gh`
 
 Same rules as SKILL.md step 3 — one `## Screenshots` comment per PR, edited in place.
-Find it by `get_me`'s login and a body starting `## Screenshots`, paging through
-`get_comments` since on a busy PR it won't be on the first page.
+Find it the same way, by a body starting `## Screenshots` whoever posted it, paging
+through `get_comments` since on a busy PR it won't be on the first page.
 
 | SKILL.md | here |
 | --- | --- |
 | `gh pr view --json number` | `list_pull_requests`, `head: "bikeindex:<branch>"`, `state: "open"` |
-| `gh api user --jq .login` | `get_me` |
 | `gh api …/issues/N/comments` | `issue_read`, `method: "get_comments"` |
-| `gh pr comment` | `add_issue_comment` |
+| `gh api …/issues/N/comments -F body=@…` | `add_issue_comment` |
 | `gh api -X PATCH …/comments/ID` | `update_issue_comment` |
 
 `add_issue_comment` appends a Claude Code attribution footer the `pr` skill forbids —
