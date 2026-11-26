@@ -10,6 +10,12 @@ class ApplicationComponent < ViewComponent::Base
   include ViewComponent::ExperimentallyCacheable
   include ApplicationComponentHelper
 
+  # Rails keys digests by the finder's locale and builds each under a process-wide lock;
+  # no component template varies by locale
+  def self.cache_digest(finder: nil, **)
+    super(finder: finder || ActionView::LookupContext.new(ActionController::Base.view_paths, locale: []), **)
+  end
+
   def raise_if_invalid_value!(attribute, value, options = {})
     return if options.include?(value)
 
