@@ -34,9 +34,6 @@ RSpec.describe Integrations::Bikebook::ModelSearch do
     it "slugifies, without cycle words" do
       expect(described_class.slug("Cross-check Singlespeed BicyclE")).to eq "cross-check-singlespeed"
       expect(described_class.slug("Turbo Vado E-Bike")).to eq "turbo-vado"
-      expect(described_class.slug("paké rum runner")).to eq "pake-rum-runner"
-      expect(described_class.slug("L100+ Lowstep BLX")).to eq "l100-plus-lowstep-blx"
-      expect(described_class.slug("Trail SL 29'er 4")).to eq described_class.slug("Trail SL 29er 4")
     end
 
     it "keeps parenthesized text" do

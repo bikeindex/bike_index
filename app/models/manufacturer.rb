@@ -142,7 +142,7 @@ class Manufacturer < ApplicationRecord
     self.name = Binxtils::InputNormalizer.string(name)
     self.secondary_slug = Slugifyer.broader_company_slugify(secondary_name)
     self.slug = Slugifyer.slugify(name)
-    self.previous_slugs = ([*previous_slugs, Slugifyer.slugify(slug_in_database), Slugifyer.broader_company_slugify(name)].compact_blank - [slug]).uniq
+    self.previous_slugs = ([*previous_slugs.map { Slugifyer.slugify(it) }, Slugifyer.slugify(slug_in_database), Slugifyer.broader_company_slugify(name)].compact_blank - [slug]).uniq
     self.website = website.present? ? Urlifyer.urlify(website) : nil
     self.logo_source = logo.present? ? (logo_source || "manual") : nil
     self.twitter_name = twitter_name.present? ? twitter_name.gsub(/\A@/, "") : nil
