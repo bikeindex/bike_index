@@ -23,7 +23,7 @@ From a session with history, hand this skill to a subagent the way `AGENTS.md`'s
 
 Everything here diffs `origin/main...HEAD`, the base being `main` unless the caller names another — substitute it, since shell state doesn't carry between commands. That range sees only committed work: run after committing, or pair each audit with a pass over `rtk proxy git diff HEAD` and `git ls-files --others --exclude-standard`, or a comment you razored in the working tree still reads as present and a new file reads as absent.
 
-**Only touch lines this branch already changed.** The model-comment audit is the exception, since `app/models` is clean of what it finds.
+**Only touch lines this branch already changed.** The exceptions are the model-comment audit, since `app/models` is clean of what it finds, and whatever files the controller and marketing page audits name a fix in.
 
 ## Conform to AGENTS.md
 
@@ -121,7 +121,7 @@ State the verdict in your reply either way, naming the stored values you checked
 rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images
 ```
 
-Icons and images both go through the markup audit below, which checks each one for a file the repo already has.
+Icons and images both go through the markup audit below, which checks each one for a file the repo already has. **One with no existing copy is sized to the slot it renders in.** Read its width (`sips -g pixelWidth`) against the widest it displays — its `max-w-*`, or its grid column — and name both in your reply. Wider than twice that, resize it to twice and save it as WebP, with the `image_tag` dimensions to match. #4821 shipped a 1560px PNG into a 520px column.
 
 ## The controller audit
 
@@ -132,7 +132,7 @@ rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/javascr
 rtk proxy git diff origin/main...HEAD -G 'data-controller|controller:' --name-only
 ```
 
-For each controller named, look for one that already does its job — a shared one in `app/javascript/controllers/ui/` or the top level, or a sibling in another namespace — and for two in the branch's namespace doing the same thing. Fold a duplicate into the shared one, an option on it rather than a second controller, and delete the copy. `bikebook--center-current` into `ui--tabs` and `bikebook--image-fallback` into `image-fallback` are the pattern. Name each one you kept and what it does that nothing shared covers.
+For each controller named, look for one that already does its job — a shared one in `app/javascript/controllers/ui/` or the top level, or a sibling in another namespace — and for two in the branch's namespace doing the same thing. Fold a duplicate into the shared one, an option on it rather than a second controller, and delete the copy. `bikebook--center-current` into `ui--tabs` and `bikebook--image-fallback` into `image-fallback` are the pattern. **When nothing shared exists, the branch's controller and whatever else does the same job — another controller, or an action inside another page's controller — become one shared controller**, the other page switched over to it too. Flagging the pair and keeping both is a miss. `scroll-to-hash`, which replaced the shop's and the memberships page's scroll actions, is the pattern. Name each one you kept and what it does that nothing shared covers.
 
 ## The component audit
 
@@ -150,11 +150,19 @@ For each, name the existing component it renders or duplicates. One that wraps a
 
 ## The marketing page audit
 
-**Required when the branch adds or edits a marketing page** — one `use-existing-markup`'s **Marketing pages** section names, or one rendering `SharedBlocks::Marketing::*`. Read its templates whole, with the component sidecar `en.yml` beside them.
+**Required when the branch adds or edits a marketing page** — one `use-existing-markup`'s **Marketing pages** section names, or one rendering `SharedBlocks::Marketing::*`. Read its templates whole, the page's own sub-components (`Pages::Shop::Product`) included, with each sidecar `en.yml`.
 
-**Repeated objects.** Look for a block written out more than once — three feature cards, a row of stat tiles, a set of steps, each a copy of the same markup with different copy. Each is one existing component rendered in a loop over the values: a `SharedBlocks::Marketing::*` block from `use-existing-markup`'s table, or a `UI::*` one. Convert them without asking, the same way the markup audit does, and list each in your reply.
+**Reach a verdict on every numbered check, in your reply, by number.** Every check but the last names its fix: make it, in whatever file it lands in — a sibling page, `SharedBlocks::Marketing::Wrapper`, a footer link. Flagging one of these instead of fixing it is a miss.
 
-**Repeated text and values.** List every phrase, figure or link that says the same thing twice on the page: a heading restated by the intro under it, a stat in the hero and again in a number block, a call to action that appears twice, a sentence the closing banner repeats. Compare what the copy *says*, not only identical strings — "Register your bike for free" and "Registration is always free" are one claim. **Don't delete any of them.** Flag each set in your reply, quoting every occurrence and where it sits, for the user to choose which to keep.
+1. **Kit blocks.** Every heading with an intro paragraph is `SharedBlocks::Marketing::SectionHeading`, inside a sub-component too, and every figure over a label — a price grid in a `<dl>` as much as a stats row — is `SharedBlocks::Marketing::NumberBlocks`. "No component covers it" is never the verdict for either.
+2. **Repeated objects.** A block written out more than once — feature cards, stat tiles, steps, each a copy of the same markup with different copy — is one existing component rendered in a loop over the values: a `SharedBlocks::Marketing::*` block from `use-existing-markup`'s table, or a `UI::*` one.
+3. **Gray bands** read `SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES`, with the section adding its border sides. Where the constant is missing, add it to the wrapper.
+4. **Fonts** are the ones the wrapper loads: `tw:font-header` and the body font. Replace every `tw:font-[…]` and delete any font `<link>` the page loads itself.
+5. **A value kept in step with something outside the repo is one constant** the template reads — a price that has to match Shopify is a `PRICES` entry, not a literal where it shows.
+6. **The controller** rendering the page has `before_action :force_html_response` — `AGENTS.md`'s architecture notes say why, and a redirect into the page is what triggers it.
+7. **The preview.** The page's `component_preview.rb` renders it through `SharedBlocks::Marketing::Wrapper`, the way the controller does.
+8. **Entry points.** A page that takes over an old destination takes every way in: grep for the old route helper, the external URL and any `/info` post on the subject, and point each at the new page — an `/info` post through a `Blog` slug method and a branch in `InfoController#show`, the way `Blog.why_donate_slug` reaches `/donate` — with an anchor where a link means one section. Add the page to `config/initializers/sitemap_pages.rb`, and drop the `as:` from a redirect route whose helper nothing calls any more. `/shop` (#4821) is the pattern.
+9. **Repeated text and values.** List every phrase, figure or link that says the same thing twice on the page: a heading restated by the intro under it, a stat in the hero and again in a number block, a call to action that appears twice, a sentence the closing banner repeats. Compare what the copy *says*, not only identical strings — "Register your bike for free" and "Registration is always free" are one claim. **Don't delete any of them.** Flag each set, quoting every occurrence and where it sits, for the user to choose which to keep.
 
 ## The cycle-type translation check
 
@@ -188,4 +196,4 @@ rtk's hook rewrites every `git diff` and `git log`. A `git diff` without `-U0` c
 
 ## The reply
 
-One line per audit that ran: its verdict and what it changed, or "nothing" — the backfill verdict naming the stored values checked, the markup audit's conversions and callouts in full. Then any finding you left for the user, like a component to fold into a `UI::*` argument, and every set of repeated text from the marketing page audit. Leave the fixes uncommitted; the caller commits them.
+One line per audit that ran: its verdict and what it changed, or "nothing" — the backfill verdict naming the stored values checked, the markup audit's conversions and callouts in full. The marketing page audit gets a line per numbered check. Then any finding you left for the user, like a component to fold into a `UI::*` argument, and every set of repeated text from the marketing page audit. Leave the fixes uncommitted; the caller commits them.
