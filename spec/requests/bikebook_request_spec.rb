@@ -1,0 +1,543 @@
+require "rails_helper"
+
+RSpec.describe BikebookController, type: :request do
+  include ActiveSupport::Testing::TimeHelpers
+
+  describe "show" do
+    before { stub_bikebook_catalog }
+
+    it "renders the search and a spinner, and the shell the browser fills in from the catalog" do
+      get "/bikebook"
+
+      expect(response).to have_http_status(:ok)
+      page = Capybara.string(response.body)
+      bikebook = page.find("[data-controller='bikebook--page']")
+      expect(bikebook["data-bikebook--page-manifest-url-value"]).to eq Integrations::Bikebook::Catalog::MANIFEST_URL
+      expect(bikebook).to have_css("[inert] #vehicle_models[placeholder='Loading…']")
+        .and have_css("[role='status'] svg.tw\\:animate-spin")
+        .and have_css("[role='status']", text: "Loading the catalog…")
+      # its modules all asked for at once, beside the application's rather than repeating them
+      preloads = page.all("head link[rel='modulepreload']", visible: :all).map { it[:href] }
+      expect(preloads).to include(a_string_matching(%r{/bikebook/catalog-}), a_string_matching(%r{/lit-html-}))
+      expect(preloads).to eq preloads.uniq
+      # the URL setting nothing, the search as it is until the browser fills it in
+      expect(bikebook.find("[inert]")[:class]).to be_blank
+
+      shell = Capybara.string(Nokogiri::HTML5(response.body).at_css("template[data-bikebook--page-target='shell']").inner_html)
+      expect(shell).to have_field("vehicle_models", placeholder: "Search by manufacturer or model…")
+        .and have_css("#manufacturer-hw-listbox", visible: :all)
+        .and have_css("#vehicle-viewers", visible: :all)
+      expect(page).to have_title("Bike Book", exact: true)
+        .and have_css("meta[property='og:image'][content*='/assets/logos/bikebook']", visible: :all)
+        .and have_css("meta[name='twitter:card'][content='summary']", visible: :all)
+      expect(response.headers["X-Robots-Tag"]).to be_nil
+      expect(page.find("p", text: "Bike Book data is free to use under CC BY-SA 4.0.")).to have_link("Learn how to use it", href: "/bikebook/license")
+        .and have_link("view the raw data", href: "https://github.com/bikeindex/bikebook")
+        .and have_text("Learn how to use it or view the raw data.", normalize_ws: true)
+    end
+
+    context "comparing" do
+      it "isn't indexed, and shows the search it can't fill in as loading" do
+        get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3-pro,m/aventon/2022/level-2"}
+        expect(response).to have_http_status(:ok)
+        expect(response.headers["X-Robots-Tag"]).to eq "noindex, follow"
+        shell = Capybara.string(response.body).find("[inert]")
+        expect(shell[:class]).to be_blank
+        expect(shell).to have_field("vehicle_models", placeholder: "Loading…")
+      end
+    end
+
+    context "cached", :caching do
+      include_context :caching_basic
+
+      it "is every visitor's and every search's, the page giving the visitor's market around it" do
+        get "/bikebook", params: {search: "1", manufacturer: "aventon"}, headers: {"CF-IPCountry" => "JP"}
+        japan = Nokogiri::HTML5(response.body)
+        get "/bikebook", params: {search: "1"}, headers: {"CF-IPCountry" => "US"}
+        us = Nokogiri::HTML5(response.body)
+        # an EU member's visitor in the EU, which the catalog lists their models under
+        get "/bikebook", params: {search: "1"}, headers: {"CF-IPCountry" => "FR"}
+        france = Nokogiri::HTML5(response.body)
+
+        shell = "template[data-bikebook--page-target='shell']"
+        expect(us.at_css(shell).inner_html).to eq japan.at_css(shell).inner_html
+        expect(us.at_css(shell).inner_html).to_not include("default-market-value")
+        expect(us.at_css(shell).inner_html).to include(%(data-jurisdiction="NY"))
+        expect(japan.at_css("[inert]")[:class]).to eq "tw:invisible"
+        expect(us.at_css("[inert]")[:class]).to be_blank
+        expect([japan, us, france].map { it.at_css("[data-controller='bikebook--page']").attributes.slice(*%w[market market-name jurisdiction].map { "data-bikebook--page-#{it}-value" }).transform_values(&:value).values })
+          .to eq [%w[JP Japan US], ["US", "United States", "US"], ["EU", "European Union", "US"]]
+        expect(response.body).to include("https://github.com/bikeindex/bikebook (CC BY-SA 4.0). Clone that repository instead.")
+        expect(us.at_css("[data-controller='bikebook--page'] > noscript").text).to include("AI agents: get the data there")
+          .and include("github.com/bikeindex/bikebook")
+      end
+
+      it "isn't kept while the catalog doesn't answer, which leaves the state laws out" do
+        WebMock.stub_request(:get, /#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}/o).to_return(status: 503)
+        shells = 2.times.map do
+          get "/bikebook", params: {search: "1"}
+          Nokogiri::HTML5(response.body).at_css("template[data-bikebook--page-target='shell']").inner_html
+        end
+
+        expect(shells.first).to_not eq shells.last
+        expect(shells.first).to_not include("data-jurisdiction=\"NY\"")
+      end
+    end
+
+    context "in a frame" do
+      it "doesn't autofocus the search, which would take the host page's focus" do
+        get "/bikebook"
+        expect(Capybara.string(response.body)).to have_css("#vehicle_models[autofocus]")
+
+        get "/bikebook", headers: {"Sec-Fetch-Dest" => "iframe"}
+        expect(response).to have_http_status(:ok)
+        expect(Capybara.string(response.body)).to have_css("#vehicle_models")
+          .and have_no_css("#vehicle_models[autofocus]")
+      end
+    end
+
+    context "the search the server can't fill in" do
+      let(:shell_class) { Capybara.string(response.body).find("[inert]")[:class] }
+
+      it "is blank with filters" do
+        get "/bikebook", params: {search: "1", manufacturer: "aventon"}
+        expect(shell_class).to eq "tw:invisible"
+      end
+
+      it "is blank with filters and picks" do
+        get "/bikebook", params: {vehicle_models: "m/segway/2025/gt3-pro,m/aventon/2022/level-2", electric: "1"}
+        expect(shell_class).to eq "tw:invisible"
+      end
+
+      it "shows when asked for alone" do
+        get "/bikebook", params: {search: "1"}
+        expect(shell_class).to be_blank
+      end
+    end
+
+    context "a model alone" do
+      include BikebookCatalogHelpers
+
+      let(:catalog_status) { 200 }
+      let(:params) { {vehicle_models: "m/segway/2025/gt3-pro{size:M}{json}", filters: "1"} }
+      let(:page) { Capybara.string(response.body) }
+
+      before do
+        stub_bikebook_catalog(status: catalog_status)
+        get("/bikebook", params:)
+      end
+      after { WebMock.reset! }
+
+      it "renders the model's page, titled and described for it, canonically without the search or what's picked for it" do
+        expect(response).to have_http_status(:ok)
+        expect(response.headers["X-Robots-Tag"]).to be_nil
+        expect(page).to have_title("Segway GT3 Pro", exact: true)
+          .and have_css("[data-controller='bikebook--page'][data-bikebook--page-title-value='Bike Book']")
+        expect(page).to have_css("meta[name='description'][content^='Experience elite performance with the Segway GT3 Pro']", visible: :all)
+          .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/segway/2025/gt3-pro.png']", visible: :all)
+          .and have_css("meta[name='twitter:card'][content='summary_large_image']", visible: :all)
+          .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3-pro']", visible: :all)
+        # its search hidden from the start, as the browser hides it
+        expect(page.find("[inert]", visible: :all)[:class]).to eq "tw:hidden"
+      end
+
+      context "a market's, by its citation key" do
+        let(:params) { {vehicle_models: "m/specialized/2025/haul-st@CA"} }
+
+        it "renders its page" do
+          expect(response).to have_http_status(:ok)
+          expect(page).to have_title("Specialized Haul ST", exact: true)
+            .and have_css("meta[property='og:image'][content='https://bikebook.bikeindex.org/specialized/2025/haul-st.png']", visible: :all)
+            .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/specialized/2025/haul-st@CA']", visible: :all)
+        end
+      end
+
+      context "that the catalog hasn't" do
+        let(:params) { {vehicle_models: "m/segway-ninebot/2025/gt-9"} }
+
+        it "is not found" do
+          expect(response).to have_http_status(:not_found)
+        end
+      end
+
+      context "with the catalog unreachable" do
+        let(:catalog_status) { 503 }
+
+        it "renders the page for the browser to try, as unavailable to a crawler" do
+          expect(response).to have_http_status(:service_unavailable)
+          expect(page).to have_title("Bike Book", exact: true)
+            .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3-pro']", visible: :all)
+        end
+      end
+    end
+
+    describe "donation strip" do
+      let(:page) do
+        get "/bikebook"
+        Capybara.string(response.body)
+      end
+
+      it "renders under the Bike Book heading" do
+        expect(page).to have_css("h1", text: "find your next ride.")
+        expect(page.find("section[aria-label='Donate to Bike Index']")).to have_link("Donate", href: "/donate?source=bikebook")
+          .and have_no_css("button")
+      end
+    end
+
+    describe "units" do
+      let(:headers) { {} }
+      let(:html_class) do
+        get("/bikebook", headers:)
+        Nokogiri::HTML5(response.body).at_css("html")["class"]
+      end
+
+      it "is metric" do
+        expect(html_class).to be_blank
+      end
+
+      context "from the US" do
+        let(:headers) { {"HTTP_CF_IPCOUNTRY" => "US"} }
+
+        it "is imperial" do
+          expect(html_class).to eq "imperial"
+        end
+
+        context "with a user who prefers metric" do
+          include_context :request_spec_logged_in_as_user
+          before { current_user.update(preferred_unit_system: "metric") }
+
+          it "is metric" do
+            expect(html_class).to be_blank
+          end
+        end
+      end
+    end
+  end
+
+  describe "vehicle" do
+    it "redirects to the page with that vehicle picked" do
+      get "/bikebook/m/segway/2025/gt3-pro"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3-pro")
+      get "/bikebook/m/specialized/2025/haul-st@CA"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/specialized/2025/haul-st@CA")
+    end
+
+    it "redirects from the vehicle's id alone" do
+      get "/m/super-73/2024/s-adv"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/super-73/2024/s-adv")
+    end
+
+    it "redirects from an e-vehicle classification's id to its card" do
+      get "/evc/us/class-3"
+      expect(response).to redirect_to("/bikebook?classifications=evc/us/class-3")
+      get "/evc/off-highway-motorcycle"
+      expect(response).to redirect_to("/bikebook?classifications=evc/off-highway-motorcycle")
+    end
+
+    context "without its m/, and with vehicles already picked" do
+      it "picks it ahead of them, keeping the query" do
+        get "/bikebook/segway/2025/gt3-pro", params: {vehicle_models: "m/aventon/2022/level-2,m/segway/2025/gt3-pro", filters: "1"}
+        expect(response).to redirect_to("/bikebook?filters=1&vehicle_models=m/segway/2025/gt3-pro,m/aventon/2022/level-2")
+      end
+
+      context "with what's picked for each" do
+        it "keeps each with its vehicle, a name's commas its own" do
+          vehicle_models = "m/aventon/2022/level-2{size:Large}{json},m/segway/2025/gt3-pro{color:Navy, Fade},m/aventon/2026/current-adv{size:Small}{color:Sage}"
+          get "/bikebook/m/segway/2025/gt3-pro", params: {vehicle_models:}
+          expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3-pro{color:Navy,+Fade},m/aventon/2022/level-2{size:Large}{json},m/aventon/2026/current-adv{size:Small}{color:Sage}")
+        end
+      end
+    end
+  end
+
+  describe "other spellings" do
+    it "redirects them to /bikebook, keeping the rest of the path and the query" do
+      get "/BikeBook"
+      expect(response).to redirect_to("/bikebook")
+      expect(response).to have_http_status(:moved_permanently)
+
+      get "/bike-book?vehicle_models=m/segway/2025/gt3-pro"
+      expect(response).to redirect_to("/bikebook?vehicle_models=m/segway/2025/gt3-pro")
+
+      get "/bike_book/m/segway/2025/gt3-pro"
+      expect(response).to redirect_to("/bikebook/m/segway/2025/gt3-pro")
+    end
+  end
+
+  describe "up" do
+    before { stub_bikebook_catalog }
+
+    it "is ok, in the format the browser's reader reads" do
+      get "/up/bikebook"
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include(%(<body style="background-color: green">))
+      %w[catalog_worker similarity].each do |reader|
+        expect(Rails.root.join("app/javascript/bikebook/#{reader}.js").read).to include("const FORMAT = #{Integrations::Bikebook::Catalog::FORMAT}\n")
+      end
+    end
+
+    context "with the catalog in a format the reader doesn't read" do
+      it "is unavailable" do
+        stub_const("Integrations::Bikebook::Catalog::FORMAT", 2)
+        get "/up/bikebook"
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.body).to include(%(<body style="background-color: red">))
+      end
+    end
+
+    context "with no catalog published" do
+      it "is unavailable" do
+        stub_bikebook_catalog(status: 404)
+        get "/up/bikebook"
+        expect(response).to have_http_status(:service_unavailable)
+        expect(response.body).to include(%(<body style="background-color: red">))
+      end
+    end
+  end
+
+  describe "license" do
+    let(:section_ids) do
+      %w[what-you-can-do what-you-need-to-do how-to-credit share-alike what-this-license-covers disclaimer
+        contributing versions-and-downloads show-that-you-use-bike-book questions]
+    end
+
+    it "renders the license, with an anchor for each section and its credit snippets" do
+      get "/bikebook/license"
+
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("<title>Bike Book license and attribution | Bike Index</title>")
+      page = Capybara.string(response.body)
+      expect(page).to have_css("h1", text: "Bike Book license and attribution")
+      section_ids.each { expect(page).to have_css("h2##{it}") }
+      expect(page.find("meta[name='description']", visible: false)["content"])
+        .to eq "Bike Book data is open under CC BY-SA 4.0. Here's how to use it and how to credit Bike Index."
+      expect(page.find("link[rel='canonical']", visible: false)["href"]).to eq "https://bikeindex.org/bikebook/license"
+      # the pointers to sections link to them
+      expect(page).to have_link("How to credit Bike Book", href: "#how-to-credit")
+        .and have_link("Share-alike: what has to stay open", href: "#share-alike")
+      # no copy waits on a person to fill it in; the Markdown snippet's own brackets are in a pre
+      expect(page.all("h2, p, li, td").map(&:text).join).not_to match(/\[[^\]]+\]/)
+      # every address is a mailto link
+      expect(page.all("a[href='mailto:licensing@bikeindex.org']").count).to eq 6
+      expect(page.find("body").text.scan("licensing@bikeindex.org").count).to eq 6
+      expect(page).to have_css("li", text: "Product descriptions and photos, which belong to their manufacturers", normalize_ws: true)
+      # snippets are text, with a button to copy each
+      expect(page).to have_css("pre code", text: 'Bike data: <a href="https://bikeindex.org/bikebook/license">Bike Book by Bike Index</a>')
+        .and have_css("pre code", text: "Bike data: [Bike Book by Bike Index](https://bikeindex.org/bikebook/license)")
+      expect(page).to have_css("[data-controller='ui--copy-button']", count: 2)
+      expect(page).to have_css("table th", text: "Where you use the data")
+      expect(page).to have_css("#badge img[alt='Powered by Bike Index']", count: 4)
+      expect(page).to have_link("SVG", count: 4).and have_link("PNG 2x", count: 4).and have_link("PNG 4x", count: 4)
+      page.all("a[download]").each do |link|
+        expect(Rails.public_path.join(link["href"].delete_prefix("/"))).to exist
+      end
+    end
+  end
+
+  describe "schema_viewer" do
+    before { stub_bikebook_catalog }
+
+    let(:fields) { Integrations::Bikebook::Catalog.schema_viewer.dig("documents", "vehicle_model", "fields") }
+    let(:manufacturer_count) { fields.dig("manufacturer", "models_count") }
+    let(:example_id) { fields.dig("manufacturer", "example_ids").first }
+
+    it "renders the vehicle model's fields with how many models fill each, opening what the URL names and the folds around it" do
+      get "/bikebook_schemas", params: {open: "type,frame.mounts", by_count: "type"}
+
+      expect(response).to have_http_status(:ok)
+      page = Capybara.string(response.body)
+      expect(page).to have_title("Bike Book schemas | Bike Index", exact: true)
+        .and have_css("[aria-current='page']", text: "Vehicle model")
+        .and have_css("details[open][data-schema-path='type']")
+        .and have_css("details:not([open])[data-schema-path='type_detail']")
+        # opened around the fold it names, and closed everywhere else
+        .and have_css("details[open][data-schema-path='frame'] details[open][data-schema-path='frame.mounts']")
+        .and have_css("details:not([open])[data-schema-path='wheels']")
+        .and have_css("input[aria-label='type by count'][checked]")
+        .and have_css("button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']")
+        .and have_link(example_id, href: "/bikebook?vehicle_models=#{example_id}", visible: :all)
+    end
+
+    context "with another document" do
+      it "renders its fields" do
+        get "/bikebook_schemas", params: {document: "e_vehicle_classification"}
+
+        expect(response).to have_http_status(:ok)
+        expect(Capybara.string(response.body)).to have_css("[aria-current='page']", text: "E vehicle classification")
+          .and have_content("jurisdiction:")
+      end
+    end
+
+    context "with caching" do
+      around do |example|
+        ActionController::Base.perform_caching = true
+        ActionController::Base.cache_store = ActiveSupport::Cache::MemoryStore.new
+        example.run
+      ensure
+        ActionController::Base.perform_caching = false
+        ActionController::Base.cache_store = :null_store
+      end
+
+      it "renders a newly published schema viewer's counts rather than the cached ones" do
+        # model and first_year fill as many models as manufacturer does
+        old_badge = "button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']"
+        get "/bikebook_schemas"
+        old_badges = Capybara.string(response.body).all(old_badge).count
+
+        stub_bikebook_catalog_update
+        travel(5.minutes + 1.second) { get "/bikebook_schemas" }
+
+        expect(Capybara.string(response.body)).to have_css("button[aria-label='12,345,678 models']")
+          .and have_css(old_badge, count: old_badges - 1)
+      end
+
+      it "caches a field's fields inside its fragment, and on their own only where it renders afresh" do
+        written = []
+        record = ->(*, payload) { written << payload[:key].to_s }
+        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook_schemas" }
+        expect(written.count { it.include?("/frame/") }).to eq 1
+        expect(written.count { it.include?("/frame.mounts/") }).to eq 0
+
+        written.clear
+        ActiveSupport::Notifications.subscribed(record, "cache_write.active_support") { get "/bikebook_schemas", params: {open: "frame"} }
+        expect(written.count { it.include?("/frame.mounts/") }).to eq 1
+      end
+
+      it "renders a field the URL opens anything in afresh, rather than as cached closed" do
+        get "/bikebook_schemas"
+        expect(Capybara.string(response.body)).to have_css("details:not([open])[data-schema-path='type']")
+
+        get "/bikebook_schemas", params: {open: "type", by_count: "type"}
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css("details[open][data-schema-path='type']")
+          .and have_css("input[aria-label='type by count'][checked]")
+          .and have_css("details:not([open])[data-schema-path='type_detail']")
+          .and have_css("button[aria-label='#{ActiveSupport::NumberHelper.number_to_delimited(manufacturer_count)} models']")
+      end
+    end
+
+    context "while the catalog doesn't answer" do
+      before { WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}#{Integrations::Bikebook::Catalog::MANIFEST}").to_return(status: 503) }
+
+      it "says so" do
+        get "/bikebook_schemas", params: {document: "component"}
+
+        expect(response).to have_http_status(:service_unavailable)
+        expect(Capybara.string(response.body)).to have_content("Bike Book's catalog isn't answering")
+          .and have_no_css("[aria-current='page']")
+      end
+    end
+
+    context "with a document the catalog doesn't publish" do
+      it "renders the vehicle model's" do
+        get "/bikebook_schemas", params: {document: "vocabulary"}
+
+        expect(Capybara.string(response.body)).to have_css("[aria-current='page']", text: "Vehicle model")
+      end
+    end
+  end
+
+  describe "schema" do
+    include ActiveSupport::Testing::TimeHelpers
+
+    let(:url) { Integrations::Bikebook::RepositoryRecord::URL }
+    # WebMock's request counts outlive examples
+    before do
+      WebMock.reset!
+      stub_bikebook_catalog
+    end
+
+    def lines = Nokogiri::HTML5(response.body).css("pre > span").map(&:text)
+
+    it "pretty-prints a record's file in its own key order, commented with the schema's descriptions, and keeps it" do
+      component = WebMock.stub_request(:get, "#{url}components/aventon/2024/a100.json").to_return(body: <<~JSON)
+        {"schema_version": "2.0.0", "id": "c/aventon/2024/a100", "type": "ebike-motor", "manufacturer": "Aventon", "model": "A100",
+         "first_year": 2024, "motor": {"spindle": "ISIS", "kind": "mid-drive"}, "aliases": []}
+      JSON
+      model = WebMock.stub_request(:get, "#{url}vehicle_models/segway/2025/gt3-pro.json").to_return(body: <<~JSON)
+        {"id": "m/segway/2025/gt3-pro", "markets": ["US"], "years": {"2025": {"colorways": [{"name": "Grey", "stock_photo": "grey.png"}], "url_live": true}}}
+      JSON
+
+      2.times { get "/bikebook_schemas/c/aventon/2024/a100" }
+      expect(response).to have_http_status(:ok)
+      expect(response.body).to include("<title>c/aventon/2024/a100 | Bike Book</title>")
+      expect(lines).to eq([
+        "{",
+        '  "schema_version": "2.0.0",',
+        '  "id": "c/aventon/2024/a100",',
+        '  "type": "ebike-motor", // E-vehicle Motor',
+        '  "manufacturer": "Aventon",',
+        '  "model": "A100",',
+        '  "first_year": 2024, // year it launched',
+        '  "motor": { // E-vehicle Motor only',
+        '    "spindle": "ISIS", // a mid drive\'s crank interface, e.g. ISIS',
+        '    "kind": "mid-drive"',
+        "  },",
+        '  "aliases": [] // other names it\'s specced under',
+        "}"
+      ])
+      page = Capybara.string(response.body)
+      expect(page.find("[data-controller='bikebook--schema-lookup']"))
+        .to have_link("View this file on GitHub", href: "https://github.com/bikeindex/bikebook/blob/main/components/aventon/2024/a100.json")
+      expect(page).to have_css("[aria-current='page']", text: "Component")
+        .and have_text("The shape of a component file")
+        .and have_no_css("[data-schema-path]")
+      # the search picks it, named as /bikebook names it, once the catalog loads
+      lookup = page.find("[data-controller='bikebook--schema-lookup']")
+      expect(lookup["data-bikebook--schema-lookup-display-value"]).to eq "Aventon A100"
+      expect(lookup["data-bikebook--schema-lookup-cleared-url-value"]).to eq "/bikebook_schemas?document=component"
+      expect(lookup).to have_field("vehicle_models", disabled: true, placeholder: "Loading the catalog…")
+      WebMock::API.assert_requested(component, times: 1)
+
+      get "/bikebook_schemas/m/segway/2025/gt3-pro"
+      expect(lines).to eq([
+        "{",
+        '  "id": "m/segway/2025/gt3-pro",',
+        '  "markets": [ // ISO 3166-1 alpha-2 country codes, or EU',
+        '    "US" // United States',
+        "  ],",
+        '  "years": { // one record per model year, keyed by year, newest first',
+        '    "2025": {',
+        '      "colorways": [ // one per paint',
+        "        {",
+        '          "name": "Grey",',
+        '          "stock_photo": "grey.png"',
+        "        }",
+        "      ],",
+        '      "url_live": true // whether the manufacturer\'s page is still up; false for an archive capture, which shows it as it was',
+        "    }",
+        "  }",
+        "}"
+      ])
+      # a market variant's citation key, whose record is in its home model's file
+      get "/bikebook_schemas/m/segway/2025/gt3-pro@CA"
+      expect(lines.second).to eq '  "id": "m/segway/2025/gt3-pro",'
+      expect(response.body).to include("<title>m/segway/2025/gt3-pro@CA | Bike Book</title>")
+      WebMock::API.assert_requested(model, times: 1)
+    end
+
+    it "is not found for an id the repository has no file for, or that isn't a record's" do
+      missing = WebMock.stub_request(:get, "#{url}vehicle_models/segway/2025/nope.json").to_return(status: 404)
+
+      2.times { get "/bikebook_schemas/m/segway/2025/nope" }
+      expect(response).to have_http_status(:not_found)
+      WebMock::API.assert_requested(missing, times: 1)
+      get "/bikebook_schemas/aventon/2025"
+      expect(response).to have_http_status(:not_found)
+      get "/bikebook_schemas/m/../config/secrets"
+      expect(response).to have_http_status(:not_found)
+    end
+
+    it "is unavailable while GitHub doesn't answer, asking again after a minute" do
+      down = WebMock.stub_request(:get, "#{url}components/aventon/2024/a100.json").to_return(status: 503)
+
+      2.times { get "/bikebook_schemas/c/aventon/2024/a100" }
+      expect(response).to have_http_status(:service_unavailable)
+      expect(Capybara.string(response.body)).to have_text("The Bike Book repository isn't answering. Try again in a minute.")
+      WebMock::API.assert_requested(down, times: 1)
+      travel_to(2.minutes.from_now) { get "/bikebook_schemas/c/aventon/2024/a100" }
+      WebMock::API.assert_requested(down, times: 2)
+    end
+  end
+end

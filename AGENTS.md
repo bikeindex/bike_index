@@ -6,7 +6,7 @@ Bike Index is a Rails webapp
 
 Run `eval "$(ruby bin/env --export)"` once so `$DEV_PORT` (and `$BASE_URL`, `$REDIS_URL`) are set with the right WORKSPACE_ID fallback.
 
-**A spawned `.claude/worktrees/…` checkout runs `bin/workspace_setup --without_seeds` before anything else** — until it has, `bin/env` falls back to the *main* checkout's port, database and Redis. The `sandbox-test-setup` skill has it.
+**A spawned `.claude/worktrees/…` checkout runs `bin/workspace_setup --without_seeds` before anything else** — until it has, `bin/env` falls back to the *main* checkout's port, database and Redis. `.claude/hooks/worktree-setup.sh` runs it at the first session start. The `sandbox-test-setup` skill has it.
 
 **A workspace's database generally starts empty** — created and migrated, but not seeded, so `Bike.count` is 0 and real pages render nothing. Run `bundle exec rails db:seed` when you need records to try something in development; `bikeindex_development_$WORKSPACE_ID` is a per-workspace throwaway, so seeding or re-seeding it is safe and never needs asking.
 
@@ -74,7 +74,9 @@ Run `bundle exec rails prepare_translations` after hand-editing a `component.en.
 
 **A component's copy lives in that component's own sidecar, and orphaning is never a reason to leave it somewhere else.** The sync relocates the other four locales on its next run, and non-English readers fall back to English only until it does — a scope that doesn't match its component doesn't expire.
 
-**Don't hand-edit `config/locales/translation.*.yml` for a new key either** — the sync writes those four too. A lookup in another locale raises rather than falling back in test, so the three `:nl` specs (`shared_blocks/footer`, `navbar/wrapper`, `header_tags`) go red until the sync reaches the key.
+**Changing what a value says means a new key.** The other locales keep their translation under an unchanged key, so rewording one in place leaves every non-English reader on the old copy.
+
+**Don't hand-edit `config/locales/translation.*.yml` for a new key either** — the sync writes those four too. A lookup in another locale raises rather than falling back in test, so the `:nl` specs (`shared_blocks/footer`, `navbar/wrapper`, `header_tags`, `user_services/menu_items_org`) go red until the sync reaches the key. That red is expected — never keep the old key to turn it green.
 
 When a sync lands on the base, apply the base's move onto your files rather than the reverse, then check for a scope both sides created: it auto-merges into two sibling keys of the same name and YAML keeps the last.
 
@@ -89,6 +91,15 @@ When a command fans out to subagents — `/simplify`, `/code-review`, or an ad-h
 - **Omit `model:`** (inherit the session model) for judgement — the passes that catch an unvalidated param landing in a fragment cache key, or a shared partial's N+1.
 
 Delegate the enumeration rather than eyeballing a grep — a hand-written grep anchors on one method name and misses the call sites that don't use it.
+
+**Tell a backgrounded reviewer not to spawn its own subagents.** It hands part of its scope to them, then finishes with "still running" and none of their findings — three of five did on #4505, and each needed a follow-up message to report.
+
+**A skill that takes many turns costs mostly in re-reading the session it runs in** — 65–87% of each skill's cost in the transcripts measured; shortening a skill's text doesn't cut that. So a multi-turn skill opens with a **Who runs this** section naming the model, the brief and the reply for handing it to one subagent, and every such hand-off works the same way:
+
+- **From a session with history, spawn one `general-purpose` `Agent` that invokes the skill** (the `Skill` tool, so the skill's `allowed-tools` apply) and relay its reply rather than redoing its work. A job of a command or two is cheaper done in the session than briefed.
+- **Brief it with what only the conversation knows** — the branch's purpose, choices already made — or it undoes them.
+- **Wait for it, and stay out of the checkout meanwhile** — it may check out the base, run specs, or drive the shared browser.
+- **Any subagent skips a Who runs this section** and does the work itself; handing off again only loses context.
 
 ## Testing
 
@@ -116,18 +127,21 @@ Uses Stimulus.js for JavaScript and Tailwind CSS for styling. SCSS and CoffeeScr
 
 Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it isn't, **stop and ask the user to start it** so Tailwind and JS asset watchers are running before any frontend work — or, in a spawned `.claude/worktrees/…` checkout, start it yourself.
 
+**A "down" answer expires — re-run the curl each time you need the server, including right before reporting it down.** `bin/dev` boots Rails twice (`log:clear`, then puma) and calls `gh` in between, so a check landing in that gap says down about a server that's about to be up — and one started mid-session never gets noticed at all.
+
 **`app/views` holds more `.haml` than `.erb`** — deprecated, but 301 files against 266, so a grep for call sites that passes `--include='*.erb'` and stops there misses the majority of the directory. Anything a view can reach needs `*.haml` in the pathspec too; the miss surfaces as a `NoMethodError` at render, caught only by a spec that renders that page.
 
 ## Pull requests
 
 - When creating a PR, run the `/pr` workflow rather than calling `gh pr create` directly — `/pr` detects frontend diffs and captures desktop+mobile screenshots, which it posts as a `## Screenshots` comment (never in the body, so the summary stays first). `.claude/hooks/pr-guardrails.sh` denies the authoring commands until that skill is loaded.
 - **Merging a PR is the human's, including when they ask you to do it in the moment.** Say the PR is ready and leave it. The same hook denies it, and won't be talked round — but it only covers agents running here, so treat the rule as the thing to follow rather than the hook as the thing to get past.
-- To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, the `gh` CLI **cannot upload images** — use the `github-pr-images` skill, which drives a real browser to GitHub's user-attachments uploader.
+- To attach a local image (screenshot, .png/.jpg, CleanShot capture) to an existing GitHub PR, use the `github-pr-images` skill — it owns the PR's `## Screenshots` comment.
 
 ## Architecture notes
 
 - **`app/components` has five top-level folders, and a new component goes in exactly one of them**: `ui` (the design system — reusable controls and primitives, of which `ui/forms` is every form control; reading a domain constant doesn't disqualify one, `UI::Forms::Turnstile` reads `EmailDomain.risky_email?`), `atoms` (small renderers reused across pages — `Atoms::Serial`, `Atoms::Admin::Badges::User`), `pages` (one namespace per route, `Pages::Admin::Bikes::Table`), `shared_blocks` (the chrome around a page — navbar, footer, alerts), and `emails`. Nothing else belongs at the top level.
 - **A new state on the registration show page is a new alert, not a branch inside a sibling.** `Pages::Registrations::Show::CurrentAlerts::Wrapper` holds a flat array whose members each render themselves or nothing, so adding one costs an array entry and no conditionals — `SentToNewOwner` is the pattern. The tell that a branch landed in the wrong component: its class comment stops describing the class, its `en.yml` scope mixes two vocabularies, and its preview and spec each grow an "except this one case" note.
+- **An action that renders a component inline needs `force_html_response` when anything can redirect to it.** A component takes its content type from the request, and Turbo leads its `Accept` with `text/vnd.turbo-stream.html` — so a Turbo form submission redirected there answers as a turbo_stream, which Turbo discards without touching the DOM or logging anything, leaving the browser sitting on the submitting page. A template-rendering action is safe: lookup falls back to `.html.erb` and sets the type with it. Keep it a per-controller `before_action` — the app has real `*.turbo_stream.erb` templates that a blanket `request.format = :html` would break.
 - **Moving a file silently un-suppresses whatever was keyed to its old path.** `.herb.yml` excludes lint rules by path, `config/brakeman.ignore` hashes the file path into each fingerprint, and `config/i18n-tasks.yml` routes deep component scopes by path — so a rename re-enables the rule, obsoletes the entry, and leaves a write rule pointing at nothing, and none of the three says so until CI fails or a key lands in the wrong sidecar. Grep the repo root and `config/` for the old path, not just `app/`; re-fingerprint brakeman from `brakeman -f json` rather than hand-editing the path.
 - **Changing a `PublicImage::VARIANTS` transformation re-keys every variant** — the key digests the transformations. Existing objects orphan and regenerate lazily, and the heic R2 cassette re-records: `rm` it and re-run rather than committing the appended interactions.
 - **`UI::ButtonLink::Component(method:)` renders a `button_to` — a block-level `<form>`, not the inline `<a>` it replaced — unless a `confirm:` comes with it, which puts the method on a Turbo link instead.** It can't nest inside another `form_for`, and it closes an open `<p>` the way any flow element does — so a `link_to … method:` converted in prose silently breaks the paragraph around it, and one converted beside an `f.submit` has to move out of the form. Layout classes belong on the wrapper via `form: {class:}`, which replaces Rails' own `button_to` class rather than adding to it.
@@ -140,7 +154,7 @@ Check whether the dev server is up: `curl -fs "$BASE_URL/" >/dev/null`. If it is
 - **A version constraint in the `Gemfile` needs a matching `.github/dependabot.yml` ignore.** Dependabot widens the constraint rather than skipping the update, so a pin with no ignore entry is silently reverted by a later bump PR — `redis` went that way in #4215, undoing #4175 and leaving its comment behind to explain a pin that was no longer there.
 - **Every user has a `password_digest`** — `User#set_calculated_attributes` gives passwordless accounts a random one so `has_secure_password` is satisfied. So it answers nothing about whether someone chose a password; `passwordless_user?` is that question.
 - **`Organization#is_invoiced?` is neither a money question nor a feature check.** It means an active invoice, the org's own or its `parent_organization`'s, and a $0 invoice sets it — which is how law enforcement gets features. `paid_money?` is the money question. It diverges from `enabled_feature_slugs` in both directions too: regional children and ambassadors get slugs with no invoice, and a child of an invoiced parent gets the flag with no slugs.
-- **`user_emails.email` is not unique** — no unique index, no uniqueness validation, and only confirmed rows share a partial index, so the same address can sit on two accounts. `UserEmail.where(email:)` therefore reaches rows belonging to whoever else holds it; scope an address lookup to its user (`user.user_emails.friendly_find`, or a `user_id` term) before writing to what comes back.
+- **`user_emails.email` is not unique** — no unique index, no uniqueness validation, so the same address can sit on two accounts. `UserEmail.where(email:)` therefore reaches rows belonging to whoever else holds it; scope an address lookup to its user (`user.user_emails.friendly_find`, or a `user_id` term) before writing to what comes back.
 
 # Initial setup
 

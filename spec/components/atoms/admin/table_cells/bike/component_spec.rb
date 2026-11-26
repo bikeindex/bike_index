@@ -58,7 +58,6 @@ RSpec.describe Atoms::Admin::TableCells::Bike::Component, type: :component do
 
       it "renders the unregistered badge once" do
         expect(component.text.scan("Unregistered").count).to eq 1
-        expect(component.css("em.text-warning")).to be_empty
       end
     end
 

@@ -8,13 +8,13 @@ module UserJobs
       return if payment.membership_id.present?
 
       membership = Membership.where(user_id: payment.user_id).time_ordered.active.last
-      if membership.present?
-        membership.update!(period_from_amount(payment.amount_cents, start_at: membership.start_at,
-          end_at: membership.end_at))
-      else
+      if membership.blank?
         membership = Membership.new(user_id: payment.user_id, creator_id: admin_id)
         membership.level = level_from_amount(payment.amount_cents)
         membership.update!(period_from_amount(payment.amount_cents))
+      elsif membership.end_at.present? # an open-ended (e.g. Stripe) membership has no period to extend
+        membership.update!(period_from_amount(payment.amount_cents, start_at: membership.start_at,
+          end_at: membership.end_at))
       end
       payment.update!(membership_id: membership.id)
     end

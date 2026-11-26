@@ -1,25 +1,13 @@
-= form_for [:admin, @ctype], html: {class: "form-group"} do |f|
+= form_for [:admin, @ctype] do |f|
   = render(UI::Alerts::ObjectError::Component.new(name: "Component Type", object: @ctype))
 
-  .form-group
-    = f.label :name, "Name"
-    = f.text_field :name, class: "form-control"
-  .form-group
-    = f.label :secondary_name, "Secondary Name"
-    = f.text_field :secondary_name, class: "form-control"
-  .form-group
-    = f.label :cgroup, "Component Group"
-    = collection_select :ctype, :cgroup_id, Cgroup.all, :id, :name, {prompt: "Select the component group"}, class: "form-control"
-  .form-group
-    = f.label :image, "Component type avatar", class: "mt-2"
-    - if @ctype.image?
-      = image_tag(@ctype.image_url(:thumb))
-    - else
-      %p
-        No picture!
-  .form-group
-    = f.file_field :image, class: "w-100", accept: ImageUploader.permitted_extensions.join(",")
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :name))
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :secondary_name, label_text: "Secondary Name"))
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :cgroup_id, label_text: "Component Group", required: true)) do
+    = render(UI::Forms::Select::Component.new(form_builder: f, attribute: :cgroup_id, option_tags: Cgroup.pluck(:name, :id), options: {prompt: "Select the component group"}, required: true))
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :image, label_text: "Component type avatar")) do
+    = render(UI::Forms::Files::Upload::Component.new(form_builder: f, attribute: :image, accept: ImageUploader.permitted_extensions))
     = f.hidden_field :image_cache
 
-  .mt-4
-    = f.submit 'Save', class: 'btn btn-success'
+  %div{class: "tw:mt-6"}
+    = render(UI::Button::Component.new(text: "Save", color: :primary, type: "submit"))

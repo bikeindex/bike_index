@@ -6,9 +6,8 @@ module Pages
       class Component < ApplicationComponent
         include MoneyHelper
 
-        def initialize(feedback: Feedback.new, current_user: nil)
+        def initialize(feedback: Feedback.new)
           @feedback = feedback
-          @current_user = current_user
         end
 
         private

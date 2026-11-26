@@ -1,0 +1,23 @@
+---
+en:
+  components:
+    pages:
+      org_signup:
+        views:
+          confirm:
+            activate: Activate
+            activate_org: Activate %{name}
+            activating_signs_you_out: >-
+              Activating signs you out of it, and into the organization's administrator
+              account.
+            confirm_email_to_activate_html: >-
+              Confirm %{email} is your email, and we'll set up the organization with
+              you as its administrator.
+            i_agree_to_terms: I agree to Bike Index's Terms of Service and Terms of
+              Service for Organizations
+            link_is_for: This link is for
+            read_terms_html: Read the %{terms_link} and %{vendor_terms_link}
+            sign_out_and_activate: Sign out and activate
+            signed_in_as: You're signed in as
+            terms_of_service: Terms of Service
+            vendor_terms: Terms of Service for Organizations

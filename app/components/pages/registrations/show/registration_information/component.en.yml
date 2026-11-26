@@ -12,6 +12,7 @@ en:
             creation_source: Source
             creator: Creator
             credibility: Credibility
+            education_course: Education course
             is_false: 'false'
             is_true: 'true'
             link_sticker: Link sticker
@@ -19,6 +20,5 @@ en:
             not_audited: Not audited
             organization_registered: Organization
             registration_information: Registration information
-            registration_sequence: Registration sequence
             sticker: Sticker
             sticker_claimed: claimed

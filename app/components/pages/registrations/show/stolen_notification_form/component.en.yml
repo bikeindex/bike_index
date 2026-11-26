@@ -1,0 +1,12 @@
+---
+en:
+  components:
+    pages:
+      registrations:
+        show:
+          stolen_notification_form:
+            link_url: Link url
+            send_message: Send message
+            where_did_you_see_this_bike: >-
+              Where did you see this %{bike_type}? If you're contacting about an ad
+              you found online, include a link in the field below

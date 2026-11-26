@@ -5,6 +5,13 @@ RSpec.describe Invoice, type: :model do
 
   let(:organization) { invoice.organization }
 
+  describe "amount_due=" do
+    it "rounds to the nearest cent" do
+      expect(Invoice.new(amount_due: "19.99").amount_due_cents).to eq 1999
+      expect(Invoice.new(amount_due: "0.29").amount_due_cents).to eq 29
+    end
+  end
+
   describe "friendly_find" do
     let!(:invoice) { FactoryBot.create(:invoice) }
     it "finds or doesn't appropriately" do
@@ -225,7 +232,7 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe "two invoices" do
-    let(:organization_feature1) { FactoryBot.create(:organization_feature, feature_slugs: ["bike_search"]) }
+    let(:organization_feature1) { FactoryBot.create(:organization_feature, feature_slugs: ["csv_exports"]) }
     let(:organization_feature2) { FactoryBot.create(:organization_feature, feature_slugs: ["extra_registration_number"]) }
     let(:invoice1) { FactoryBot.create(:invoice, amount_due_cents: 0, subscription_start_at: Time.current - 1.week) }
     let(:organization) { invoice1.organization }
@@ -237,7 +244,7 @@ RSpec.describe Invoice, type: :model do
 
       organization.update(updated_at: Time.current)
       organization.reload
-      expect(organization.enabled_feature_slugs).to eq(["bike_search"])
+      expect(organization.enabled_feature_slugs).to eq(["csv_exports"])
       expect(organization.is_invoiced?).to be_truthy
       expect(organization.paid_money?).to be_falsey
 
@@ -252,7 +259,7 @@ RSpec.describe Invoice, type: :model do
 
       organization.update(updated_at: Time.current)
       organization.reload
-      expect(organization.enabled_feature_slugs).to match_array %w[bike_search extra_registration_number]
+      expect(organization.enabled_feature_slugs).to match_array %w[csv_exports extra_registration_number]
       expect(organization.is_invoiced?).to be_truthy
       expect(organization.paid_money?).to be_truthy
     end

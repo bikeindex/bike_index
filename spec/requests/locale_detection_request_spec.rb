@@ -57,6 +57,7 @@ RSpec.describe "Locale detection", type: :request do
         expect(response.body).to match(/bike registration/i)
         get "/", params: {locale: :nl}
         expect(response.body).to match(/fietsregistratie/i)
+        expect(response.body).to match("locale=nl")
         get "/", params: {locale: :nb}
         expect(response.body).to match(/sykkelregistrering/i)
         get "/", params: {locale: :es}
@@ -67,9 +68,10 @@ RSpec.describe "Locale detection", type: :request do
     end
 
     context "given an invalid locale query param" do
-      it "renders the homepage in the default language" do
+      it "renders the homepage in the default language, without passing the param to links" do
         get "/", params: {locale: :klingon}
         expect(response.body).to match(/bike registration/i)
+        expect(response.body).to_not match("klingon")
 
         get "/", params: {locale: nil}
         expect(response.body).to match(/bike registration/i)

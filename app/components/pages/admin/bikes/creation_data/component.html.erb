@@ -24,7 +24,7 @@
               <%= render(UI::Time::Component.new(time: ownership.created_at)) %>
 
               <% if @display_dev_info %>
-                <code class="tw:ml-2 tw:text-xs">ID: <%= ownership.id %></code>
+                <span class="tw:ml-2"><%= render(UI::Code::Inline::Component.new(text: "ID: #{ownership.id}", small: true)) %></span>
               <% end %>
             <% end %>
 
@@ -43,12 +43,14 @@
           <% end %>
         </div>
 
-        <%= render UI::JsonDisplay::Component.new(data: ownership_attributes(ownership), skip_blank: true) %>
+        <%= render UI::Code::Json::Component.new(data: ownership_attributes(ownership), skip_blank: true) %>
       <% end %>
     </div>
 
     <% if b_params.none? %>
-      <p class="tw:mt-4">No <code>BParams</code> exist</p>
+      <p class="tw:my-4">
+        No <%= render(UI::Code::Inline::Component.new(text: "BParams")) %> exist
+      </p>
     <% else %>
       <div class="twwiderow tw:mt-4">
         <% b_params.each do |b_param| %>
@@ -60,7 +62,7 @@
                 <%= render(UI::Time::Component.new(time: b_param.created_at)) %>
 
                 <% if @display_dev_info %>
-                  <code class="tw:ml-2 tw:text-xs">ID: <%= b_param.id %></code>
+                  <span class="tw:ml-2"><%= render(UI::Code::Inline::Component.new(text: "ID: #{b_param.id}", small: true)) %></span>
                 <% end %>
               <% end %>
 
@@ -70,7 +72,7 @@
             <% end %>
           </div>
 
-          <%= render UI::JsonDisplay::Component.new(data: b_param.params, skip_blank: true) %>
+          <%= render UI::Code::Json::Component.new(data: b_param.params, skip_blank: true) %>
         <% end %>
       </div>
     <% end %>

@@ -48,7 +48,7 @@ module Atoms
 
             content_tag(:small,
               content_tag(:span, "deleted: ") +
-                content_tag(:span, l(@bike.deleted_at, format: :convert_time), class: "localizeTime"),
+                render(UI::Time::Component.new(time: @bike.deleted_at)),
               class: UI::Alerts::Base::Component::TEXT_CLASSES[:warning])
           end
 

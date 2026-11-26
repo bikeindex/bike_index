@@ -1,14 +1,8 @@
 = render(UI::Alerts::ObjectError::Component.new(object: @ad))
 
-.form-group
-  = f.label :organization
-  = collection_select( :ad, :organization_id, @organizations, :id, :name, {:include_blank => "Please select org"}, class: "form-control w-50 mb-2")
-.form-group
-  = f.label :url
-  = f.text_field :target_url, placeholder: 'Target url', class: "form-control w-50 mb-2"
-.form-group
-  = f.label :title
-  = f.text_field :title, placeholder: "Title", class: "form-control w-50 mb-2"
-.form-group
-  = f.label :body, class: "w-100"
-  = f.text_area :body, placeholder: 'Ad body copy', class: "form-control w-50 block"
+%div{class: "tw:md:w-1/2"}
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :organization_id)) do
+    = render(UI::Forms::Combobox::Component.new(name: :organization_id, options: @organizations.pluck(:name, :id), include_blank: true, html_options: {form: f, placeholder: "Please select org"}))
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :target_url, label_text: "Url", html_options: {placeholder: "Target url"}))
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :title, html_options: {placeholder: "Title"}))
+  = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, html_options: {placeholder: "Ad body copy"}))

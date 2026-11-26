@@ -10,6 +10,13 @@ RSpec.describe Admin::UsersController, type: :request do
     let!(:organization_user) { FactoryBot.create(:organization_user) }
     let!(:developer) { FactoryBot.create(:developer) }
     let!(:superuser_ability) { SuperuserAbility.create(user: user_subject) }
+    let!(:legacy_viewer) { FactoryBot.create(:user, feature_registration_show_legacy: true) }
+
+    it "searches in the sort direction it's showing" do
+      get base_url, params: {sort: "created_at", direction: "asc"}
+
+      expect(Capybara.string(response.body)).to have_field("direction", type: "hidden", with: "asc")
+    end
 
     it "renders with all search options" do
       get "#{base_url}?query=something"
@@ -26,6 +33,9 @@ RSpec.describe Admin::UsersController, type: :request do
 
       get base_url, params: {search_developers: true}
       expect(assigns(:collection).pluck(:id)).to eq([developer.id])
+
+      get base_url, params: {search_legacy_viewer: true}
+      expect(assigns(:collection).pluck(:id)).to eq([legacy_viewer.id])
 
       get base_url, params: {search_unconfirmed: true}
       expect(assigns(:collection).pluck(:id)).to include(user_subject.id)
@@ -57,6 +67,49 @@ RSpec.describe Admin::UsersController, type: :request do
     it "links to edit" do
       get "#{base_url}/#{user_subject.username}"
       expect(response).to redirect_to(edit_admin_user_path(user_subject.username))
+      # A tab the show action doesn't render would otherwise raise from the tabs component
+      get "#{base_url}/#{user_subject.id}?active_tab=party"
+      expect(response).to redirect_to(edit_admin_user_path(user_subject.id))
+    end
+
+    context "with a record behind every tab" do
+      let!(:organization_role) { FactoryBot.create(:organization_role_claimed, user: user_subject) }
+      let!(:user_email) { FactoryBot.create(:user_email, user: user_subject) }
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, serial_number: "LIVE-SERIAL") }
+      let!(:bike_deleted) { FactoryBot.create(:bike, :with_ownership_claimed, user: user_subject, serial_number: "GONE-SERIAL", deleted_at: Time.current) }
+      let!(:feedback) { FactoryBot.create(:feedback, user: user_subject, body: "FEEDBACK-BODY") }
+      let!(:user_alert) { FactoryBot.create(:user_alert, user: user_subject) }
+      let!(:membership) { FactoryBot.create(:membership, user: user_subject) }
+      let!(:payment) { FactoryBot.create(:payment, user: user_subject) }
+      let!(:bug_report) { FactoryBot.create(:bug_report, user: user_subject, subject: "IGNORED-REPORT", status: :ignored) }
+
+      it "renders each tab" do
+        Pages::Admin::Users::Show::Component::TABS.each do |tab|
+          get "#{base_url}/#{user_subject.id}?active_tab=#{tab}"
+          expect(response.code).to eq("200"), "#{tab} rendered #{response.code}"
+        end
+        get "#{base_url}/#{user_subject.id}?active_tab=emails"
+        expect(Nokogiri::HTML(response.body).at_css("h2").text.squish).to eq "Emails #{user_subject.user_emails.count}"
+        expect(response.body).to include(user_email.email)
+        get "#{base_url}/#{user_subject.id}?active_tab=messages"
+        sections = Nokogiri::HTML(response.body).css("h2").map { |heading| heading.text.squish }
+        expect(sections).to eq(["Marketplace messages 0", "Alerts 1", "Notifications 0", "Feedbacks 1", "Bug reports 1"])
+        expect(response.body).to include(admin_feedback_path(feedback))
+        expect(response.body).to include("IGNORED-REPORT")
+        get "#{base_url}/#{user_subject.id}?active_tab=payments"
+        sections = Nokogiri::HTML(response.body).css("h2").map { |heading| heading.text.squish }
+        expect(sections).to eq(["Memberships 1", "Payments 1"])
+        expect(response.body).to include(edit_admin_payment_path(payment))
+        get "#{base_url}/#{user_subject.id}?active_tab=organization_roles"
+        expect(response.body).to include(organization_role.organization.name)
+        expect(Nokogiri::HTML(response.body).at_css("h2").text.squish).to eq "Organizations 1 (0 registration organizations)"
+        get "#{base_url}/#{user_subject.id}?active_tab=bikes"
+        expect(Nokogiri::HTML(response.body).at_css("h2").text.squish).to start_with("Bikes 1 (view in admin/bikes)")
+        expect(response.body).to include("LIVE-SERIAL")
+        expect(response.body).to_not include("GONE-SERIAL")
+        deleted_path = admin_bikes_path(user_id: user_subject.id, search_status_deleted_only: true, search_status_example: true)
+        expect(Nokogiri::HTML(response.body).at_css("a[href='#{deleted_path}']")&.text&.squish).to eq "1 deleted bike"
+      end
     end
   end
 
@@ -80,6 +133,50 @@ RSpec.describe Admin::UsersController, type: :request do
       get "#{base_url}/#{user_subject.id}/edit"
       expect(response).to render_template :edit
       expect(response.body).to include(user_email.email)
+      expect(response.body).to include("&amp; membership")
+      expect(response.body).to_not include("deleted_only")
+    end
+
+    describe "color_scheme" do
+      let(:current_user) { FactoryBot.create(:superuser, color_scheme:) }
+      let(:body) { Nokogiri::HTML(response.body).at_css("body") }
+      let(:color_scheme) { :light }
+      let(:layout_paths) { ["/", "/oauth/applications", "/payments/new", "/documentation/api_v3", "/documentation/api_v2", "/documentation/authorize"] }
+      it "isn't dark, and doesn't follow the system" do
+        get "#{base_url}/#{user_subject.id}/edit"
+        expect(body[:class]).to be_blank
+        expect(body.at_css("script:contains('colorSchemeQuery')")).to be_nil
+
+        get "/"
+        expect(Nokogiri::HTML(response.body).at_css("body.dark")).to be_nil
+      end
+      context "system" do
+        let(:color_scheme) { :system }
+        it "leaves the body light for the script to resolve, on every layout" do
+          ["#{base_url}/#{user_subject.id}/edit", *layout_paths].each do |path|
+            get path
+            expect(response.status).to eq 200
+            expect(Nokogiri::HTML(response.body).at_css("body.dark")).to be_nil
+            expect(Nokogiri::HTML(response.body).at_css("body script:contains('colorSchemeQuery')")).to be_present
+          end
+        end
+      end
+      context "dark" do
+        let(:color_scheme) { :dark }
+        it "is dark on every layout, beside the page's own body class" do
+          get "#{base_url}/#{user_subject.id}/edit"
+          expect(body[:class]).to eq "dark"
+
+          layout_paths.each do |path|
+            get path
+            expect(response.status).to eq 200
+            expect(Nokogiri::HTML(response.body).at_css("body.dark")).to be_present
+          end
+
+          get "/for_bike_shops"
+          expect(Nokogiri::HTML(response.body).at_css("body")[:class].to_s.split).to match_array(%w[landing-page-body dark])
+        end
+      end
     end
 
     # It rendered a link with ?method=delete, so deleting quietly did nothing but show the user again
@@ -109,7 +206,29 @@ RSpec.describe Admin::UsersController, type: :request do
       {email: user_subject.email, banned: true,
        can_send_many_stolen_notifications: false, can_send_many_marketplace_messages: false}
     end
+    context "superuser limited to users" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+      let!(:superuser_ability) { SuperuserAbility.create(user: current_user, controller_name: "users") }
+      it "doesn't grant universal superuser" do
+        patch "#{base_url}/#{current_user.id}", params: {user: ban_user_params.merge(name: "New Name", email: current_user.email, banned: false, superuser: true)}
+        expect(current_user.reload.name).to eq "New Name"
+        expect(current_user.superuser?).to be_falsey
+        expect(current_user.superuser_abilities.pluck(:kind)).to eq(["controller"])
+      end
+      it "doesn't change another superuser" do
+        superuser = FactoryBot.create(:superuser)
+        patch "#{base_url}/#{superuser.id}", params: {user: ban_user_params.merge(email: "new@example.com", banned: false)}
+        expect(response).to redirect_to(edit_admin_user_path(superuser.id))
+        expect(superuser.reload.email).to_not eq "new@example.com"
+      end
+    end
     context "non developer" do
+      it "leaves the user unconfirmed when the box is unchecked" do
+        patch "#{base_url}/#{user_subject.id}", params: {user: ban_user_params.merge(name: "New Name", banned: "0", confirmed: "0")}
+        expect(user_subject.reload.name).to eq "New Name"
+        expect(user_subject.confirmed?).to be_falsey
+      end
+
       it "updates all the things that can be edited (finding via user id)" do
         user_subject.reload
         og_auth_token = user_subject.auth_token

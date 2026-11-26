@@ -37,6 +37,10 @@ RSpec.describe "Signup", type: :system do
   context "with JavaScript", :js do
     let(:password) { "a-long-enough-password" }
 
+    # Each submit's click waits out a POST, its redirect and the next page, which a
+    # loaded CI shard can take past the 2s default
+    around { |example| Capybara.using_wait_time(10) { example.run } }
+
     it "sets a password from the nudge, then signs back in with it" do
       user = sign_up_and_confirm
       dismiss_donation_modal
@@ -109,9 +113,11 @@ RSpec.describe "Signup", type: :system do
       click_button "Sign in"
       expect(page).to have_link("set a password to sign in", wait: 10)
 
-      click_link "Update your profile"
+      click_link "Update profile"
       wait_for_page_script
       click_link "Add additional email"
+      # Typed into mid-collapse, the final keystroke lands at the start of the value
+      expect(page).to have_css("#additional_email_fields .form-group.collapse.in")
       fill_in "Additional email", with: additional_email
 
       # The form has a save button at the top and the bottom - this is the one by the field

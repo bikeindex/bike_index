@@ -113,7 +113,7 @@ module UI
 
       # The prefix drops below md, where the row has no room for it
       def period_button_label(period)
-        safe_join([(tag.span(translation(".#{period[:prefix]}"), class: "d-none d-md-inline") if period[:prefix]),
+        safe_join([(tag.span(translation(".#{period[:prefix]}"), class: "tw:hidden tw:md:inline") if period[:prefix]),
           " ", translation(".#{period[:label]}")].compact)
       end
 

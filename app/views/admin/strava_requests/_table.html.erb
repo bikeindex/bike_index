@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", lower_right: ->(r) { content_tag(:span, r.id, class: "only-dev-visible") }) do |strava_request| %>
     <%= render UI::Time::Component.new(time: strava_request.created_at) %>
   <% end %>
@@ -49,9 +49,7 @@
   <% end %>
 
   <% table.column(label: "Params") do |strava_request| %>
-    <small>
-      <%= strava_request.parameters&.to_json if strava_request.parameters.present? %>
-    </small>
+    <%= render(UI::Code::Json::Component.new(data: strava_request.parameters, small: true, max_width: :table_cell)) %>
   <% end %>
 
   <% table.column(label: "Rate limit") do |strava_request| %>

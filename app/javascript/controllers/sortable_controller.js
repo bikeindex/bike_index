@@ -1,18 +1,17 @@
 import { Controller } from '@hotwired/stimulus'
+import { followPointer, moveByKey, startsDrag } from 'utils/drag_handle'
 
 // Connects to data-controller='sortable'
 // Pointer drag-to-reorder of [data-sortable-target=item] rows, grabbed by their
-// [data-sortable-target=handle] grip. A thin bar shows where the row will land; on release
-// the row is moved there and (when it has data-url) its new position is PATCHed.
+// [data-sortable-target=handle] grip, whose arrow keys move its row a place at a time. A thin bar
+// shows where the row will land; on release the row is moved there and (when it has data-url)
+// its new position is PATCHed.
 // Pointer events -- not native HTML5 draggable -- so a rich-text editor inside a row can't
 // swallow the drag and there is no native snap-back animation. Subclasses override reorder().
 export default class extends Controller {
   static targets = ['item', 'handle']
 
   connect () {
-    this.draggingItem = null
-    this.dropTarget = null
-    this.dropAfter = false
     // Slid into the target gap during a drag; pointer-events:none so it never blocks hit-testing.
     this.indicator = document.createElement('div')
     this.indicator.setAttribute('aria-hidden', 'true')
@@ -20,7 +19,7 @@ export default class extends Controller {
   }
 
   disconnect () {
-    this.#stopTracking()
+    this.stopFollowing?.()
   }
 
   handleTargetConnected (handle) {
@@ -28,16 +27,14 @@ export default class extends Controller {
   }
 
   #onPointerDown = (event) => {
-    if (event.button !== 0) return
+    if (!startsDrag(event)) return
     const item = event.target.closest(this.#itemSelector)
     if (!item) return
     event.preventDefault()
     this.draggingItem = item
     this.dropTarget = null
     item.classList.add('tw:opacity-50')
-    document.addEventListener('pointermove', this.#onPointerMove)
-    document.addEventListener('pointerup', this.#onPointerUp, { once: true })
-    document.addEventListener('pointercancel', this.#onPointerCancel, { once: true })
+    this.stopFollowing = followPointer(event, { move: this.#onPointerMove, drop: this.#drop, done: this.#done })
   }
 
   #onPointerMove = (event) => {
@@ -51,29 +48,23 @@ export default class extends Controller {
     item.parentNode.insertBefore(this.indicator, this.dropAfter ? item.nextSibling : item)
   }
 
-  #onPointerUp = () => {
-    this.#stopTracking()
-    this.draggingItem.classList.remove('tw:opacity-50')
-    if (this.dropTarget && this.dropTarget !== this.draggingItem) {
-      this.reorder(this.dropTarget, this.dropAfter)
-    }
-    this.draggingItem = null
-    this.dropTarget = null
+  #drop = () => {
+    if (this.dropTarget && this.dropTarget !== this.draggingItem) this.reorder(this.dropTarget, this.dropAfter)
   }
 
-  // The browser can hijack a touch gesture (scroll/zoom) and fire pointercancel; abort cleanly.
-  #onPointerCancel = () => {
-    this.#stopTracking()
+  #done = () => {
+    this.indicator.remove()
     this.draggingItem?.classList.remove('tw:opacity-50')
     this.draggingItem = null
     this.dropTarget = null
   }
 
-  #stopTracking () {
-    document.removeEventListener('pointermove', this.#onPointerMove)
-    document.removeEventListener('pointerup', this.#onPointerUp)
-    document.removeEventListener('pointercancel', this.#onPointerCancel)
-    this.indicator.remove()
+  moveByKey (event) {
+    moveByKey(event, () => this.itemTargets, (item, target, after) => {
+      this.draggingItem = item
+      this.reorder(target, after)
+      this.draggingItem = null
+    })
   }
 
   // Default: move the dragged row next to the target, then persist its new position.
@@ -82,15 +73,17 @@ export default class extends Controller {
     this.persist(this.draggingItem)
   }
 
+  // One at a time, so a run of arrow keys saves its moves in the order they were made
   persist (item) {
     if (!item.dataset.url) return
     const position = this.itemTargets.indexOf(item)
     const token = document.querySelector('meta[name="csrf-token"]')?.content
-    fetch(item.dataset.url, {
+    const save = () => fetch(item.dataset.url, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json', 'X-CSRF-Token': token },
       body: JSON.stringify({ position })
     })
+    this.saving = (this.saving ?? Promise.resolve()).then(save, save)
   }
 
   #after (item, clientY) {

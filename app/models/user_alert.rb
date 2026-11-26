@@ -49,7 +49,7 @@ class UserAlert < ApplicationRecord
 
   scope :dismissed, -> { where.not(dismissed_at: nil) }
   scope :resolved, -> { where.not(resolved_at: nil) }
-  scope :inactive, -> { where.not(resolved_at: nil).or(where(dismissed_at: nil)) }
+  scope :inactive, -> { resolved.or(dismissed) }
   scope :active, -> { where(resolved_at: nil, dismissed_at: nil) }
   scope :ignored_member, -> { where(kind: ignored_kinds_member) }
   scope :ignored_superuser, -> { where(kind: ignored_kinds_superuser) }
@@ -129,12 +129,29 @@ class UserAlert < ApplicationRecord
   def self.update_unfinished_registrations(user)
     user.b_params.unfinished_registrations
       .each { |b_param| update_unfinished_registration(user:, b_param:) }
+    resolve_finished_registrations(user)
+  end
 
-    # Expiry is silent, and CleanBParamsJob deletes without callbacks, so those alerts
-    # never reach the after_commit that would resolve them
+  # Expiry is silent, CleanBParamsJob deletes without callbacks, and deleting or
+  # transferring the bike doesn't touch the b_param - so those alerts never reach the
+  # after_commit that would resolve them
+  def self.resolve_finished_registrations(user)
     user.user_alerts.active.unfinished_registration.includes(:alertable)
       .reject { |user_alert| user_alert.alertable&.unfinished_registration?(user) }
       .each(&:resolve!)
+  end
+
+  # Deleted and transferred bikes leave these, which is all the other updates revisit.
+  # An organization member can buy a theft alert for a bike they don't own
+  def self.alert_bike_ids(user)
+    bike_ids = user.bike_ids
+    other_ids = user.theft_alerts.where.not(bike_id: bike_ids).distinct.pluck(:bike_id)
+    bike_ids + Bike.current_with_user_hidden.where(id: other_ids).select { it.authorized?(user) }.map(&:id)
+  end
+
+  def self.resolve_without_bike(user, bike_ids: alert_bike_ids(user))
+    user.user_alerts.active.where.not(bike_id: nil).where.not(bike_id: bike_ids)
+      .update_all(resolved_at: Time.current, updated_at: Time.current)
   end
 
   def self.update_unfinished_registration(user:, b_param:)
@@ -162,7 +179,7 @@ class UserAlert < ApplicationRecord
   end
 
   def self.update_stolen_bike_without_location(user:, bike:)
-    user_alert = UserAlert.find_or_build_by(kind: "stolen_bike_without_location",
+    user_alert = UserAlert.active.find_or_build_by(kind: "stolen_bike_without_location",
       user_id: user.id, bike_id: bike.id)
     if bike.current_stolen_record&.without_street?
       user_alert.save

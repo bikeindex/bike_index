@@ -1,13 +1,19 @@
 import { Controller } from '@hotwired/stimulus'
-import { computePosition, flip, shift, offset, arrow, autoUpdate } from '@floating-ui/dom'
+import { computePosition, flip, shift, offset, arrow, hide, autoUpdate } from '@floating-ui/dom'
 import { claimFloatingZIndex, releaseFloatingZIndex } from 'utils/floating_z_index'
 
 // Connects to data-controller="ui--tooltip"
 //
+// Shown as a manual popover, in the top layer: an ancestor's opacity - a disabled
+// control's - its overflow clipping and its stacking context don't reach it there.
+// The top layer stacks in the order shown, so raising one shows it again. A
+// browser without popovers (Safari before 17) raises it by z-index instead.
+//
 // State model: two independent flags, OR'd together.
-//   hoverActive       toggled by mouseenter/mouseleave
-//   persistentActive  set by focus or a click / cleared by a press outside or
-//                     focus moving to another element in the page
+//   hoverActive       set by mouseenter / cleared by mouseleave, unless the pointer
+//                     is crossing the gap onto the tooltip - then once it strays
+//   persistentActive  set by focus, a click or a press in the tooltip / cleared
+//                     by a press outside or focus moving to another element in the page
 // The tooltip is visible whenever either flag is true.
 
 // Keyed by placement side: the tooltip edge the arrow sits on, and the
@@ -18,6 +24,9 @@ const ARROW_SIDES = {
   bottom: { edge: 'top', borderWidth: '1px 0 0 1px' },
   left: { edge: 'right', borderWidth: '1px 1px 0 0' }
 }
+
+const POPOVER = 'popover' in window.HTMLElement.prototype
+const STRATEGY = POPOVER ? 'fixed' : 'absolute'
 
 export default class extends Controller {
   static targets = ['trigger', 'tooltip', 'arrow']
@@ -33,20 +42,39 @@ export default class extends Controller {
   connect () {
     this.pointerdownOutside = this.pointerdownOutside.bind(this)
     this.keydownEscape = this.keydownEscape.bind(this)
+    this.pointermoveBetween = this.pointermoveBetween.bind(this)
+  }
+
+  tooltipTargetConnected (tooltip) {
+    // Fragment caches still hold markup rendered with it
+    tooltip.classList.remove('tw:pointer-events-none')
+    // A press holds it open, so a selection dragged past its edge survives the mouseleave
+    tooltip.addEventListener('pointerdown', () => this.showPersistent())
+    if (!POPOVER) return
+    // A popover's UA overflow clips the arrow hanging off its edge
+    tooltip.popover = 'manual'
+    tooltip.style.overflow = 'visible'
   }
 
   disconnect () {
     this.close()
   }
 
+  // The one under the pointer goes on top, though another was opened since
   showOnHover () {
+    document.removeEventListener('pointermove', this.pointermoveBetween)
     this.hoverActive = true
+    if (this.isOpen) this.#raise()
     this.sync()
   }
 
-  hideOnHover () {
-    this.hoverActive = false
-    this.sync()
+  hideOnHover (event) {
+    if (this.isOpen && this.#between(event)) document.addEventListener('pointermove', this.pointermoveBetween)
+    else this.#endHover()
+  }
+
+  pointermoveBetween (event) {
+    if (!this.#between(event)) this.#endHover()
   }
 
   // Bound to click as well as focusin: Escape leaves focus on the trigger, so
@@ -84,9 +112,6 @@ export default class extends Controller {
   }
 
   sync () {
-    // Pointer events only while held open - always-on would swallow clicks on
-    // whatever a hover-only tooltip overlaps
-    this.tooltipTarget.classList.toggle('tw:pointer-events-none', !this.persistentActive)
     if (this.hoverActive || this.persistentActive) this.open()
     else this.close()
   }
@@ -94,8 +119,8 @@ export default class extends Controller {
   open () {
     if (this.isOpen) return
     this.isOpen = true
-    this.tooltipTarget.style.zIndex = claimFloatingZIndex(this.tooltipTarget)
     this.tooltipTarget.classList.remove('tw:hidden')
+    this.#raise()
     document.addEventListener('keydown', this.keydownEscape)
     this.cleanup = autoUpdate(this.triggerTarget, this.tooltipTarget, () => this.updatePosition())
   }
@@ -103,25 +128,48 @@ export default class extends Controller {
   close () {
     if (!this.isOpen) return
     this.isOpen = false
-    releaseFloatingZIndex(this.tooltipTarget)
+    if (!POPOVER) releaseFloatingZIndex(this.tooltipTarget)
+    else if (this.tooltipTarget.matches(':popover-open')) this.tooltipTarget.hidePopover()
     this.tooltipTarget.classList.add('tw:hidden')
     document.removeEventListener('pointerdown', this.pointerdownOutside)
     document.removeEventListener('keydown', this.keydownEscape)
+    document.removeEventListener('pointermove', this.pointermoveBetween)
     if (this.cleanup) {
       this.cleanup()
       this.cleanup = null
     }
   }
 
+  #endHover () {
+    document.removeEventListener('pointermove', this.pointermoveBetween)
+    this.hoverActive = false
+    this.sync()
+  }
+
+  #between ({ clientX, clientY }) {
+    const [trigger, tooltip] = [this.triggerTarget, this.tooltipTarget].map((element) => element.getBoundingClientRect())
+    return clientX >= Math.min(trigger.left, tooltip.left) && clientX <= Math.max(trigger.right, tooltip.right) &&
+      clientY >= Math.min(trigger.top, tooltip.top) && clientY <= Math.max(trigger.bottom, tooltip.bottom)
+  }
+
+  #raise () {
+    if (!POPOVER) return claimFloatingZIndex(this.tooltipTarget)
+    this.tooltipTarget.hidePopover()
+    this.tooltipTarget.showPopover()
+  }
+
   async updatePosition () {
     const { x, y, placement, middlewareData } = await computePosition(this.triggerTarget, this.tooltipTarget, {
       placement: this.placementValue,
-      middleware: [offset(8), flip(), shift({ padding: 4 }), arrow({ element: this.arrowTarget, padding: 4 })]
+      strategy: STRATEGY,
+      middleware: [offset(8), flip(), shift({ padding: 4 }), arrow({ element: this.arrowTarget, padding: 4 }), hide()]
     })
+    // in the top layer, no container clips it once its trigger scrolls out of view
     Object.assign(this.tooltipTarget.style, {
       left: `${x}px`,
       top: `${y}px`,
-      position: 'absolute'
+      position: STRATEGY,
+      visibility: middlewareData.hide.referenceHidden ? 'hidden' : ''
     })
 
     const { edge, borderWidth } = ARROW_SIDES[placement.split('-')[0]]

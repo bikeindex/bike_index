@@ -52,11 +52,15 @@ RSpec.describe Pages::Admin::IndexSkeleton::Component, type: :component do
     end
   end
 
-  describe "nav_header_list_items" do
-    let(:options) { super().merge(nav_header_list_items: '<li class="nav-item"><a class="nav-link" href="#">Custom</a></li>'.html_safe) }
+  describe "nav items" do
+    let(:component) do
+      with_request_url("/admin") do
+        render_inline(instance) { |skeleton| skeleton.with_nav_item { '<a href="#">Custom</a>'.html_safe } }
+      end
+    end
 
-    it "renders custom nav items" do
-      expect(component).to have_css("li.nav-item a", text: "Custom")
+    it "lists them before its own" do
+      expect(component.css("ul li a").map { |link| link.text.strip }.first(2)).to eq ["Custom", "graph"]
     end
   end
 

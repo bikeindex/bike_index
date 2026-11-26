@@ -106,22 +106,22 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
   context "e-vehicle with an organization's safety rules" do
     let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
     # Built as a draft and activated below, since activation freezes the pages
-    let(:sequence) do
-      FactoryBot.create(:registration_sequence, organization:,
+    let(:course) do
+      FactoryBot.create(:education_course, organization:,
         acknowledgment_text: "agree to comply with all of the rules above.")
     end
     let!(:battery_page) do
-      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 0,
+      FactoryBot.create(:education_course_page, education_course: course, listing_order: 0,
         title: "Battery & charging", subtitle: "Unsafe charging is the biggest cause of e-bike fires.",
         body: "<ul><li>Charge with the manufacturer's charger</li><li>Report a swollen battery</li></ul>")
     end
     let!(:campus_page) do
-      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 1,
+      FactoryBot.create(:education_course_page, education_course: course, listing_order: 1,
         title: "Campus rules", body: "<ul><li>Dismount in posted zones</li></ul>",
         organization_specific: true)
     end
 
-    before { sequence.make_active! }
+    before { course.make_active! }
 
     # flaky: the color combobox below is typed into right after step 1's Turbo navigation,
     # and filters nothing when its controller hasn't connected yet. wait_for_details_step
@@ -154,7 +154,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
       click_button "Continue"
 
       expect(page).to have_content("Campus rules")
-      # The organization owns this page's rules, so they carry its name
+      # The organization owns this page's bullets, so they carry its name
       expect(page).to have_content("Brakebills")
       check "Dismount in posted zones"
       click_button "Continue"
@@ -180,11 +180,69 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
       click_button "Complete Bike Registration"
 
       expect(page).to have_css("h1", text: "Progress saved")
-      acknowledgment = RegistrationSequenceAcknowledgment.last
-      expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
+      acknowledgment = EducationCourseAcknowledgment.last
+      expect(acknowledgment).to have_attributes(education_course_id: course.id,
         b_param_id: BParam.last.id, owner_email:,
         acknowledgment_text: "agree to comply with all of the rules above.")
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
+    end
+
+    context "a member, on the organization's single page" do
+      let(:member) { FactoryBot.create(:organization_user, organization:, email: "member@bikeindex.org") }
+
+      it "labels the submit and asks for the owner's name off what's filled in above them" do
+        sign_in(member)
+        visit "/o/#{organization.to_param}/registrations/new"
+        click_link "Registration form settings"
+        check "Single page registration form"
+        within("form[action$='/registrations/switches']") { click_button "Update" }
+
+        expect(page).to have_button("Complete Bike Registration")
+        check "Electric (motorized)"
+        expect(page).to have_button("Next")
+        uncheck "Electric (motorized)"
+        expect(page).to have_button("Complete Bike Registration")
+
+        expect(page).to have_field("bike[user_name]")
+        fill_in "b_param[owner_email]", with: member.email
+        expect(page).to have_no_field("bike[user_name]")
+        fill_in "b_param[owner_email]", with: owner_email
+        expect(page).to have_field("bike[user_name]")
+
+        # Separate attestation leaves the education course to an owner who isn't the member
+        click_link "Registration form settings"
+        # The old view always leaves the education course to the owner
+        check "Use the old registration page"
+        expect(page).to have_checked_field("Registrant fills out the registration attestation separately", disabled: true)
+        expect(page).to have_unchecked_field("Single page registration form", disabled: true)
+        uncheck "Use the old registration page"
+        expect(page).to have_unchecked_field("Registrant fills out the registration attestation separately")
+        expect(page).to have_checked_field("Single page registration form")
+        check "Registrant fills out the registration attestation separately"
+        within("form[action$='/registrations/switches']") { click_button "Update" }
+        # The draft comes back after the reload, and would undo a check that landed before it
+        expect(page).to have_field("b_param[owner_email]", with: owner_email)
+        check "Electric (motorized)"
+        fill_in "b_param[owner_email]", with: owner_email
+        expect(page).to have_button("Complete Bike Registration")
+        fill_in "b_param[owner_email]", with: member.email
+        expect(page).to have_button("Next")
+
+        # Registered, it comes back to the single page for the next one
+        uncheck "Electric (motorized)"
+        type_into("#b_param_manufacturer_id", "Surly")
+        click_combobox_option("Surly")
+        fill_in "b_param[owner_email]", with: owner_email
+        type_into("#bike_primary_frame_color_id", "Red")
+        click_combobox_option("Red")
+        fill_in_verified "bike[serial_number]", with: "XYZ 123"
+        fill_in "bike[user_name]", with: user_name
+        click_button "Complete Bike Registration"
+        expect(page).to have_content("The Surly is registered - we've emailed #{owner_email} so they can claim it.")
+        expect(page).to have_current_path("/o/#{organization.to_param}/registrations/new")
+        expect(page).to have_field("b_param[owner_email]", with: "")
+        expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123")
+      end
     end
 
     # Every step submits through Turbo, so a throttle or a bad gateway is a response the
@@ -265,6 +323,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
 
         # The emailed link finishes a step like any other, and fails like one
         visit confirmation_link
+        check "I agree to Bike Index's Terms of Service"
         click_button "Continue"
 
         # Confirming proves the address, which leaves the theft it's reporting
@@ -272,8 +331,10 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         fill_in "report[date]", with: "2026-08-05T14:30"
         fill_in "report[address_record_attributes][street]", with: "278 Broadway"
         fill_in "report[address_record_attributes][city]", with: "New York"
-        select state.name, from: "report[address_record_attributes][region_record_id]"
+        type_into("#report_address_record_attributes_region_record_id", state.abbreviation)
+        click_combobox_option(state.name)
         fill_in "report[address_record_attributes][postal_code]", with: "10007"
+        fill_in "report[theft_description]", with: "Cut lock outside the office"
         click_button "Complete Bike Registration"
 
         expect(page).to have_css("h1", text: "is listed as stolen on Bike Index", wait: 10)
@@ -282,7 +343,7 @@ RSpec.describe "Register flow, with an organization", :js, type: :system do
         expect(Bike.last.current_stolen_record.street).to eq "278 Broadway"
         # A retry that landed twice would be a second registration, or a second signature
         expect(Bike.count).to eq 1
-        expect(RegistrationSequenceAcknowledgment.count).to eq 1
+        expect(EducationCourseAcknowledgment.count).to eq 1
 
         # Every step of the flow failed, and none of them more than once
         expect(failed_steps).to eq([["/register", "1"], ["/register", "2"],

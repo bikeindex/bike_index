@@ -66,17 +66,12 @@ $border-radius-sm: 1px;
 @import 'bootstrap/grid';
 @import 'bootstrap/tables';
 
-.table-compact-long {
-  line-height: 1.2em;
-}
-
 @import 'bootstrap/forms';
 
 // @import "bootstrap/buttons"; // Override buttons with our own buttons
 
 // Components
 @import 'bootstrap/animation';
-@import 'bootstrap/dropdown';
 @import 'bootstrap/button-group';
 @import 'bootstrap/input-group';
 @import 'bootstrap/custom-forms';
@@ -209,11 +204,7 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import 'revised/pages/bikes/show_photo';
 @import 'revised/pages/bikes/stolen_bike_listings'; // Sorta fits here...
 
-// separated because it's a lot
-@import 'revised/pages/bikes/multi_serial_search';
-
 // My Account pages
-@import 'revised/pages/my_accounts/show';
 @import 'revised/pages/my_accounts/edit';
 
 // public user show page
@@ -255,9 +246,6 @@ $zoom-img-wrap-z-index: $zindex-navbar-fixed + 100;
 @import 'revised/sections/legacy_content';
 
 // general legacy content styles
-@import 'revised/pages/legacy_stolen';
-
-// legacy stolen page - including multi-serial search
 @import 'revised/sections/oauth';
 
 html {
@@ -329,28 +317,6 @@ body {
 
 .text-center {
   text-align: center;
-}
-
-.less-strong {
-  opacity: 0.65;
-  // Couldn't get & + input to work, so manually specifying the applicable element classes
-  a:hover,
-  & + a:hover,
-  .btn:hover,
-  &.btn:hover,
-  .btn:focus,
-  &.btn:focus,
-  .form-control:hover,
-  &.form-control:hover,
-  .form-control:focus,
-  &.form-control:focus {
-    opacity: 1;
-  }
-}
-
-.less-less-strong {
-  @extend .less-strong;
-  opacity: 0.4;
 }
 
 .gray-link {

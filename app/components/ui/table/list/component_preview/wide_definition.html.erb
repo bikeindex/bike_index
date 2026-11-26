@@ -1,0 +1,6 @@
+<%= render(UI::Table::List::Component.new(wide_definition: true)) do |list| %>
+  <% list.with_row(label: "Sightings reported near Point Pleasant", value: number_display(142)) %>
+  <% list.with_row(label: "Sightings with a photo", value: number_display(9)) %>
+  <% list.with_row(label: "Sightings ever reported (including retracted and unverified sightings)", value: number_display(1_204)) %>
+  <% list.with_row(label: tag.strong("Total sightings"), value: tag.strong(number_display(1_355))) %>
+<% end %>

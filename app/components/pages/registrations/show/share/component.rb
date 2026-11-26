@@ -16,6 +16,7 @@ module Pages
               html_class: "tw:w-full tw:py-2.5!",
               data: {controller: "registrations--show--share",
                      "registrations--show--share-url-value": @url,
+                     "registrations--show--share-copied-value": translation(".link_copied"),
                      action: "registrations--show--share#share"}) do
               content_tag(:span, @text, data: {"registrations--show--share-target": "label"})
             end

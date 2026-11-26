@@ -15,6 +15,15 @@ module IntegrationSpecHelpers
     end
   end
 
+  # The zone Intl reports, so the time localizer writes it to the timezone cookie on the
+  # next page load. Attached like emulate_touch_device's.
+  def emulate_timezone(timezone)
+    page.driver.with_playwright_page do |playwright_page|
+      session = playwright_page.context.new_cdp_session(playwright_page)
+      session.send_message("Emulation.setTimezoneOverride", params: {timezoneId: timezone})
+    end
+  end
+
   # Resize for this example only -- the browser context is recreated between
   # examples, so the configured viewport comes back on its own.
   def resize_window(width:, height:)
@@ -80,6 +89,17 @@ module IntegrationSpecHelpers
     move_mouse(element, cap:) { |mouse| mouse.up.tap { mouse.move(0, 0) } }
   end
 
+  def drag_select(element, past:)
+    box = element.native.bounding_box
+    middle = box["y"] + box["height"] / 2
+    page.driver.with_playwright_page do |playwright_page|
+      playwright_page.mouse.move(box["x"] + 2, middle)
+      playwright_page.mouse.down
+      playwright_page.mouse.move(box["x"] + box["width"] + past, middle, steps: 12)
+      playwright_page.mouse.up
+    end
+  end
+
   def browser_cookie_value(name)
     page.driver.with_playwright_page do |playwright_page|
       playwright_page.context.cookies.find { |cookie| cookie["name"] == name }&.fetch("value")
@@ -102,9 +122,11 @@ module IntegrationSpecHelpers
   # Playwright's fill, which dispatches only an `input` event; JS that opens on
   # keydown (e.g. hotwire_combobox's async dropdown) needs real key events. A combobox
   # typed into before its controller connects never searches, so that waits first.
+  # has_ancestor? because matches_css? can't ask this: it resolves against the field's parent,
+  # and Playwright scopes a selector to its root, so an ancestor above that never matches.
   def type_into(locator, text)
     field = locator.is_a?(Capybara::Node::Element) ? locator : find(locator)
-    wait_for_stimulus("hw-combobox") if field.matches_css?("[data-controller~='hw-combobox'] *", wait: 0)
+    wait_for_stimulus("hw-combobox") if field.has_ancestor?("[data-controller~='hw-combobox']", wait: 0)
     field.set("")
     field.send_keys(text)
     field
@@ -216,7 +238,7 @@ module IntegrationSpecHelpers
 
   # search--form#handlePopstate reconciles these to the address bar on a
   # back/forward; the results frame reloads separately and faster.
-  RESTORED_FILTER_FIELDS = %w[search_email serial search_notes].freeze
+  RESTORED_FILTER_FIELDS = %w[search_email serial search_notes location distance].freeze
 
   # Navigate back, then wait for the filters to settle to the address bar so
   # callers don't read or fill against the restoration preview.
@@ -240,8 +262,18 @@ module IntegrationSpecHelpers
 
   # Click an async hotwire_combobox option, re-finding it if a later async
   # response re-renders the listbox and detaches the node between find and click.
+  # The pick filters once more, and Turbo renders that response by putting focus back where
+  # it was when the render began - so a fill landing in that frame types into the field
+  # filled before it. This waits for the response and the frame after it.
   def click_combobox_option(text)
-    retry_on_detach { find(".hw-combobox__option", text:, match: :first).click }
+    combobox = nil
+    retry_on_detach do
+      option = find(".hw-combobox__option", text:, match: :first)
+      combobox = option.ancestor("[data-controller~='hw-combobox']")
+      option.click
+    end
+    expect(combobox).to have_no_css("[data-pending]", wait: 10)
+    page.evaluate_async_script("requestAnimationFrame(() => requestAnimationFrame(arguments[0]))")
   end
 
   # Takes the trigger (a page with two of them opens the same modal from either), which names
@@ -330,6 +362,8 @@ module IntegrationSpecHelpers
       # Pushing the token back leaves the gate open for the next one
       @gate.push(@gate.pop)
     end
+
+    def held? = @held
 
     # A pattern that stops matching holds nothing, leaving the example green against no race
     def release

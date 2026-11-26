@@ -6,9 +6,9 @@
 
 <% unless turbo_frame_request? %>
   <div class="tw:mx-auto tw:mb-6 tw:max-w-7xl tw:px-4">
-    <h1 class="tw:mb-4 tw:text-3xl tw:text-slate-800">
-      Bike Index Marketplace
-    </h1>
+    <%= render Pages::Search::MarketplaceIntro::Component.new(
+      dismissed: cookies[Pages::Search::MarketplaceIntro::Component::COOKIE_NAME].present?,
+      searched: searched?) %>
 
     <%= render Pages::Search::Form::Component.new(target_search_path: search_marketplace_path,
       target_frame: :marketplace_results_frame, interpreted_params: @interpreted_params,
@@ -17,7 +17,7 @@
   </div>
 <% end %>
 
-<%= render Pages::SearchResults::Frame::Component.new(frame_id: :marketplace_results_frame,
+<%= render SharedBlocks::SearchResults::Frame::Component.new(frame_id: :marketplace_results_frame,
   render_results: @render_results, current_path: request.original_fullpath,
   loading_text: t(".loading_results")) do %>
   <%= turbo_frame_tag "page_#{@pagy.page}" do %>

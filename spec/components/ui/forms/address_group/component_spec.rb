@@ -13,7 +13,8 @@ RSpec.describe UI::Forms::AddressGroup::Component, type: :component do
   it "renders the address fields with a default street label" do
     expect(component).to have_css("input[name='address_record[street]']")
     expect(component).to have_css("input[name='address_record[city]']")
-    expect(component).to have_css("select[name='address_record[region_record_id]']")
+    expect(component).to have_css("input[type='hidden'][name='address_record[region_record_id]']", visible: :all)
+    expect(component).to have_no_css("[data-ui--forms--address-group-target='state'] [data-controller~='ui--forms--js-required']")
     expect(component).to have_css("input[name='address_record[region_string]']")
     expect(component).to have_css("input[name='address_record[postal_code]']")
     expect(component).to have_css("select[name='address_record[country_id]']")
@@ -37,7 +38,8 @@ RSpec.describe UI::Forms::AddressGroup::Component, type: :component do
     it "requires every field but street_2" do
       expect(component).to have_css("input[name='address_record[street]'][required]")
       expect(component).to have_css("input[name='address_record[city]'][required]")
-      expect(component).to have_css("select[name='address_record[region_record_id]'][required]")
+      # the state combobox is marked required once JavaScript connects
+      expect(component).to have_css("[data-ui--forms--address-group-target='state'] [data-controller~='ui--forms--js-required']")
       expect(component).to have_css("input[name='address_record[postal_code]'][required]")
       expect(component).to have_css("select[name='address_record[country_id]'][required]")
       expect(component).to have_css("input[name='address_record[street_2]']:not([required])")
@@ -51,7 +53,7 @@ RSpec.describe UI::Forms::AddressGroup::Component, type: :component do
 
       it "moves required to region_string" do
         expect(component).to have_css("input[name='address_record[region_string]'][required]")
-        expect(component).to have_css("select[name='address_record[region_record_id]']:not([required])")
+        expect(component).to have_no_css("[data-ui--forms--address-group-target='state'] [data-controller~='ui--forms--js-required']")
       end
     end
   end

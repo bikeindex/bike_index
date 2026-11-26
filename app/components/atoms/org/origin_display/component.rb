@@ -4,8 +4,8 @@ module Atoms
   module Org
     module OriginDisplay
       class Component < ApplicationComponent
-        def initialize(ownership:)
-          @creation_kind = ownership&.creation_kind
+        def initialize(ownership: nil, creation_kind: nil)
+          @creation_kind = creation_kind || ownership&.creation_kind
         end
 
         def render?
@@ -13,8 +13,10 @@ module Atoms
         end
 
         def call
-          safe_join([Ownership.creation_kind_humanized(@creation_kind),
-            render(UI::Tooltip::Component.new(text: Ownership.creation_kind_description(@creation_kind)))], " ")
+          tag.span(class: "keep-together tw:whitespace-nowrap") do
+            safe_join([Ownership.creation_kind_humanized(@creation_kind),
+              render(UI::Tooltip::Component.new(text: Ownership.creation_kind_description(@creation_kind)))], " ")
+          end
         end
       end
     end

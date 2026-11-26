@@ -1,0 +1,3 @@
+<%= render(Pages::Admin::Users::Tabs::Component.new(user: @user, active: @active)) do %>
+  <%= render(Pages::Admin::Users::Summary::Component.new(user: @user)) %>
+<% end %>

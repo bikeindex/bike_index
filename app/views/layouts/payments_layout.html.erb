@@ -32,7 +32,8 @@
     <%= render "/shared/analytics" %>
   </head>
 
-  <body class="payments-layout-body" id="<%= page_id %>">
+  <%= body_tag(html_class: class_names("payments-layout-body", dark: color_scheme == "dark")) do %>
+    <%= render(SharedBlocks::SystemColorScheme::Component.new(color_scheme:)) %>
     <%= render(UI::Alerts::FlashMessage::Component.new(flash:)) %>
     <%= render 'layouts/revised_messages' %>
 
@@ -141,5 +142,5 @@
         $('body').css('min-height', ($(window).height()) + "px");
       });
     </script>
-  </body>
+  <% end %>
 </html>

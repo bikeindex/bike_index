@@ -4,7 +4,7 @@ module Admin
 
     before_action :set_period, only: %i[index]
     before_action :find_ad, except: [:index, :new, :create]
-    before_action :find_organizations, only: [:new, :edit]
+    before_action :find_organizations, only: [:new, :edit, :create, :update]
 
     def index
       @ads = Ad.all
@@ -43,7 +43,7 @@ module Admin
     protected
 
     def permitted_parameters
-      params.require(:ad).permit(:title, :body, :target_url, :organization_id, :image)
+      params.require(:ad).permit(:title, :body, :target_url, :organization_id, :image, :live)
     end
 
     def find_ad

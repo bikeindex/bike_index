@@ -18,6 +18,11 @@ module Pages
               @notifications ||= @bike.notifications.includes(:notifiable).order(created_at: :desc)
             end
 
+            def organization_messages
+              @organization_messages ||= @bike.organization_messages.includes(:organization, :sender, :receiver)
+                .order(created_at: :desc)
+            end
+
             def feedbacks = @feedbacks ||= Feedback.bike(@bike.id).order(created_at: :desc)
 
             def user_alerts = @user_alerts ||= UserAlert.where(bike_id: @bike.id).order(created_at: :desc)
@@ -28,11 +33,6 @@ module Pages
 
             def graduated_notifications_count
               @graduated_notifications_count ||= GraduatedNotification.where(bike_id: @bike.id).count
-            end
-
-            def section_heading(title, count, path)
-              safe_join([title, tag.small(link_to(helpers.number_display(count), path, class: "twlink"),
-                class: "twless-strong tw:ml-2")], " ")
             end
           end
         end

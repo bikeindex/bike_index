@@ -6,7 +6,7 @@ module Admin
     # picks between them, so only "edit" is an action
     FORM_TABS = %w[edit locations invoice_functionality sso].freeze
     # Like FORM_TABS, each names a template of its own - one #show renders in place of the profile
-    SHOW_TABS = %w[registration_sequences].freeze
+    SHOW_TABS = %w[education_courses].freeze
 
     before_action :find_organization, only: %w[show edit update destroy]
     before_action :set_admin_form_page_id, only: %w[edit new]
@@ -184,8 +184,13 @@ module Admin
       features_and_settings = Array(params[:search_features_and_settings])
         .flat_map { it.to_s.split(",") }.reject(&:blank?)
       organization_features = OrganizationFeature.where(id: features_and_settings)
-      if organization_features.any? # HACK - doesn't search InvoiceOrganizationFeature, just feature slugs
-        matching_organizations = matching_organizations.with_enabled_feature_slugs(organization_features.feature_slugs)
+      if organization_features.any?
+        feature_slugs = organization_features.feature_slugs
+        matching_organizations = matching_organizations.with_enabled_feature_slugs(feature_slugs) if feature_slugs.any?
+        # A feature without slugs enables nothing, so only an active invoice says who has it
+        matching_organizations = organization_features.where(feature_slugs: []).reduce(matching_organizations) do |organizations, feature|
+          organizations.where(id: feature.invoices.active.select(:organization_id))
+        end
         @features_and_settings_ids += organization_features.pluck(:id).map(&:to_s)
       end
       selected_settings = organization_settings & features_and_settings

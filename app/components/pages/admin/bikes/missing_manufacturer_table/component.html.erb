@@ -1,5 +1,5 @@
 <%#
-  UI::Table instance_execs its cell blocks, so this component's own methods are out of
+  UI::Table::Base instance_execs its cell blocks, so this component's own methods are out of
   reach inside them - each one it needs comes across as a local
 %>
 
@@ -8,18 +8,25 @@
 <% paint_for = ->(bike) { unmatched_paint(bike) } %>
 <% searched_other_name = @searched_other_name %>
 
-<%= render(UI::Table::Component.new(records: @bikes)) do |table| %>
-  <% table.column(label: toggle_all_button) do |bike| %>
-    <%= check_box_tag "bikes_selected[#{bike.id}]", bike.id, false,
-          data: {"table-multi-checkbox-target": "checkbox"} %>
+<%= render(UI::Table::InCard::Component.new(records: @bikes,
+  column_settings: {storage_key: "adminMissingManufacturerColumns", columns: COLUMNS, defaults: COLUMNS.keys, narrow_hidden: %i[created_by_cell]},
+  form: {url: update_manufacturers_admin_bikes_path, method: :post})) do |table| %>
+  <% table.with_actions do %>
+    <%= render(UI::Forms::Group::Component.new(attribute: :manufacturer_id, label_text: Manufacturer.model_name.human, required: true, wrapper_class: "tw:mb-0 tw:min-w-64")) do %>
+      <%= render UI::Forms::ComboboxManufacturer::Component.new(frame_maker: true, no_manufacturer_other: true, html_options: {required: true}) %>
+    <% end %>
+
+    <%= render(UI::Button::Component.new(text: "Update selected", color: :primary, size: :sm, type: :submit)) %>
   <% end %>
+
+  <% table.selection_column(param: "bikes_selected") %>
 
   <% table.column(label: "Date indexed") do |bike| %>
     <%= link_to edit_admin_bike_url(bike), class: "twlink" do %>
       <%= render(UI::Time::Component.new(time: bike.created_at)) %>
     <% end %>
 
-    <span class="twless-strong tw:ml-2">
+    <span class="less-strong tw:ml-2">
       <% if bike.example %>
         <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:error] %>"><%= bike.id %></span>
       <% else %>
@@ -36,15 +43,15 @@
         <%= link_to "search", other_name_search.call(bike), class: "twlink tw:text-sm" %>
       <% end %>
     <% else %>
-      <em class="twless-strong"><%= bike.mnfg_name %></em>
+      <em class="less-strong"><%= bike.mnfg_name %></em>
     <% end %>
   <% end %>
 
-  <% table.column(label: "Info") do |bike| %>
+  <% table.column(hideable: :info_cell) do |bike| %>
     <%= describe.call(bike) %>
 
     <% if paint_for.call(bike).present? %>
-      <div class="twless-strong">
+      <div class="less-strong">
         <%= link_to bike.paint_description, edit_admin_paint_url(bike.paint), class: "twlink" %>
         <%= bike.frame_colors.to_sentence %>
       </div>
@@ -55,13 +62,13 @@
     </span>
   <% end %>
 
-  <% table.column(label: "Created by") do |bike| %>
+  <% table.column(hideable: :created_by_cell) do |bike| %>
     <% if bike.creation_organization.present? %>
       <%= link_to bike.creation_organization.name, admin_organization_path(bike.creation_organization), class: "twlink" %>
     <% end %>
 
     <% if bike.pos? %>
-      <span class="twless-strong tw:ml-2">pos</span>
+      <span class="less-strong tw:ml-2">pos</span>
     <% end %>
   <% end %>
 <% end %>

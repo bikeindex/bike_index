@@ -53,7 +53,6 @@ class OrganizationFeature < ApplicationRecord
   # NOTE: impound_bikes_public is automatically added if the org configures, no need to manually addz
   EXPECTED_SLUGS = (%w[
     avery_export
-    bike_search
     bike_stickers
     bike_stickers_user_editable
     child_organizations
@@ -61,6 +60,8 @@ class OrganizationFeature < ApplicationRecord
     credibility_badges
     csv_exports
     customize_emails
+    education_courses
+    education_courses_edit
     graduated_notifications
     hot_sheet
     impound_bikes_locations
@@ -72,8 +73,6 @@ class OrganizationFeature < ApplicationRecord
     passwordless_users
     regional_bike_counts
     registration_notes
-    registration_sequences
-    registration_sequences_edit
     saml_sso
     show_bulk_import
     show_bulk_import_impound
@@ -89,6 +88,7 @@ class OrganizationFeature < ApplicationRecord
   has_many :invoice_organization_features
   has_many :invoices, through: :invoice_organization_features
 
+  validates_presence_of :name
   validates_uniqueness_of :name
 
   after_commit :update_invoices

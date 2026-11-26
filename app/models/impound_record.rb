@@ -45,6 +45,7 @@ class ImpoundRecord < ApplicationRecord
   has_one :parking_notification
   has_one :ownership
   has_many :impound_record_updates
+  has_many :noted_updates, -> { where("notes ~ '\\S'").order(id: :desc) }, class_name: "ImpoundRecordUpdate"
   has_many :impound_claims
 
   validates_presence_of :user_id
@@ -173,17 +174,15 @@ class ImpoundRecord < ApplicationRecord
     false
   end
 
-  def latitude_public
-    return unless address_record&.latitude.present?
-
-    show_address ? address_record.latitude : address_record.latitude&.round(Bike::PUBLIC_COORD_LENGTH)
+  # A record not saved since impounded_from_address_record was added has it only as address_record
+  def impounded_from_address
+    impounded_from_address_record || (address_record if address_record&.impounded_from?)
   end
 
-  def longitude_public
-    return unless address_record&.latitude.present?
+  # Where it was impounded from, not where it's held
+  def latitude_public = public_coordinate(:latitude)
 
-    show_address ? address_record.longitude : address_record.longitude&.round(Bike::PUBLIC_COORD_LENGTH)
-  end
+  def longitude_public = public_coordinate(:longitude)
 
   def unorganized?
     !organized?
@@ -287,14 +286,14 @@ class ImpoundRecord < ApplicationRecord
     self.impounded_at = created_at if created_at.present? && created_at > impounded_at + 10.years
     # unregistered_bike means essentially that the bike was created for this impound record
     self.unregistered_bike ||= calculated_unregistered_bike?
-    # Update address_record_id from location if there's an explicit move_location update
-    move_location_update = impound_record_updates.with_location.order(:id).last
-    # Set address_record from parking_notification if present and no address_record yet
-    set_address_record_from_parking_notification if parking_notification.present? && !address_record? && !move_location_update
-    if address_record.present? && address_record.impounded_from?
-      self.impounded_from_address_record ||= address_record
+    self.impounded_from_address_record ||= address_record if address_record&.impounded_from?
+    # Linked after create, by which point a default impound location already holds address_record
+    self.impounded_from_address_record ||= parking_notification_address_record if parking_notification.present?
+    if location.present?
+      self.address_record_id = location.address_record_id
+    else
+      self.address_record ||= impounded_from_address_record
     end
-    self.address_record_id = location.address_record_id if location.present?
   end
 
   def reply_to_email
@@ -307,6 +306,13 @@ class ImpoundRecord < ApplicationRecord
   end
 
   private
+
+  def public_coordinate(attribute)
+    coordinate = impounded_from_address&.public_send(attribute)
+    return if coordinate.blank?
+
+    show_address ? coordinate : coordinate.round(Bike::PUBLIC_COORD_LENGTH)
+  end
 
   def set_calculated_display_id
     if organization_id.blank?
@@ -363,13 +369,12 @@ class ImpoundRecord < ApplicationRecord
       (created_at || Time.current).between?(b_created_at - 1.hour, b_created_at + 1.hour)
   end
 
-  def set_address_record_from_parking_notification
-    return if address_record.present? && address_record.changed?
+  # The whole repeat chain shares impound_record_id, so has_one :parking_notification picks arbitrarily
+  def parking_notification_address_record
+    notification = ParkingNotification.impound_notification.order(:id).find_by(impound_record_id: id) if id
+    return unless notification
 
-    # Create address_record from parking_notification's legacy fields
-    self.address_record = AddressRecord.new(
-      Geocodeable.attrs_to_duplicate(parking_notification)
-        .merge(kind: :impounded_from, organization_id:, bike_id:)
-    )
+    AddressRecord.new(Geocodeable.attrs_to_duplicate(notification)
+      .merge(kind: :impounded_from, organization_id:, bike_id:))
   end
 end

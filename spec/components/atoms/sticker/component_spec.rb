@@ -30,6 +30,15 @@ RSpec.describe Atoms::Sticker::Component, type: :component do
     end
   end
 
+  context "copyable" do
+    let(:options) { {pretty_code: "BR 000 1", copyable: true} }
+
+    it "renders the code with a copy button" do
+      expect(component).to have_css("code", text: "BR 000 1")
+      expect(component).to have_css("button[title='Copy sticker'][data-ui--copy-button-text-value='BR 000 1']")
+    end
+  end
+
   context "with a blank code" do
     let(:options) { {bike_sticker: nil} }
 

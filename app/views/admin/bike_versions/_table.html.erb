@@ -4,7 +4,7 @@
   data-controller="update-cached-sortable-links"
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
-  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
+  <%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:,
         cache_key: cache_fragment_name(["admin_bike_versions", render_sortable]),
         cache_records: ->(bike_version) { bike_version.owner })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(record) { tag.span(record.id, class: "only-dev-visible") }) do |bike_version| %>
@@ -29,7 +29,7 @@
       <% if bike_version.user_hidden? %>
         <span class="less-strong">hidden</span>
       <% elsif bike_version.all_visible? %>
-        <span class="text-success">visible</span>
+        <span class="<%= UI::Alerts::Base::Component::TEXT_CLASSES[:success] %>">visible</span>
       <% else %>
         <small><%= bike_version.visibility&.humanize %></small>
       <% end %>

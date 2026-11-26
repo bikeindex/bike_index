@@ -6,23 +6,39 @@ module UI
     # submits a request to a URL (button_to), use UI::ButtonLink instead — it reuses
     # this component's build_classes, so the two stay visually in lockstep.
     class Component < ApplicationComponent
-      BASE_CLASSES = "tw:inline-flex tw:items-center tw:justify-center tw:gap-1.5 tw:rounded-lg tw:cursor-pointer tw:transition-colors"
+      BASE_CLASSES = "tw:inline-flex tw:items-center tw:justify-center tw:gap-1.5 tw:cursor-pointer"
+
+      # Per size rather than in BASE_CLASSES, so :callout's radius, border, weight and transition
+      # have nothing to tie with
+      STANDARD_SHAPE = "tw:rounded-lg tw:border tw:font-medium tw:transition-colors"
+
+      # A press sinks it 2px from where it sits - back down from the hover lift, or below
+      # rest on a device that can't hover
+      CALLOUT_SHAPE = "tw:rounded-full tw:border-2 tw:font-semibold tw:uppercase tw:tracking-[0.5px] tw:transition-all tw:duration-300 tw:not-disabled:not-aria-disabled:hover:-translate-y-0.5 tw:not-disabled:not-aria-disabled:active:translate-y-0.5 tw:hover:is-active:translate-y-0"
 
       SIZES = {
-        sm: "tw:px-2.5 tw:py-1 tw:text-xs",
-        md: "tw:px-3 tw:py-1.5 tw:text-sm",
-        lg: "tw:px-4 tw:py-2 tw:text-base"
+        sm: "#{STANDARD_SHAPE} tw:px-2.5 tw:py-1 tw:text-xs",
+        md: "#{STANDARD_SHAPE} tw:px-3 tw:py-1.5 tw:text-sm",
+        lg: "#{STANDARD_SHAPE} tw:px-4 tw:py-2 tw:text-base",
+        callout: "#{CALLOUT_SHAPE} tw:px-10 tw:py-4 tw:text-base",
+        callout_sm: "#{CALLOUT_SHAPE} tw:px-6 tw:py-1.5 tw:text-[13px]"
       }.freeze
 
       # Hover is guarded against both ways an element says it's disabled — :disabled for a
       # button, aria-disabled for UI::ButtonLink's anchor. Nothing else stops it now.
       COLORS = {
-        primary: "tw:text-white tw:bg-blue-600 tw:border tw:border-blue-600 tw:not-disabled:not-aria-disabled:hover:bg-blue-700 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-blue-600",
-        secondary: "tw:text-gray-800 tw:bg-white tw:border tw:border-gray-200 tw:not-disabled:not-aria-disabled:hover:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-800 tw:dark:text-gray-100 tw:dark:border-gray-700 tw:dark:not-disabled:not-aria-disabled:hover:border-purple-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-purple-950",
-        error: "tw:text-[#c0392b] tw:bg-white tw:border tw:border-[#f3c9c9] tw:not-disabled:not-aria-disabled:hover:bg-red-50 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:not-disabled:not-aria-disabled:hover:bg-red-950",
-        purple: "tw:text-white tw:bg-purple-500 tw:border tw:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-600 tw:not-disabled:not-aria-disabled:hover:border-purple-600 tw:focus:ring-purple-500/40",
-        link: "twlink tw:p-0 tw:focus:ring-blue-500/40"
+        primary: "tw:text-white tw:bg-blue-600 tw:border-blue-600 tw:not-disabled:not-aria-disabled:hover:bg-blue-700 tw:focus:ring-blue-500/40 tw:dark:bg-blue-500 tw:dark:border-blue-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-blue-600",
+        secondary: "tw:text-gray-800 tw:bg-white/80 tw:border-gray-200 tw:not-disabled:not-aria-disabled:hover:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-50 tw:focus:ring-purple-500/40 tw:dark:bg-gray-800/80 tw:dark:text-gray-100 tw:dark:border-gray-700 tw:dark:not-disabled:not-aria-disabled:hover:border-purple-500 tw:dark:not-disabled:not-aria-disabled:hover:bg-purple-950",
+        error: "tw:text-[#c0392b] tw:bg-white tw:border-[#f3c9c9] tw:not-disabled:not-aria-disabled:hover:bg-red-50 tw:focus:ring-red-500/40 tw:dark:bg-transparent tw:dark:text-red-400 tw:dark:border-red-900 tw:dark:not-disabled:not-aria-disabled:hover:bg-red-950",
+        purple: "tw:text-white tw:bg-purple-500 tw:border-purple-500 tw:not-disabled:not-aria-disabled:hover:bg-purple-600 tw:not-disabled:not-aria-disabled:hover:border-purple-600 tw:focus:ring-purple-500/40",
+        yellow: "tw:text-blue-600 tw:bg-yellow-300 tw:border-yellow-300 tw:not-disabled:not-aria-disabled:hover:bg-yellow-400 tw:not-disabled:not-aria-disabled:hover:border-yellow-400 tw:focus:ring-yellow-300/60",
+        link: "twlink tw:rounded-lg tw:p-0 tw:focus:ring-blue-500/40",
+        # The grays outrank twlink-underlined's color shift, so each state names its own
+        link_gray: "twlink-underlined tw:text-gray-500 tw:not-disabled:not-aria-disabled:hover:text-gray-700 tw:dark:text-gray-400 tw:dark:not-disabled:not-aria-disabled:hover:text-gray-200 tw:rounded-lg tw:p-0 tw:focus:ring-gray-500/40"
       }.freeze
+
+      # Text-only, so they take no size
+      LINK_COLORS = %i[link link_gray].freeze
 
       # The active look, as a delta over COLORS — always emitted alongside it and inert
       # until the element flags itself active (see the is-active variant in application.css,
@@ -35,7 +51,9 @@ module UI
         primary: "tw:is-active:bg-blue-800 tw:is-active:ring-2 tw:is-active:ring-blue-500/40 tw:is-active:dark:bg-blue-700",
         secondary: "tw:is-active:text-white tw:is-active:bg-purple-500 tw:is-active:border-purple-500 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
         error: "tw:is-active:bg-red-100 tw:is-active:border-[#c0392b] tw:is-active:ring-2 tw:is-active:ring-red-500/40 tw:is-active:dark:bg-red-950 tw:is-active:dark:border-red-700",
-        purple: "tw:is-active:bg-purple-700 tw:is-active:border-purple-700 tw:is-active:ring-2 tw:is-active:ring-purple-500/40"
+        purple: "tw:is-active:bg-purple-700 tw:is-active:border-purple-700 tw:is-active:ring-2 tw:is-active:ring-purple-500/40",
+        yellow: "tw:is-active:bg-yellow-500 tw:is-active:border-yellow-500 tw:is-active:ring-2 tw:is-active:ring-yellow-300/60",
+        link_gray: "tw:is-active:text-gray-900 tw:is-active:dark:text-gray-100"
       }.freeze
 
       # No pointer-events-none: with pointer events off the browser takes the cursor from
@@ -47,18 +65,17 @@ module UI
       # unless focus is restated under the variant.
       FOCUS_CLASSES = "tw:focus:outline-none tw:focus:ring-3 tw:is-active:focus:ring-3"
 
-      # Focus and disabled reach link color too — only the sizing and weight are
-      # button-shaped
+      # Focus and disabled reach the link colors too — only SIZES is button-shaped
       def self.build_classes(color:, size:, html_class: nil)
         extras = [FOCUS_CLASSES, DISABLED_CLASSES]
-        extras += [SIZES[size], "tw:font-medium tw:no-underline"] unless color == :link
+        extras += [SIZES[size], "tw:no-underline"] unless LINK_COLORS.include?(color)
         [BASE_CLASSES, html_class, *extras, COLORS[color], ACTIVE_COLORS[color]].compact.join(" ")
       end
 
       # ButtonLink calls this too, so the pair answers a caller the same way
       def self.validate_options!(color:, size:, html_options:)
         raise ArgumentError, "unknown color #{color.inspect}, expected one of: #{COLORS.keys.join(", ")}" unless COLORS.key?(color)
-        raise ArgumentError, "size is not supported for link color" if color == :link && size != :md
+        raise ArgumentError, "size is not supported for link color" if LINK_COLORS.include?(color) && size != :md
         # The component builds its own class, so a passed one is dropped rather than merged
         raise ArgumentError, "class is not supported, you must use the keyword arg html_class" if html_options.key?(:class)
       end

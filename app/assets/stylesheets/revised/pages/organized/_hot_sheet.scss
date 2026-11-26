@@ -1,18 +1,3 @@
-.hot-sheet-recipient-emails {
-  padding: 0 !important;
-  ul {
-    max-height: 250px;
-    overflow-x: scroll;
-    margin-bottom: 0;
-    li:first-of-type {
-      margin-top: 0.5rem;
-    }
-    li:last-of-type {
-      margin-bottom: 0.5rem;
-    }
-  }
-}
-
 .hot-sheet-list {
   list-style-type: none;
   margin: 0;
@@ -51,11 +36,6 @@
     flex: 0 0 66.6666666666%;
     max-width: 66.6666666666%;
     padding: 0;
-  }
-  tr.bike-main-info td {
-    font-size: 100%;
-    text-align: left;
-    font-style: normal;
   }
 }
 

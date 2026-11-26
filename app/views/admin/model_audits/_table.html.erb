@@ -3,7 +3,7 @@
 <% org_ids = OrganizationModelAudit.distinct.pluck(:organization_id) %>
 <% org_names_hash = Organization.where(id: org_ids).pluck(:id, :short_name).to_h %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:,
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:,
     cache_key: cache_fragment_name("admin_model_audit"),
     cache_records: ->(model_audit) { [*model_audit.organization_model_audits, model_audit.model_attestations.size] })) do |table| %>
   <% table.column(sortable: "created_at", header_classes: "tw:text-xs", lower_right: ->(record) { tag.span(record.id, class: "only-dev-visible") }) do |model_audit| %>
@@ -17,7 +17,7 @@
   <% table.column(sortable: "mnfg_name", label: "Manufacturer") do |model_audit| %>
     <%= model_audit.mnfg_name %>
 
-    <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_mnfg_name: model_audit.mnfg_name)), class: "display-sortable-link small" %>
+    <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_mnfg_name: model_audit.mnfg_name)), class: "display-sortable-link tw:text-sm" %>
   <% end %>
 
   <% table.column(label: "Mnfg other", header_classes: "tw:text-xs", classes: "tw:text-center") do |model_audit| %>

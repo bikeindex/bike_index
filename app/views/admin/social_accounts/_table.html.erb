@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at") do |social_account| %>
     <%= link_to admin_social_account_path(social_account), class: "twlink" do %>
       <%= render UI::Time::Component.new(time: social_account.created_at) %>
@@ -32,7 +32,7 @@
   <% end %>
 
   <% table.column(label: "Address") do |social_account| %>
-    <small class="less-strong"><%= social_account.address %></small>
+    <small class="less-strong"><%= social_account.formatted_address_string %></small>
   <% end %>
 
   <% table.column(label: "Neighborhood") do |social_account| %>
@@ -44,7 +44,7 @@
   <% end %>
 
   <% table.column(label: "State") do |social_account| %>
-    <small class="less-strong"><%= social_account.state&.abbreviation %></small>
+    <small class="less-strong"><%= social_account.region %></small>
   <% end %>
 
   <% table.column(sortable: "country") do |social_account| %>

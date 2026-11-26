@@ -24,10 +24,10 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(assigns(:impound_records).count).to eq 0
       expect(assigns(:available_statuses)).to eq available_statuses
 
-      # The card holds the chart, so its frame asks with chart_only alone
-      expect(response.body).to include("chart_only=1")
+      expect(response.body).to include("Search settings and filters")
+      expect(response.body).to include("Current records")
 
-      get "#{base_url}?chart_only=1"
+      get base_url, headers: {"Turbo-Frame" => Pages::Org::Search::ChartCard::Component::FRAME_ID.to_s}
       expect(response.status).to eq(200)
       expect(assigns(:impound_records)).to be_nil
       expect(assigns(:pagy)).to be_nil
@@ -56,6 +56,11 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(assigns(:search_status)).to eq "current"
         expect(assigns(:impound_records).pluck(:id)).to match_array([impound_record.id, impound_record2.id])
         expect(assigns(:available_statuses)).to eq(available_statuses + ["expired"])
+
+        # The form posts distance_unit on every search, which isn't a bike search term
+        get "#{base_url}?search_no_js=true&search_bike_id=#{bike2.id}&distance_unit=km"
+        expect(response.status).to eq(200)
+        expect(assigns(:impound_records).pluck(:id)).to eq([impound_record2.id])
 
         get "#{base_url}?search_no_js=true&search_email=&serial=yar1s"
         expect(response.status).to eq(200)
@@ -108,11 +113,16 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
         expect(assigns(:search_proximity)).to eq 50
 
-        # with below minimum distance (0.01)
+        # with below minimum distance (0.01 miles)
         get "#{base_url}?search_no_js=true&search_location=New+York&search_proximity=0.001"
         expect(response.status).to eq(200)
-        expect(assigns(:search_proximity)).to eq(0.01)
+        expect(assigns(:search_proximity)).to eq(0.02)
         expect(assigns(:impound_records).pluck(:id)).to eq([impound_record_nyc.id])
+
+        get "#{base_url}?search_no_js=true&search_location=New+York&search_proximity=0.001&distance_unit=mi"
+        expect(response.status).to eq(200)
+        expect(assigns(:search_proximity)).to eq(0.01)
+        expect(response.body).to match(/miles of/)
       end
 
       context "unknown location" do
@@ -142,6 +152,19 @@ RSpec.describe Organized::ImpoundRecordsController, type: :request do
       expect(response).to render_template(:show)
       expect(assigns(:impound_record)).to eq impound_record
       expect(response.body).not_to include("created from a parking notification")
+      expect(response.body).not_to include("Current location")
+    end
+    context "held at a location" do
+      let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: current_organization, name: "Back lot") }
+      let(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, organization: current_organization, user: current_user, bike:, location:) }
+
+      it "renders its current location apart from where it was impounded from" do
+        get "#{base_url}/pkey-#{impound_record.id}"
+        expect(response.status).to eq(200)
+        current_location = Nokogiri::HTML(response.body).css("tr").find { it.text.include?("Current location") }
+        expect(current_location.text.squish).to match(/Back lot 278 Broadway/)
+        expect(response.body).to include("1300 W 14th Pl")
+      end
     end
     context "unregistered parking notification bike" do
       let(:parking_notification) do

@@ -23,7 +23,7 @@ module Admin
     end
 
     def show
-      @bike = @stolen_notification.bike
+      @bike = Bike.unscoped.find_by(id: @stolen_notification.bike_id)
     end
 
     def find_notification

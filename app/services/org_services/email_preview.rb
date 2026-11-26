@@ -35,7 +35,7 @@ module OrgServices
       impound_claim ||= impound_claims.where(status:).last
       return impound_claim if impound_claim.present?
 
-      organization.impound_records.last&.impound_claims&.build(status:)
+      organization.impound_records.last&.impound_claims&.build(status:, organization:)
     end
 
     #

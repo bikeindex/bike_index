@@ -15,7 +15,7 @@ RSpec.describe Pages::Admin::Bikes::Tabs::Component, type: :component do
       "Stickers 0", "Promoted alerts 0", "Recoveries 0"]
     expect(component.css("nav a[aria-current]").map { |tab| tab.text.squish }).to eq ["Edit"]
     expect(component).to have_link("Edit", href: "/admin/bikes/#{bike.id}/edit")
-    expect(component).to have_link("non-admin view", href: "/bikes/#{bike.id}")
+    expect(component).to have_link("non-admin view", href: "/bikes/#{bike.id}?organization_id=false")
   end
 
   context "with an invalid active tab" do
@@ -113,6 +113,7 @@ RSpec.describe Pages::Admin::Bikes::Tabs::Component, type: :component do
 
       it "renders the deleted alert" do
         expect(component).to have_content("#{bike.type_titleize} deleted")
+        expect(component).to have_link("Un-delete #{bike.type}", href: "/admin/bikes/#{bike.id}/undelete")
       end
     end
 

@@ -75,6 +75,15 @@ RSpec.describe Pages::Admin::Organizations::Form::Wrapper::Component, type: :com
     end
   end
 
+  context "with SAML SSO active" do
+    let(:organization) { FactoryBot.create(:organization_saml_configuration, :active).organization }
+
+    it "says the short name is locked, rather than warning about invoiced URLs" do
+      expect(component).to have_content("locked while SAML SSO is active")
+      expect(component).not_to have_content("will change org URLs")
+    end
+  end
+
   context "with a new organization" do
     let(:organization) { Organization.new }
 

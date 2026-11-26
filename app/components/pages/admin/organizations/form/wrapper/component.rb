@@ -40,7 +40,7 @@ module Pages
             # required or optional
             def read_only_field(label, value, note: nil)
               tag.div(class: "tw:mb-4") do
-                tag.label(label_with_note(label, note), class: "twlabel") + tag.p(value, class: "less-strong")
+                tag.label(label_with_note(label, note), class: "twlabel") + tag.p(value, class: "less-strong tw:mb-4")
               end
             end
 

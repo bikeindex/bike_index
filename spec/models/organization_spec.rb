@@ -3,6 +3,63 @@ require "rails_helper"
 RSpec.describe Organization, type: :model do
   it_behaves_like "search_radius_metricable"
 
+  describe "user_creatable_kinds" do
+    it "is every kind but the admin-only ones, in display order with other last" do
+      expect(Organization.user_creatable_kinds).to eq %w[bike_shop bike_advocacy law_enforcement school municipality
+        bike_manufacturer software property_management other]
+    end
+  end
+
+  describe "name_problem" do
+    before { FactoryBot.create(:organization, name: "Shifty Bike Shop") }
+
+    it "says why a name can't be used" do
+      expect(Organization.name_problem("Shifty Cycles")).to be_nil
+      expect(Organization.name_problem(" shifty  BIKE shop")).to eq :taken
+      expect(Organization.name_problem("Shifty Bike-Shop!")).to eq :taken
+      expect(Organization.name_problem("Registrations")).to eq :reserved
+      expect(Organization.name_problem("Signups")).to eq :reserved
+      expect(Organization.name_problem("X")).to eq :too_short
+      expect(Organization.name_problem("<b></b>!")).to eq :too_short
+      # Fine as typed, but not once shortened to its short name, or slugged
+      expect(Organization.name_problem("Stolen (Bicycle Recovery Network of Portland)")).to eq :reserved
+      expect(Organization.name_problem("Adminx")).to eq :reserved
+    end
+
+    # /register/{slug} is the organization's registration link, unless /register has a page by that name
+    it "reserves the names of /register's pages" do
+      register_pages = Rails.application.routes.routes.filter_map { it.path.spec.to_s[%r{\A/register/(\w+)\(}, 1] if it.verb == "GET" }
+      expect(register_pages).to include("landing")
+      expect(register_pages.map { Organization.name_problem(it) }.uniq).to eq [:reserved]
+    end
+
+    # A landing page puts its organization's slug at the top level, beside every other route there
+    it "reserves the top level of routes, other than the landing pages' own" do
+      top_level = Rails.application.routes.routes.filter_map { it.path.spec.to_s[%r{\A/([[:alnum:]][\w-]*)}, 1] }.uniq -
+        LandingPageOrganizations::SLUGS
+      expect(top_level).to include("search", "marketplace", "e-bike-rules")
+      expect(top_level.reject { Organization.name_problem(it).in?(%i[reserved too_short]) }).to eq []
+    end
+  end
+
+  describe "landing_page_slug" do
+    let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills University", previous_slug:) }
+    let(:previous_slug) { nil }
+
+    it "is nil unless routed" do
+      expect(organization.landing_page_slug).to be_nil
+    end
+
+    context "with a routed previous slug" do
+      let(:previous_slug) { "brakebills" }
+
+      it "is the previous slug" do
+        expect(organization.slug).to eq "brakebills-university"
+        expect(organization.landing_page_slug).to eq "brakebills"
+      end
+    end
+  end
+
   describe "factory" do
     let(:organization) { FactoryBot.create(:organization, :with_invoice) }
     it "is_invoiced and is valid" do
@@ -254,6 +311,8 @@ RSpec.describe Organization, type: :model do
     let!(:organization) { FactoryBot.create(:organization, short_name: "something cool") }
     let!(:organization2) { FactoryBot.create(:organization, short_name: "Bike Shop", name: "Trek Store of Santa Cruz") }
     let!(:organization3) { FactoryBot.create(:organization, short_name: "BikeEastBay", previous_slug: "ebbc") }
+    let!(:organization4) { FactoryBot.create(:organization, name: "Bike and Trike Shop") }
+    let!(:organization5) { FactoryBot.create(:organization, name: "Bike & Trike Shop", previous_slug: "bike-amp-trike-shop") }
     it "finds by slug, previous_slug and name" do
       expect(organization2.slug).to eq "bike-shop"
       expect(Organization.friendly_find(" ")).to be_nil
@@ -261,6 +320,10 @@ RSpec.describe Organization, type: :model do
       expect(Organization.friendly_find("bike shop")).to eq organization2
       expect(Organization.friendly_find("trek store of SANTA CRUZ")).to eq organization2
       expect(Organization.friendly_find("bikeeastbay")).to eq organization3
+      expect(organization5.slug).to eq "bike-and-trike-shop-2"
+      expect(Organization.friendly_find("bike-amp-trike-shop-2")).to eq organization5
+      # An exact previous slug beats the -and- version of an -amp- one
+      expect(Organization.friendly_find("bike-amp-trike-shop")).to eq organization5
       expect(Organization.friendly_find(organization)).to eq organization
     end
     it "scrubs null bytes rather than raising" do
@@ -390,29 +453,23 @@ RSpec.describe Organization, type: :model do
   describe "show_single_search_menu_item?" do
     let(:organization) { Organization.new }
 
-    it "is falsey without bike_search" do
-      expect(organization.show_single_search_menu_item?).to be_falsey
+    it "is truthy" do
+      expect(organization.show_single_search_menu_item?).to be_truthy
     end
 
-    context "with bike_search" do
-      let(:organization) do
-        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["bike_search"])
+    context "law_enforcement" do
+      let(:organization) { Organization.new(kind: "law_enforcement") }
+
+      it "is falsey" do
+        expect(organization.show_single_search_menu_item?).to be_falsey
       end
+    end
 
-      it "is truthy" do
-        expect(organization.show_single_search_menu_item?).to be_truthy
-      end
+    context "ambassador" do
+      let(:organization) { Organization.new(kind: "ambassador") }
 
-      context "law_enforcement" do
-        let(:organization) do
-          FactoryBot.create(:organization_with_organization_features, kind: "law_enforcement",
-            enabled_feature_slugs: ["bike_search"])
-        end
-
-        it "is falsey" do
-          expect(organization.enabled?("bike_search")).to be_truthy
-          expect(organization.show_single_search_menu_item?).to be_falsey
-        end
+      it "is falsey" do
+        expect(organization.show_single_search_menu_item?).to be_falsey
       end
     end
   end
@@ -467,11 +524,11 @@ RSpec.describe Organization, type: :model do
       expect(organization.child_ids).to eq([organization_child.id])
       expect(organization.child_organizations.pluck(:id)).to eq([organization_child.id])
     end
-    context "registration_sequences_edit" do
-      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["registration_sequences_edit"]) }
+    context "education_courses_edit" do
+      let(:organization) { FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["education_courses_edit"]) }
 
-      it "adds registration_sequences, since editing without viewing locks the organization out" do
-        expect(organization.reload.enabled_feature_slugs).to match_array(%w[registration_sequences registration_sequences_edit])
+      it "adds education_courses, since editing without viewing locks the organization out" do
+        expect(organization.reload.enabled_feature_slugs).to match_array(%w[education_courses education_courses_edit])
       end
     end
     context "regional bike_stickers" do
@@ -679,13 +736,22 @@ RSpec.describe Organization, type: :model do
       end
     end
 
+    context "no letters" do
+      let(:name) { "$.0. $" }
+      it "replaces the name" do
+        organization.set_calculated_attributes
+        expect(organization.name).to eq "Stop messing about"
+        expect(organization.slug).to eq "stop-messing-about"
+      end
+    end
+
     context "&" do
       let(:name) { "Bikes & Trikes" }
       it "permits & in names" do
         organization.set_calculated_attributes
         expect(organization.name).to eq "Bikes & Trikes"
         expect(organization.short_name).to eq "Bikes & Trikes"
-        expect(organization.slug).to eq "bikes-amp-trikes"
+        expect(organization.slug).to eq "bikes-and-trikes"
       end
     end
 
@@ -717,7 +783,7 @@ RSpec.describe Organization, type: :model do
       it "truncates without ellipse" do
         organization.set_calculated_attributes
         expect(organization.short_name).to eq "Banff RCMP - Royal Canadian"
-        expect(organization.slug).to eq "banff-rcmp---royal-canadian"
+        expect(organization.slug).to eq "banff-rcmp-royal-canadian"
         expect(organization.name).to eq name
       end
       context "with parens" do

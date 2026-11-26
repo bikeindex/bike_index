@@ -1,10 +1,18 @@
 <% if @bike.present? %>
   <%= render Pages::Admin::Bikes::Header::Component.new(bike: @bike, active: :listings, user: current_user, display_dev_info: display_dev_info?) %>
-  <h1 class="mt-5 mb-4">Marketplace Listings</h1>
+  <%= render(UI::Header::Component.new(tag: :h2)) do %>
+    Marketplace listings
+    <%= render(Pages::Admin::Headers::Count::Component.new(count: @pagy.count)) %>
+  <% end %>
   <%= render(partial: "table", locals: {collection: @collection, render_sortable: false, skip_item: true}) %>
 <% else %>
-  <% nav_header_list_items = capture do %>
-    <li>
+  <%= render(Pages::Admin::IndexSkeleton::Component.new(
+  index: admin_index_state,
+  collection: @collection,
+  viewing: controller_name.humanize,
+  chart_collection: @render_chart && matching_marketplace_listings,
+)) do |skeleton| %>
+    <% skeleton.with_nav_item do %>
       <% status_filter_name = @status.blank? ? "All statuses" : ({"removed_or_sold" => "Removed or sold"}[@status] || "#{@status.titleize} only") %>
 
       <%= render(UI::Dropdown::Component.new(name: status_filter_name, button_size: :sm,
@@ -17,12 +25,6 @@
           <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "#{kind.titleize} only", path: url_for(sortable_search_params.merge(search_status: kind)), match_params: {search_status: kind}) } %>
         <% end %>
       <% end %>
-    </li>
+    <% end %>
   <% end %>
-  <%= render(Pages::Admin::IndexSkeleton::Component.new(
-  index: admin_index_state,
-  collection: @collection,
-  viewing: controller_name.humanize,
-  chart_collection: @render_chart && matching_marketplace_listings, nav_header_list_items:,
-)) %>
 <% end %>

@@ -48,10 +48,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       let auth = await getAuth();
       const config = getConfig();
-      const configAthleteId = parseInt(config.athleteId, 10);
 
       // Clear all data if stored athlete doesn't match the signed-in user
-      if (auth && Number(auth.athlete.id) !== configAthleteId) {
+      if (auth && auth.athlete.id !== config.athleteId) {
         await clearAllData();
         auth = undefined;
       }
@@ -66,7 +65,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // Refresh athlete profile in the background
         getAthlete().then(async (freshAthlete) => {
           if (!freshAthlete.profile_medium) return; // Not a valid athlete response
-          freshAthlete.id = Number(freshAthlete.id);
           const updatedAuth = { ...auth, athlete: freshAthlete };
           await saveAuth(updatedAuth);
           setAthlete(freshAthlete);
@@ -81,7 +79,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         accessToken: tokenResponse.access_token,
         refreshToken: '',
         expiresAt: (tokenResponse.created_at + tokenResponse.expires_in) * 1000,
-        athlete: auth?.athlete || { id: configAthleteId, username: '', firstname: '', lastname: '', city: '', state: '', country: '', profile: '', profile_medium: '' },
+        athlete: auth?.athlete || { id: config.athleteId, username: '', firstname: '', lastname: '', city: '', state: '', country: '', profile: '', profile_medium: '' },
       };
       await saveAuth(newAuth);
       setAthlete(newAuth.athlete);
@@ -93,7 +91,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // Fetch real athlete profile from Strava
       try {
         const freshAthlete = await getAthlete();
-        freshAthlete.id = Number(freshAthlete.id);
         const updatedAuth = { ...newAuth, athlete: freshAthlete };
         await saveAuth(updatedAuth);
         setAthlete(freshAthlete);

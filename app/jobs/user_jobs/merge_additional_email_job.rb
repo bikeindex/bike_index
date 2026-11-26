@@ -9,6 +9,7 @@ module UserJobs
       old_user = find_old_user(user_email.email, user_email.user_id)
       merge_old_user(user_email, old_user) if old_user.present?
       CallbackJobs::AfterUserCreateJob.new.perform(user_email.user_id, "merged", user: user_email.user, email: user_email.email)
+      true
     end
 
     def merge_old_user(user_email, old_user)
@@ -28,6 +29,7 @@ module UserJobs
       old_user.received_stolen_notifications.update_all(receiver_id: user_id)
       old_user.theft_alerts.update_all(user_id:)
       old_user.bike_sticker_updates.update_all(user_id:)
+      old_user.bug_reports.update_all(user_id:)
       old_user.email_bans.each { |eb| eb.update(user_id:) }
 
       BikeVersion.unscoped.where(owner_id: old_user.id).each { |i| i.update(owner_id: user_id) }

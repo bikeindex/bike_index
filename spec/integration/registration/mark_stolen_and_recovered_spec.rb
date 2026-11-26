@@ -43,11 +43,19 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
 
     expect(bike.reload.status_stolen?).to be_truthy
 
-    # ---- Fill the required theft details (country, street, city) plus useful extras ----
+    # ---- Fill the required theft details plus useful extras ----
+    %w[date_stolen theft_description].each do |attribute|
+      expect(find("[name='bike[stolen_records_attributes][0][#{attribute}]']")[:required]).to be_present
+    end
+    # A local wall-clock time, so the browser is what can compare it to now
+    expect(page.evaluate_script("new Date(document.querySelector('.dateInputUpdateZone').max) <= new Date()")).to be true
     pick_within_selectize(selectize_for("select.country-select-input"), "United States")
     fill_in "Address or intersection", with: "100 Main St"
     fill_in "City", with: "New York"
+    # Whitespace alone doesn't satisfy the required description
+    fill_in "Description of the incident", with: "   "
     fill_in "Postal code", with: "10001"
+    expect(page).to have_field("Description of the incident", with: "")
     fill_in "Phone", with: "3125551234"
     fill_in "Description of the incident", with: "Cut lock outside the cafe"
     save_bike
@@ -71,6 +79,8 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
     # form end-to-end; the component spec guards the csrf-refresh hook. ----
     RearGearType.fixed # bike-details render creates this lazily, which is read-only mid-request
     visit registration_path(bike, view_as: "public")
+    # The form stays hidden until ui--collapse's lazily loaded module connects
+    wait_for_stimulus("ui--collapse")
     within("[data-controller~='ui--collapse']") do
       click_on "Contact the owner"
       fill_in "stolen_notification[message]", with: "Saw this locked up outside the library"
@@ -86,6 +96,7 @@ RSpec.describe "Reporting a registration stolen, then recovered", :js, type: :sy
 
     within("#toggle-stolen") do
       expect(page).to have_css(".modal-body", visible: true, wait: 5)
+      expect(page).to have_no_content("Not enough information!")
       fill_in "mark_recovered_reason", with: "Found it locked up around the corner"
       click_button "Mark recovered"
     end

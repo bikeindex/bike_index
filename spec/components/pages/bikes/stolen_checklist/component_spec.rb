@@ -21,6 +21,33 @@ RSpec.describe Pages::Bikes::StolenChecklist::Component, type: :component do
     expect(component).to have_no_text("CRITICAL")
   end
 
+  context "with an organization stolen message" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:organization_stolen_message) { OrganizationStolenMessage.for(organization) }
+    let(:email) { false }
+    let(:component) { render_inline(described_class.new(bike:, stolen_record:, email:)) }
+
+    before do
+      organization_stolen_message.update(body: "Call the front desk", is_enabled: true)
+      stolen_record.update(organization_stolen_message:)
+    end
+
+    it "renders it in an alert" do
+      expect(component.at_css("[role=alert]").text).to include("Call the front desk")
+      expect(component).to have_no_css(".organization-stolen-message-alert")
+    end
+
+    context "in an email, which has no tailwind" do
+      let(:email) { true }
+
+      it "renders it with the email's class, without the alert's svg" do
+        expect(component.at_css(".organization-stolen-message-alert").text).to include("Call the front desk")
+        expect(component).to have_no_css("[role=alert]")
+        expect(component).to have_no_css("svg")
+      end
+    end
+  end
+
   context "without a location" do
     let(:bike) { FactoryBot.create(:stolen_bike) }
 

@@ -138,8 +138,8 @@ module BikeServices
           .map { |c| c.gsub(/(,?c_)/, "") }
       end
       if @color_ids.present?
-        @color_ids.compact.each do |c_id|
-          @bikes = bikes.where("primary_frame_color_id = ? OR secondary_frame_color_id = ? OR tertiary_frame_color_id = ?", c_id, c_id, c_id)
+        @bikes = @color_ids.compact.reduce(bikes) do |matching_bikes, c_id|
+          matching_bikes.where("primary_frame_color_id = ? OR secondary_frame_color_id = ? OR tertiary_frame_color_id = ?", c_id, c_id, c_id)
         end
       end
       @bikes

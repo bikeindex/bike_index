@@ -1,5 +1,5 @@
-.container
-  %h1 Edit Promoted Alert Plan
+= render(UI::Container::Component.new(width: :wide)) do
+  = render(Pages::Admin::Headers::Nav::Component.new(title: "Edit Promoted Alert Plan"))
 
   = render "form",
     record: @theft_alert_plan,

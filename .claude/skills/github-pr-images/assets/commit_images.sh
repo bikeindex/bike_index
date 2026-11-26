@@ -1,6 +1,6 @@
 #!/bin/bash
-# Host images for a PR comment from the Claude Code web sandbox, where GitHub's
-# uploader is out of reach (no gh, and the MCP browser can't load github.com).
+# Host images for a PR comment from the Claude Code web sandbox, when SKILL.md's
+# upload is out of reach there.
 #
 #   bash .claude/skills/github-pr-images/assets/commit_images.sh tmp/pr_screenshots/*.png
 #
@@ -17,10 +17,8 @@ set -euo pipefail
 
 [ "$#" -gt 0 ] || { echo "usage: $0 <image>..." >&2; exit 2; }
 
-# Sandbox-only by design: anywhere else has the browser uploader, whose
-# user-attachments URLs are permanent and leave no commits behind.
 [ "${CLAUDE_CODE_REMOTE:-}" = "true" ] ||
-  { echo "not the web sandbox - use the browser uploader (SKILL.md steps 2-8)" >&2; exit 1; }
+  { echo "not the web sandbox - upload with SKILL.md's endpoint" >&2; exit 1; }
 
 ROOT=$(git rev-parse --show-toplevel)
 BRANCH=$(git symbolic-ref --quiet --short HEAD) ||

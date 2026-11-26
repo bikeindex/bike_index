@@ -12,6 +12,8 @@ const READER_SCROLL_EVENTS = ['wheel', 'touchmove', 'keydown']
 // short of the fold
 const REVEAL_MARGIN = 8
 const GROUP = '[data-controller~="ui--collapse"]'
+// So a ui--collapse that never loads can't leave a frame loop running
+const COLLAPSE_WAIT_MS = 10000
 
 // Connects to data-controller="shared-blocks--org-sidebar"
 //
@@ -85,14 +87,14 @@ export default class extends Controller {
   // ui--collapse owns the opening and registers whenever its module resolves, which is not
   // ordered against this one -- so a group that isn't connected yet is waited for rather
   // than skipped, and the row is read from the DOM in case its event fired first
-  openGroupFor (link, attempt = 0) {
+  openGroupFor (link, deadline = Date.now() + COLLAPSE_WAIT_MS) {
     const group = link.closest(GROUP)
     // A top-level row has no group to open, but is still a row to reveal
     if (!group) return this.revealCurrentRow()
 
     const collapse = this.collapseFor(group)
     if (!collapse) {
-      if (attempt < 30) requestAnimationFrame(() => this.openGroupFor(link, attempt + 1))
+      if (Date.now() < deadline) requestAnimationFrame(() => this.openGroupFor(link, deadline))
       return
     }
 

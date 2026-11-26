@@ -79,7 +79,7 @@ class CustomerMailer < ApplicationMailer
     raise "Missing theft survey mail snippet" if mail_snippet.blank?
 
     mail_body = mail_snippet.body.gsub("SURVEY_LINK_ID", notification.survey_id.to_s)
-    if notification.user.present?
+    if notification.user&.name.present?
       mail_body = mail_body.gsub(/Bike Index Registrant/i, notification.user.name)
     end
 
@@ -188,6 +188,19 @@ class CustomerMailer < ApplicationMailer
       mail(to: @bike.owner_email,
         subject: "We may have found your stolen #{@bike.title_string}",
         tag: __callee__)
+    end
+  end
+
+  def pos_registration_match_email(pos_registration_match, user)
+    @user = user
+    pos_bike = pos_registration_match.pos_bike
+    component = Emails::PosRegistrationMatch::Component.new(bike: pos_registration_match.bike, pos_bike:,
+      pos_registration_match:)
+
+    I18n.with_locale(@user.preferred_language) do
+      mail(to: @user.email, subject: default_i18n_subject(bike_type: pos_bike.type), tag: __callee__) do |format|
+        format.html { render component }
+      end
     end
   end
 

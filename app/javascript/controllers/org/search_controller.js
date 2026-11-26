@@ -1,18 +1,19 @@
 import { Controller } from '@hotwired/stimulus'
-
-/* global localStorage */
-
-const RESULT_VIEW_KEY = 'orgRegistrationResultView'
+import { collapseField } from 'utils/collapse_utils'
+import { storage } from 'utils/storage'
 
 // Connects to data-controller='org--search'
 export default class extends Controller {
-  static targets = ['perPage', 'notesField', 'notesCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint']
+  static targets = ['perPage', 'optionalField', 'optionalFieldCheckbox', 'filterSummary', 'periodLabel', 'searchAll', 'searchAllHint', 'locationSearchHint', 'impoundSearchLink']
   // What the results rendered as, so a stored preference knows whether it has anything to ask for
-  static values = { resultView: String }
+  // and where it's kept - the impound records search keeps its own
+  static values = { resultView: String, resultViewKey: { type: String, default: 'orgRegistrationResultView' } }
 
   connect () {
-    this.initNotesSearch()
+    this.initOptionalFields(0)
+    this.syncLocationSearch(0)
     this.syncResultView()
+    this.syncImpoundSearchLink()
     document.addEventListener('turbo:frame-render', this.handleFrameRender)
     document.addEventListener('turbo:before-fetch-request', this.handleFetchRequest)
     window.addEventListener('search:results-failed', this.stopChartSpinner)
@@ -29,6 +30,10 @@ export default class extends Controller {
   handleFrameRender = (event) => {
     this.syncResultView()
     this.syncPeriodLabel()
+    // A back/forward moves the radios - search--form restores them from the URL
+    this.syncFilterSummary()
+    this.syncLocationSearch()
+    this.syncImpoundSearchLink()
     this.endSubmitSpinner()
     if (event.target === this.resultsFrame) this.reloadChart()
   }
@@ -58,11 +63,13 @@ export default class extends Controller {
   // for it again - only when the address bar names no view, which every search and every
   // chip leaves it doing.
   syncResultView () {
+    // multi_search and the registration page's org search have no result views
+    if (!this.hasResultViewValue) return
     const params = new URLSearchParams(window.location.search)
     const inUrl = params.get('search_result_view')
-    if (inUrl) return localStorage.setItem(RESULT_VIEW_KEY, inUrl)
+    if (inUrl) return storage.setItem(this.resultViewKeyValue, inUrl)
 
-    const stored = localStorage.getItem(RESULT_VIEW_KEY)
+    const stored = storage.getItem(this.resultViewKeyValue)
     const frame = this.resultsFrame
     if (!stored || stored === this.resultViewValue || !frame) return
 
@@ -79,29 +86,65 @@ export default class extends Controller {
     return this.element.querySelector('turbo-frame#chart_card_frame')
   }
 
-  // Pages::SearchResults::Frame's, which the loading overlay's CSS reaches the same way
+  // SharedBlocks::SearchResults::Frame's, which the loading overlay's CSS reaches the same way
   get resultsFrame () {
     return this.element.querySelector('.search-results-frame-wrapper > turbo-frame')
   }
 
-  initNotesSearch () {
-    if (!this.hasNotesFieldTarget) return
-    const input = this.notesFieldTarget.querySelector('input')
-    const hasValue = input && input.value.length > 0
-    if (hasValue || localStorage.getItem('orgRegistrationNotesSearchOpen') === 'true') {
-      this.setNotesSearch(true)
-    }
+  // The notes and location fields, each named by data-field. One opens if an input in it has
+  // a value, or if it was left open. A hidden input's value isn't something entered
+  initOptionalFields (duration) {
+    this.optionalFieldTargets.forEach(field => {
+      const hasValue = [...field.querySelectorAll('input:not([type=hidden])')].some(input => input.value.length > 0)
+      const open = hasValue || storage.getItem(field.dataset.storageKey) === 'true'
+      this.setOptionalField(field.dataset.field, open, duration)
+    })
   }
 
-  toggleNotesSearch () {
-    if (!this.hasNotesFieldTarget) return
-    this.setNotesSearch(this.notesFieldTarget.classList.contains('tw:hidden'))
+  toggleOptionalField (event) {
+    this.setOptionalField(event.target.dataset.field, event.target.checked)
   }
 
-  setNotesSearch (open) {
-    this.notesFieldTarget.classList.toggle('tw:hidden', !open)
-    localStorage.setItem('orgRegistrationNotesSearchOpen', String(open))
-    if (this.hasNotesCheckboxTarget) this.notesCheckboxTarget.checked = open
+  setOptionalField (name, open, duration) {
+    const field = this.optionalFieldTargets.find(target => target.dataset.field === name)
+    if (!field) return
+    collapseField(field, open, duration)
+    storage.setItem(field.dataset.storageKey, String(open))
+    const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === name)
+    if (checkbox) checkbox.checked = open
+  }
+
+  // BikeServices::OrganizedSearch.location_searchable? - disabled, the fields hide and stop
+  // submitting, but the checkbox keeps whether they were open
+  syncLocationSearch (duration) {
+    const checkbox = this.optionalFieldCheckboxTargets.find(target => target.dataset.field === 'location')
+    const field = this.optionalFieldTargets.find(target => target.dataset.field === 'location')
+    if (!checkbox || !field) return
+
+    const status = document.querySelector('input[type=radio][name=search_status][form="Search_Form"]:checked')?.value
+    const searchAll = this.hasSearchAllTarget && this.searchAllTarget.checked
+    const searchable = JSON.parse(checkbox.dataset.locationableStatuses).includes(status) || (checkbox.dataset.regAddress === 'true' && !searchAll)
+
+    checkbox.disabled = !searchable
+    if (this.hasLocationSearchHintTarget) this.locationSearchHintTarget.hidden = searchable
+    collapseField(field, searchable && checkbox.checked, duration)
+  }
+
+  // The impound records search has statuses and sorts of its own, and its own names for the
+  // location fields
+  syncImpoundSearchLink () {
+    if (!this.hasImpoundSearchLinkTarget) return
+    const params = new URLSearchParams(window.location.search)
+    this.impoundSearchLinkTarget.hidden = params.get('search_status') !== 'impounded'
+    ;['search_status', 'sort', 'direction'].forEach(name => params.delete(name))
+    ;[['location', 'search_location'], ['distance', 'search_proximity']].forEach(([from, to]) => {
+      if (params.has(from)) params.set(to, params.get(from))
+      params.delete(from)
+    })
+    const link = this.impoundSearchLinkTarget.querySelector('a')
+    const url = new URL(link.href)
+    url.search = params
+    link.href = url
   }
 
   // Bubbled from any field, so it picks out the one it's for
@@ -109,12 +152,17 @@ export default class extends Controller {
     if (event.target.name !== 'search_email' || !this.hasSearchAllTarget) return
     const hasEmail = event.target.value.trim() !== ''
     this.searchAllTarget.disabled = hasEmail
-    if (hasEmail) this.searchAllTarget.checked = false
     this.searchAllHintTarget.hidden = !hasEmail
+    if (hasEmail && this.searchAllTarget.checked) {
+      this.searchAllTarget.checked = false
+      this.syncLocationSearch()
+    }
   }
 
   filterChanged () {
     this.syncFilterSummary()
+    // Before the submit, so a disabled location isn't searched
+    this.syncLocationSearch()
     const form = document.getElementById('Search_Form')
     if (form) {
       form.requestSubmit()

@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(label: "Registry") do |creds| %>
     <%= link_to creds.registry_name, edit_admin_external_registry_credential_path(creds), class: "twlink" %>
   <% end %>

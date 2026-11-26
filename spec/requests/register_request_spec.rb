@@ -11,7 +11,7 @@ RSpec.describe RegisterController, type: :request do
       params: {bike: {owner_email:, manufacturer_id: "Trek"}}.as_json)
   end
 
-  # Where Pages::Register::Step1::Component's start over link goes - it names the registration
+  # Where Pages::Register::Parts::Step1Submit::Component's start over link goes - it names the registration
   # it was rendered on, rather than leaving it to the session
   def start_over_path(b_param, **params)
     new_register_path(discard_token: b_param.id_token, **params)
@@ -33,6 +33,19 @@ RSpec.describe RegisterController, type: :request do
       expect { get "/register/new" }.to change(BParam, :count).by 1
       expect(BParam.last.id).to_not eq new_b_param.id
       expect(response).to redirect_to register_path(b_param_token: BParam.last.id_token, step: 1)
+    end
+
+    it "prefills a linked bike's manufacturer and model, without counting step 1 as submitted" do
+      manufacturer = FactoryBot.create(:manufacturer, name: "Specialized", frame_maker: true)
+      get "/register/new", params: {manufacturer: "Specialized", frame_model: "Haul LT"}
+      b_param = BParam.last
+      expect(b_param.manufacturer_id).to be_nil
+      expect(b_param.params["prefill"]).to eq("manufacturer" => "Specialized", "frame_model" => "Haul LT")
+      expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: 1)
+
+      follow_redirect!
+      expect(Nokogiri::HTML(response.body).at_css("input[type=hidden][name='b_param[manufacturer_id]']")["value"]).to eq manufacturer.id.to_s
+      expect(b_param.reload.manufacturer_id).to be_nil
     end
 
     context "status and organization params" do
@@ -364,6 +377,46 @@ RSpec.describe RegisterController, type: :request do
     end
   end
 
+  describe "landing" do
+    it "states the registry's live counts" do
+      Counts.assign_for("total_bikes", 1_234_567)
+      Counts.assign_for("organizations", 1_234)
+      get "/register/landing"
+      expect(response.body).to include("1.2 million bikes are registered.", "more than 1,200 police departments")
+    end
+
+    it "renders step 1 in the page, posting into the flow on the session's registration" do
+      expect { get "/register/landing" }.to change(BParam, :count).by 1
+      expect(response.status).to eq 200
+      landing_b_param = BParam.last
+      expect(landing_b_param.origin).to eq "register_flow"
+      expect(response.body).to include("Give your bike a way home.", "Fund the next recovery", "</html>")
+      expect(response.body).to include(%(value="#{landing_b_param.id_token}"))
+      # Turbo, persisted and challenged like the flow's own step 1, but it doesn't grab focus
+      expect(response.body).to match(/<form[^>]*data-turbo="true"/)
+      expect(response.body).to_not match(/<form[^>]*data-controller="autofocus/)
+      expect(response.headers["Cache-Control"]).to eq "no-store"
+
+      # The session's still-blank registration, rather than one per view
+      expect { get "/register/landing" }.to_not change(BParam, :count)
+
+      post base_url, params: {b_param_token: landing_b_param.id_token,
+                              b_param: {manufacturer_id: "Trek", cycle_type: "bike", owner_email:}}
+      expect(response).to redirect_to register_path(b_param_token: landing_b_param.id_token, step: 2)
+      expect(landing_b_param.reload).to have_attributes(owner_email:, manufacturer_id: manufacturer.id)
+
+      # Past step 1, so coming back resumes it rather than starting another
+      expect { get "/register/landing" }.to_not change(BParam, :count)
+      expect(response.body).to include(%(value="#{landing_b_param.id_token}"), owner_email, "Start over")
+      # The card's heading sits under the page's own
+      expect(response.body.scan("<h1").count).to eq 1
+
+      # Its bike created, so the next visit starts another
+      landing_b_param.update(created_bike_id: FactoryBot.create(:bike).id)
+      expect { get "/register/landing" }.to change(BParam, :count).by 1
+    end
+  end
+
   describe "show step: 1" do
     it "renders" do
       get register_path(b_param_token: b_param.id_token, step: 1)
@@ -425,15 +478,15 @@ RSpec.describe RegisterController, type: :request do
     end
 
     context "with an organization" do
-      let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills") }
+      let(:organization) { FactoryBot.create(:organization, name: "Brakebills University", short_name: "Brakebills") }
       let(:b_param) do
         BParam.create(origin: "register_flow",
           params: {bike: {owner_email:, cycle_type: "cargo", creation_organization_id: organization.id}}.as_json)
       end
 
-      it "names the organization in the heading, and the cycle type only where js can swap it" do
+      it "names the organization in full in the heading, and the cycle type only where js can swap it" do
         get register_path(b_param_token: b_param.id_token, step: 1)
-        expect(response.body).to include "Register your vehicle with Brakebills!"
+        expect(response.body).to include "Register your vehicle with <strong>Brakebills University</strong>!"
         expect(response.body).to include '<span data-register--heading-target="cycleType">cargo bike</span> info'
         # Posted back, so a submission that has to build a registration keeps the org
         expect(Nokogiri::HTML(response.body).at_css("input[name='organization_id']")["value"])
@@ -463,7 +516,7 @@ RSpec.describe RegisterController, type: :request do
           get register_path(b_param_token: b_param.id_token, step: 1, organization_id: organization.slug)
           expect(b_param.reload.creation_organization_id).to eq organization.id
           expect(b_param.organization_id).to eq organization.id
-          expect(response.body).to include "with Brakebills!"
+          expect(response.body).to include "with <strong>Brakebills University</strong>!"
 
           # Once the bike exists there's nothing left to attribute
           b_param.update(created_bike_id: FactoryBot.create(:bike).id)
@@ -501,6 +554,47 @@ RSpec.describe RegisterController, type: :request do
         get register_path(b_param_token: "unknown-token", step: 1)
         expect(response).to redirect_to new_register_path
         expect(flash[:notice]).to be_present
+      end
+    end
+
+    context "started by a user, visited signed out" do
+      let(:user) { FactoryBot.create(:user_confirmed, email: owner_email) }
+      let(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: user) }
+      it "signs in, then resumes it" do
+        get register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to new_session_url
+        expect(flash[:notice]).to eq "Sign in to continue your registration"
+
+        post session_path, params: {session: {email: user.email, password: "testthisthing7$"}}
+        expect(response).to redirect_to register_path(b_param_token: b_param.id_token)
+      end
+      context "submitting a step" do
+        it "signs in, then resumes it" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: {frame_model: "Something"}}
+          expect(response).to redirect_to new_session_url
+          expect(session[:return_to]).to eq register_path(b_param_token: b_param.id_token)
+
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3"}
+          expect(response).to redirect_to new_session_url
+
+          post session_path, params: {session: {email: user.email, password: "testthisthing7$"}}
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "3")
+        end
+      end
+      context "by organization staff, for the owner" do
+        let(:owner) { FactoryBot.create(:user_confirmed, email: owner_email) }
+        let(:b_param) do
+          FactoryBot.create(:b_param_unfinished_registration, creator: FactoryBot.create(:user_confirmed),
+            owner_email:, origin: "register_flow_organized")
+        end
+        it "signs the owner in, then resumes it" do
+          get register_path(b_param_token: b_param.id_token)
+          expect(response).to redirect_to new_session_url
+
+          post session_path, params: {session: {email: owner.email, password: "testthisthing7$"}}
+          get register_path(b_param_token: b_param.id_token)
+          expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: "2")
+        end
       end
     end
   end
@@ -669,6 +763,75 @@ RSpec.describe RegisterController, type: :request do
             organization_id: organization.slug)
           expect(BParam.last.creation_organization_id).to eq organization.id
         end
+      end
+    end
+
+    # single_page rides the form rather than the session, so the embed's step 1 posts
+    # here unchanged whatever the member who framed it switched on
+    context "the single page form" do
+      include_context :request_spec_logged_in_as_user
+      let(:bike_details) do
+        {primary_frame_color_id: color.id, serial_number: "XYZ 123", status: "status_with_owner",
+         user_name:}
+      end
+      let(:create_params) { super().merge(single_page: true, bike: bike_details) }
+
+      it "saves both steps and finishes the registration" do
+        expect { post base_url, params: create_params }.to change(Bike, :count).by 1
+        expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
+          manufacturer_id: manufacturer.id, creator_id: current_user.id)
+        expect(Bike.last.current_ownership.registration_info.slice("register_single_page", "register_separate_attestation"))
+          .to eq("register_single_page" => true)
+        expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: "finished")
+      end
+
+      context "step 2's details missing" do
+        let(:bike_details) { super().except(:user_name) }
+
+        it "re-renders the one page with both steps on it, saving what it has" do
+          expect { post base_url, params: create_params }.to_not change(Bike, :count)
+          expect(response).to have_http_status(:unprocessable_entity)
+          expect(empty_b_param.reload).to have_attributes(owner_email:, manufacturer_id: manufacturer.id)
+          fields = Nokogiri::HTML(response.body).css("form[action='/register'] input").map { |el| el["name"] }
+          expect(fields).to include("b_param[owner_email]").and include("bike[serial_number]")
+        end
+      end
+
+      context "step 1's manufacturer missing" do
+        let(:step_1_params) { {b_param: {manufacturer_id: "", cycle_type: "cargo", owner_email:}} }
+
+        it "re-renders the one page with the details still on it, saving neither step" do
+          expect { post base_url, params: create_params }.to_not change(Bike, :count)
+          expect(response).to have_http_status(:unprocessable_entity)
+          page = Nokogiri::HTML(response.body)
+          expect(page.at_css("input[name='bike[serial_number]']")["value"]).to eq "XYZ 123"
+          expect(empty_b_param.reload.bike["serial_number"]).to be_blank
+        end
+      end
+    end
+
+    context "the single page form, anonymous with a risky email and the challenge configured" do
+      let(:owner_email) { "rider@yahoo.com" }
+      let(:create_params) do
+        super().merge(single_page: true, bike: {primary_frame_color_id: color.id, serial_number: "XYZ 123",
+                                                status: "status_with_owner", user_name:})
+      end
+      before do
+        stub_const("Integrations::Turnstile::ENABLED", true)
+        stub_const("Integrations::Turnstile::SECRET_KEY", "1x0000000000000000000000000000000AA")
+      end
+
+      it "leaves the registration unfinished until the challenge is answered, then emails the link" do
+        expect { post base_url, params: create_params }
+          .to_not change(EmailJobs::PartialRegistrationJob.jobs, :size)
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(BikeServices::Register.finished?(empty_b_param.reload, course: nil)).to be_falsey
+
+        VCR.use_cassette("integrations_turnstile-verified") do
+          expect { post base_url, params: create_params.merge("cf-turnstile-response" => "XXXX.DUMMY.TOKEN.XXXX") }
+            .to change(EmailJobs::PartialRegistrationJob.jobs, :size).by 1
+        end
+        expect(response).to redirect_to register_path(b_param_token: empty_b_param.id_token, step: "finished")
       end
     end
   end
@@ -898,6 +1061,17 @@ RSpec.describe RegisterController, type: :request do
         expect(response.body).to_not include "Finish reporting your stolen"
       end
 
+      context "with a model picked from Bike Book" do
+        before { sync_bikebook_models }
+
+        it "saves the model's name rather than the catalog id its combobox posts, and the country it's registered from" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.merge(frame_model: "m/specialized/2025/haul-st@CA")},
+            headers: {"HTTP_CF_IPCOUNTRY" => "CA"}
+          expect(b_param.reload.bike["frame_model"]).to eq "Haul ST"
+          expect(b_param.params["registrant_country"]).to eq "CA"
+        end
+      end
+
       context "with a photo" do
         let(:blob) do
           ActiveStorage::Blob.create_and_upload!(io: File.open(Rails.root.join("spec/fixtures/bike.jpg")),
@@ -983,7 +1157,7 @@ RSpec.describe RegisterController, type: :request do
           # Everything entered is kept, but incomplete - so the flow stays on step 2
           expect(b_param.reload.bike["serial_number"]).to eq "XYZ 123"
           expect(BikeServices::Register.send(:details_completed?, b_param)).to be_falsey
-          expect(BikeServices::Register.permitted_step(b_param, "review", sequence: nil)).to eq "2"
+          expect(BikeServices::Register.permitted_step(b_param, "review", course: nil)).to eq "2"
         end
       end
 
@@ -1085,6 +1259,26 @@ RSpec.describe RegisterController, type: :request do
           expect(response.body).to include "keep watch"
           expect(response.body).to include "View your registration"
         end
+
+        context "whose account has no name" do
+          let(:current_user) { FactoryBot.create(:user_confirmed, name: nil) }
+
+          it "asks for it, naming the account and the registration" do
+            get register_path(b_param_token: b_param.id_token, step: 2)
+            expect(response.body).to include "bike[user_name]"
+
+            expect {
+              patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.except(:user_name)}
+            }.to_not change(Bike, :count)
+            expect(response.status).to eq 422
+            expect(response.body).to include "Owner name is required to register"
+
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+            expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+            expect(current_user.reload.name).to eq user_name
+            expect(Bike.last.owner_name).to eq user_name
+          end
+        end
       end
 
       context "with an automatically assigned organization" do
@@ -1119,6 +1313,28 @@ RSpec.describe RegisterController, type: :request do
           expect(b_param.reload.creation_organization_id).to be_blank
           expect(Bike.last.creation_organization_id).to be_blank
           expect(Bike.last.organizations.pluck(:id)).to eq([])
+        end
+
+        # The course is resolved in a filter, before the checkbox drops the organization
+        context "with an e-vehicle course, unchecked" do
+          let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
+          let(:b_param) do
+            BParam.create(origin: "register_flow", creator_id: current_user.id,
+              params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter",
+                              creation_organization_id: organization.id},
+                       auto_organization_id: organization.id}.as_json)
+          end
+
+          it "owes nothing to the organization it just dropped" do
+            expect {
+              patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+            }.to_not change(EducationCourseAcknowledgment, :count)
+            expect(b_param.reload.creation_organization_id).to be_blank
+            expect(response).to redirect_to register_path(b_param_token: b_param.id_token, step: :finished)
+            # Nothing holding it back, so it goes out rather than waiting on an education course nobody owes
+            ActionMailer::Base.deliveries = []
+            expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+          end
         end
 
         it "keeps offering it after it's dropped, so it can be taken back" do
@@ -1254,6 +1470,19 @@ RSpec.describe RegisterController, type: :request do
         end
       end
 
+      context "with a blank description" do
+        it "re-renders the step, and creates no bike" do
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+
+          expect {
+            patch "#{base_url}/report", params: {b_param_token: b_param.id_token,
+                                                 report: report_details.merge(theft_description: "   ")}
+          }.to_not change(Bike, :count)
+          expect(response).to have_http_status :unprocessable_entity
+          expect(response.body).to include "Please tell us what happened"
+        end
+      end
+
       context "registered with the owner" do
         let(:bike_details) { super().merge(status: "status_with_owner") }
 
@@ -1269,25 +1498,31 @@ RSpec.describe RegisterController, type: :request do
         end
       end
 
-      # The safety pages sit between the report and the bike, which is the window to go back in
-      context "the status changes after the report" do
+      # The report creates the bike, ahead of the safety pages
+      context "going back after the report" do
         let(:organization) { FactoryBot.create(:organization) }
-        let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+        let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
         let(:b_param) do
           BParam.create(origin: "register_flow", params: {bike: {owner_email:, manufacturer_id: "Trek",
                                                                  cycle_type: "e-scooter", creation_organization_id: organization.id}}.as_json)
         end
 
-        it "carries on to the safety pages, with no theft to report on the way" do
+        it "can't change what the bike was created from" do
           patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
           expect(response).to redirect_to step_path("report")
-          patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+          expect {
+            patch "#{base_url}/report", params: {b_param_token: b_param.id_token, report: report_details}
+          }.to change(Bike, :count).by 1
           expect(response).to redirect_to step_path("3")
 
-          patch base_url, params: {b_param_token: b_param.id_token,
-                                   bike: bike_details.merge(status: "status_with_owner")}
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token,
+                                     bike: bike_details.merge(status: "status_with_owner")}
+          }.to_not change { b_param.reload.params }
           expect(response).to redirect_to step_path("3")
-          expect(b_param.reload.status).to eq "status_with_owner"
+          get step_path("report")
+          expect(response).to redirect_to step_path("3")
+          expect(Bike.last.status).to eq "status_stolen"
         end
       end
     end
@@ -1304,7 +1539,7 @@ RSpec.describe RegisterController, type: :request do
 
         expect {
           post "#{base_url}/confirm_email", params: {b_param_token: b_param.id_token,
-                                                     confirmation_token: token}
+                                                     confirmation_token: token, terms_of_service: "1"}
         }.to_not change(Bike, :count)
         expect(response).to redirect_to step_path("report")
 
@@ -1336,18 +1571,18 @@ RSpec.describe RegisterController, type: :request do
   describe "acknowledge" do
     let(:organization) { FactoryBot.create(:organization) }
     # Built as a draft and activated below, since activation freezes the pages
-    let(:sequence) do
-      FactoryBot.create(:registration_sequence, organization:,
+    let(:course) do
+      FactoryBot.create(:education_course, organization:,
         faq_url: "https://example.com/faq", acknowledgment_text: "agree to all of it")
     end
     let!(:battery_page) do
-      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 0,
+      FactoryBot.create(:education_course_page, education_course: course, listing_order: 0,
         title: "Battery & charging", subtitle: "Charge safely",
         heading: "Looks like you have an e-vehicle!",
         body: "<ul><li>Charge with the manufacturer's charger</li><li>Report a swollen battery</li></ul>")
     end
     let!(:campus_page) do
-      FactoryBot.create(:registration_sequence_page, registration_sequence: sequence, listing_order: 1,
+      FactoryBot.create(:education_course_page, education_course: course, listing_order: 1,
         title: "Campus rules", body: "<ul><li>Dismount in posted zones</li></ul>",
         organization_specific: true)
     end
@@ -1362,19 +1597,33 @@ RSpec.describe RegisterController, type: :request do
     def step_path(step) = register_path(b_param_token: b_param.id_token, step:)
 
     include_context :request_spec_logged_in_as_user
-    before { sequence.make_active! }
+    before { course.make_active! }
 
-    it "walks the safety pages between the details and the bike" do
-      # Step 2 hands off to the first safety page rather than creating the bike
+    it "creates the bike at step 2, then walks the safety pages before finishing" do
+      # Step 2 creates the bike, but hands off to the first safety page rather than finishing
       expect {
         patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-      }.to_not change(Bike, :count)
+      }.to change(Bike, :count).by(1).and change(EducationCourseAcknowledgment.pending, :count).by 1
+      expect(response).to redirect_to step_path("3")
+      bike = Bike.last
+      expect(b_param.reload.created_bike_id).to eq bike.id
+      expect(b_param.acknowledgment_pending?).to be_truthy
+      expect(bike.unfinished_registration?).to be_truthy
+      expect(BParam.unfinished_registrations.pluck(:id)).to eq([b_param.id])
+      # The finished registration email waits on the education course, not on a skipped ownership
+      expect(bike.current_ownership.skip_email).to be_falsey
+      expect { EmailJobs::OwnershipInvitationJob.drain }.to_not change(ActionMailer::Base.deliveries, :count)
+
+      # The steps the bike was created from are closed
+      get step_path("2")
+      expect(response).to redirect_to step_path("3")
+      get step_path("finished")
       expect(response).to redirect_to step_path("3")
 
       follow_redirect!
       # The cycle type reads as it's stored, so no title leads with it and stays sentence case
       expect(response.body).to include "<title>Safety check for your e-scooter</title>"
-      # The heading is the page's own; the title labels its rules and names it on the review
+      # The heading is the page's own; the title labels its bullets and names it on the review
       expect(response.body).to include "Looks like you have an e-vehicle!"
       expect(response.body).to include "Battery &amp; charging"
       expect(response.body).to include "Charge with the manufacturer's charger"
@@ -1386,18 +1635,18 @@ RSpec.describe RegisterController, type: :request do
       get step_path("4")
       expect(response).to redirect_to step_path("3")
 
-      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "3",
                                                 acknowledged: {"0" => "1", "1" => "1"}}
       expect(response).to redirect_to step_path("4")
       expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([battery_page.id])
 
       follow_redirect!
       expect(response.body).to include "Campus rules"
-      # The organization owns this page's rules, so its name is on them
+      # The organization owns this page's bullets, so its name is on them
       expect(response.body).to include organization.short_name
 
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "4",
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "4",
                                                   acknowledged: {"0" => "1"}}
       }.to_not change(Bike, :count)
       expect(response).to redirect_to step_path("review")
@@ -1414,12 +1663,17 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include user_name
       expect(response.body).to_not include current_user.name
 
-      # The acknowledgment is what creates the bike
+      # The acknowledgment is what finishes the registration
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
-      }.to change(Bike, :count).by(1).and change(RegistrationSequenceAcknowledgment, :count).by(1)
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "review", acknowledged_all: "1"}
+      }.to change(EducationCourseAcknowledgment.acknowledged, :count).by 1
+      expect(EducationCourseAcknowledgment.count).to eq 1
+      expect(Bike.count).to eq 1
       expect(response).to redirect_to step_path("finished")
-      expect(b_param.reload.created_bike_id).to eq Bike.last.id
+      expect(b_param.reload.acknowledgment_pending?).to be_falsey
+      expect(BParam.unfinished_registrations.pluck(:id)).to eq([])
+      expect { EmailJobs::OwnershipInvitationJob.drain }.to change(ActionMailer::Base.deliveries, :count).by 1
+      expect(ActionMailer::Base.deliveries.last.to).to eq([owner_email])
 
       follow_redirect!
       expect(response.body).to include "<title>Your e-scooter registration</title>"
@@ -1427,46 +1681,105 @@ RSpec.describe RegisterController, type: :request do
       expect(response.body).to include "<meta name=\"turbo-cache-control\" content=\"no-cache\">"
 
       # The record hangs off the bike, so it survives the b_param being swept
-      acknowledgment = RegistrationSequenceAcknowledgment.last
-      expect(acknowledgment).to have_attributes(registration_sequence_id: sequence.id,
-        bike_id: Bike.last.id, user_id: current_user.id, owner_email:,
+      acknowledgment = EducationCourseAcknowledgment.last
+      expect(acknowledgment).to have_attributes(education_course_id: course.id,
+        bike_id: bike.id, user_id: current_user.id, owner_email:,
         acknowledgment_text: "agree to all of it")
       expect(acknowledgment.acknowledged_pages.pluck(:id)).to match_array([battery_page.id, campus_page.id])
     end
 
-    it "claims a registrant who signed in partway through the safety pages" do
-      patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-      # As if the details had gone in before there was an account to attribute them to
-      b_param.reload.update_column(:creator_id, nil)
+    it "leaves nothing pending when the bike isn't created" do
+      expect {
+        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details.except(:primary_frame_color_id)}
+      }.to_not change(EducationCourseAcknowledgment, :count)
+      expect(Bike.count).to eq 0
+      expect(response).to redirect_to step_path("2")
+      expect(b_param.reload.acknowledgment_pending?).to be_falsey
+    end
 
-      sequence.registration_sequence_pages.each_with_index do |page, index|
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: (index + 3).to_s,
+    it "claims a registrant who signed in partway through the safety pages" do
+      # As if the details had gone in before there was an account to attribute them to
+      b_param.update(params: b_param.params.deep_merge("details_completed" => true, "bike" => bike_details.as_json))
+
+      course.education_course_pages.each_with_index do |page, index|
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: (index + 3).to_s,
                                                   acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
       end
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "review", acknowledged_all: "1"}
       }.to change(Bike, :count).by 1
       expect(Bike.last.creator_id).to eq current_user.id
     end
 
+    context "with a newer version activated partway through" do
+      let(:new_course) { FactoryBot.create(:education_course, :with_pages, organization:, acknowledgment_text: "the new rules") }
+      let(:new_pages) { new_course.education_course_pages.to_a }
+      before do
+        patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id,
+                                                  step: "3", acknowledged: {"0" => "1", "1" => "1"}}
+        new_course.make_active!
+        expect(course.reload.archived?).to be_truthy
+      end
+
+      it "finishes on the version they started" do
+        get step_path("4")
+        expect(response.body).to include "Campus rules"
+
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id,
+                                                  step: "4", acknowledged: {"0" => "1"}}
+        expect(response).to redirect_to step_path("review")
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id,
+                                                  step: "review", acknowledged_all: "1"}
+        expect(response).to redirect_to step_path("finished")
+        expect(EducationCourseAcknowledgment.sole).to have_attributes(education_course_id: course.id,
+          bike_id: b_param.reload.created_bike_id)
+        expect(EducationCourseAcknowledgment.sole.acknowledged_at).to be_present
+      end
+
+      it "starts the newer version over when resumed from a link" do
+        get register_path(b_param_token: b_param.id_token)
+        expect(response).to redirect_to step_path("3")
+        expect(flash[:notice]).to eq "The safety rules have been updated — please review them again"
+        expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([])
+        expect(BikeServices::Register.education_course(b_param)&.id).to eq new_course.id
+
+        # A page left open from the old version doesn't count toward the new one
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id,
+                                                  step: "4", acknowledged: {"0" => "1"}}
+        expect(response).to redirect_to step_path("3")
+        expect(flash[:notice]).to eq "The safety rules have been updated — please review them again"
+        expect(BikeServices::Register.acknowledged_page_ids(b_param.reload)).to eq([])
+
+        new_pages.each_with_index do |page, index|
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: new_course.id,
+                                                    step: (index + 3).to_s, acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
+        end
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: new_course.id,
+                                                  step: "review", acknowledged_all: "1"}
+        expect(response).to redirect_to step_path("finished")
+        expect(EducationCourseAcknowledgment.sole.education_course_id).to eq new_course.id
+      end
+    end
+
     it "advances one page at a time, even once the later ones are acknowledged" do
       patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "3",
                                                 acknowledged: {"0" => "1", "1" => "1"}}
-      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "4",
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "4",
                                                 acknowledged: {"0" => "1"}}
       expect(response).to redirect_to step_path("review")
 
       # Revisiting the first page from the review and continuing walks forward
       # through the rest, rather than jumping straight back to the end
-      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "3",
                                                 acknowledged: {"0" => "1", "1" => "1"}}
       expect(response).to redirect_to step_path("4")
     end
 
     it "refuses a page with a rule left unchecked" do
       patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
-      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "3",
+      patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "3",
                                                 acknowledged: {"0" => "1"}}
       expect(flash[:error]).to be_present
       expect(response).to redirect_to step_path("3")
@@ -1476,7 +1789,7 @@ RSpec.describe RegisterController, type: :request do
     it "refuses an acknowledgment that skipped the pages" do
       patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "review", acknowledged_all: "1"}
       }.to_not change(Bike, :count)
       # The review isn't reachable yet, so this lands back on the first page
       expect(response).to redirect_to step_path("3")
@@ -1496,11 +1809,67 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to step_path("finished")
       end
     end
+
+    context "without an organization, with the default course" do
+      let(:organization) { nil }
+      let(:owner_email) { current_user.email }
+      let(:b_param) do
+        BParam.create(origin: "register_flow",
+          params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter"}}.as_json)
+      end
+
+      it "walks the default course's safety pages, without its organization-specific one, before finishing" do
+        expect(course.default?).to be_truthy
+        expect {
+          patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+        }.to change(Bike, :count).by(1).and change(EducationCourseAcknowledgment.pending, :count).by 1
+        expect(response).to redirect_to step_path("3")
+        follow_redirect!
+        expect(response.body).to include "Charge with the manufacturer's charger"
+
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "3",
+                                                  acknowledged: {"0" => "1", "1" => "1"}}
+        expect(response).to redirect_to step_path("review")
+        follow_redirect!
+        expect(response.body).not_to include "Campus rules"
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "review", acknowledged_all: "1"}
+        expect(response).to redirect_to step_path("finished")
+        expect(EducationCourseAcknowledgment.acknowledged.pluck(:education_course_id)).to eq([course.id])
+      end
+
+      context "reporting a theft" do
+        let(:b_param) do
+          BParam.create(origin: "register_flow",
+            params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter", status: "status_stolen"}}.as_json)
+        end
+
+        it "has no rules to walk" do
+          expect(course.default?).to be_truthy
+          expect(b_param.self_made?(current_user)).to be_truthy
+          expect(BikeServices::Register.education_course(b_param, user: current_user)).to be_nil
+          get register_path(b_param_token: b_param.id_token, step: "3")
+          expect(response).to redirect_to step_path("2")
+        end
+      end
+
+      context "registering someone else's" do
+        let(:owner_email) { "owner@example.com" }
+
+        it "finishes without holding the bike on the rules" do
+          expect(course.default?).to be_truthy
+          expect {
+            patch base_url, params: {b_param_token: b_param.id_token, bike: bike_details}
+          }.to change(Bike, :count).by 1
+          expect(EducationCourseAcknowledgment.count).to eq 0
+          expect(response).to redirect_to step_path("finished")
+        end
+      end
+    end
   end
 
   describe "acknowledge, anonymous" do
     let(:organization) { FactoryBot.create(:organization) }
-    let!(:sequence) { FactoryBot.create(:registration_sequence_active, :with_pages, organization:) }
+    let!(:course) { FactoryBot.create(:education_course_active, :with_pages, organization:) }
     let(:b_param) do
       BParam.create(origin: "register_flow",
         params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter",
@@ -1515,15 +1884,15 @@ RSpec.describe RegisterController, type: :request do
       # No creator, but the safety pages still come before the completion page
       expect(response).to redirect_to step_path("3")
 
-      sequence.registration_sequence_pages.each_with_index do |page, index|
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token,
+      course.education_course_pages.each_with_index do |page, index|
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id,
                                                   step: (index + 3).to_s,
                                                   acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
       end
       expect(response).to redirect_to step_path("review")
 
       expect {
-        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, step: "review", acknowledged_all: "1"}
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "review", acknowledged_all: "1"}
       }.to_not change(Bike, :count)
       expect(response).to redirect_to step_path("finished")
       follow_redirect!
@@ -1533,26 +1902,73 @@ RSpec.describe RegisterController, type: :request do
       get step_path("3")
       expect(response).to redirect_to step_path("finished")
     end
+
+    context "agreeing to the default course, then naming an organization with its own" do
+      let!(:default_course) { FactoryBot.create(:education_course_default_active, :with_pages) }
+      let(:b_param) do
+        BParam.create(origin: "register_flow",
+          params: {bike: {owner_email:, manufacturer_id: "Trek", cycle_type: "e-scooter"}}.as_json)
+      end
+
+      it "asks step 2 again, filled in, then walks the organization's rules instead" do
+        patch base_url, params: {b_param_token: b_param.id_token,
+                                 bike: {primary_frame_color_id: color.id, serial_number: "XYZ 123",
+                                        status: "status_with_owner", user_name: "Sally Rider"}}
+        expect(response).to redirect_to step_path("3")
+        default_course.education_course_pages.each_with_index do |page, index|
+          patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: default_course.id,
+                                                    step: (index + 3).to_s,
+                                                    acknowledged: page.bullets.each_index.to_h { [it.to_s, "1"] }}
+        end
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: default_course.id, step: "review", acknowledged_all: "1"}
+        expect(response).to redirect_to step_path("finished")
+        expect(EducationCourseAcknowledgment.acknowledged.pluck(:education_course_id)).to eq([default_course.id])
+
+        get register_path(b_param_token: b_param.id_token, organization_id: organization.to_param)
+        expect(response).to redirect_to step_path("2")
+        expect(b_param.reload.creation_organization_id).to eq organization.id
+        expect(EducationCourseAcknowledgment.count).to eq 0
+        get step_path("2")
+        expect(response.body).to include "XYZ 123"
+        expect(response.body).to include "Sally Rider"
+
+        patch base_url, params: {b_param_token: b_param.id_token, bike: {user_name: "Sally Rider"}}
+        expect(response).to redirect_to step_path("3")
+        patch acknowledge_register_path, params: {b_param_token: b_param.id_token, education_course_id: course.id, step: "3",
+                                                  acknowledged: course.education_course_pages.first.bullets.each_index.to_h { [it.to_s, "1"] }}
+        expect(response).to redirect_to step_path("4")
+      end
+    end
   end
 
   describe "confirm" do
     let!(:token) { b_param.generate_email_confirmation_token! }
     let(:confirm_params) { {b_param_token: b_param.id_token, confirmation_token: token} }
+    let(:accepted_params) { confirm_params.merge(terms_of_service: "1") }
     def step_path(step) = register_path(b_param_token: b_param.id_token, step:)
 
     it "renders a self-submitting form, then makes an account and signs them in" do
       get "#{base_url}/confirm", params: confirm_params
       expect(response.status).to eq 200
       expect(response.body).to include token
+      expect(response.body).to include "Terms of Service"
       # Rendering confirms nothing - a link scanner following the URL can't spend the token
       expect(b_param.reload.email_confirmed?).to be_falsey
 
       expect {
         post "#{base_url}/confirm_email", params: confirm_params
+      }.to_not change(User, :count)
+      expect(response).to redirect_to confirm_register_path(**confirm_params)
+      expect(flash[:error]).to eq "Agree to the Terms of Service to continue"
+      expect(b_param.reload.email_confirmed?).to be_falsey
+
+      expect {
+        post "#{base_url}/confirm_email", params: accepted_params
       }.to change(User, :count).by 1
       expect(b_param.reload).to have_attributes(email_confirmed?: true,
         email_confirmation_token: nil, creator_id: User.last.id)
-      expect(User.last).to have_attributes(email: owner_email, confirmed: true, passwordless_user: true)
+      expect(User.last).to have_attributes(email: owner_email, confirmed: true, passwordless_user: true,
+        terms_of_service: true)
       expect(User.last.last_login_at).to be_within(2.seconds).of Time.current
       # An account they never signed up for, so they're offered a password
       expect(flash[:notice]).to include(translation_key: :signed_up)
@@ -1563,7 +1979,7 @@ RSpec.describe RegisterController, type: :request do
 
       # Single use, so a forwarded link can't sign anyone in again
       expect {
-        post "#{base_url}/confirm_email", params: confirm_params
+        post "#{base_url}/confirm_email", params: accepted_params
       }.to_not change(User, :count)
       expect(response).to redirect_to step_path("2")
     end
@@ -1604,7 +2020,7 @@ RSpec.describe RegisterController, type: :request do
         expect(response).to redirect_to step_path("finished")
 
         expect {
-          post "#{base_url}/confirm_email", params: confirm_params
+          post "#{base_url}/confirm_email", params: accepted_params
         }.to change(Bike, :count).by 1
         expect(Bike.last).to have_attributes(owner_email:, serial_number: "XYZ 123",
           creator_id: User.last.id)
@@ -1618,10 +2034,12 @@ RSpec.describe RegisterController, type: :request do
         include_context :request_spec_logged_in_as_user
 
         it "keeps their session, creating the bike for the confirmed address" do
+          get "#{base_url}/confirm", params: confirm_params
+          expect(response.body).to include "Continuing keeps you signed in"
           # The registration parked before they signed in, so it's still waiting here
           expect(b_param.reload.created_bike_id).to be_nil
           expect {
-            post "#{base_url}/confirm_email", params: confirm_params
+            post "#{base_url}/confirm_email", params: accepted_params
           }.to change(Bike, :count).by 1
           # No account for the confirmed address - they're still signed in as themselves
           expect(User.count).to eq 1
@@ -1641,7 +2059,7 @@ RSpec.describe RegisterController, type: :request do
         post base_url, params: step_1_params.merge(b_param_token: b_param.id_token)
         expect(b_param.reload.owner_email).to eq other_user.email
 
-        expect { post "#{base_url}/confirm_email", params: confirm_params }
+        expect { post "#{base_url}/confirm_email", params: accepted_params }
           .to_not change(User, :count)
         expect(b_param.reload.email_confirmed?).to be_falsey
         expect(flash[:error]).to be_present
@@ -1651,10 +2069,31 @@ RSpec.describe RegisterController, type: :request do
       end
     end
 
+    context "an address at an SSO domain" do
+      let(:owner_email) { "rider@sso.edu" }
+      let(:organization) do
+        FactoryBot.create(:organization_with_organization_features,
+          enabled_feature_slugs: ["saml_sso"], user_email_domain: "sso.edu")
+      end
+      before { FactoryBot.create(:organization_saml_configuration, :active, organization:) }
+
+      it "signs in at the identity provider, which brings them back to the link" do
+        expect { post "#{base_url}/confirm_email", params: accepted_params }
+          .to_not change(User, :count)
+        expect(response).to redirect_to saml_init_path(org_slug: organization.to_param)
+        # The box they ticked comes back ticked
+        expect(session[:return_to]).to eq confirm_register_path(**accepted_params)
+        expect(b_param.reload.email_confirmed?).to be_falsey
+      end
+    end
+
     context "unconfirmed account for the address" do
       let!(:unconfirmed_user) { FactoryBot.create(:user, email: owner_email) }
 
       it "confirms it, since the link proved the address" do
+        get "#{base_url}/confirm", params: confirm_params
+        expect(response.body).to_not include "Terms of Service"
+        # They agreed to the terms when they signed up
         expect { post "#{base_url}/confirm_email", params: confirm_params }
           .to_not change(User, :count)
         expect(unconfirmed_user.reload.confirmed).to be_truthy

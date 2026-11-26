@@ -6,9 +6,8 @@ module SharedBlocks
       DEFAULT_IMAGE = "/opengraph.png"
       DEFAULT_TWITTER = "@bikeindex"
 
-      def initialize(controller_name:, action_name:, request_url:, page_title: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil, display_dev_info: false)
-        # TODO: Do any pages need a query string?
-        @page_url = request_url.split("?").first
+      def initialize(controller_name:, action_name:, request_url:, page_url: nil, page_title: nil, page_description: nil, page_image: nil, twitter_card: nil, page_obj: nil, updated_at: nil, organization_name: nil, controller_namespace: nil, display_dev_info: false)
+        @page_url = page_url || request_url.split("?").first
         @display_dev_info = display_dev_info
 
         # TODO: Don't actually need to store @page_key, it's just for page_json_ld
@@ -16,6 +15,9 @@ module SharedBlocks
         @display_auto_discovery = controller_name == "news"
 
         @page_title = page_title
+        @page_description = page_description
+        @page_image = page_image
+        @twitter_card = twitter_card || "summary_large_image"
 
         if page_obj.is_a?(Bike) || page_obj.is_a?(BikeVersion)
           assign_bike_attrs(page_obj, action_name)
@@ -153,7 +155,8 @@ module SharedBlocks
           new: "New",
           edit: "Edit",
           show: "View",
-          create: "Created"
+          # A create that renders rather than redirects is the form again, with its errors
+          create: "New"
         }.as_json.freeze[action_name]
       end
 
@@ -212,7 +215,7 @@ module SharedBlocks
         elsif bike.status_stolen? && bike.current_stolen_record.present?
           "#{status_prefix}: #{date(bike.current_stolen_record.date_stolen)}, from: #{bike.current_stolen_record.formatted_address_string(render_country: true)}"
         elsif bike.current_impound_record.present?
-          "#{status_prefix}: #{date(bike.current_impound_record.impounded_at)}, in: #{bike.current_impound_record.formatted_address_string}"
+          "#{status_prefix}: #{date(bike.current_impound_record.impounded_at)}, in: #{bike.current_impound_record.impounded_from_address&.formatted_address_string}"
         end
 
         # Don't show serial on bike versions

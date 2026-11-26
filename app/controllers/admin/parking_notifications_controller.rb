@@ -34,6 +34,7 @@ module Admin
       else
         @search_status = "all"
       end
+      parking_notifications = parking_notifications.where(bike_id: params[:search_bike_id]) if params[:search_bike_id].present?
       parking_notifications = parking_notifications.where(organization_id: current_organization.id) if current_organization.present?
       @matching_parking_notifications = parking_notifications.where(created_at: @time_range)
     end

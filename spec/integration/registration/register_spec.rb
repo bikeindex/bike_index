@@ -25,6 +25,22 @@ RSpec.describe "Register flow", :js, type: :system do
     end
   end
 
+  it "searches what was typed before the combobox's module landed" do
+    hold = hold_requests(%r{hotwire_combobox.*\.js})
+    # A plain visit waits for the load the held module is holding up
+    page.driver.with_playwright_page { it.goto("#{Capybara.app_host || page.server_url}/register/new", waitUntil: "commit") }
+
+    find("#b_param_manufacturer_id").send_keys("Surly")
+    wait_for { hold.held? }
+    hold.release
+
+    click_combobox_option("Surly")
+    expect(page).to have_field("b_param_manufacturer_id", with: "Surly")
+    fill_in "b_param[owner_email]", with: owner_email
+    click_button "Next"
+    expect(page).to have_field("bike[serial_number]", wait: 10)
+  end
+
   it "keeps a step 1 draft across a reload, and comes back to what it submitted" do
     visit "/register/new"
     type_into("#b_param_manufacturer_id", "Surly")
@@ -72,6 +88,30 @@ RSpec.describe "Register flow", :js, type: :system do
     send_keys("Kona")
 
     expect(page).to have_field("b_param_manufacturer_id", with: "Kona")
+  end
+
+  it "registers without a draft where the browser blocks storage" do
+    errors = []
+    page.driver.with_playwright_page do |playwright_page|
+      # Chrome with site data blocked throws on any read of the property
+      playwright_page.add_init_script(script: <<~JS)
+        Object.defineProperty(window, "localStorage", {
+          get () { throw new DOMException("Access is denied for this document.", "SecurityError") }
+        })
+      JS
+      playwright_page.on("pageerror", ->(error) { errors << error.message })
+    end
+
+    visit "/register/new"
+    type_into("#b_param_manufacturer_id", "Surly")
+    click_combobox_option("Surly")
+    fill_in "b_param[owner_email]", with: owner_email
+    sleep 0.5 # past form-persist's write debounce
+    click_button "Next"
+
+    wait_for_details_step
+    expect(BParam.last).to have_attributes(manufacturer_id: manufacturer.id, owner_email:)
+    expect(errors).to eq([])
   end
 
   it "starts a registration, keeps a full details draft across a reload, and completes" do
@@ -128,8 +168,18 @@ RSpec.describe "Register flow", :js, type: :system do
     click_button "+ Add another color"
     type_into("#bike_tertiary_frame_color_id", "Green")
     click_combobox_option("Green")
+    fill_in_verified "bike[frame_size_number]", with: "18"
+    find_field("bike[frame_size_number]").send_keys(:tab)
+    expect(page).to have_select("bike[frame_size_unit]", selected: "inches")
+    expect(page).to have_content("That looks like inches not cm, so we switched it.")
+    expect(find("label", text: "M", exact_text: true)).to have_ancestor("div", style: {opacity: "0.6"})
+    click_button "Change back"
+    expect(page).to have_select("bike[frame_size_unit]", selected: "cm")
+    expect(page).to have_no_content("so we switched it")
     find("label", text: "M", exact_text: true).click
-    select "cm", from: "bike[frame_size_unit]"
+    expect(find_field("bike[frame_size_number]")).to have_ancestor("div", style: {opacity: "0.6"})
+    expect(find("label", text: "M", exact_text: true)).to have_no_ancestor("div", style: {opacity: "0.6"})
+    select "inches", from: "bike[frame_size_unit]"
     check "Missing serial"
     # Hidden rather than removed, so "unknown" still submits
     expect(page).to have_no_field("bike[serial_number]")
@@ -159,8 +209,9 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_field("bike_tertiary_frame_color_id", with: "Green")
     expect(page).to have_no_button("+ Add another color")
     expect(find("input[name='bike[frame_size]'][value='m']", visible: :all)).to be_checked
+    expect(find_field("bike[frame_size_number]")).to have_ancestor("div", style: {opacity: "0.6"})
     # A select always has a value, so it restores from the draft rather than the server default
-    expect(page).to have_select("bike[frame_size_unit]", selected: "cm")
+    expect(page).to have_select("bike[frame_size_unit]", selected: "inches")
     # The restored missing serial hides the input again and re-reveals the made-without link
     expect(page).to have_no_field("bike[serial_number]")
     expect(page).to have_field("bike[serial_number]", with: "unknown", visible: :all)
@@ -239,6 +290,7 @@ RSpec.describe "Register flow", :js, type: :system do
     # The emailed link lands on the interstitial, which waits for a click - confirming
     # proves the address, which leaves the theft it's reporting to tell us about
     visit confirmation_link
+    check "I agree to Bike Index's Terms of Service"
     click_button "Continue"
 
     expect(page).to have_content("Report your stolen bike", wait: 10)
@@ -268,7 +320,8 @@ RSpec.describe "Register flow", :js, type: :system do
     fill_in "report[address_record_attributes][street]", with: "278 Broadway"
     fill_in "report[address_record_attributes][city]", with: "New York"
     # The whole address is required alongside the street and city the server checks
-    select state.name, from: "report[address_record_attributes][region_record_id]"
+    type_into("#report_address_record_attributes_region_record_id", state.abbreviation)
+    click_combobox_option(state.name)
     fill_in "report[address_record_attributes][postal_code]", with: "10007"
 
     click_button "Complete Bike Registration"
@@ -291,15 +344,78 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_css("li.completed-item", text: "Report theft on Bike Index")
     expect(page).to have_link("your Police Report Number")
 
-    # An account nobody signed up for, so the terms are the first thing it's asked
+    # The terms were agreed to with the link, so the account goes straight in
     visit "/my_account"
-    check "user_terms_of_service"
-    click_button "Submit"
-
     expect(page).to have_current_path("/my_account", wait: 5)
     user = User.last
     expect(user).to have_attributes(email: owner_email, confirmed: true, terms_of_service: true)
     expect(bike.creator_id).to eq user.id
+  end
+
+  it "picks the model from its manufacturer's Bike Book models, filling in its year and showing its stock photo" do
+    sync_bikebook_models
+    Autocomplete::Loader.load_all(%w[Manufacturer])
+    serve_bikebook_catalog(photos: true)
+    visit "/register/new"
+    type_into("#b_param_manufacturer_id", "Specialized")
+    click_combobox_option("Specialized")
+    fill_in "b_param[owner_email]", with: owner_email
+    click_button "Next"
+    expect(page).to have_content("Add your bike", wait: 10)
+
+    model = find("#bike_frame_model[role='combobox']", wait: 10)
+    type_into(model, "haul")
+    # Only the registration's manufacturer's
+    expect(page).to have_no_css("[role='option']", text: "Segway")
+    retry_on_detach { find("[role='option']", text: "Specialized Haul ST").click }
+    photo = "[data-register--model-lookup-target='photo'] img"
+    expect(page).to have_css("#{photo}[src$='/specialized/2025/haul-st.png']")
+    # The field names the pick on a line, rather than as the option's photo and price
+    overlay = "[data-controller~='register--model-lookup'] [data-ui--forms--combobox-display-target='overlay']"
+    expect(page).to have_css(overlay, exact_text: "Specialized Haul ST current")
+    expect(page).to have_no_css("#{overlay} img", visible: :all)
+    # The newest year it was sold, through its newest record as it's current
+    expect(page).to have_field("Model year", with: "2026")
+
+    # A year the catalog has no record of says so in place of the photo, as the catalog may not have all its years
+    unknown_year = "We don't have the details for that year of that model."
+    fill_in "Model year", with: "2020"
+    expect(page).to have_no_css(photo)
+    expect(page).to have_content(unknown_year)
+    fill_in "Model year", with: "2025"
+    expect(page).to have_css(photo)
+    expect(page).to have_no_content(unknown_year)
+
+    # Typed over, it's the text that submits, so the pick's name and photo go
+    type_into(model, "Haul ST custom")
+    find("h1", text: "Add your bike").click
+    expect(page).to have_no_css(overlay)
+    expect(page).to have_no_css(photo)
+    expect(page).to have_field("bike_frame_model", with: "Haul ST custom")
+    expect(page).to have_field("Model year", with: "2025")
+
+    type_into(model, "fuse")
+    retry_on_detach { find("[role='option']", text: "Specialized Fuse FOUR").click }
+    expect(page).to have_css("#{photo}[src$='/specialized/2007/fuse-four.jpg']")
+    expect(page).to have_field("Model year", with: "2007")
+    fill_in "Model year", with: "2008"
+
+    # Restored from the draft, the pick shows its name, and its photo for its year, rather than the catalog id it submits
+    visit page.current_url
+    expect(page).to have_css("#bike_frame_model[role='combobox']", wait: 10)
+    expect(page).to have_field("bike_frame_model", with: "Specialized Fuse FOUR (2007)")
+    expect(page).to have_field("Model year", with: "2008")
+    expect(page).to have_no_css(photo)
+    expect(page).to have_content(unknown_year)
+
+    type_into("#bike_primary_frame_color_id", "Red")
+    click_combobox_option("Red")
+    fill_in_verified "bike[serial_number]", with: "SERIAL9"
+    fill_in_verified "bike[user_name]", with: user_name
+    click_button "Complete Bike Registration"
+
+    expect(page).to have_css("h1", text: "Progress saved", wait: 10)
+    expect(BParam.last.bike).to include("frame_model" => "Fuse FOUR", "year" => "2008")
   end
 
   # form-persist announces its restore once, and controllers are lazily loaded - so a
@@ -521,7 +637,8 @@ RSpec.describe "Register flow", :js, type: :system do
         click_combobox_option("Red")
         fill_in_verified "bike[serial_number]", with: "R2UP1234"
         click_button "Complete Bike Registration"
-        expect(page).to have_content("Registration complete")
+        # Attaching the blob reads its first bytes back from R2 to identify it, inside the submit
+        expect(page).to have_content("Registration complete", wait: 15)
 
         public_image = Bike.last.public_images.first
         expect(public_image.file.attached?).to be_truthy

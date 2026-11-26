@@ -9,19 +9,15 @@ module Pages
         # search (search_page) the header also carries the view switcher and the export, the
         # cards and list views swap the table for cards or rows, and the card renders inside
         # the results turbo-frame, so every search brings it back whole.
+        #
+        # With impound_records it's the impound records search's: its rows are the records, and
+        # its actions (in place of the export) and below_header open their multi-update form.
         class Component < ApplicationComponent
-          # With the card, once twfullbleed takes it to one column: out past the org layout's 15px
-          # .container-fluid padding to the page's edges
-          TABLE_BLEED_CLASSES = "tw:@max-[672px]/twwiderow:-mx-[15px]"
+          renders_one :actions
+          renders_one :below_header
 
           # Display order, and the first is what search_result_view falls back to
           RESULT_VIEWS = %i[table list cards].freeze
-
-          # The table's is BikesTable, rendered with its column settings
-          RESULT_COMPONENTS = {
-            list: Pages::Org::SearchResults::BikeListItem::Component,
-            cards: Pages::Org::SearchResults::BikeCard::Component
-          }.freeze
 
           def self.permitted_result_view(result_view)
             view = result_view&.to_sym
@@ -34,7 +30,7 @@ module Pages
             per_page:,
             params:,
             bikes: [],
-            current_user: nil,
+            impound_records: nil,
             interpreted_params: {},
             sort_state: ComponentStructs::SortState.new,
             search_stickers: nil,
@@ -50,8 +46,8 @@ module Pages
           )
             @organization = organization
             @pagy = pagy
-            @bikes = bikes
-            @current_user = current_user
+            @bikes = impound_records&.map(&:bike) || bikes
+            @impound_records = impound_records
             @interpreted_params = interpreted_params
             @sort_state = sort_state
             @per_page = per_page
@@ -97,36 +93,35 @@ module Pages
               search_address: @search_address,
               search_status: @search_status,
               search_unregisteredness: @search_unregisteredness,
-              search_all: @search_all
+              search_all: @search_all,
+              impound: !@impound_records.nil?
             )
           end
 
-          # On the search page the .twwiderow holding the card supplies the gap above it and is
-          # the container twfullbleed reads, and search-results-card is what the results frame
-          # reads to leave this card standing while it loads; elsewhere the card stands alone
+          # On the search page the .twwiderow holding the card supplies the gap above it, and
+          # search-results-card is what the results frame reads to leave this card standing while
+          # it loads; elsewhere the card stands alone
           def card_classes
-            ["org-search-component tw:rounded-xl", UI::Card::Component::BASE_CLASSES,
-              @search_page ? "search-results-card tw:twfullbleed" : "tw:mt-4"].join(" ")
+            ["org-search-component", UI::Table::InCard::Component::CARD_CLASSES,
+              @search_page ? "search-results-card" : "tw:mt-4"].join(" ")
           end
 
           def table_clip_classes
-            ["tw:overflow-hidden", results_swap_class, (TABLE_BLEED_CLASSES if @search_page)].compact.join(" ")
+            ["tw:overflow-hidden tw:table-bleed:-mx-(--gutter)", results_swap_class].compact.join(" ")
           end
 
           # The rows hide for the spinner above them while the frame they render in is busy
           def results_swap_class = ("tw:group-[[busy]]:hidden" if @search_page)
-
-          # Full bleed drops the card's gutter, so the header and cards meet the chart's edge
-          def padding_x_class = @search_page ? "tw:@min-[672px]/twwiderow:px-4" : "tw:px-4"
 
           # Built here rather than on the settings struct, which route helpers never reach
           def export_path
             organization_registrations_path(settings.search_params.merge(create_export: true))
           end
 
-          # Only the search page offers the view switcher, so it's the only place cards or rows render
+          # Only the search page offers the view switcher, so it's the only place cards or rows
+          # render - and :table isn't one of Container's, which is what sends it to BikesTable
           def result_component
-            RESULT_COMPONENTS[@result_view] if @search_page
+            SharedBlocks::SearchResults::Container::Component::RESULT_VIEW_COMPONENT[@result_view] if @search_page
           end
 
           # The cards and rows have no headers to sort by, so their views name the order
@@ -150,9 +145,9 @@ module Pages
             end
           end
 
+          # The search this card renders in, which the impound records search shares
           def result_view_path(result_view)
-            organization_registrations_path(@organization.to_param,
-              @sort_state.search_params.except(:organization_id).merge(search_result_view: result_view))
+            url_for(@sort_state.search_params.merge(organization_id: @organization.to_param, search_result_view: result_view))
           end
 
           def show_pagination?
@@ -162,9 +157,8 @@ module Pages
           # The search page declares org--search itself, on a div spanning the form and the
           # chart as well as this card
           def card_data_attributes
-            return Pages::Org::Search::ColumnSettings::Component::COLLAPSE_DATA if @search_page
-
-            Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(settings, collapse: true)
+            Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(controllers: ("org--search" unless @search_page),
+              impound: !@impound_records.nil?).merge(table_bleed: false)
           end
         end
       end

@@ -24,50 +24,29 @@
   - else
     Registrations
   = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
-.full-screen-table.mt-4
-  %table.table.table-striped.table-bordered.table-sm
-    %tbody
-      %tr
-        %td Registered with #{current_organization.name}
-        %td= number_with_delimiter(@bikes_in_organization_count)
-      - if current_organization.enabled?("claimed_ownerships")
-        -# %tr
-        -#   %td Registrations sent to new owners
-        -#   %td= number_with_delimiter(@ownerships_to_new_owner.count)
-        %tr
-          %td Registrations claimed by their owners
-          %td= number_with_delimiter(@claimed_ownerships.count)
-      %tr
-        %td
-          Ever registered
-          %span.less-strong
-            (including deleted
-            - if current_organization.enabled?("graduated_notifications")
-              and graduated
-            registrations)
-            %em.small not shown in the chart or above totals
-        %td= number_with_delimiter(@bikes_ever_registered_count)
-      - if current_organization.parent?
-        %tr
-          %td Registered by related organizations
-          %td= number_with_delimiter(@bikes_in_child_organizations_count)
-      - if current_organization.regional?
-        - if current_organization.regional_ids.any?
-          %tr
-            %td
-              Registered by local bike shops or other organizations
-            %td= number_with_delimiter(@bikes_in_nearby_organizations_count)
-        %tr
-          %td Self-registered nearby, not registered with an organization
-          %td= number_with_delimiter(@bikes_in_region_not_in_organizations_count)
-        %tr
-          %td
-            %strong
-              Total registrations
-          %td
-            %strong
-              - total_bikes = @bikes_in_organizations.count(:all) + @bikes_not_in_organizations.count(:all)
-              = number_with_delimiter(total_bikes)
+.mt-4
+  = render(UI::Table::List::Component.new(wide_definition: true)) do |list|
+    - list.with_row(label: "Registered with #{current_organization.name}", value: number_display(@bikes_in_organization_count))
+    - if current_organization.enabled?("claimed_ownerships")
+      -# - list.with_row(label: "Registrations sent to new owners", value: number_display(@ownerships_to_new_owner.count))
+      - list.with_row(label: "Registrations claimed by their owners", value: number_display(@claimed_ownerships.count))
+    - ever_registered_label = capture do
+      Ever registered
+      %span.less-strong
+        (including deleted
+        - if current_organization.enabled?("graduated_notifications")
+          and graduated
+        registrations)
+        %em.small not shown in the chart or above totals
+    - list.with_row(label: ever_registered_label, value: number_display(@bikes_ever_registered_count))
+    - if current_organization.parent?
+      - list.with_row(label: "Registered by related organizations", value: number_display(@bikes_in_child_organizations_count))
+    - if current_organization.regional?
+      - if current_organization.regional_ids.any?
+        - list.with_row(label: "Registered by local bike shops or other organizations", value: number_display(@bikes_in_nearby_organizations_count))
+      - list.with_row(label: "Self-registered nearby, not registered with an organization", value: number_display(@bikes_in_region_not_in_organizations_count))
+      - total_bikes = @bikes_in_organizations.count(:all) + @bikes_not_in_organizations.count(:all)
+      - list.with_row(label: tag.strong("Total registrations"), value: tag.strong(number_display(total_bikes)))
 
   - if current_organization.regional?
     %small.less-strong.d-md-block{ style: "display: none; padding: 0.25rem 0.5rem; margin: -1rem 0 0 0;" }
@@ -80,47 +59,30 @@
     Registrations by related organizations
     = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
   - render_regional_nearby = current_organization.child_organizations.first.regional?
-  .full-screen-table.mt-4
-    %table.table.table-striped.table-bordered.table-sm
-      %thead
-        %th Organization
-        %th.small Signed up
-        - if render_regional_nearby
-          %th Registered with org
-          %th Registered in area
-        - else
-          %th Bikes
-      %tbody
-        - current_organization.child_organizations.reorder(:name).each do |organization|
-          %tr
-            %td
-              = link_to organization.name, organization_dashboard_index_path(organization_id: organization.to_param)
-            %td
-              %small.localizeTime= l(organization.created_at, format: :convert_time)
-            %td
-              = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
-            - if render_regional_nearby
-              %td
-                = number_with_delimiter(organization.nearby_bikes.where(created_at: @time_range).count)
+  .mt-4
+    - time_range = @time_range
+    = render(UI::Table::Base::Component.new(records: current_organization.child_organizations.reorder(:name))) do |table|
+      - table.column(label: "Organization") do |organization|
+        = link_to organization.name, organization_dashboard_index_path(organization_id: organization.to_param), class: "twlink"
+      - table.column(label: "Signed up", header_classes: "tw:text-xs") do |organization|
+        %small= render(UI::Time::Component.new(time: organization.created_at))
+      - table.column(label: render_regional_nearby ? "Registered with org" : "Bikes") do |organization|
+        = number_display(organization.bikes.where(created_at: time_range).count)
+      - if render_regional_nearby
+        - table.column(label: "Registered in area") do |organization|
+          = number_display(organization.nearby_bikes.where(created_at: time_range).count)
 
 - if current_organization.nearby_organizations.any?
   = render(UI::Header::Component.new(tag: :h3, html_class: "uncap mt-4")) do
     Registrations by local bike shops or other organizations
     = render(UI::TimeRange::Component.new(time_range: @time_range, period: @period))
-  .full-screen-table.mt-4
-    %table.table.table-striped.table-bordered.table-sm
-      %thead
-        %th Organization
-        %th.small Signed up
-        %th Bikes
-      %tbody
-        - current_organization.nearby_organizations.reorder(:name).each do |organization|
-          %tr
-            %tr
-              %td
-                = organization.name
-              %td
-                %small.localizeTime= l(organization.created_at, format: :convert_time)
-              %td
-                = number_with_delimiter(organization.bikes.where(created_at: @time_range).count)
+  .mt-4
+    - time_range = @time_range
+    = render(UI::Table::Base::Component.new(records: current_organization.nearby_organizations.reorder(:name))) do |table|
+      - table.column(label: "Organization") do |organization|
+        = organization.name
+      - table.column(label: "Signed up", header_classes: "tw:text-xs") do |organization|
+        %small= render(UI::Time::Component.new(time: organization.created_at))
+      - table.column(label: "Bikes") do |organization|
+        = number_display(organization.bikes.where(created_at: time_range).count)
 

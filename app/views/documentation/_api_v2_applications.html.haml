@@ -13,73 +13,47 @@
       .application-info.initially-hidden
         - v2_accessor = application.access_tokens.where(resource_owner_id: ENV['V2_ACCESSOR_ID']).first
         - if v2_accessor.present? && current_user.has_organization_role?
-          %table.table.tokens-table
-            %thead
-              %th
-                Permanent bike creation token
-                %span.less-strong
-                  use to create bikes for
-                  = current_user.organizations.map(&:name).to_sentence
+          - permanent_token_header = capture do
+            Permanent bike creation token
+            %span.less-strong
+              use to create bikes for
+              = current_user.organizations.map(&:name).to_sentence
 
-                %br
-                %em.less-strong
-                  ** You must include an 
-                  %code
-                    organization_slug
-                  when creating a bike to use this token **
-              %th
-                Scopes
-              %th
-            %tbody
-              %td
-                %pre
-                  = v2_accessor.token
-              %td
-                %code 
-                  write_bikes
-              %td
-                %a.set-token.btn.binxbtn-primary{href: '#', data: {token: v2_accessor.token }}
-                  Use token
-        %table.table.padded
-          %tbody
-            %tr
-              %td
-                ID:
-              %td
-                = application.uid
-            %tr
-              %td
-                Secret:
-              %td
-                = application.secret
+            %br
+            %em.less-strong
+              ** You must include an
+              %code
+                organization_slug
+              when creating a bike to use this token **
+          = render(UI::Table::Base::Component.new(records: [v2_accessor], classes: "tokens-table")) do |table|
+            - table.column(label: permanent_token_header) do |accessor|
+              %pre
+                = accessor.token
+            - table.column(label: "Scopes") do
+              %code
+                write_bikes
+            - table.column do |accessor|
+              %a.set-token.btn.binxbtn-primary{href: '#', data: {token: accessor.token }}
+                Use token
+        = render(UI::Table::List::Component.new) do |list|
+          - list.with_row(label: "ID:", value: application.uid)
+          - list.with_row(label: "Secret:", value: application.secret)
         - tokens = application.access_tokens.where(resource_owner_id: current_user.id).where('revoked_at IS NULL').select{ |t| t.expired? != true }
         - if tokens.present?
-          %table.table.tokens-table
-            %thead
-              %tr
-                %th
-                  Access token
-                %th
-                  Scopes
-                %th
-                %th
-            %tbody
-              - tokens.each do |token|
-                - next if token.expired?
-                %tr
-                  %td
-                    %pre
-                      = token.token
-                  %td
-                    - token.scopes.each do |s|
-                      %code 
-                        = s
-                  %td
-                    %a.set-token.btn.binxbtn-primary{href: '#', data: {token: token.token }}
-                      Use token
-                    = form_tag oauth_authorized_application_path(application), class: 'pull-right' do
-                      %input{:name => "_method", :type => "hidden", :value => "delete"}/
-                      = submit_tag 'Delete', onclick: "return confirm('Are you sure?')", class: 'btn binxbtn-danger'
+          = render(UI::Table::Base::Component.new(records: tokens, classes: "tokens-table")) do |table|
+            - table.column(label: "Access token") do |token|
+              %pre
+                = token.token
+            - table.column(label: "Scopes") do |token|
+              - token.scopes.each do |s|
+                %code
+                  = s
+            - table.column do |token|
+              %a.set-token.btn.binxbtn-primary{href: '#', data: {token: token.token }}
+                Use token
+              = form_tag oauth_authorized_application_path(application), class: 'pull-right' do
+                %input{:name => "_method", :type => "hidden", :value => "delete"}/
+                = submit_tag 'Delete', onclick: "return confirm('Are you sure?')", class: 'btn binxbtn-danger'
           %p
             Refresh token:
             %code
@@ -107,8 +81,8 @@
                   %a.authorize_new_token_link{ href: url, data: {base: url}}
                     = url
           - else
-            .alert.alert-danger.margined
-              This application doesn't have the documentation URL as a redirect, so  you can't create tokens for it here. #{link_to "Add the documentation URL", edit_oauth_application_url(application)} as a redirect url if you would like to be able to.
+            = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mt-5 tw:mb-4")) do
+              This application doesn't have the documentation URL as a redirect, so  you can't create tokens for it here. #{link_to "Add the documentation URL", edit_oauth_application_url(application), class: "twlink-underlined"} as a redirect url if you would like to be able to.
           - if application.is_internal
-            .alert.alert-warning.margined
+            = render(UI::Alerts::Base::Component.new(kind: :warning, margin_classes: "tw:mt-5 tw:mb-4")) do
               This application is <em>internal</em> which means it doesn't require authorization by users. They will be passed directly back to the application redirect.

@@ -18,7 +18,7 @@ RSpec.describe SharedBlocks::MainContent::OrganizedShopIntegrationAlert::Compone
     expect(component).to have_link "Integrate Bike Index with Ascend", href: ascend_path
     expect(component).to have_link "Integrate Bike Index with Shopify",
       href: new_shopify_integration_path(organization_id: organization.to_param)
-    expect(component).to have_link "Add a bike",
+    expect(component).to have_link "Add a registration",
       href: new_organization_bike_path(organization_id: organization.to_param)
   end
 
@@ -44,7 +44,7 @@ RSpec.describe SharedBlocks::MainContent::OrganizedShopIntegrationAlert::Compone
     let(:action_name) { "new" }
 
     it "shows a static message instead of linking to itself" do
-      expect(component).to_not have_link "Add a bike"
+      expect(component).to_not have_link "Add a registration"
       expect(component.text).to include "You're already viewing this page"
     end
   end

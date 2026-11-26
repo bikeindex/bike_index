@@ -3,7 +3,7 @@
 
 # Clean up workspace-specific resources for this checkout: stops bin/dev,
 # drops postgres databases whose names end in `_<workspace_id>` (optionally
-# followed by `_replica` and/or a single digit 1-8 for parallel test DBs),
+# followed by `_replica` and/or the TEST_ENV_NUMBER of a parallel test DB),
 # soft-deletes the row in dev_workspaces.workspace_ids (so the ID can be
 # reused after DELETED_REUSE_DELAY in bin/workspace_setup), and deletes
 # .workspace_id.
@@ -60,16 +60,29 @@ if listener_pid
   end
 end
 
-# Discover postgres databases tied to this workspace_id.
-databases = psql("postgres", "SELECT datname FROM pg_database WHERE datname ~ '_#{workspace_id}(_replica)?[1-8]?$' ORDER BY datname")
+# Discover postgres databases tied to this workspace_id. config/database.yml
+# appends TEST_ENV_NUMBER straight onto the id with no separator, so a parallel
+# test DB ends in any run of digits — one process per core, well past 8.
+candidates = psql("postgres", "SELECT datname FROM pg_database WHERE datname ~ '_#{workspace_id}(_replica)?[0-9]*$' ORDER BY datname")
   .split("\n").map(&:strip).reject(&:empty?)
 
+# Which makes `_<id><n>` indistinguishable from workspace `<id><n>`'s own base
+# database, so leave anything another registered workspace owns alone.
+other_ids = psql(WORKSPACE_DB, "SELECT id FROM workspace_ids WHERE id <> #{workspace_id}")
+  .split("\n").map(&:strip).reject(&:empty?)
+databases = candidates.reject { |db| other_ids.any? { |id| db.match?(/_#{id}(_replica)?\z/) } }
+
+undropped = []
 if databases.empty?
   log_line("No databases found matching workspace_id #{workspace_id}")
 else
   databases.each do |db|
     log_line("Dropping database: #{db}")
-    system("dropdb", "--if-exists", db, out: File::NULL, err: File::NULL)
+    # --force: a leftover console or test process holding a connection would
+    # otherwise block the drop, and this workspace is going away regardless.
+    next if system("dropdb", "--force", "--if-exists", db, out: File::NULL, err: File::NULL)
+    undropped << db
+    log_line("  FAILED to drop #{db}")
   end
 end
 
@@ -77,5 +90,10 @@ log_line("Soft-deleting workspace_ids row: #{workspace_id}")
 psql(WORKSPACE_DB, "UPDATE workspace_ids SET deleted_at = NOW() WHERE id = #{workspace_id}")
 
 FileUtils.rm_f(WORKSPACE_FILE)
+
+if undropped.any?
+  log_line("Workspace teardown finished, but #{undropped.count} database(s) survived: #{undropped.join(", ")}")
+  exit 1
+end
 
 log_line("Workspace teardown complete!")

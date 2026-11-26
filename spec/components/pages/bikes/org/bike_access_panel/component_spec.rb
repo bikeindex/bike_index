@@ -116,8 +116,8 @@ RSpec.describe Pages::Bikes::Org::BikeAccessPanel::Component, type: :component d
       let!(:parking_notification) { FactoryBot.create(:parking_notification_organized, organization:, bike:, user: current_user) }
 
       it "renders a row in each table" do
-        expect(component).to have_css("table.ui-table", count: 2)
-        expect(component).to have_css("table.ui-table tbody tr", count: 2)
+        expect(component).to have_css("table.ui-table:not(.ui-table-list)", count: 2)
+        expect(component).to have_css("table.ui-table:not(.ui-table-list) tbody tr", count: 2)
         expect(component).to have_content(graduated_notification.bike.title_string)
         expect(component).to have_content(parking_notification.kind_humanized)
       end

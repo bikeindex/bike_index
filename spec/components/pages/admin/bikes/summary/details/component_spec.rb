@@ -10,13 +10,14 @@ RSpec.describe Pages::Admin::Bikes::Summary::Details::Component, type: :componen
   # The row's own label - matching on a value risks colliding with a factory sequence
   # somewhere else in the summary, which is how the phone assertion used to fail on CI
   def row_labels
-    component.css("table.table-list tr td:first-child").map { |td| td.text.squish }
+    component.css("table.ui-table-list th[scope=row]").map { |th| th.text.squish }
   end
 
   it "renders the owner and creation, and no dev rows" do
     expect(component).to have_content("owner@bikeindex.org")
     expect(component).to have_content("self reg")
     expect(component).to_not have_content("status:")
+    expect(component).to have_link("No Image", href: "/bikes/#{bike.id}?organization_id=false")
   end
 
   context "with display_dev_info" do
@@ -29,12 +30,35 @@ RSpec.describe Pages::Admin::Bikes::Summary::Details::Component, type: :componen
     end
   end
 
+  context "impounded, held at a location" do
+    let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york) }
+    let!(:impound_record) { FactoryBot.create(:impound_record_with_organization, :with_address_record, bike:, location:) }
+
+    it "renders where it was impounded from, not where it's held" do
+      expect(impound_record.reload.address_record_id).to eq location.address_record_id
+      bike.reload
+      expect(component).to have_content("Chicago")
+      expect(component).not_to have_content("New York")
+    end
+  end
+
   context "with a creation organization" do
     let(:bike) { FactoryBot.create(:bike_organized, owner_email: "owner@bikeindex.org") }
 
     it "links it instead of the creator" do
       expect(component).to have_link(bike.creation_organization.name)
       expect(component.css("small").map { |e| e.text.strip }).to_not include "self reg"
+    end
+  end
+
+  context "registered from the iOS app" do
+    let(:bike) do
+      FactoryBot.create(:bike, :with_ownership, creation_state_origin: "api_v3",
+        creation_registration_info: {ios_version: "1.6.9"})
+    end
+
+    it "renders the iOS version" do
+      expect(component.css("small").map { |e| e.text.squish }).to include "iOS 1.6.9"
     end
   end
 

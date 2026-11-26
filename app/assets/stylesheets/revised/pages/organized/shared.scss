@@ -12,25 +12,9 @@ hr.delete-organization-section {
   }
 }
 
-.ambassador-tasks-table {
-  td p {
-    display: inline;
-  }
-}
-
 .organized-body {
   h2 {
     margin-top: 40px;
   }
   .modal h2 { margin-top: 0; }
-}
-
-.organization-wide-alert {
-  @extend .alert-info;
-  margin: 0 auto 40px;
-  p,
-  ul {
-    color: $body-font-color;
-    margin-bottom: 0;
-  }
 }

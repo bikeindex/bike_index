@@ -60,7 +60,7 @@ require it, and only reload_database accepts sandbox.
 Examples:
   bin/kamal_review app logs -f                       # sandbox (default)
   bin/kamal_review app logs -f --app 3594
-  bin/kamal_review app exec --reuse "bin/rails runner 'puts Bike.count'" --app pr-3594
+  bin/kamal_review app exec --reuse --roles web "bin/rails runner 'puts Bike.count'" --app pr-3594   # without --roles, once per role
   bin/kamal_review accessory reboot db --app 0       # accessories live in the pr-* config
   bin/kamal_review deploy  --app 3594 --version pr-3594-abc123
   bin/kamal_review destroy --app 3594

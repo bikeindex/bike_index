@@ -16,7 +16,7 @@ module Atoms
           locals: {badges: status_bikes.values.zip(times).map { |bike, time| {bike:, time:} }})
       end
 
-      # @param size select { choices: [xs, sm, md, lg] }
+      # @param size select { choices: [xs, sm, md, lg, inherit] }
       def sizes(size: "lg")
         render(Atoms::RegistrationStatusBadge::Component.new(bike: status_bikes[:stolen], size: size&.to_sym))
       end

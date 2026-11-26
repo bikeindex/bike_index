@@ -69,8 +69,23 @@ RSpec.describe OrgPublic::ImpoundedBikesController, type: :request do
 
       # Also test that we can view the bike!
       get "/bikes/#{bike.to_param}"
+      expect(response).to redirect_to(registration_path(bike))
+      follow_redirect!
       expect(response.status).to eq(200)
-      expect(response).to render_template :show
+    end
+
+    context "impound record held at a location" do
+      let(:location) { FactoryBot.create(:location, :with_address_record, address_in: :new_york, organization: current_organization) }
+      let!(:impound_record) { FactoryBot.create(:impound_record, :with_address_record, organization: current_organization, location:) }
+      let!(:bike) { impound_record.bike }
+
+      it "shows where it was impounded from, not where it's held" do
+        expect(impound_record.reload.address_record_id).to eq location.address_record_id
+        get base_url
+        expect(response.body).to include("Chicago, IL 60608")
+        expect(response.body).not_to include("1300 W 14th Pl")
+        expect(response.body).not_to include("New York")
+      end
     end
   end
 end

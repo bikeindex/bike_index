@@ -30,34 +30,33 @@
 
   <div class="tw:grid tw:gap-6 tw:lg:grid-cols-3">
     <div class="tw:contents tw:lg:col-span-2 tw:lg:flex tw:lg:flex-col tw:lg:gap-6">
-      <% archive_images = @bike.public_images.select(&:image_url) %>
+      <% archive_photos = BikeServices::Displayer.photos(@bike) %>
 
-      <% if archive_images.any? %>
+      <% if archive_photos.any? %>
         <%= render(UI::Card::Component.new) do %>
-          <h2
-            class="
-              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-              tw:uppercase
-            "
-          >
+          <h2 class="tw:tweyebrow">
             <%= translation(".photo_archive") %>
           </h2>
 
           <ul class="tw:mt-3 tw:flex tw:flex-wrap tw:gap-3">
-            <% archive_images.each do |public_image| %>
-              <li>
+            <% archive_photos.each do |photo| %>
+              <%# A stock photo's badge goes beside the link rather than in it, as it's a tooltip's button %>
+              <li class="tw:relative">
                 <a
-                  href="<%= public_image.image_url %>"
+                  href="<%= photo.url %>"
                   target="_blank"
                   rel="noopener"
                   class="
-                    tw:block tw:size-24 tw:overflow-hidden tw:rounded-lg
-                    tw:border tw:border-gray-200 tw:transition
-                    tw:hover:border-[#715eb2] tw:dark:border-gray-700
+                    tw:block tw:size-24 tw:overflow-hidden tw:rounded-lg tw:border tw:border-gray-200 tw:transition tw:hover:border-[#715eb2] tw:dark:border-gray-700
+                    <%= "tw:bg-white" if photo.stock %>
                   "
                 >
-                  <%= image_tag(public_image.image_url(:small), alt: public_image.image_alt, class: "tw:size-full tw:object-cover") %>
+                  <%= image_tag(photo.small_url, alt: photo.alt || translation(".stock_photo", bike_type: @bike.type_titleize), class: ["tw:size-full", photo.stock ? "tw:object-contain" : "tw:object-cover"]) %>
                 </a>
+
+                <% if photo.stock %>
+                  <%= render(Atoms::StockPhotoBadge::Component.new(bike: @bike, display: :word, html_class: "tw:absolute tw:bottom-1 tw:left-1")) %>
+                <% end %>
               </li>
             <% end %>
           </ul>
@@ -77,12 +76,7 @@
 
       <% if @bike.description.present? %>
         <%= render(UI::Card::Component.new(additional_classes: "tw:order-6 tw:lg:order-none")) do %>
-          <h2
-            class="
-              tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-              tw:uppercase
-            "
-          >
+          <h2 class="tw:tweyebrow">
             <%= translation(".about_this_bike", bike_type: @bike.type) %>
           </h2>
 
@@ -107,12 +101,7 @@
 
     <div class="tw:contents tw:lg:flex tw:lg:flex-col tw:lg:gap-6">
       <%= render(UI::Card::Component.new(additional_classes: "tw:order-1 tw:lg:order-none")) do %>
-        <h2
-          class="
-            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-            tw:uppercase
-          "
-        >
+        <h2 class="tw:tweyebrow">
           <%= translation(".owner_access") %>
         </h2>
 
@@ -139,6 +128,19 @@
                 <% end %>
                 <% owner_reg_field_rows.each do |label, value| %>
                   <%= info_row(label, value) %>
+                <% end %>
+              <% elsif show_phone_only? %>
+                <%= info_row(translation(".owner_phone")) do %>
+                  <div
+                    data-controller="ui--collapse"
+                    data-ui--collapse-param-value="phone_shown"
+                  >
+                    <%= render(UI::Collapse::Component.new(text: translation(".show_phone"), color: :link, html_class: "tw:aria-expanded:hidden")) %>
+
+                    <div data-ui--collapse-target="content" class="tw:hidden">
+                      <%= render Atoms::Phone::Component.new(phone: owner_phone) %>
+                    </div>
+                  </div>
                 <% end %>
               <% end %>
             <% end %>
@@ -187,15 +189,11 @@
   </div>
 
   <% if show_other_registrations? %>
-    <%= render(UI::Card::Component.new) do %>
-      <%= tag.div(class: "org-search-component", data: (Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(other_registrations_settings, collapse: true) if other_registrations?)) do %>
+    <%# One column settings panel for both tables: a second would duplicate its checkbox ids %>
+    <%= tag.div(class: "org-search-component tw:flex tw:flex-col tw:gap-6", data: (Pages::Org::Search::ColumnSettings::Component.column_settings_data_attributes(controllers: "org--search") if other_registrations? || potential_duplicates_component.render?)) do %>
+      <%= render(UI::Card::Component.new(additional_classes: Pages::Registrations::Show::PotentialDuplicates::Component::CARD_CLASSES)) do %>
         <div class="tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
-          <h2
-            class="
-              tw:mb-0 tw:text-xs tw:font-bold tw:tracking-wider
-              tw:text-[#715eb2] tw:uppercase
-            "
-          >
+          <h2 class="tw:mb-0 tw:tweyebrow">
             <%= translation(".other_registrations") %>
           </h2>
 
@@ -216,22 +214,24 @@
 
         <% if other_registrations? %>
           <div class="tw:mt-3">
-            <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings: other_registrations_settings)) %>
+            <%= render(Pages::Org::Search::ColumnSettings::Component.new(settings: search_settings)) %>
           </div>
 
-          <div class="tw:mt-3">
-            <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, current_user: @current_user, settings: other_registrations_settings)) %>
+          <div class="<%= Pages::Registrations::Show::PotentialDuplicates::Component::TABLE_CLASSES %>">
+            <%= render(Pages::Org::SearchResults::BikesTable::Component.new(organization: @organization, bikes: recent_other_registrations, settings: search_settings)) %>
           </div>
+        <% end %>
+
+        <% if more_other_registrations? %>
+          <p class="tw:mt-3 tw:text-xs tw:opacity-65">
+            <%= translation(".showing_recent", count: recent_other_registrations.size) %>
+            ·
+            <%= link_to translation(".view_all_registrations"), other_registrations_search_path, class: "twlink", data: {turbo_frame: "_top"} %>
+          </p>
         <% end %>
       <% end %>
 
-      <% if more_other_registrations? %>
-        <p class="tw:mt-3 tw:text-xs tw:opacity-65">
-          <%= translation(".showing_recent", count: recent_other_registrations.size) %>
-          ·
-          <%= link_to translation(".view_all_registrations"), other_registrations_search_path, class: "twlink", data: {turbo_frame: "_top"} %>
-        </p>
-      <% end %>
+      <%= render(potential_duplicates_component) %>
     <% end %>
   <% end %>
 
@@ -251,6 +251,4 @@
       <% end %>
     <% end %>
   <% end %>
-
-  <%= render(Pages::Registrations::Show::LegacyViewLink::Component.new(bike: @bike, current_user: @current_user)) %>
 </div>

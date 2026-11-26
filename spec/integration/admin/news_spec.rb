@@ -21,8 +21,13 @@ RSpec.describe "Admin news", :js, type: :system do
     expect(find_field("blog_content_tag_names")[:validationMessage]).to be_present
     expect(blog.reload.content_tag_names).to eq([])
 
-    find_field("blog_content_tag_names").click
+    tags_field = find_field("blog_content_tag_names")
+    tags_field.click
     find('[role="option"]', text: "Partners").click
+    tags_field.click
+    # a press on the field beside its chips leaves the open listbox's input focused
+    tags_field.ancestor(".hw-combobox__main__wrapper").click(x: 4, y: 4, offset: :top_left)
+    expect(page).to have_field("blog_content_tag_names", focused: true)
     find('[role="option"]', text: "Theft prevention").click
     find('[aria-label="Remove Partners"]').click
     send_keys(:escape)

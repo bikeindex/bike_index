@@ -74,6 +74,8 @@ RSpec.describe UI::Modal::Component, :js, type: :system do
   it "opens and closes through the controller's listeners without invoker commands" do
     emulate_browser_without_invoker_commands
     visit("/rails/view_components/ui/modal/component/default")
+    # without invoker commands, a click before the lazy loaded controller connects opens nothing
+    wait_for_stimulus("ui--modal")
 
     expect_settings_modal_opens_and_closes
   end

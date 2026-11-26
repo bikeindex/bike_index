@@ -5,13 +5,14 @@ RSpec.describe Admin::SocialAccountsController, type: :request, vcr: true do
   include_context :request_spec_logged_in_as_superuser
 
   describe "index" do
-    let!(:social_account) { FactoryBot.create(:social_account, account_info: {name: "Some account"}) }
+    let!(:social_account) { FactoryBot.create(:social_account, :in_nyc, account_info: {name: "Some account"}) }
 
     it "renders" do
       get base_url
       expect(response).to be_ok
       expect(response).to render_template(:index)
       expect(response.body).to include(social_account.screen_name)
+      expect(response.body).to include("278 Broadway, New York, NY 10007")
     end
   end
 
@@ -39,6 +40,17 @@ RSpec.describe Admin::SocialAccountsController, type: :request, vcr: true do
       expect(social_account.append_block).to eq "Something special"
       expect(social_account.errored?).to be_truthy
       expect(social_account.active).to be_falsey
+    end
+
+    it "updates the location" do
+      state = FactoryBot.create(:state_new_york)
+      patch "#{base_url}/#{social_account.id}",
+        params: {
+          check_credentials: "0",
+          social_account: {street: "278 Broadway", city: "New York", region_record_id: state.id, country: "US"}
+        }
+      expect(social_account.reload).to have_attributes(street: "278 Broadway", city: "New York",
+        region_record_id: state.id, country_id: Country.united_states_id)
     end
     context "switching to active" do
       let(:platform_client) { OpenStruct.new(verify_credentials: false) }

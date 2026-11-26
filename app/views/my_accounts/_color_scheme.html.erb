@@ -1,0 +1,9 @@
+<%# locals: (color_scheme:) %>
+<div class="form-group row unnested-field">
+  <label class="form-well-label"><%= t(".appearance") %></label>
+
+  <%# dirtyignore keeps dirtyForms' leave-page prompt off fields that save as they're picked %>
+  <div class="form-well-input dirtyignore">
+    <%= render(SharedBlocks::ColorSchemePicker::Component.new(color_scheme:, url: my_account_path)) %>
+  </div>
+</div>

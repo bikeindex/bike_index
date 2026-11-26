@@ -11,11 +11,11 @@ module Pages
             # Parking-notification statuses that are still ongoing (vs replaced/retrieved/resolved)
             ACTIVE_PARKING_STATUSES = %w[current impounded].freeze
 
-            # [tile background, icon color] per action-icon tile
+            # An open panel's button is purple in both modes, so its tile keeps the light colors there
             TILES = {
-              purple: ["tw:bg-purple-100", "tw:text-purple-500"],
-              blue: ["tw:bg-[#e7f3fb]", "tw:text-blue-600"],
-              amber: ["tw:bg-[#fff8e1]", "tw:text-[#caa11a]"]
+              purple: "tw:bg-purple-100 tw:text-purple-500 tw:dark:not-in-data-[active=true]:bg-purple-500/15 tw:dark:not-in-data-[active=true]:text-purple-300",
+              blue: "tw:bg-[#e7f3fb] tw:text-blue-600 tw:dark:not-in-data-[active=true]:bg-blue-500/10 tw:dark:not-in-data-[active=true]:text-blue-300",
+              amber: "tw:bg-[#fff8e1] tw:text-[#caa11a] tw:dark:not-in-data-[active=true]:bg-yellow-300/5 tw:dark:not-in-data-[active=true]:text-yellow-600"
             }.freeze
 
             def initialize(bike:, organization:, org_role:, current_user: nil, display_dev_info: false)
@@ -66,9 +66,8 @@ module Pages
             end
 
             def action_icon(icon, tile:, html_class: nil)
-              tile_classes = TILES.fetch(tile, TILES[:purple])
-              content_tag(:span, class: "tw:col-start-1 tw:row-start-1 tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-lg #{tile_classes.first} #{html_class}") do
-                helpers.inline_svg_tag("kelsey/registration_show/#{icon}.svg", class: "tw:size-[19px] #{tile_classes.last}")
+              content_tag(:span, class: "tw:col-start-1 tw:row-start-1 tw:flex tw:size-9 tw:items-center tw:justify-center tw:rounded-lg #{TILES.fetch(tile, TILES[:purple])} #{html_class}") do
+                helpers.inline_svg_tag("kelsey/registration_show/#{icon}.svg", class: "tw:size-[19px]")
               end
             end
 
@@ -76,13 +75,25 @@ module Pages
               @bike.status_impounded?
             end
 
-            # What the submit answers to, so a panel this opens is one that's accepted.
             # Their own impound belongs to the update action below, not this one
             def contactable?
               return @contactable if defined?(@contactable)
 
-              @contactable = !impounded_by_organization? &&
-                @bike.contact_owner?(@current_user, @organization)
+              @contactable = !impounded_by_organization? && !@bike.unregistered_parking_notification? &&
+                (contact_owner? || owner_notifications_off?)
+            end
+
+            # What the submit answers to
+            def contact_owner?
+              return @contact_owner if defined?(@contact_owner)
+
+              @contact_owner = @bike.contact_owner?(@current_user, @organization)
+            end
+
+            # Only the owner's own setting stands between the viewer and contact_owner?
+            def owner_notifications_off?
+              !contact_owner? && @bike.owner.present? && !@bike.owner.notification_unstolen &&
+                @organization.enabled?("unstolen_notifications") && @current_user&.member_of?(@organization)
             end
 
             def show_impound?
@@ -111,6 +122,10 @@ module Pages
             # No point filing a new parking notification against an already-impounded bike
             def show_create_parking_notification?
               show_parking_notifications? && !impounded?
+            end
+
+            def active_parking_notification?
+              show_create_parking_notification? && active_notifications_count.positive?
             end
 
             def parking_notifications

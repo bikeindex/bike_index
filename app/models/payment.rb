@@ -31,6 +31,7 @@ class Payment < ApplicationRecord
   include Currencyable
   include Amountable
 
+  MAX_AMOUNT_CENTS = 99_999_999
   PAYMENT_METHOD_ENUM = {stripe: 0, check: 1}.freeze
   KIND_ENUM = {donation: 0, payment: 1, invoice_payment: 2, theft_alert: 3, membership_donation: 4}
 
@@ -82,7 +83,7 @@ class Payment < ApplicationRecord
     def normalize_referral_source(str)
       return nil if str.blank?
 
-      str = str.strip.downcase.gsub(/\A(https:\/\/)?bikeindex.org\W?/, "").gsub(/\/|_/, "-")
+      str = str.strip.downcase.gsub(/\A(https:\/\/)?bikeindex.org\W?/, "")
       Slugifyer.slugify(str)
     end
 
@@ -296,10 +297,10 @@ class Payment < ApplicationRecord
     if user&.stripe_id.present?
       {customer: user.stripe_id}
     else
-      email = email.presence || user&.email
-      return {} unless email.present?
+      customer_email = email.presence || user&.email
+      return {} unless customer_email.present?
 
-      {customer_email: user.email}
+      {customer_email:}
     end
   end
 end

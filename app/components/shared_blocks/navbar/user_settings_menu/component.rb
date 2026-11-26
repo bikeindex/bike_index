@@ -23,6 +23,11 @@ module SharedBlocks
           UserServices::MenuItemsAccount.for(user: @current_user_or_unconfirmed_user)
         end
 
+        # The primary menu has its own registration row below the breakpoint, so this one is desktop-only
+        def item_class(item)
+          SharedBlocks::Navbar::PrimaryMenu::Component::SIDE_CLASSES.fetch(:desktop) if item[:path] == register_path
+        end
+
         # .nav-link is the navbar's own, which the submenu's rows take with the rest of its links
         def entry(item)
           UI::ActiveLink::Component.from_item(item,

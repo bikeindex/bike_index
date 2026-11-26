@@ -13,20 +13,15 @@ listing_locations = [
 ].map { |location| location.merge(kind: :marketplace_listing, country: Country.united_states, skip_geocoding: true) }
 
 def seed_marketplace_seller(email:, name:)
-  user = User.create!(name:, email:, password: "pleaseplease12",
-    password_confirmation: "pleaseplease12", terms_of_service: true)
+  user = User.create!(name:, email:, password: SeedHelpers::PASSWORD,
+    password_confirmation: SeedHelpers::PASSWORD, terms_of_service: true)
   user.confirm(user.confirmation_token)
   user
 end
 
-def seed_marketplace_bike(creator:, seller:, manufacturer_id:, primary_activity_id:)
-  b_param = BParam.create!(creator: seller, params: {bike: {
-    cycle_type: "bike", propulsion_type: "foot-pedal", manufacturer_id:, primary_activity_id:,
-    serial_number: (0...10).map { rand(65..90).chr }.join,
-    primary_frame_color_id: Color.pluck(:id).sample,
-    rear_tire_narrow: [true, false].sample, handlebar_type: HandlebarType.slugs.sample,
-    owner_email: seller.email
-  }})
+def seed_marketplace_bike(creator:, seller:, primary_activity_id:)
+  b_param = BParam.create!(creator: seller, params: {bike: SeedHelpers.bike_params(owner_email: seller.email)
+    .merge(primary_activity_id:, rear_tire_narrow: [true, false].sample, handlebar_type: HandlebarType.slugs.sample)})
   bike = creator.create_bike(b_param)
   raise "Marketplace bike error: #{b_param.bike_errors}" if bike.errors.any?
   bike
@@ -47,7 +42,7 @@ listings = 10.times.map do |i|
   prefix = promoted ? "member" : "seller"
   seller = seed_marketplace_seller(email: "marketplace-#{prefix}-#{i}@bikeindex.org", name: "Marketplace #{prefix.capitalize} #{i + 1}")
   Membership.create!(user: seller, creator: admin, level: :basic, start_at: Time.current - 1.hour) if promoted
-  bike = seed_marketplace_bike(creator:, seller:, manufacturer_id: SeedHelpers.weighted_frame_maker_id, primary_activity_id: primary_activity_ids.sample)
+  bike = seed_marketplace_bike(creator:, seller:, primary_activity_id: primary_activity_ids.sample)
   seed_marketplace_listing(bike:, seller:, location: listing_locations[i % listing_locations.length],
     amount_cents: (250 + i * 175) * 100, condition: conditions[i % conditions.length])
 end

@@ -18,7 +18,7 @@
       -# worker finishes, so image_fallback swaps to the synchronously-stored original
       - original_url = image.image_url
       %img{ src: image.image_url(:small) || original_url,
-        data: { controller: "image-fallback", action: "error->image-fallback#useOriginal", "image-fallback-url-value": original_url } }
+        data: { controller: "image-fallback", action: "error->image-fallback#fallBack", "image-fallback-url-value": original_url } }
     - else
       %em.missing-image
         = t(".missing_image")

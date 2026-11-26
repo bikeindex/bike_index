@@ -4,7 +4,11 @@ module HeaderTagHelper
     page_title = @page_title || page_title_for_edit_bikes(controller_name, action_name)
 
     {
+      page_url: @page_url,
       page_title:,
+      page_description: @page_description,
+      page_image: @page_image,
+      twitter_card: @twitter_card,
       page_obj: @page_obj || @blog || @bike || @user,
       updated_at: @page_updated_at,
       organization_name:,

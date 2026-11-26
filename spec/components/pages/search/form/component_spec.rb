@@ -57,7 +57,7 @@ RSpec.describe Pages::Search::Form::Component, type: :component do
       expect(component).to have_css "div"
       expect(component).to_not have_css("#serial")
       expect(component).to have_css("#primary_activity")
-      expect(instance.instance_variable_get(:@result_view)).to eq :bike_box
+      expect(instance.instance_variable_get(:@result_view)).to eq :cards
     end
     context "with serial" do
       let(:interpreted_params) { BikeSearchable.searchable_interpreted_params({serial: "xxx"}) }

@@ -15,6 +15,8 @@ RSpec.describe SharedBlocks::Navbar::UserSettingsMenu::Component, type: :compone
     expect(component).to have_css "#navUserSettingLink[data-email='party@bikeindex.org']"
     # The submenu's rows are the navbar's own links, so they take .nav-link with the rest
     expect(component.css("ul.primary-submenu a.nav-link").count).to eq links.count
+    # Below the breakpoint the primary menu carries its own registration row
+    expect(component.css("ul.primary-submenu li.d-none").map { |row| row.text.strip }).to eq(["Register a new bike"])
   end
 
   # Which row is current is ui--active-link's, in the browser -- the navbar renders inside a

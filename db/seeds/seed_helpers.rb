@@ -5,6 +5,9 @@ module SeedHelpers
   extend Functionable
   extend ActiveSupport::Testing::TimeHelpers
 
+  # Published in the README, and .github/workflows/ios-e2e.yml signs in with it
+  PASSWORD = "pleaseplease12"
+
   # Seeded records are timestamped across the last week, rather than all at once:
   # the clock starts a week ago and each tick moves it forward, stopping at now.
   # Later seeds and jobs touch earlier records, so updated_at is reset to match
@@ -15,11 +18,24 @@ module SeedHelpers
     yield
     sync_updated_at(since: clock_start)
   ensure
+    @clock_end = nil
     travel_back
   end
 
+  # A no-op outside with_clock, where bin/docker-entrypoint runs a seed on its own
   def tick
+    return unless @clock_end
+
     travel_to([Time.current + rand(60..130).minutes, @clock_end].min)
+  end
+
+  # R2 rejects a request signed with a clock more than 15 minutes off (RequestTimeTooSkewed)
+  def without_clock
+    seeded_time = Time.current
+    travel_back
+    yield
+  ensure
+    travel_to(seeded_time)
   end
 
   def sync_updated_at(since:)
@@ -41,7 +57,7 @@ module SeedHelpers
   # often), with the long tail of unprioritized makers appearing ~8% of the
   # time. Falls back to uniform when no priorities are set (e.g. fresh import).
   def weighted_frame_maker_id
-    makers = Manufacturer.frame_makers.pluck(:id, :priority)
+    makers = seedable_manufacturers.frame_makers.pluck(:id, :priority)
     prioritized = makers.select { |_id, priority| priority.to_i.positive? }
     return makers.sample.first if prioritized.empty?
 
@@ -52,4 +68,45 @@ module SeedHelpers
     target = rand(total)
     prioritized.find { |_id, priority| (target -= priority) < 0 }.first
   end
+
+  def bike_params(owner_email:, manufacturer_id: nil, **attributes)
+    {
+      cycle_type: "bike",
+      propulsion_type: "foot-pedal",
+      serial_number: (0...10).map { rand(65..90).chr }.join,
+      primary_frame_color_id: Color.pluck(:id).sample,
+      rear_tire_narrow: "true",
+      handlebar_type: HandlebarType.slugs.first,
+      owner_email:
+    }.merge(manufacturer_id ? {manufacturer_id:} : manufacturer_params(catalog: !attributes.key?(:cycle_type)), attributes)
+  end
+
+  def seed_bike(creator:, user:, params:, origin: nil, label: "bike")
+    tick
+    b_param = BParam.create!(creator: user, params:)
+    b_param.origin = origin if origin
+    bike = creator.create_bike(b_param)
+    puts "\n #{label} error \n #{b_param.bike_errors}" if bike.errors.any?
+    bike
+  end
+
+  #
+  # private below here
+  #
+
+  # Every other bike is a Bike Book catalog model, which registration fills in the stock specs of. Its cycle type too,
+  # so not a bike that sets its own
+  def manufacturer_params(catalog:)
+    @bikebook_turn = !@bikebook_turn if catalog
+    model = BikebookModel.where(manufacturer: seedable_manufacturers).order("RANDOM()").first if catalog && @bikebook_turn
+    return {manufacturer_id: weighted_frame_maker_id} unless model
+
+    {manufacturer_id: model.manufacturer_id, frame_model: model.name,
+     year: rand(model.first_year..(model.final_year || [model.first_year, Time.current.year].max))}
+  end
+
+  # Never Jamis: seeds pass it in for a bike whose label must be unique
+  def seedable_manufacturers = Manufacturer.where.not(name: "Jamis")
+
+  conceal :manufacturer_params, :seedable_manufacturers
 end

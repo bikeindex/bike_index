@@ -18,10 +18,10 @@ module Bikes
         Payment.where(stripe_id: params[:session_id]).first
       end
 
-      redirect_to new_bike_theft_alert_path(bike_id: @bike.id) unless @payment.present?
+      return redirect_to(new_bike_theft_alert_path(bike_id: @bike.id)) unless @payment.present?
       return unless setup_edit_template("alert_purchase_confirmation")
 
-      @payment&.update_from_stripe!
+      @payment.update_from_stripe!
       if @payment.theft_alert&.activateable?
         BikeJobs::ActivateTheftAlertJob.perform_async(@payment.theft_alert.id)
       end

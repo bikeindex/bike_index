@@ -66,8 +66,7 @@ search:
     - ["::I18n::Tasks::Scanners::PatternWithScopeScanner", {exclude: ["*.erb", "*.rb"]}]
     - ["::I18nTasks::ComponentScanner",
        {paths: ["app/components"], only: ["*.rb", "*.erb"], translate_call: "(?<![\\p{L}_'\\-.])translation",
-        scope_overrides: {"pages/search/everything_combobox_options": "components.pages.search.everything_combobox",
-          "pages/org/search_results/bike_list_item": "components.pages.org.search_results.bike_card"}}]
+        scope_overrides: {"pages/search/everything_combobox_options": "components.pages.search.everything_combobox"}}]
 
   ## Root directories for relative keys resolution.
   relative_roots:
@@ -170,6 +169,7 @@ ignore_unused:
   - "shared.menu_items_account.*" # used dynamically by UserServices::MenuItemsAccount
   - "shared.menu_items_org.*" # used dynamically by UserServices::MenuItemsOrg
   - "shared.register_flow.*" # used dynamically by BikeServices::Register
+  - "shared.organization_signup.*" # used dynamically by OrgServices::Signup
   - "*_mailer.*"
   - "date.*"
   - "datetime.*"

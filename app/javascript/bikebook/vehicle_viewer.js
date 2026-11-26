@@ -1,0 +1,265 @@
+import { html, nothing } from 'lit-html'
+import { basics } from 'bikebook/templates/vehicles/basics'
+import { withColorwayPhoto } from 'bikebook/colorways'
+import { chosenSizes } from 'bikebook/sizes'
+import { groupId, pickedColorways, pickedSizes, vehicleIds, vehicleKeys, vehiclesOf, withGroup, withoutVehicle, withSize, withVehicles } from 'bikebook/vehicle_models'
+import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
+import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
+import { emptyState } from 'bikebook/templates/vehicles/empty_state'
+import { compareToggle, similarAdjustments, similarResults, similarSection } from 'bikebook/templates/vehicles/similar'
+import { geometryOverlay, overlayFrames, overlayOpener, seriesBorders } from 'bikebook/templates/vehicles/geometry_overlay'
+import { jumpTo, VIEWS } from 'bikebook/templates/vehicles/jump_to'
+import { modelCard } from 'bikebook/templates/vehicles/model_card'
+import { modelGroup } from 'bikebook/templates/vehicles/model_group'
+import { removeLink } from 'bikebook/templates/vehicles/remove_link'
+import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
+import { componentsOf, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
+import { array, present } from 'bikebook/templates/values'
+import { searching, toQuery } from 'bikebook/query'
+import { VehiclePresenter } from 'bikebook/vehicle_presenter'
+
+// rather than the kit's max_compare, which the catalog publishes as 3
+export const MAX_COMPARE = 10
+
+// The compared vehicles' cards, from catalog blocks
+export class VehicleViewer {
+  // `jurisdiction`'s out of class marker, evc/out-of-class/us/ca, where its law bars a Class 3's throttle, as
+  // EbikeRuleServices::StateLaws.out_of_class_ids has them, and as a state, whose /ebike-rules says why a model isn't
+  // an e-bike there. Model cards name the markets of those `market` doesn't sell
+  constructor (vocabulary, { jurisdiction, market } = {}) {
+    this.presenter = new VehiclePresenter(vocabulary)
+    const barred = Object.values(vocabulary.e_vehicle_classifications)
+      .some((record) => record.jurisdiction === `US-${jurisdiction}` && record.class_3_throttle === false)
+    this.outOfClassId = barred ? `evc/out-of-class/us/${jurisdiction.toLowerCase()}` : null
+    this.state = jurisdiction && jurisdiction !== 'US' ? jurisdiction : null
+    this.card = { placeholderUrl: vocabulary.kit.placeholder_url, currencies: vocabulary.currencies, market, configurations: vocabulary.kit.model_configurations }
+  }
+
+  // The vehicles at `url` in the view it picks, each under its key, whose links keep its other params, compared in the
+  // sizes it picks or the nearest to the `preferredSize`, the overview over the `group` it shows. With none, the
+  // `search`'s count, whether filters narrow it, and its featured models. `similar` puts the models most like the first
+  // above the views, its settings, and its `results` once they're scored
+  render (picks, url, preferredSize, search, { group = null, similar } = {}) {
+    const { presenter, outOfClassId, state } = this
+    const vehicles = withChosenPhotos(url, picks)
+    const photos = pickedPhotos(vehicles)
+    const colorways = pickedColorways(url)
+    if (vehicles.length === 0) {
+      return emptyState({
+        url,
+        vehiclePath: (id) => pathWith(url, { vehicle_models: id }),
+        ...this.card,
+        ...search
+      })
+    }
+
+    const shown = Object.keys(VIEWS).filter((each) => each !== 'motors' || vehicles.some(({ data }) => present(data.motors)))
+    const requested = url.searchParams.get('view')
+    const view = shown.includes(requested) ? requested : 'basics'
+    const comparing = vehicles.length > 1
+    const picked = pickedSizes(url)
+    const sizes = chosenSizes(vehicles, { picked, preferred: preferredSize })
+    const selectedSizes = new Map(vehicles.map(({ key }, index) => [key, sizes[index]?.name]))
+    const baseline = vehicles[0]
+    const others = (key) => key === baseline.key ? [] : [baseline.data]
+    const removePath = (index) => pathWith(withoutVehicle(url, vehicles[index].key))
+    const sizePath = (key) => (name) => pathWith(withSize(url, key, name))
+    // a figure's letter lights it on each drawing, card and table row, until it's clicked again
+    const highlight = url.searchParams.get('figure')
+    const figurePath = (key) => pathWith(url, { figure: key === highlight ? '' : key })
+    const compared = { presenter, vehicles, sizes, frames: overlayFrames(vehicles, sizes), market: this.card.market }
+    // the width leaves each side of a centered card its gap and 12px of its neighbor
+    const rowClasses = comparing
+      ? 'tw:justify-center-safe tw:overflow-x-auto tw:px-(--gutter) tw:pb-3 tw:max-md:snap-x tw:max-md:snap-mandatory tw:max-md:gap-2 tw:max-md:*:w-[calc(100vw-2.5rem)] tw:max-md:*:shrink-0 tw:max-md:*:snap-center'
+      : 'tw:flex-col tw:lg:flex-row tw:lg:justify-center'
+    const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} ${comparing
+      ? 'tw:twpagebleed'
+      : 'tw:max-[500px]:twpagebleed tw:lg:twpagebleed tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
+    // each vehicle's `field` on a card of its own, after whatever `lead` shows, with the overview's ×
+    // `keyed`, each topped in its frame's color in the overlay
+    const cards = (field, none, content, { lead, keyed = false } = {}) => vehicles.map(({ data, value, key }, index) => {
+      const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
+      const name = [manufacturer, model].filter(present).join(' ')
+      return html`<section aria-label=${`${name} ${field}`} class="twgutter tw:relative tw:w-full tw:min-w-0 tw:space-y-4
+        tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)] tw:dark:border-gray-700 tw:dark:bg-gray-800
+        ${keyed ? seriesBorders(compared.frames, index).top : ''} ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${removeLink({
+        label: `Remove ${name}`,
+        href: removePath(index)
+      })}<header data-align-row="header" class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${
+        vehicleTitle({ manufacturer, model, data, value, ...this.card, heading: 'h3' })}</div><div
+        class="tw:shrink-0">${photoOf({ presenter, data }, 'tw:h-14 tw:w-21')}</div></header>${lead ? html`<div data-align-row="lead">${lead(data, key)}</div>` : nothing}${present(data[field])
+        ? content(data, key, index)
+        : html`<p class="less-strong">${none}</p>`}</section>`
+    })
+    // its type's drawing of `size`, said where it works figures out or takes a typical one's: its `typicalKind`'s where
+    // they're all that kind of bike's
+    const drawing = (data, size, { figure, legend, typicalKind }) => {
+      const notes = [legend.some(({ calculated }) => calculated) && 'Light purple figures are calculated from the listed ones.',
+        legend.some(({ listed, calculated }) => !listed && !calculated) &&
+          `Gray figures aren't listed, so they're estimated from ${typicalKind ? 'typical' : 'average'} values on ${typicalKind ?? typeNoun(presenter, data)}s.`]
+        .filter(Boolean)
+      return html`<figure class="tw:space-y-1"><div class="tw:mx-auto tw:max-w-xl tw:text-gray-800 tw:dark:text-gray-200">${figure}</div>${notes.length
+        ? html`<figcaption class="tw:text-center tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${present(size?.name) && array(data.sizes).length > 1 ? `${size.name} drawn. ` : ''}${notes.join(' ')}</figcaption>`
+        : nothing}</figure>`
+    }
+    // drawn only where its size lists some of its frame: overall dimensions, wheels and a cargo area alone would be all
+    // it drew of its own
+    const framed = (legend) => legend.some(({ letter, listed, editable, extra, key }) => letter && listed && editable && !extra && !key.startsWith('dimensions'))
+    // each one's drawing, those drawn at the largest's scale and on the same ground, so they line up across the cards
+    const sizeDrawings = () => {
+      const draw = (index, options) => cycleDrawing({ type: vehicles[index].data.type, data: vehicles[index].data, size: sizes[index], kit: presenter.kit, highlight, figurePath, ...options })
+      const own = vehicles.map((_, index) => draw(index))
+      const shown = own.filter(({ legend }) => framed(legend))
+      if (shown.length < 2) return own
+      const span = Math.max(...shown.map((each) => each.span))
+      const scaled = own.map((each, index) => framed(each.legend) && each.span !== span ? draw(index, { span }) : each)
+      const bounds = scaled.filter(({ legend }) => framed(legend)).map((each) => each.bounds)
+      const box = { width: Math.max(...bounds.map(({ left, right }) => right - left)), top: Math.max(...bounds.map(({ top }) => top)), bottom: Math.min(...bounds.map(({ bottom }) => bottom)) }
+      return scaled.map((each) => framed(each.legend) ? { ...each, figure: each.within(box) } : each)
+    }
+    // the overlay left of the `table` once the window is wide, beneath it until then or `above`, which closes to a button in the
+    // table's corner
+    const withOverlay = (table, above = false) => {
+      const open = url.searchParams.get('overlay') !== '0'
+      const parts = [geometryOverlay({ ...compared, selected: url.searchParams.get('overlay_selected'), open, beside: true }), table(overlayOpener(open))]
+      return html`<div class="tw:flex tw:flex-col tw:min-[1500px]:twpagebleed tw:min-[1500px]:flex-row tw:min-[1500px]:items-start tw:min-[1500px]:gap-6
+        tw:min-[1500px]:px-4" data-controller="ui--collapse" data-ui--collapse-param-value="overlay" data-ui--collapse-direction-value="horizontal">${
+        above ? parts : parts.toReversed()}</div>`
+    }
+    const views = {
+      // comparing, the overlay, each column topped and footed in its frame's color
+      basics: () => {
+        const overview = { presenter, vehicles, market: this.card.market, outOfClassId, state, removePath, colorways, groupPath: (value) => pathWith(withGroup(url, value)), shownGroup: group && groupId(url) }
+        const groupModels = group ? modelGroup({ group, card: (model) => this.#toggleCard(url, model, 'group', photos) }) : nothing
+        if (!comparing) return html`${basics(overview)}${groupModels}`
+        return html`${withOverlay((corner) => basics({
+          ...overview,
+          frames: compared.frames,
+          corner,
+          sectionClasses: 'tw:min-[1500px]:mx-0 tw:min-[1500px]:w-auto tw:min-[1500px]:min-w-0 tw:min-[1500px]:flex-1 tw:min-[1500px]:px-0'
+        }))}${groupModels}`
+      },
+      geometry: () => {
+        const drawings = sizeDrawings()
+        return html`${withOverlay((corner) => comparisonTable({ ...compared, highlight, beside: true, corner }), true)}${cardRow('tw:mt-6', cards('sizes', 'No sizes listed', (data, key, index) => {
+        const size = sizes[index]
+        const drawn = drawings[index]
+        const { legend } = drawn
+        return html`${framed(legend) ? drawing(data, size, drawn) : nothing}${sizesOf({
+          presenter,
+          data,
+          others: others(key),
+          selectedSize: selectedSizes.get(key),
+          sizePath: sizePath(key),
+          lettering: framed(legend) && {
+            letters: new Map(legend.filter(({ letter }) => letter).map(({ key, letter }) => [key, letter])),
+            highlight,
+            figurePath,
+            drawn: { id: key, name: size?.name, figures: legend.filter(({ letter, listed }) => letter && !listed) }
+          }
+        })}`
+      }, { keyed: true }))}`
+      },
+      components: () => {
+        const components = componentsOf({ presenter, vehicles, others })
+        return cardRow('tw:mt-6', cards('components', 'No components listed', (data, key) => components.get(key),
+          { lead: (data, key) => runningGearOf({ presenter, data, others: others(key) }) }), true)
+      },
+      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, key) => motorsOf({ presenter, data, others: others(key), outOfClassId, state })))
+    }
+    // a model opened alone, its search hidden, has a tab to show it filtered to its type: "Search other cargo bikes"
+    const lone = !searching(url) && vehicles.length === 1 && vehicles[0].data
+    const searchTab = lone && {
+      label: `Search other ${typeNoun(presenter, lone)}s`,
+      href: pathWith(url, { search: '1', vehicle_type: lone.type || 'bike' })
+    }
+    return html`${this.similarModels(baseline, similar, url, photos)}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
+  }
+
+  // The section of the models most like `baseline`, where `similar` offers them, showing `photos` of those `url` compares,
+  // its toggle's line kept for it while they're `waiting` on the comparison
+  similarModels (baseline, similar, url, photos) {
+    if (similar?.waiting) return searching(url) ? nothing : html`<div data-similar-waiting>${this.compareToggle([baseline], similar)}</div>`
+    return similar
+      ? similarSection({
+        ...this.#similarOf(baseline, similar),
+        model: modelName(this.presenter, baseline.data),
+        results: similar.results === undefined ? undefined : this.similarResults(url, similar.results, photos),
+        searchShown: searching(url)
+      })
+      : nothing
+  }
+
+  // The controls that rescore the models most like the first of `vehicles`, for the filters' card
+  similarAdjustments (vehicles, similar) {
+    return similar && vehicles.length ? similarAdjustments(this.#similarOf(vehicles[0], similar)) : nothing
+  }
+
+  #similarOf ({ value, data, current }, similar) {
+    return {
+      vehicle: value,
+      current,
+      type: typeNoun(this.presenter, data),
+      complete: (data.model_configuration ?? 'complete') === 'complete',
+      settings: similar,
+      groups: similar.results?.groups,
+      scored: similar.results !== undefined
+    }
+  }
+
+  // What opens the models most like the first of `vehicles` from the search's More filters lines, where `similar` offers them
+  compareToggle (vehicles, similar) {
+    if (!similar) return nothing
+    return compareToggle({ type: typeNoun(this.presenter, vehicles[0].data), model: modelName(this.presenter, vehicles[0].data), waiting: similar.waiting })
+  }
+
+  // The cards of the models most like the first at `url`, those it compares showing `photos`' photo of them
+  similarResults (url, results, photos) {
+    const full = vehicleIds(url).length >= MAX_COMPARE && MAX_COMPARE
+    return similarResults({ results, cards: results?.models.map((model) => this.#toggleCard(url, model, 'similar', photos)), full })
+  }
+
+  // `model`'s card, a link adding it to the comparison at `url` or taking it out, which renders in place, focusing it again
+  #toggleCard (url, model, idPrefix, photos) {
+    const picked = vehiclesOf(url)
+    const active = picked.some(({ id }) => id === model.id)
+    const next = active ? picked.filter(({ id }) => id !== model.id) : [...picked, { id: model.id }]
+    const id = `${idPrefix}-${model.id.replace(/[/@]/g, '-')}`
+    return modelCard({
+      model: photos.has(model.id) ? { ...model, stock_photo: photos.get(model.id) } : model,
+      href: active || picked.length < MAX_COMPARE ? pathWith(withVehicles(url, next)) : null,
+      ...this.card,
+      toggle: true,
+      active,
+      attributes: { id, 'data-in-place': `#${id}` }
+    })
+  }
+}
+
+// Each of the `picks` at `url` keyed, its photo its chosen colorway's where it has one
+const withChosenPhotos = (url, picks) => {
+  const colorways = pickedColorways(url)
+  const keys = vehicleKeys(picks.map(({ value }) => value))
+  return picks.map((pick, index) => ({ ...pick, key: keys[index], data: pick.data && withColorwayPhoto(pick.data, colorways[keys[index]]) }))
+}
+
+// Each of the `vehicles` compared's photo, by its id
+const pickedPhotos = (vehicles) => new Map(vehicles.filter(({ data }) => present(data?.stock_photo)).map(({ value, data }) => [value, data.stock_photo]))
+
+export const chosenPhotos = (url, picks) => pickedPhotos(withChosenPhotos(url, picks))
+
+// This page's URL with `params` laid over its own
+const pathWith = (url, params = {}) => {
+  const query = toQuery({ ...Object.fromEntries(url.searchParams), ...params })
+  return query ? `${url.pathname}?${query}` : url.pathname
+}
+// A type mid-sentence, "other cargo bikes", where its vocabulary name doesn't read as one: "Cargo Bike Rear"
+const TYPE_NOUNS = {
+  'cargo-rear': 'rear-loading cargo bike',
+  'cargo-trike-rear': 'rear-loading cargo tricycle',
+  'personal-mobility': 'e-personal mobility device',
+  'trail-behind': 'trail-behind bike',
+  'e-atv': 'e-ATV'
+}
+const typeNoun = (presenter, data) => TYPE_NOUNS[data.type] ?? (presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike').toLowerCase()
+const modelName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).model

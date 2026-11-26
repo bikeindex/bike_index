@@ -2,7 +2,7 @@ require "rails_helper"
 
 RSpec.describe BikeV2ShowSerializer do
   describe "standard validations" do
-    let(:bike) { FactoryBot.create(:bike, propulsion_type: "pedal-assist", cycle_type: "cargo", frame_size: "42", extra_registration_number: "XXYY") }
+    let(:bike) { FactoryBot.create(:bike, propulsion_type: "pedal-assist", cycle_type: "cargo", frame_size: "42", extra_registration_number: "XXYY", handlebar_type: "horizontal") }
     let!(:component) { FactoryBot.create(:component, bike: bike) }
     let!(:public_image) { FactoryBot.create(:public_image, imageable: bike) }
     subject { BikeV2ShowSerializer.new(bike) }
@@ -61,10 +61,11 @@ RSpec.describe BikeV2ShowSerializer do
         front_tire_narrow: nil,
         type_of_cycle: "Cargo Bike (front storage)",
         test_bike: false,
+        hidden: false,
         frame_material_slug: nil,
         rear_wheel_size_iso_bsd: nil,
         front_wheel_size_iso_bsd: nil,
-        handlebar_type_slug: nil,
+        handlebar_type_slug: "flat",
         front_gear_type_slug: nil,
         rear_gear_type_slug: nil,
         additional_registration: "XXYY",
@@ -96,6 +97,17 @@ RSpec.describe BikeV2ShowSerializer do
     it "is cached" do
       expect(serializer.perform_caching).to be_truthy
       expect(serializer.as_json.is_a?(Hash)).to be_truthy
+    end
+
+    context "impounded bike", :caching do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed) }
+      let!(:impound_record) { FactoryBot.create(:impound_record, bike:) }
+
+      it "caches the hidden serial separately for the owner" do
+        bike.reload
+        expect(described_class.new(bike, root: false, scope: bike.user).as_json[:serial]).to eq bike.serial_number.upcase
+        expect(described_class.new(bike, root: false).as_json[:serial]).to eq "Hidden"
+      end
     end
   end
 end

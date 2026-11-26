@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(label: "Created", classes: "tw:w-1/4") do |ad| %>
     <%= link_to edit_admin_ad_url(ad), class: "twlink" do %>
       <%= render UI::Time::Component.new(time: ad.created_at) %>
@@ -12,12 +12,10 @@
   <% end %>
 
   <% table.column(label: "Text", classes: "tw:w-1/4") do |ad| %>
-    <h3>
-      <%= link_to ad.title, edit_admin_ad_url(ad), class: "text-dark" %>
-    </h3>
+    <%= render(UI::Header::Component.new(text: link_to(ad.title, edit_admin_ad_url(ad), class: "tw:twtext-color"), tag: :h2)) %>
 
-    <p>
-      <%= link_to ad.body, edit_admin_ad_url(ad), class: "text-dark" %>
+    <p class="tw:mb-4">
+      <%= link_to ad.body, edit_admin_ad_url(ad), class: "tw:twtext-color" %>
     </p>
   <% end %>
 

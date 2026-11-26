@@ -88,6 +88,15 @@ RSpec.describe Admin::OrganizationFeaturesController, type: :request do
   end
 
   describe "create" do
+    it "re-renders the form without a name" do
+      expect { post base_url, params: {organization_feature: passed_params.merge(name: "")} }
+        .not_to change(OrganizationFeature, :count)
+
+      expect(response.status).to eq 422
+      expect(response).to render_template(:new)
+      expect(response.body).to match(/Name can.+t be blank/)
+    end
+
     it "succeeds" do
       expect {
         post base_url, params: {organization_feature: passed_params.merge(feature_slugs_string: "csv_exports, show_bulk_import")}

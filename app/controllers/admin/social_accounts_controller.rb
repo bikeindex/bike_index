@@ -64,8 +64,9 @@ module Admin
         :longitude,
         :national,
         :neighborhood,
+        :region_record_id,
         :screen_name,
-        :state,
+        :street,
         :user_secret,
         :user_token
       )

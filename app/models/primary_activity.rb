@@ -22,7 +22,8 @@ class PrimaryActivity < ApplicationRecord
 
   SPECIAL_SHORT_NAMES = {
     "road" => "road-biking",
-    "track" => "track-racing"
+    "track" => "track-racing",
+    "endurance" => "road-endurance-sportive"
   }.freeze
 
   belongs_to :primary_activity_family, class_name: "PrimaryActivity"
@@ -33,13 +34,10 @@ class PrimaryActivity < ApplicationRecord
   has_many :bike_versions
 
   validates_presence_of :name
-  # NOTE: This class has something very similar to FriendlySlugFindable
-  # But scopes the validation of uniqueness
+  # A flavor's name repeats across families (MTB: Bikepacking, ATB: Bikepacking), its slug doesn't
   validates_uniqueness_of :name, scope: [:primary_activity_family_id], allow_nil: false
-  validates_uniqueness_of :slug, scope: [:primary_activity_family_id], allow_nil: false
-  # require uniqueness for family categories
   validates_uniqueness_of :name, if: -> { primary_activity_family_id.nil? }
-  validates_uniqueness_of :slug, if: -> { primary_activity_family_id.nil? }
+  validates_uniqueness_of :slug
 
   before_validation :set_calculated_attributes
   after_create :assign_family_id_if_self
@@ -97,9 +95,11 @@ class PrimaryActivity < ApplicationRecord
       special_short_slug = SPECIAL_SHORT_NAMES[str.downcase]
       return where(slug: special_short_slug).select(*select_attrs).first if special_short_slug.present?
 
-      by_priority.where(slug: Slugifyer.slugify(str)).select(*select_attrs).first ||
+      slug = Slugifyer.slugify(str)
+      by_priority.where(slug:).select(*select_attrs).first ||
         by_priority.where("lower(name) = ?", str.downcase).select(*select_attrs).first ||
-        by_priority.where("name ILIKE ?", "%#{str}%").select(*select_attrs).first
+        by_priority.where("name ILIKE ?", "%#{str}%").select(*select_attrs).first ||
+        Slugifyer.amp_as_and(slug)&.then { friendly_find_with_select(it, select_attrs:) }
     end
   end
 
@@ -132,10 +132,7 @@ class PrimaryActivity < ApplicationRecord
   end
 
   def short_name
-    return "Road" if slug == "road-biking"
-    return "Track" if slug == "track-racing"
-
-    super
+    SPECIAL_SHORT_NAMES.key(slug)&.capitalize || super
   end
 
   private
@@ -148,7 +145,8 @@ class PrimaryActivity < ApplicationRecord
 
   def set_calculated_attributes
     self.name = name&.strip
-    self.slug ||= Slugifyer.slugify(name)
+    # Everything from the parenthetical on is a gloss: "ATB (All Terrain Biking) — Gravel, Cyclocross, etc." is atb
+    self.slug = Slugifyer.slugify(display_name.sub(/\s?\(.*/, ""))
     self.priority ||= calculated_priority
     # If it doesn't have a family, assign primary_activity_family_id to its own ID, so it's searchable
     # EVEN if it's a flavor

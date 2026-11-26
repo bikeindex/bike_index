@@ -12,12 +12,12 @@ module UI
 
       # @label hyphenated controller (dasherizes the target key)
       def hyphenated_controller
-        render(UI::DragHandle::Component.new(controller: "bullet-editors"))
+        render(UI::DragHandle::Component.new(controller: "bullet-editors", label: "bullet"))
       end
 
       # @label with extra classes appended
       def with_html_class
-        render(UI::DragHandle::Component.new(controller: "sortable", html_class: "tw:pt-2"))
+        render(UI::DragHandle::Component.new(controller: "sortable", label: "First item", html_class: "tw:pt-2"))
       end
       # @!endgroup
     end

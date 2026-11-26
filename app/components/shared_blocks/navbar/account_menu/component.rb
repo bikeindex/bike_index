@@ -8,7 +8,7 @@ module SharedBlocks
       class Component < ApplicationComponent
         # Template Dependency: UI::ActiveLink::Component
         # The tint SharedBlocks::Navbar::UserSettingsMenu::LOGOUT deviates from, for its darker panel
-        LOGOUT = "tw:text-red-700! tw:hover:bg-red-50! tw:hover:text-red-600!"
+        LOGOUT = "tw:text-red-700! tw:hover:bg-red-50! tw:hover:text-red-600! tw:dark:text-red-400! tw:dark:hover:bg-red-600/5! tw:dark:hover:text-red-300!"
 
         def initialize(current_user:, current_organization: nil, button_class: nil)
           @current_user = current_user

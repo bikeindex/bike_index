@@ -7,4 +7,6 @@ en:
           settings_and_filters:
             date_range: 'Date range:'
             filters: Filters
+            impound_search: the impounded vehicles search
             search_settings_and_filters: Search settings and filters
+            view_in_impound_search_html: View in %{impound_search}

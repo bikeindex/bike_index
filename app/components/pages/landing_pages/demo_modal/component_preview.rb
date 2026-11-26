@@ -9,7 +9,8 @@ module Pages
             feedback: Feedback.new,
             name_label: "School",
             feedback_type: "lead_for_school",
-            modal_id: "schools-demo-modal"
+            modal_id: "schools-demo-modal",
+            return_to: "/for_schools"
           ))
         end
       end

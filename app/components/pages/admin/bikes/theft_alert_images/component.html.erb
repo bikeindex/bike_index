@@ -1,17 +1,16 @@
-<h3 class="tw:mt-6">
+<%= render(UI::Header::Component.new(tag: :h2)) do %>
   <%= @bike.type_titleize %> images
-
   <% if public_images.any? %>
     <%= link_to "user edit", edit_bike_path(@bike, edit_template: "photos", return_to: @return_to),
-          class: "twlink tw:ml-2 tw:text-sm" %>
+            class: "twlink tw:ml-2 tw:text-sm" %>
   <% else %>
     <%= render(UI::ButtonLink::Component.new(text: "remove alert", href: regenerate_path(nil),
-          method: :put, size: :sm, html_class: "tw:ml-2")) %>
+            method: :put, size: :sm, html_class: "tw:ml-2")) %>
   <% end %>
-</h3>
+<% end %>
 
 <%# A row that scrolls sideways rather than wrapping - the widths the legacy JS summed %>
-<ul class="tw:flex tw:list-none tw:gap-4 tw:overflow-x-auto tw:p-0">
+<ul class="twgutter-bleed tw:mb-4 tw:flex tw:gap-4 tw:overflow-x-auto">
   <% public_images.each do |image| %>
     <li class="tw:w-44 tw:shrink-0 tw:text-center">
       <%= render(UI::ButtonLink::Component.new(text: "Delete image", href: delete_path(image.id), method: :put, color: :error, size: :sm,
@@ -28,12 +27,12 @@
   <% end %>
 </ul>
 
-<h3 class="tw:mt-6">Promoted alert images</h3>
+<%= render(UI::Header::Component.new(text: "Promoted alert images", tag: :h2)) %>
 
 <% if !alert_images? %>
   <div class="tw:mb-4">None</div>
 <% else %>
-  <ul class="tw:mb-4 tw:flex tw:list-none tw:gap-4 tw:overflow-x-auto tw:p-0">
+  <ul class="twgutter-bleed tw:mb-4 tw:flex tw:gap-4 tw:overflow-x-auto">
     <% alert_image_versions.each do |name, image_url| %>
       <li class="tw:w-72 tw:shrink-0 tw:text-center">
         <%= link_to image_tag(image_url, class: "tw:mx-auto"), image_url, target: "_blank", rel: "noopener" %>

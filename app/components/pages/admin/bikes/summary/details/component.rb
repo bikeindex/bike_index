@@ -33,7 +33,7 @@ module Pages
                 search_url: admin_bikes_path(user_id: @bike.creator_id), render_search: true))
             end
 
-            def self_registered = tag.small("self reg", class: "twless-strong")
+            def self_registered = tag.small("self reg", class: "less-strong")
 
             def doorkeeper_app = current_ownership&.doorkeeper_app
 
@@ -55,7 +55,7 @@ module Pages
             def address_hash = @address_hash ||= @bike.address_hash
 
             def registration_address
-              @registration_address ||= @bike.registration_address
+              @registration_address ||= @bike.registration_address_record&.address_hash(visible_attribute: :street, render_country: true)
             end
 
             # Rendered JSON-ish rather than as a ruby hash, to make it a little easier to read

@@ -1,5 +1,5 @@
-.container
-  %h1 New Exchange Rate
+= render(UI::Container::Component.new(width: :wide)) do
+  = render(Pages::Admin::Headers::Nav::Component.new(title: "New Exchange Rate"))
 
   = render "form",
     exchange_rate: @exchange_rate,

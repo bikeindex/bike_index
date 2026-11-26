@@ -11,10 +11,6 @@ module StravaJobs
         "#{REDLOCK_PREFIX}-#{strava_request_id}"
       end
 
-      def new_lock_manager
-        Redlock::Client.new([Bikeindex::Application.config.redis_default_url])
-      end
-
       def make_request_and_update(strava_integration, strava_request)
         if strava_request.incoming_webhook?
           return handle_incoming_webhook(strava_request, strava_integration)
@@ -116,11 +112,7 @@ module StravaJobs
       strava_request ||= StravaRequest.find_by(id: strava_request_id)
       return if strava_request.blank? || !strava_request.pending?
 
-      lock_manager = self.class.new_lock_manager
-      redlock = lock_manager.lock(self.class.redlock_key(strava_request_id), 5.minutes.in_milliseconds.to_i)
-      return unless redlock
-
-      begin
+      with_redlock(strava_request_id, duration: 5.minutes) do
         strava_integration = StravaIntegration.find_by(id: strava_request.strava_integration_id)
         if strava_integration.blank?
           return mark_requests_deleted(strava_request)
@@ -129,8 +121,6 @@ module StravaJobs
         end
 
         self.class.make_request_and_update(strava_integration, strava_request)
-      ensure
-        lock_manager.unlock(redlock)
       end
     end
 
@@ -148,7 +138,7 @@ module StravaJobs
     def mark_requests_deleted(strava_request)
       strava_request.update(response_status: :integration_deleted)
       StravaRequest.pending.where(strava_integration_id: strava_request.strava_integration_id)
-        .find_each { strava_request.update(response_status: :integration_deleted) }
+        .find_each { |pending_request| pending_request.update(response_status: :integration_deleted) }
     end
   end
 end

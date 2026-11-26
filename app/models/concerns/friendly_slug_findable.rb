@@ -8,7 +8,9 @@ module FriendlySlugFindable
       return nil if str.blank?
       return where(id: str).first if integer_string?(str)
 
-      find_by_slug(Slugifyer.slugify(str)) || where("lower(name) = ?", str.downcase).first
+      slug = Slugifyer.slugify(str)
+      find_by_slug(slug) || where("lower(name) = ?", str.downcase).first ||
+        Slugifyer.amp_as_and(slug)&.then { friendly_find(it) }
     end
 
     def friendly_find_id(str)

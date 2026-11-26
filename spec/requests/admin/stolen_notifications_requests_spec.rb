@@ -26,6 +26,24 @@ RSpec.describe Admin::StolenNotificationsController, type: :request do
         expect(response).to render_template(:show)
         expect(flash).to be_blank
       end
+
+      context "with a bike outside the default scope" do
+        let(:stolen_notification) { FactoryBot.create(:stolen_notification) }
+        let(:bike) { stolen_notification.bike }
+
+        it "renders the bike, then says when it's gone" do
+          bike.update_column(:likely_spam, true)
+          expect(Bike.where(id: bike.id)).to be_blank
+          get "#{base_url}/#{stolen_notification.id}"
+          expect(response.code).to eq "200"
+          expect(response.body).to include(bike.title_string)
+
+          bike.really_destroy!
+          get "#{base_url}/#{stolen_notification.id}"
+          expect(response.code).to eq "200"
+          expect(response.body).to include("Bike deleted!")
+        end
+      end
     end
 
     describe "resend" do

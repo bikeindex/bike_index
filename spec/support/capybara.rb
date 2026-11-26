@@ -10,7 +10,8 @@ Capybara.register_driver :playwright do |app|
   Capybara::Playwright::Driver.new(app,
     browser_type: :chromium,
     headless: true,
-    viewport: {width: 1920, height: 1080})
+    viewport: {width: 1920, height: 1080},
+    permissions: ["clipboard-read", "clipboard-write"])
 end
 
 # The same browser with scripting turned off, for specs about what a rider without
@@ -27,6 +28,8 @@ end
 Capybara.configure do |config|
   config.default_driver = :playwright
   config.javascript_driver = :playwright
+  # UI::Collapse triggers are role=button spans
+  config.enable_aria_role = true
 end
 
 # Each parallel worker needs its own port - a pinned one leaves all but the first

@@ -80,7 +80,7 @@ RSpec.shared_examples "bike_attributable" do
   end
 
   describe "handlebar_type_name" do
-    let(:obj) { FactoryBot.build(model_sym, handlebar_type: "bmx") }
+    let(:obj) { FactoryBot.build(model_sym, handlebar_type: "forward") }
     it "returns the normalized name" do
       normalized_name = HandlebarType.new(obj.handlebar_type).name
       expect(obj.handlebar_type_name).to eq(normalized_name)

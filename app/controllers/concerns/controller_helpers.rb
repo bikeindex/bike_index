@@ -18,7 +18,8 @@ module ControllerHelpers
       :current_organization, :passive_organization, :current_location,
       :page_id, :default_bike_search_path, :every_bike_search_path, :bikehub_url, :show_general_alert,
       :display_dev_info?, :current_country_id, :current_currency, :turbo_request?,
-      :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state
+      :render_donation_request?, :old_register_view?, :sort_state, :admin_index_state, :metric_units?,
+      :search_distance_unit, :request_location_hash, :color_scheme
     before_action :enable_rack_profiler
 
     before_action do
@@ -76,6 +77,23 @@ module ControllerHelpers
 
   def current_country_id
     request_location_hash[:country_id]
+  end
+
+  def metric_units?
+    return @metric_units if defined?(@metric_units)
+
+    # local requests carry no CF country, so development reads as the US
+    @metric_units = UnitSystem.metric?(user: current_user, country_id: current_country_id || (Country.united_states_id if Rails.env.development?))
+  end
+
+  # A signed-out visitor's pick is a cookie the color-scheme controller writes
+  def color_scheme
+    current_user&.color_scheme || cookies[:color_scheme].presence_in(User.color_schemes.keys) || "system"
+  end
+
+  # A searched URL keeps the unit it was searched in
+  def search_distance_unit
+    params[:distance_unit].presence_in(UnitSystem::DISTANCE_UNITS) || UnitSystem.distance_unit(metric_units?)
   end
 
   def enable_rack_profiler
@@ -190,6 +208,10 @@ module ControllerHelpers
     session[:old_register_view].present?
   end
 
+  def old_unregistered_notification_view?
+    session[:old_unregistered_notification_view].present?
+  end
+
   def show_general_alert
     return @show_general_alert = false if @skip_general_alert || current_user.blank? ||
       render_donation_request?
@@ -215,6 +237,8 @@ module ControllerHelpers
 
     fail ActiveRecord::RecordNotFound
   end
+
+  def local_return_to = LocalPath.only(params[:return_to])
 
   # Generally this is implicitly set - however! it can also be explicitly set
   def store_return_to(target = nil)
@@ -247,26 +271,24 @@ module ControllerHelpers
         translation(:reset_your_password,
           scope: [:controllers, :concerns, :controller_helpers, __method__])
       render(action: :update_password) && (return true)
-    when /\A#{ENV["BASE_URL"]}/, %r{\A/} # Either starting with our URL or /
-      redirect_to(target) && (return true) if URI.parse(target).relative? || target.include?("/oauth/")
+    when /\A#{ENV["BASE_URL"]}/
+      redirect_to(target) && (return true) if target.include?("/oauth/")
+    when %r{\A/}
+      redirect_to(target) && (return true) if LocalPath.only(target)
     when "https://facebook.com/bikeindex"
       redirect_to(target, allow_other_host: true) && (return true)
     end
   end
 
   # handle_target refuses an off-site target on arrival, too late to keep a caller-chosen
-  # URL out of mail we send. "//host" is off-site despite the leading slash.
-  def emailable_return_to
-    target = session[:return_to]
-    target if target&.start_with?("/") && !target.start_with?("//")
-  end
+  # URL out of mail we send
+  def emailable_return_to = LocalPath.only(session[:return_to])
 
   def permitted_return_to
     target = (session[:return_to] || cookies[:return_to] || params[:return_to])&.downcase
     return nil if invalid_return_to?(target)
 
-    # Either starting with our URL or /
-    target if target.start_with?(/#{ENV["BASE_URL"]}/, "/")
+    target.start_with?(/#{ENV["BASE_URL"]}/) ? target : LocalPath.only(target)
   end
 
   # Wrap `I18n.translate` for use in controllers, abstracting away
@@ -343,6 +365,18 @@ module ControllerHelpers
 
   private
 
+  # For a bike the user can't see: a registration merged into its shop's POS registration sends its links to the
+  # same page of that one, if they can see it
+  def redirect_merged_bike_or_not_found(bike)
+    merged_into = PosRegistrationMatch.merged_into(bike) if request.get? || request.head?
+    fail ActiveRecord::RecordNotFound unless merged_into&.visible_by?(current_user)
+
+    id_param = request.path_parameters.key?(:bike_id) ? :bike_id : :id
+    # Keeps tokens, e.g. a parking notification's retrieval link, as query params only. An id there would win
+    redirect_to(url_for(request.path_parameters.merge(id_param => merged_into.id, :only_path => true,
+      :params => request.query_parameters.except("id", "bike_id"))))
+  end
+
   # passive_organization is the organization set for the user - which is persisted in session
   # The user may or may not be interacting with the current_organization in any given request
   def passive_organization
@@ -351,7 +385,9 @@ module ControllerHelpers
     if session[:passive_organization_id].present?
       return @passive_organization = nil if session[:passive_organization_id].to_i == 0
 
-      @passive_organization = Organization.friendly_find(session[:passive_organization_id])
+      organization = Organization.friendly_find(session[:passive_organization_id])
+      # A signed in user can lose the membership the session still names
+      @passive_organization = organization if current_user.blank? || current_user.member_of?(organization)
     end
     @passive_organization ||= set_passive_organization(OrganizationRole.default_organization(current_user))
   end
@@ -432,7 +468,7 @@ module ControllerHelpers
     redirect_to(my_account_url) && return
   end
 
-  def require_index_admin!
+  def require_index_admin!(controller_name: self.controller_name, action_name: self.action_name)
     if current_user.present?
       return true if current_user.superuser?(controller_name:, action_name:)
     end
@@ -446,6 +482,8 @@ module ControllerHelpers
 
       flash[:success] = translation(:accept_tos_for_orgs,
         scope: [:controllers, :concerns, :controller_helpers, __method__])
+      # Back here once they've accepted - a POST's path can't be revisited
+      store_return_to(request.fullpath) if request.get?
       redirect_to(accept_vendor_terms_path) && return
     elsif current_user.blank?
       flash[:notice] = translation(:please_sign_in,
@@ -461,7 +499,8 @@ module ControllerHelpers
   end
 
   def invalid_return_to?(target)
-    return true if target.blank?
+    # The session is a cookie, which overflows past 4KB
+    return true if target.blank? || target.length > 2000
 
     # return_to can't be a sign in/up page, or we'll loop
     ["/users/new", "/session/new", "/session/magic_link", "/integrations", "/users/please_confirm_email"].any? { |r| target.match?(r) }

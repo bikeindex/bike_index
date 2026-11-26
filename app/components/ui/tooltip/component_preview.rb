@@ -26,13 +26,18 @@ module UI
         render(UI::Tooltip::Component.new(text: "Visible to other riders viewing your bike"))
       end
 
-      # A link in the popup: click the "?" to keep it open, then click the link
+      # A link in the popup: hover onto it, or click the "?" to keep it open
       def with_interactive_body
         render(UI::Tooltip::Component.new(text: "current commit: a1b2c3d")) do |tooltip|
           tooltip.with_body do
             'current commit: <a href="https://github.com/bikeindex/bike_index/commit/a1b2c3d" class="twlink">a1b2c3d</a>'.html_safe
           end
         end
+      end
+
+      # Held open, it hides while the container's scrolled its trigger out of view
+      def in_a_scroll_container
+        render_with_template(template: "ui/tooltip/component_preview/in_a_scroll_container")
       end
       # @!endgroup
     end

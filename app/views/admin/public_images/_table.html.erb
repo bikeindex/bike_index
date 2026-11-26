@@ -4,7 +4,7 @@
   data-controller="update-cached-sortable-links"
   data-update-cached-sortable-links-base-url-value="<%= url_for(sort_state.search_params) %>"
 >
-  <%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name(["admin_public_image", render_sortable, render_size]),
+  <%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:, cache_key: cache_fragment_name(["admin_public_image", render_sortable, render_size]),
         cache_records: ->(public_image) { public_image.imageable })) do |table| %>
     <% table.column(sortable: "created_at", lower_right: ->(public_image) { content_tag(:span, public_image.id, class: "only-dev-visible") }) do |public_image| %>
       <%= render UI::Time::Component.new(time: public_image.created_at) %>
@@ -20,7 +20,7 @@
       <% if image_url.present? %>
         <%= link_to image_url do %>
           <%= image_tag(public_image.image_url(:small), class: "tw:max-h-12", loading: "lazy", alt: public_image.image_alt,
-            data: {controller: "image-fallback", action: "error->image-fallback#useOriginal", "image-fallback-url-value": image_url}) %>
+            data: {controller: "image-fallback", action: "error->image-fallback#fallBack", "image-fallback-url-value": image_url}) %>
         <% end %>
       <% end %>
     <% end %>
@@ -44,7 +44,7 @@
       <%= public_image.kind&.titleize %>
 
       <% if render_sortable %>
-        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_kind: public_image.kind)), class: "display-sortable-link small" %>
+        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_kind: public_image.kind)), class: "display-sortable-link tw:text-sm" %>
       <% end %>
     <% end %>
 
@@ -52,7 +52,7 @@
       <%= public_image.imageable_type %>
 
       <% if render_sortable %>
-        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_imageable_type: public_image.imageable_type)), class: "display-sortable-link small" %>
+        <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_imageable_type: public_image.imageable_type)), class: "display-sortable-link tw:text-sm" %>
       <% end %>
     <% end %>
 

@@ -65,6 +65,8 @@ RSpec.describe UserAlert, type: :model do
       expect(user_alert.dismissed?).to be_truthy
       expect(user_alert.active?).to be_falsey
       expect(user_alert.inactive?).to be_truthy
+      expect(UserAlert.inactive.pluck(:id)).to eq([user_alert.id])
+      expect(UserAlert.active.pluck(:id)).to eq([])
       expect(user_alert.resolved?).to be_falsey
       expect(user_alert.alertable).to eq user_phone
       expect(user_alert.alertable_type).to eq "UserPhone"

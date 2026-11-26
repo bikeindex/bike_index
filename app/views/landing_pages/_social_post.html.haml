@@ -3,18 +3,21 @@
 - social_post = SocialPost.friendly_find(post_id)
 
 - if social_post.present?
-  .embeded-tweet
+  - alignment_classes = {"top-left" => "tw:left-[2.5%] tw:top-[2.5%]", "top-right" => "tw:right-[2.5%] tw:top-[2.5%]",
+    "bottom-left" => "tw:left-[2.5%] tw:bottom-[5%]", "bottom-right" => "tw:right-[2.5%] tw:bottom-[5%]"}[social_post.alignment]
+  -# .embeded-tweet carries the landing pages' margins
+  .embeded-tweet{class: "tw:relative tw:border tw:border-black/20"}
     - if social_post.image?
       = image_tag social_post.image_url, alt: ""
-    .tweet-display{ class: "tweet-align-#{social_post.alignment}" }
-      %a.tweetor-header{ href: social_post.poster_link, target: '_blank' }
+    %div{class: "tw:absolute tw:block tw:w-[350px] tw:max-w-[94%] tw:border-2 tw:border-[#2c2c2c] tw:bg-white tw:px-3 tw:pt-1.5 tw:pb-3 tw:shadow-[0_0_5px_rgba(0,0,0,.3)] #{alignment_classes}"}
+      %a{class: "tw:group tw:relative tw:z-1 tw:block tw:w-full tw:leading-none tw:text-[#2c2c2c] tw:no-underline", href: social_post.poster_link, target: '_blank'}
         - if social_post.poster_avatar.present?
-          = image_tag social_post.poster_avatar, alt: ""
-        %span.tweetor-name
+          = image_tag social_post.poster_avatar, alt: "", class: "tw:float-left tw:mr-[7px] tw:block tw:w-9"
+        %span{class: "tw:mt-[3px] tw:inline-block tw:text-[90%] tw:font-bold tw:group-hover:text-[#3498dc] tw:group-hover:underline"}
           = social_post.poster_name
-        %span.tweetor-handle
+        %span{class: "tw:text-[75%] tw:text-[#8b9da8]"}
           %br
           @#{social_post.poster}
-      .tweet-body
+      %div{class: "tw:relative tw:z-1 tw:clear-both tw:mt-3 tw:text-[90%] tw:leading-[1.2em] tw:text-[#2c2c2c] tw:[&_a]:text-[#3498dc]"}
         = social_post.body_html&.html_safe
-      %a.body-link{ href: social_post.post_link, target: '_blank' }
+      %a{class: "tw:absolute tw:top-0 tw:left-0 tw:z-0 tw:h-full tw:w-full", href: social_post.post_link, target: '_blank'}

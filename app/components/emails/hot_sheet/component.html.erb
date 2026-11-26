@@ -101,7 +101,7 @@
   </p>
 
   <div class="clear-org-buttons">
-    <%= link_to "Search Stolen Bikes near #{organization_address&.city}", bikes_url(stolenness: "proximity", distance: 100, location: search_location), class: "org-button" %>
+    <%= link_to "Search Stolen Bikes near #{organization_address&.city}", bikes_url(stolenness: "proximity", distance: 100, distance_unit:, location: search_location), class: "org-button" %>
   </div>
 
   <p class="hot-sheet-notification-change">

@@ -144,6 +144,15 @@ RSpec.describe EmailBan, type: :model do
     end
   end
 
+  describe "email_plus_duplicate_matches" do
+    let!(:user) { FactoryBot.create(:user, email: "j.smith@gmail.com") }
+    let!(:user_other) { FactoryBot.create(:user, email: "jxsmith@gmail.community") }
+    it "matches the address without its plus, literally" do
+      expect(EmailBan.send(:email_plus_duplicate_matches, "j.smith+1@gmail.com").pluck(:id)).to eq([user.id])
+      expect(EmailBan.send(:email_plus_duplicate_matches, "a(+b@gmail.com")).to eq([])
+    end
+  end
+
   describe "ban? for an additional email address" do
     before { stub_const("EmailDomain::VERIFICATION_ENABLED", true) }
     let!(:user) { FactoryBot.create(:user_confirmed, email: "someone@bikeindex.org") }

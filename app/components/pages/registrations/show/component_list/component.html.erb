@@ -1,4 +1,4 @@
-<details data-controller="ui--details" <% unless @collapsed %>  open<% end %>>
+<details data-controller="ui--details" <% unless @collapsed %>open<% end %>>
   <summary
     data-action="click->ui--details#toggle"
     class="
@@ -19,7 +19,7 @@
     <span
       class="
         tw:flex tw:flex-none tw:items-center tw:gap-1.5 tw:text-[13px]
-        tw:font-bold tw:text-[#715eb2]
+        tw:font-bold tw:text-[#715eb2] tw:dark:text-purple-300
       "
     >
       <span class="tw:[details[open]_&]:hidden">
@@ -30,7 +30,7 @@
         <%= translation(".hide") %>
       </span>
 
-      <%= render(UI::IconChevron::Component.new(direction: :down, size: :md, html_class: "tw:transition-transform tw:[details[open]_&]:rotate-270")) %>
+      <%= render(UI::IconChevron::Component.new(size: :md, html_class: "tw:transition-transform tw:[details[open]_&]:rotate-90")) %>
     </span>
   </summary>
 
@@ -40,12 +40,7 @@
   >
     <% grouped_rows.each do |cgroup, rows| %>
       <%= render(UI::Card::Component.new) do %>
-        <h2
-          class="
-            tw:text-xs tw:font-bold tw:tracking-wider tw:text-[#715eb2]
-            tw:uppercase
-          "
-        >
+        <h2 class="tw:tweyebrow">
           <%= cgroup.name %>
         </h2>
 

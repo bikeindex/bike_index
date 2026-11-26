@@ -6,12 +6,7 @@ import { collapse } from 'utils/collapse_utils'
 // Nothing had been driving this form: the vendored admin bundle's tweet module is guarded
 // on #tweetForm, an id the page lost when tweets became social posts.
 export default class extends Controller {
-  static targets = ['kind', 'kindFields', 'characterCounter', 'characterTotal', 'accountCheckbox']
-  static values = { maxCharacterCount: Number }
-
-  connect () {
-    this.setCharacterCount()
-  }
+  static targets = ['kind', 'kindFields', 'accountCheckbox']
 
   kindChanged () {
     this.kindFieldsTargets.forEach((fields) =>
@@ -28,9 +23,5 @@ export default class extends Controller {
 
   setAccountsChecked (checked) {
     this.accountCheckboxTargets.forEach((checkbox) => { checkbox.checked = checked })
-  }
-
-  setCharacterCount () {
-    this.characterTotalTarget.textContent = `${this.characterCounterTarget.value.length}/${this.maxCharacterCountValue}`
   }
 }

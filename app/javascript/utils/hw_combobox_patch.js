@@ -2,21 +2,129 @@ import HwComboboxController from 'controllers/hw_combobox_controller'
 
 /* global AbortController, requestAnimationFrame */
 
-// hotwire_combobox 0.4.1 finds an option by interpolating the raw value into
-// `[data-value='<value>']`; a value containing a quote (e.g. a search term like
-// `2011'`) builds an invalid selector and throws a SyntaxError, which aborts the
-// multiselect reset. Match on the attribute instead so any value is safe.
-HwComboboxController.prototype._optionElementWithValue = function (value) {
-  return Array.from(
-    this._actingListbox.querySelectorAll(`[${this.filterableAttributeValue}]`)
-  ).find(option => option.getAttribute('data-value') === value) || null
+// A combobox element mapped here answers its async filter (`source.filter(controller, inputType)`),
+// renders its chips (`source.chips(controller, values)`) and lists as it connects, in place of the
+// gem's lazy turbo-frame (`source.prime(controller)`), in the browser rather than asking the server
+export const localSources = new WeakMap()
+
+const searchesLocally = (combobox) => !!localSources.get(combobox.element)?.filter
+
+// Pressing the list - an option, a label, "No matches" - or the field beside its chips would blur the input
+// onto the page, leaving it open with nothing focused to hear Escape or to blur from. The click back in still
+// selects the display, as it did after that blur
+const keepFocusOnPick = (event) => {
+  if (!event.target.closest('[role=listbox]') && !event.target.matches('.hw-combobox__main__wrapper')) return
+
+  event.preventDefault()
+  event.currentTarget.querySelectorAll('[role=combobox]').forEach((input) => clickedSinceFocus.delete(input))
 }
 
-// It also swallows Enter whether or not the listbox is open, so a combobox with
+const connect = HwComboboxController.prototype.connect
+HwComboboxController.prototype.connect = function () {
+  const source = localSources.get(this.element)
+  if (source?.prime) this.element.querySelector('.hw_combobox__pagination__wrapper turbo-frame')?.remove()
+  this.element.addEventListener('mousedown', keepFocusOnPick)
+  connect.call(this)
+  this.picked = { value: this._fieldValueString, display: this._fullQuery }
+  source?.prime?.(this)
+  searchEarlyTyping(this)
+}
+
+// Step 1 autofocuses its manufacturer, so typing can beat this module to the page. No event says so, and closing
+// clears a query that never searched, so it searches on connect, as the keystrokes would have
+const searchEarlyTyping = (controller) => {
+  if (document.activeElement !== controller._actingCombobox || !controller._fullQuery || controller._fieldValueString) return
+
+  controller.prepareToFilter({ key: 'ArrowDown' })
+  controller.filterAndSelect({})
+}
+
+// The gem reads a multiselect's value as empty only from a data attribute the server-rendered field
+// doesn't carry, so it asks for chips on connect with nothing selected
+const requestChips = HwComboboxController.prototype._requestChips
+HwComboboxController.prototype._requestChips = function (values) {
+  if (!values) return
+
+  const source = localSources.get(this.element)
+  return source ? source.chips(this, values, { adding: this.addingChip }) : requestChips.call(this, values)
+}
+
+// A paste fills the input without opening it, and closing is what commits a pick, from the options it shows -
+// so it's expanded at once, as prepareToFilter does
+const pickFirst = (combobox) => {
+  if (combobox._isClosed) {
+    combobox.open()
+    combobox._expand()
+  }
+  combobox.close('hw:keyHandler:enter')
+}
+
+// Counts the edits a local source answers, so an Enter ahead of its answer (a paste, entered at once) waits for it
+const filterAndSelect = HwComboboxController.prototype.filterAndSelect
+HwComboboxController.prototype.filterAndSelect = function (event) {
+  this.edits = (this.edits ?? 0) + 1
+  filterAndSelect.call(this, event)
+}
+
+const filterAsync = HwComboboxController.prototype._filterAsync
+HwComboboxController.prototype._filterAsync = async function (inputType) {
+  const source = localSources.get(this.element)
+  if (!source) return filterAsync.call(this, inputType)
+
+  // the gem aborts it on the next keystroke, so an answer that lands late doesn't autocomplete over newer typing
+  const filtering = new AbortController()
+  this._filterAbortController = filtering
+  const edits = this.edits
+  await source.filter(this, inputType, { signal: filtering.signal })
+  if (filtering.signal.aborted) return
+
+  this.answeredEdits = edits
+  if (this.enterPending && edits === this.edits) {
+    this.enterPending = false
+    pickFirst(this)
+  }
+}
+
+// Closing on Enter clears a query that matches nothing, so it stays open to say so - unless it's free text to
+// keep. And a multiselect's Escape makes no chip of the option the gem locks in, but the gem still announces it.
+// A local source's single select picks as it's typed into, which Escape would lock in, so it goes back to its pick
+const close = HwComboboxController.prototype.close
+HwComboboxController.prototype.close = function (inputType) {
+  if (inputType === 'hw:keyHandler:enter' && this._isQueried && !this._allowNew && !this._visibleOptionElements.length) return
+  if (inputType === 'hw:keyHandler:escape' && this._isSingleSelect && this._isOpen && searchesLocally(this)) {
+    this.expandedValue = false
+    return this.restore(this.picked)
+  }
+
+  this.dismissing = this._isMultiselect && inputType === 'hw:keyHandler:escape'
+  close.call(this, inputType)
+  this.dismissing = false
+}
+
+const dispatchSelectionEvent = HwComboboxController.prototype._dispatchSelectionEvent
+HwComboboxController.prototype._dispatchSelectionEvent = function (previousValue) {
+  if (this.dismissing) return
+
+  dispatchSelectionEvent.call(this, previousValue)
+  this.picked = { value: this._fieldValueString, display: this._fullQuery }
+}
+
+// The gem swallows Enter whether or not the listbox is open, so a combobox with
 // nothing to pick breaks the form's implicit submission -- unlike every other
 // input. Only handle the key while there's an option to choose.
 const navigate = HwComboboxController.prototype.navigate
+// A query in a local source's combobox is to pick from, though it's closed, rather than submit
 HwComboboxController.prototype.navigate = function (event) {
+  if (event.key === 'Enter' && searchesLocally(this) && this._fullQuery) {
+    if (this.edits !== this.answeredEdits) {
+      this.enterPending = true
+      return event.preventDefault()
+    }
+    if (this._isClosed) {
+      event.preventDefault()
+      return pickFirst(this)
+    }
+  }
   if (event.key === 'Enter' && this._isClosed) return
 
   navigate.call(this, event)
@@ -50,10 +158,9 @@ const clickedSinceFocus = new WeakSet()
 
 const forgetClicks = ({ currentTarget }) => clickedSinceFocus.delete(currentTarget)
 
-// The entering click, not the focus: step 1 autofocuses its manufacturer, so the first
-// click there brings no focus event to hang this on. By click the caret is already placed,
-// so the selection sticks without preventing anything, and the gem's own refocus while
-// filtering never selects - that would make the next keystroke replace the query
+// The entering click, not the focus: step 1 autofocuses its manufacturer, and a pick keeps
+// the focus, so the first click there brings no focus event to hang this on. The gem's own
+// refocus while filtering never selects - that would make the next keystroke replace the query
 const selectDisplay = ({ currentTarget }) => {
   if (clickedSinceFocus.has(currentTarget)) return
 
@@ -61,15 +168,28 @@ const selectDisplay = ({ currentTarget }) => {
   if (currentTarget.value) currentTarget.select()
 }
 
+// Pressing inside a focused input's selected text places the caret only once the click is
+// over, collapsing the selection selectDisplay just made
+const holdCaret = (event) => {
+  if (document.activeElement === event.currentTarget && !clickedSinceFocus.has(event.currentTarget)) event.preventDefault()
+}
+
 // Stimulus calls these per element, for targets the gem declares but leaves without a
 // callback -- the seam that also reaches the small-viewport dialog's own combobox
 const listenForClickIntoFocus = function (input) {
   input.addEventListener('focus', forgetClicks)
+  input.addEventListener('mousedown', holdCaret)
   input.addEventListener('click', selectDisplay)
 }
 
 HwComboboxController.prototype.comboboxTargetConnected = listenForClickIntoFocus
 HwComboboxController.prototype.dialogComboboxTargetConnected = listenForClickIntoFocus
+
+// Chrome puts a scrolling list in the tab order, but the gem listens for the arrow keys and Enter on the input
+const leaveTabOrder = (listbox) => { listbox.tabIndex = -1 }
+
+HwComboboxController.prototype.listboxTargetConnected = leaveTabOrder
+HwComboboxController.prototype.dialogListboxTargetConnected = leaveTabOrder
 
 // The dialog is the small-screen picker, but the gem measures the window the combobox is
 // in - so an iframe narrower than the breakpoint got it on a desktop, where it can't
@@ -93,9 +213,10 @@ Object.defineProperty(HwComboboxController.prototype, '_isSmallViewport', {
   }
 })
 
-// Neither covers the other: only `before-cache` runs early enough to keep an open dialog
-// out of a cached snapshot, and it's skipped on the no-cache pages the comboboxes are on
-const RENDER_EVENTS = ['turbo:before-cache', 'turbo:before-render']
+// Neither Turbo event covers the other: only `before-cache` runs early enough to keep an open
+// dialog out of a cached snapshot, and it's skipped on the no-cache pages the comboboxes are on.
+// /bikebook renders its pages without Turbo, and says so itself.
+const RENDER_EVENTS = ['turbo:before-cache', 'turbo:before-render', 'bikebook--page:before-render']
 
 // On small viewports it opens in a modal dialog and locks body scroll, but only
 // unlocks along its own collapse path, which a keypress or a click has to start.
@@ -126,4 +247,82 @@ HwComboboxController.prototype._openInDialog = function () {
 
   this.dialogTarget.addEventListener('close', dismiss, { signal: listeners.signal })
   RENDER_EVENTS.forEach(name => document.addEventListener(name, dismiss, { signal: listeners.signal }))
+}
+
+// A repeatable multiselect (data-repeatable) takes a value picked again, as a chip of its own, where the gem keeps its
+// values as a set - and removing a chip takes off its own pick, the field and its chips being in the same order
+const repeats = (controller) => controller._isMultiselect && controller.element.hasAttribute('data-repeatable')
+const picks = (controller) => controller.hiddenFieldTarget.value.split(',').filter(Boolean)
+const setPicks = (controller, values) => {
+  controller.hiddenFieldTarget.value = values.join(',')
+  controller._syncRequired()
+}
+
+Object.defineProperty(HwComboboxController.prototype, '_fieldValueArray', {
+  configurable: true,
+  get () {
+    return repeats(this) ? picks(this) : Reflect.get(Object.getPrototypeOf(HwComboboxController.prototype), '_fieldValueArray', this)
+  }
+})
+
+// its picks' options stay to pick again, rather than hidden
+const resetMultiselectionMarks = HwComboboxController.prototype._resetMultiselectionMarks
+HwComboboxController.prototype._resetMultiselectionMarks = function () {
+  if (!repeats(this)) resetMultiselectionMarks.call(this)
+}
+
+const beforeClearing = HwComboboxController.prototype._beforeClearingMultiselectQuery
+HwComboboxController.prototype._beforeClearingMultiselectQuery = function (callback) {
+  if (!repeats(this)) return beforeClearing.call(this, callback)
+
+  const { dataset } = this.hiddenFieldTarget
+  if (dataset.valueForMultiselect) callback(dataset.displayForMultiselect, dataset.valueForMultiselect)
+  dataset.displayForMultiselect = ''
+  dataset.valueForMultiselect = ''
+}
+
+const addToFieldValue = HwComboboxController.prototype._addToFieldValue
+HwComboboxController.prototype._addToFieldValue = function (value) {
+  repeats(this) ? setPicks(this, [...picks(this), String(value)]) : addToFieldValue.call(this, value)
+}
+
+// its chip's place, which the field's value is at
+const removeChip = HwComboboxController.prototype.removeChip
+HwComboboxController.prototype.removeChip = function (event) {
+  this.removingAt = [...this.element.querySelectorAll('[data-hw-combobox-value-param]')].indexOf(event.currentTarget)
+  removeChip.call(this, event)
+}
+
+const removeFromFieldValue = HwComboboxController.prototype._removeFromFieldValue
+HwComboboxController.prototype._removeFromFieldValue = function (value) {
+  if (!repeats(this)) return removeFromFieldValue.call(this, value)
+
+  const values = picks(this)
+  const at = values[this.removingAt] === String(value) ? this.removingAt : values.indexOf(String(value))
+  setPicks(this, values.filter((_, index) => index !== at))
+}
+
+// a pick's chip, which a local source draws though the value's already chipped
+const createChip = HwComboboxController.prototype._createChip
+HwComboboxController.prototype._createChip = function () {
+  this.addingChip = true
+  try {
+    createChip.call(this)
+  } finally {
+    this.addingChip = false
+  }
+}
+
+// A combobox set or cleared from code goes through the gem, so its hidden field, its input and a
+// rich display all agree - assigning the hidden field leaves the rest showing what it held
+export function selectComboboxValue (combobox, value) {
+  const option = [...combobox.querySelectorAll('[role=listbox] [role=option]')]
+    .find((element) => element.dataset.value === String(value))
+  option?.click()
+}
+
+// clear() empties the selection without an event; the keyup is what the rich display listens for
+export function clearCombobox (combobox) {
+  window.Stimulus.getControllerForElementAndIdentifier(combobox, 'hw-combobox')?.clear()
+  combobox.querySelector('[role=combobox]')?.dispatchEvent(new window.KeyboardEvent('keyup'))
 }

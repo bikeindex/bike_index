@@ -2,18 +2,23 @@
 
 module Atoms
   module Serial
-    # Renders a bike's serial as seen by the given user. A hidden, unknown or
-    # absent serial renders that word in place of the number, and a hidden serial
-    # is followed by why it's hidden - inline, or in a tooltip.
+    # Renders a bike's serial as seen by the given user, or by the given organization's
+    # members - which a page cached per organization passes. A hidden, unknown or absent
+    # serial renders that word in place of the number, and a hidden serial is followed
+    # by why it's hidden - inline, or in a tooltip. With :serial_tooltip, the serial is a
+    # pill that triggers a tooltip labelling it and saying why it's hidden.
     # Pass a bike, or a raw serial string.
     class Component < ApplicationComponent
       # What serial_display returns in place of a number
       PLACEHOLDERS = ["hidden", "unknown", "made without serial"].freeze
+      PILL_CLASSES = "tw:rounded-md tw:border tw:border-gray-100 tw:bg-gray-50 tw:px-1.5 tw:py-0.5 tw:font-mono tw:text-xs tw:text-gray-900 " \
+        "tw:dark:border-gray-700 tw:dark:bg-gray-900 tw:dark:text-gray-100"
 
-      def initialize(bike: nil, serial: nil, user: nil, explanation: :inline, html_class: nil)
+      def initialize(bike: nil, serial: nil, user: nil, organization: nil, explanation: :inline, html_class: nil)
         @bike = bike
         @serial = serial
         @user = user
+        @organization = organization
         @explanation = explanation
         @html_class = html_class
       end
@@ -23,6 +28,7 @@ module Atoms
       end
 
       def call
+        return content_tag(:span, render(UI::Tooltip::Component.new(text: serial_tooltip_text)) { serial_block }, class: PILL_CLASSES) if @explanation == :serial_tooltip
         return serial_block unless explanation?
 
         safe_join([serial_block, " ", explanation_block])
@@ -31,7 +37,7 @@ module Atoms
       private
 
       def serial
-        @serial ||= @bike&.serial_display(@user)
+        @serial ||= @bike&.serial_display(@user, organization: @organization)
       end
 
       # A passed serial is whatever was searched for, so "unknown" means the number
@@ -53,6 +59,11 @@ module Atoms
         end
       end
 
+      def serial_tooltip_text
+        text = translation(".serial_number", serial: placeholder? ? placeholder_text : serial)
+        explanation? ? "#{text} (#{explanation_text})" : text
+      end
+
       def explanation?
         @bike&.serial_hidden?
       end
@@ -60,7 +71,7 @@ module Atoms
       def explanation_block
         return tooltip(explanation_text) if @explanation == :tooltip
 
-        em = content_tag(:em, explanation_text, class: "small less-less-strong")
+        em = content_tag(:em, explanation_text, class: "less-strong tw:text-xs")
         return em unless serial_visible?
 
         safe_join([em, " ", tooltip(status_text)])

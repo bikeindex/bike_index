@@ -1,7 +1,9 @@
 module Admin
   class BugReportsController < Admin::BaseController
     include Binxtils::SortableTable
-    include API::TokenAuthenticatable
+    include Admin::TokenAccessible
+
+    token_accessible :index, :show, :update, :assign_tags
 
     # Keyed by the BugReport scope each filter applies
     MEMBERSHIP_FILTERS = {"member" => "Only members", "invoiced_organization" => "Only invoiced org",
@@ -9,8 +11,6 @@ module Admin
     STATUS_FILTER_ALL = "all"
     STATUS_FILTER_INVESTIGATE = "investigate"
 
-    # Token requests carry no CSRF token, they authenticate with the token alone
-    skip_before_action :verify_authenticity_token, if: :token_request?
     before_action :find_bug_report, only: %i[show update]
 
     def index
@@ -71,18 +71,18 @@ module Admin
 
     # Chips carry the value verbatim - the combobox removes a selection by the text as typed
     def tag_chips
-      chips = params[:combobox_values].to_s.split(",").map do
-        helpers.hw_combobox_selection_chip(display: it, value: it, for_id: params[:for_id])
-      end
-
-      render turbo_stream: helpers.safe_join(chips)
+      render :tag_chips, formats: :turbo_stream, locals: {tags: params[:combobox_values].to_s.split(",")}
     end
 
-    helper_method :matching_bug_reports, :searchable_tags, :searchable_receivers,
+    helper_method :matching_bug_reports, :searchable_tags, :tag_combobox_options, :searchable_receivers,
       :membership_filters, :status_filters, :status_only_filters
 
     def searchable_tags
       @searchable_tags ||= BugReport.all_tags
+    end
+
+    def tag_combobox_options
+      searchable_tags.map { {display: it, value: it, content: helpers.render(Atoms::Admin::Badges::BugReportTag::Component.new(tag: it))} }
     end
 
     def searchable_receivers
@@ -115,8 +115,8 @@ module Admin
 
     def matching_bug_reports
       bug_reports = BugReport.all
-      @searched_tag = params[:search_tag]
-      bug_reports = bug_reports.with_tag(@searched_tag) if @searched_tag.present?
+      @searched_tags = BugReport.normalized_tags(params[:search_tag])
+      bug_reports = bug_reports.with_tag(@searched_tags) if @searched_tags.any?
       @searched_receiver = params[:search_receiver]
       bug_reports = bug_reports.where(receiver: @searched_receiver) if @searched_receiver.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
@@ -148,11 +148,6 @@ module Admin
     end
 
     private
-
-    # Token requests get the API's JSON errors rather than a flash + redirect
-    def require_index_admin!
-      token_request? ? require_token_superuser! : super
-    end
 
     def find_bug_report
       @bug_report = BugReport.find(params[:id])

@@ -8,52 +8,32 @@
   = render(UI::Alerts::Base::Component.new(kind: :notice, margin_classes: 'tw:mt-4 mb-4')) do
     All of your emails include your custom #{all_snippet_kinds.map { MailSnippet.kind_humanized(_1)&.downcase }.to_sentence}.
 
-%table.table.table-striped.table-bordered.table-sm.without-exterior-border
-  %thead.small-header.hidden-md-down
-    %th Kind
-    %th.small Customized content enabled?
-    %th Created
-    %th Last updated
-    %th Body
-  %tbody
-    - (viewable_email_kinds - ["organization_stolen_message"]).each do |kind|
-      - if kind == "finished_registration"
-        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("finished_registration", exclude_all: true) }
-      - elsif kind == "partial_registration"
-        - mail_snippets = current_organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?("partial_registration", exclude_all: true) }
-      - else
-        - mail_snippets = current_organization.mail_snippets.where(kind: kind)
-      %tr
-        %td
-          = link_to MailSnippet.kind_humanized(kind), edit_organization_email_path(kind, organization_id: current_organization.to_param)
-        %td
-          = check_mark if mail_snippets.any? { |mail_snippet| mail_snippet.is_enabled }
-        %td
-          - if mail_snippets.any?
-            %span.localizeTime
-              = l(mail_snippets.first.created_at, format: :convert_time)
-        %td
-          - if mail_snippets.any?
-            %span.localizeTime
-              = l(mail_snippets.last.updated_at, format: :convert_time)
-        %td
-          - if mail_snippets.any?
-            %small
-              = truncate(mail_snippets.first.body_stripped, length: 100)
-    - if current_organization.enabled?("organization_stolen_message")
-      - organization_stolen_message = OrganizationStolenMessage.for(current_organization)
-      %tr
-        %td
-          = link_to "Organization Stolen Message", edit_organization_email_path("organization_stolen_message", organization_id: current_organization.to_param)
-        %td= check_mark if organization_stolen_message.is_enabled
-        %td
-          - if organization_stolen_message.content_added_at.present?
-            %span.localizeTime
-              = l(organization_stolen_message.content_added_at, format: :convert_time)
-        %td
-          - if organization_stolen_message.content_added_at.present?
-            %span.localizeTime
-              = l(organization_stolen_message.updated_at, format: :convert_time)
-        %td
-          %small
-            = truncate(organization_stolen_message.body, length: 100)
+:ruby
+  organization = current_organization
+  organization_id = organization.to_param
+  email_rows = (viewable_email_kinds - ["organization_stolen_message"]).map do |kind|
+    mail_snippets = if %w[finished_registration partial_registration].include?(kind)
+      organization.mail_snippets.select { |mail_snippet| mail_snippet.in_email?(kind, exclude_all: true) }
+    else
+      organization.mail_snippets.where(kind:)
+    end
+    {kind:, title: MailSnippet.kind_humanized(kind), enabled: mail_snippets.any?(&:is_enabled),
+     created_at: mail_snippets.first&.created_at, updated_at: mail_snippets.last&.updated_at, body: mail_snippets.first&.body_stripped}
+  end
+  stolen_message = OrganizationStolenMessage.for(organization) if organization.enabled?("organization_stolen_message")
+  stolen_message_rows = [stolen_message].compact.map do |message|
+    {kind: "organization_stolen_message", title: "Organization Stolen Message", enabled: message.is_enabled, created_at: message.content_added_at,
+     updated_at: (message.updated_at if message.content_added_at.present?), body: message.body}
+  end
+
+= render(UI::Table::Base::Component.new(records: email_rows + stolen_message_rows)) do |table|
+  - table.column(label: "Kind") do |row|
+    = link_to row[:title], edit_organization_email_path(row[:kind], organization_id:), class: "twlink"
+  - table.column(label: "Customized content enabled?", header_classes: "tw:text-xs") do |row|
+    = check_mark if row[:enabled]
+  - table.column(label: "Created") do |row|
+    = render(UI::Time::Component.new(time: row[:created_at]))
+  - table.column(label: "Last updated") do |row|
+    = render(UI::Time::Component.new(time: row[:updated_at]))
+  - table.column(label: "Body") do |row|
+    %small= truncate(row[:body], length: 100)

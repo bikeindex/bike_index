@@ -16,10 +16,11 @@ RSpec.describe ".claude/hooks/pr-guardrails.sh" do
   let(:pr_skill_loaded) { %({"message":{"content":[{"type":"tool_use","name":"Skill","input":{"skill":"pr"}}]}}\n) }
 
   # Blocking is exit 2 with the reason on stderr; anything else is a pass.
-  def verdict(tool_name, command = nil, env: {})
-    payload = {tool_name:, tool_input: command ? {command:} : {}, transcript_path: transcript.path}
+  def verdict(tool_name, command = nil, env: {}, tool_input: command ? {command:} : {}, cwd: Dir.pwd)
+    payload = {tool_name:, tool_input:, transcript_path: transcript.path, cwd:}
     _, err, status = Open3.capture3(env, "/bin/bash", hook, stdin_data: payload.to_json)
     return :allow unless status.exitstatus == 2
+    return :footer_denied if err.include?("attribution footer")
     err.include?("never the agent") ? :merge_denied : :skill_required
   end
 
@@ -60,6 +61,20 @@ RSpec.describe ".claude/hooks/pr-guardrails.sh" do
 
       it "allows" do
         expect(verdict("Bash", "gh pr create --base main")).to eq :allow
+      end
+
+      it "denies a body carrying the attribution footer, inline or in a body file" do
+        footer = "🤖 Generated with [Claude Code](https://claude.com/claude-code)"
+        expect(verdict("Bash", "gh pr create --body 'Fix it\n\n#{footer}'")).to eq :footer_denied
+        expect(verdict("mcp__github__update_pull_request", tool_input: {body: footer})).to eq :footer_denied
+
+        dir = Dir.mktmpdir
+        File.write(File.join(dir, "body.md"), "Fix it\n\n#{footer}\n")
+        File.write(File.join(dir, "clean.md"), "Fix it\n")
+        expect(verdict("Bash", "gh pr create --body-file body.md", cwd: dir)).to eq :footer_denied
+        expect(verdict("Bash", "gh pr edit 4397 -F #{dir}/body.md")).to eq :footer_denied
+        expect(verdict("Bash", "gh pr edit 4397 --body-file=body.md", cwd: dir)).to eq :footer_denied
+        expect(verdict("Bash", "gh pr create --body-file clean.md", cwd: dir)).to eq :allow
       end
     end
 

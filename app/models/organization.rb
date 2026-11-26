@@ -30,6 +30,7 @@
 #  regional_ids                    :jsonb
 #  registration_field_labels       :jsonb
 #  search_radius_miles             :float            default(50.0), not null
+#  send_self_registration_email    :boolean          default(FALSE), not null
 #  short_name                      :string(255)
 #  show_on_map                     :boolean
 #  slug                            :string(255)      not null
@@ -55,18 +56,19 @@ class Organization < ApplicationRecord
   include FriendlyNameFindable
   include SearchRadiusMetricable
 
+  # In display order, so a key's position isn't its stored value
   KIND_ENUM = {
     bike_shop: 0,
     bike_advocacy: 1,
     law_enforcement: 2,
     school: 3,
+    municipality: 10,
     bike_manufacturer: 4,
     software: 5,
     property_management: 6,
     other: 7,
     ambassador: 8,
-    bike_depot: 9,
-    municipality: 10
+    bike_depot: 9
   }.freeze
 
   USER_REGISTRATION_ALL_BIKES_EXCLUDED_IDS = [36, 1].freeze # SBR and BikeIndex
@@ -116,7 +118,7 @@ class Organization < ApplicationRecord
   has_many :locations, inverse_of: :organization, dependent: :destroy
   has_many :location_address_records, -> { where(kind: :organization) }, class_name: "AddressRecord", foreign_key: :organization_id
   has_many :mail_snippets
-  has_many :registration_sequences, dependent: :destroy
+  has_many :education_courses, dependent: :destroy
   has_many :parking_notifications
   has_many :impound_records
   has_many :impound_claims
@@ -124,6 +126,7 @@ class Organization < ApplicationRecord
   has_many :invoices
   has_many :payments
   has_many :graduated_notifications
+  has_many :organization_messages
   has_many :organization_statuses
   has_many :calculated_children, class_name: "Organization", foreign_key: :parent_organization_id
   has_many :public_images, as: :imageable, dependent: :destroy # For organization landings and other organization features
@@ -146,6 +149,7 @@ class Organization < ApplicationRecord
   validates_uniqueness_of :slug, message: "Slug error. You shouldn't see this - please contact support@bikeindex.org"
   validates_uniqueness_of :manufacturer_id, allow_blank: true
   validate :user_email_domain_format
+  validate :slug_unchanged_while_saml_active
   # Two SSO orgs on one domain would make saml_email_matching's pick arbitrary (name order),
   # silently sending logins to the wrong org's IdP. Non-SSO orgs may still share a domain.
   validates_uniqueness_of :user_email_domain, allow_blank: true,
@@ -157,6 +161,7 @@ class Organization < ApplicationRecord
 
   before_validation :set_calculated_attributes
   after_commit :update_associations
+  after_create_commit :enqueue_shop_welcome, if: :bike_shop?
 
   default_scope { order(:name) }
   scope :name_ordered, -> { order(arel_table["name"].lower) }
@@ -222,6 +227,31 @@ class Organization < ApplicationRecord
       kinds - admin_required_kinds
     end
 
+    # What would stop a new organization taking this name: :too_short, :reserved or :taken.
+    # Without building one, whose callbacks query (and can write) far more than this needs
+    def name_problem(name)
+      name = sanitize_name(name)
+      short_name = shorten_name(name)
+      return :too_short if Slugifyer.slugify(short_name).length < 2
+      # Organization validates all three, and shortening or slugging can land on a reserved word
+      return :reserved unless [name, short_name, slug_for(short_name)].all? { OrganizationNameValidator.valid?(it) }
+
+      :taken if name_taken_by(name).present?
+    end
+
+    # Short names are cut to 30 characters, and slugs drop punctuation - so a name can be taken by a different one
+    def name_taken_by(name) = shorten_name(sanitize_name(name)).then { find_by("LOWER(short_name) = ?", it.downcase) || find_by(slug: slug_for(it)) }
+
+    def sanitize_name(str) = Binxtils::InputNormalizer.sanitize(str&.strip).gsub("&amp;", "&")
+
+    def slug_for(short_name) = Slugifyer.slugify(short_name).delete_prefix("admin")
+
+    def shorten_name(str)
+      # Remove parens if the name is too long
+      str = str.gsub(/\(.*\)/, "") if str.length > 30 && str.match?(/\(.*\)/)
+      str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
+    end
+
     def kind_humanized(str)
       str.blank? ? nil : str.to_s.titleize
     end
@@ -233,8 +263,9 @@ class Organization < ApplicationRecord
       return find_by_id(n) if integer_string?(n)
 
       slug = Slugifyer.slugify(n)
-      # First try slug, then previous slug, and finally, just give finding by name a shot
-      find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first
+      # The -amp- slug's -and- form goes last, so an exact previous slug wins
+      find_by_slug(slug) || find_by_previous_slug(slug) || where("LOWER(name) = LOWER(?)", n.downcase).first ||
+        Slugifyer.amp_as_and(slug)&.then { friendly_find(it) }
     end
 
     def admin_text_search(n)
@@ -313,6 +344,9 @@ class Organization < ApplicationRecord
     slug
   end
 
+  # The slug ORGANIZATIONS_WITH_LANDING_PAGES routes, which can be the previous one
+  def landing_page_slug = [slug, previous_slug].find { LandingPageOrganizations::SLUGS.include?(it) }
+
   def restrict_invitations?
     !enabled?("passwordless_users") && !user_email_domain.present?
   end
@@ -352,7 +386,7 @@ class Organization < ApplicationRecord
   end
 
   def show_single_search_menu_item?
-    enabled?("bike_search") && !law_enforcement?
+    !law_enforcement? && !ambassador?
   end
 
   # WARNING! This is not efficient
@@ -394,6 +428,10 @@ class Organization < ApplicationRecord
     hot_sheet_configuration.present? && hot_sheet_configuration.on?
   end
 
+  def hot_sheet_viewable?
+    hot_sheet_on? || search_coordinates_set?
+  end
+
   def current_invoices
     invoices.active
   end
@@ -431,7 +469,7 @@ class Organization < ApplicationRecord
   def metric_units?
     return @metric_units if defined?(@metric_units)
 
-    @metric_units = Country.metric_units?(location_address_records.order(:id).pick(:country_id))
+    @metric_units = UnitSystem.metric?(country_id: location_address_records.order(:id).pick(:country_id))
   end
 
   def search_coordinates
@@ -499,8 +537,10 @@ class Organization < ApplicationRecord
   end
 
   def block_short_name_edit?
-    is_invoiced? # Prevent url changes breaking landing pages, etc
+    is_invoiced? || saml_active? # Prevent url changes breaking landing pages, SSO, etc
   end
+
+  def saml_active? = organization_saml_configuration&.active?
 
   def bike_actions?
     any_enabled?(OrganizationFeature::BIKE_ACTIONS)
@@ -537,6 +577,10 @@ class Organization < ApplicationRecord
     enabled?("graduated_notifications") && graduated_notification_interval.present?
   end
 
+  def skip_email_to?(email)
+    !send_self_registration_email && email.present? && email == auto_user&.email
+  end
+
   def graduated_notification_interval_days
     return nil unless graduated_notification_interval.present?
 
@@ -569,8 +613,8 @@ class Organization < ApplicationRecord
   def set_calculated_attributes
     return true unless name.present?
 
-    self.name = strip_name_tags(name)
-    self.name = "Stop messing about" unless name[/\d|\w/].present?
+    self.name = self.class.sanitize_name(name)
+    self.name = "Stop messing about" if Slugifyer.slugify(name).length < 2
     self.website = Urlifyer.urlify(website) if website.present?
     self.short_name = name_shortener(short_name.presence || name)
     self.ascend_name = nil if ascend_name.blank?
@@ -581,7 +625,7 @@ class Organization < ApplicationRecord
     self.graduated_notification_interval = nil unless graduated_notification_interval.to_i > 0
     # For now, just use them. However - nesting organizations probably need slightly modified organization_feature slugs
     self.enabled_feature_slugs = calculated_enabled_feature_slugs.compact.sort
-    new_slug = Slugifyer.slugify(short_name).delete_prefix("admin")
+    new_slug = self.class.slug_for(short_name)
     self.slug = calculated_slug(new_slug) if new_slug != slug
     self.access_token ||= SecurityTokenizer.new_token
     # NOTE: only organizations with child_organizations feature can be selected in admin view, but this doesn't block assignment
@@ -604,7 +648,7 @@ class Organization < ApplicationRecord
   end
 
   def incomplete_b_params
-    BParam.where(organization_id: [child_ids, id].flatten.compact).partial_registrations.without_bike
+    BParam.where(organization_id: [child_ids, id].flatten.compact).partial_registrations
   end
 
   # Can be improved later, for now just always get a location for the map
@@ -640,6 +684,8 @@ class Organization < ApplicationRecord
 
   private
 
+  def enqueue_shop_welcome = EmailJobs::ShopWelcomeJob.perform_in(EmailJobs::ShopWelcomeJob::DELAY, id)
+
   # Returning an address no account holds would leave auto_user blank, so every
   # later ensure_auto_user would save again and re-enqueue UpdateOrganizationAssociationsJob
   def calculated_embedable_user_email
@@ -658,6 +704,13 @@ class Organization < ApplicationRecord
     (2..).lazy.map { "#{new_slug}-#{it}" }.find { |candidate| !orgs.exists?(slug: candidate) }
   end
 
+  # The IdP registered the SP entity ID and callback URL, which are built from the slug
+  def slug_unchanged_while_saml_active
+    return unless slug_changed? && slug_was.present? && saml_active?
+
+    errors.add(:short_name, "can't change while SAML SSO is active - it would break every SSO sign in. Deactivate SAML first")
+  end
+
   def user_email_domain_format
     return if user_email_domain.blank?
     errors.add(:user_email_domain, "must include a .") unless user_email_domain.include?(".")
@@ -671,16 +724,8 @@ class Organization < ApplicationRecord
       .reorder(id: :asc)
   end
 
-  def strip_name_tags(str)
-    Binxtils::InputNormalizer.sanitize(name&.strip).gsub("&amp;", "&")
-  end
-
   def name_shortener(str)
-    # Remove parens if the name is too long
-    if str.length > 30 && str.match?(/\(.*\)/)
-      str = str.gsub(/\(.*\)/, "")
-    end
-    str = str.gsub(/\s+/, " ").strip.truncate(30, omission: "", separator: " ").strip
+    str = self.class.shorten_name(str)
     return str unless deleted_at.present?
 
     str.match?("-deleted") ? str : "#{str}-deleted"
@@ -712,7 +757,7 @@ class Organization < ApplicationRecord
     # If it has stickers, add reg_bike_sticker field
     fslugs += ["reg_bike_sticker"] if fslugs.include?("bike_stickers")
     # Alone, the edit feature would lock the organization out - viewing is gated separately
-    fslugs += ["registration_sequences"] if fslugs.include?("registration_sequences_edit")
+    fslugs += ["education_courses"] if fslugs.include?("education_courses_edit")
 
     if fslugs.include?("impound_bikes")
       # If impound_bikes enabled and there is a default location for impounding bikes, add impound_bikes_locations

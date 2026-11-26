@@ -15,8 +15,6 @@ module Organized
         flash[:success] = translation(:updated_successfully, org_name: current_organization.name)
         redirect_back(fallback_location: current_root_path)
       else
-        @page_errors = @organization.errors
-        flash[:error] = translation(:could_not_update, org_name: current_organization.name)
         render :show
       end
     end
@@ -49,8 +47,8 @@ module Organized
 
     def permitted_parameters
       params.require(:organization).permit(:name, :website, :embedable_user_email, :short_name,
-        :avatar, :lightspeed_register_with_phone, :direct_unclaimed_notifications, permitted_kind,
-        show_on_map_if_permitted, locations_attributes:)
+        :avatar, :lightspeed_register_with_phone, :direct_unclaimed_notifications, :send_self_registration_email,
+        permitted_kind, show_on_map_if_permitted, locations_attributes:)
     end
 
     def permitted_kind

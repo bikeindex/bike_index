@@ -56,11 +56,11 @@
 
             <ul class="tw:m-0 tw:list-none">
               <li>
-                <%= render UI::ActiveLink::Component.new(text: translation(".donate"), path: why_donate_path) %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".donate"), path: donate_path) %>
               </li>
 
               <li>
-                <%= render UI::ActiveLink::Component.new(text: translation(".store"), path: store_path) %>
+                <%= render UI::ActiveLink::Component.new(text: translation(".store"), path: shop_path) %>
               </li>
 
               <li>
@@ -100,11 +100,13 @@
                 <%= link_to translation(".status_page"), "https://status.bikeindex.org" %>
               </li>
 
-              <% if Flipper.enabled?(:strava_integration, @current_user) %>
-                <li>
-                  <%= render UI::ActiveLink::Component.new(text: translation(".strava_search"), path: strava_search_path) %>
-                </li>
-              <% end %>
+              <li>
+                <%= render UI::ActiveLink::Component.new(text: translation(".strava_search"), path: strava_search_path) %>
+              </li>
+
+              <li>
+                <%= render UI::ActiveLink::Component.new(text: translation(".ebike_checker"), path: ebike_rules_path) %>
+              </li>
             </ul>
           </nav>
 
@@ -180,6 +182,10 @@
                 <% end %>
               </li>
             </ul>
+
+            <div class="tw:clear-both tw:pt-8">
+              <%= render(SharedBlocks::ColorSchemePicker::Component.new(color_scheme: @color_scheme, url: (my_account_path if @current_user), compact: true)) %>
+            </div>
           </nav>
         </div>
       </div>
@@ -198,22 +204,20 @@
                   controller: "shared-blocks--locale-select",
                   action: "submit->shared-blocks--locale-select#submit change->shared-blocks--locale-select#submit"
                 } do %>
-              <div class="row">
-                <div class="form-group">
-                  <%= label_tag(:locale, translation(".language")) %>
+              <div class="form-group">
+                <%= label_tag(:locale, translation(".language")) %>
 
-                  <%= select_tag(:locale,
-                  options_for_select(helpers.language_choices, selected: I18n.locale),
-                  class: "form-control-sm") %>
+                <%= select_tag(:locale,
+                options_for_select(helpers.language_choices, selected: I18n.locale),
+                class: "form-control-sm") %>
 
-                  <% if @current_user.present? && @current_user.preferred_language != I18n.locale %>
-                    <em class="below-input-help text-right">
-                      <%= link_to translation(".change_preferred_language"), edit_my_account_path %>
-                    </em>
-                  <% end %>
+                <% if @current_user.present? && @current_user.preferred_language != I18n.locale %>
+                  <em class="below-input-help text-right">
+                    <%= link_to translation(".change_preferred_language"), edit_my_account_path %>
+                  </em>
+                <% end %>
 
-                  <%= submit_tag "update", name: "Update", class: "btn btn-primary btn-sm sr-only" %>
-                </div>
+                <%= submit_tag "update", name: "Update", class: "btn btn-primary btn-sm sr-only" %>
               </div>
             <% end %>
           </div>
@@ -241,12 +245,15 @@
   <% unless @skip_facebook %>
     <%# Facebook pixel %>
     <script>
+  // A Turbo visit runs this again, and a second init warns "Duplicate Pixel ID"
+  if (!window.fbq) {
   !function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?
   n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;
   n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;
   t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,
   document,'script','https://connect.facebook.net/en_US/fbevents.js');
   fbq('init', <%= raw FACEBOOK_PIXEL_ID.to_json %>);
+  }
   fbq('track', "PageView");
   </script>
     <noscript>

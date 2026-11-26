@@ -1,15 +1,4 @@
-<% nav_header_list_items = capture do %>
-  <li>
-    <%= render(UI::Dropdown::Component.new(name: @search_completeness.humanize, button_size: :sm,
-          active: @search_completeness != "all")) do |dropdown| %>
-      <% %w[all only_incomplete only_complete].each do |kind| %>
-        <% kind_active = @search_completeness == kind %>
-        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.humanize, path: admin_b_params_path(sortable_search_params.merge(search_completeness: kind_active ? nil : kind)), match_params: {search_completeness: kind}) } %>
-      <% end %>
-    <% end %>
-  </li>
-<% end %>
-
+<% show_data = Binxtils::InputNormalizer.boolean(params[:search_show_data]) %>
 <% rendered_chart = nil %>
 
 <% if @render_chart %>
@@ -34,14 +23,13 @@
 <% end if request.query_parameters.blank? %>
 
 <% admin_search_form = capture do %>
-  <%= form_tag admin_b_params_path, method: :get, class: "form-inline mt-4 mb-4 justify-content-md-end" do %>
+  <%= form_with(url: admin_b_params_path, method: :get, html: {class: "twsearchrow"}) do |f| %>
     <%= hidden_field_tag :search_completeness, params[:search_completeness] %>
 
-    <div class="form-group mr-2 mb-2">
-      <%= text_field_tag :query, params[:query], placeholder: "Find by email", class: "form-control" %>
-    </div>
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :query,
+      html_options: {value: params[:query], placeholder: "Find by email"}) %>
 
-    <%= submit_tag "Search", name: "search", class: "btn btn-primary mb-2" %>
+    <%= render UI::Button::Component.new(text: "Search", color: :primary, type: "submit", name: "search") %>
   <% end %>
 <% end %>
 
@@ -50,8 +38,20 @@
   collection: @b_params,
   viewing: "Partial bikes",
   rendered_chart:,
-  nav_header_list_items:,
   admin_search_form:,
   count_detail:,
-  table_view: render(partial: "table", locals: {collection: @b_params, render_sortable: true}),
-)) %>
+  table_view: render(partial: "table", locals: {collection: @b_params, render_sortable: true, show_data:}),
+)) do |skeleton| %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "Show data", href: url_for(sortable_search_params.merge(search_show_data: !show_data)), size: :sm, active: show_data)) } %>
+  <% skeleton.with_nav_item { render(UI::ButtonLink::Component.new(text: "Course in progress", href: url_for(sortable_search_params.merge(search_education_course_in_progress: !@education_course_in_progress)), size: :sm, active: @education_course_in_progress)) } %>
+
+  <% skeleton.with_nav_item do %>
+    <%= render(UI::Dropdown::Component.new(name: @search_completeness.humanize, button_size: :sm,
+          active: @search_completeness != "all")) do |dropdown| %>
+      <% %w[all only_incomplete only_complete].each do |kind| %>
+        <% kind_active = @search_completeness == kind %>
+        <% dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: kind.humanize, path: admin_b_params_path(sortable_search_params.merge(search_completeness: kind_active ? nil : kind)), match_params: {search_completeness: kind}) } %>
+      <% end %>
+    <% end %>
+  <% end %>
+<% end %>

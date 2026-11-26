@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationForm::Component, :js, type: :system do
-  let(:controller_id) { "registrations--show--parking-notification-form" }
+  let(:controller_id) { "org--parking-notification-form" }
   let(:map_selector) { "[data-#{controller_id}-target='map']" }
   # Defined in utils/maplibre.js since #3954, so there is no Ruby constant to reuse
   let(:maps_host) { "https://maps.bikeindex.org" }
@@ -161,6 +161,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
     expect(page).to have_content(/Impound this #{bike.type}/i, wait: 10)
     expect(page).to have_no_content("Notification because")
     expect(find("input[name='parking_notification[kind]'][value='impound_notification']", visible: :all)).to be_checked
+    expect(page).to have_button("Impound this #{bike.type}", visible: :all)
   end
 
   # The device fix has landed: the pin is on it and mirrored into the URL. MapLibre
@@ -220,6 +221,8 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::ParkingNotificationFor
     expect(page).to have_field("Postal code", with: "94110")
     # The endpoint hands back ids, so the selects are set directly rather than matched by label
     expect(address_field("region_record_id")).to eq(state.id.to_s)
+    # and the state combobox shows it, rather than only its hidden field holding it
+    expect(page).to have_field("State", with: "#{state.name} (#{state.abbreviation})")
     expect(address_field("country_id")).to eq(country.id.to_s)
     expect(coordinate("use_entered_address")).to eq("true")
     expect_axe_clean

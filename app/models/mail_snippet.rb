@@ -49,6 +49,8 @@ class MailSnippet < ApplicationRecord
 
   validates_uniqueness_of :organization_id, scope: [:kind], allow_nil: true
   validates_uniqueness_of :doorkeeper_app_id, scope: [:kind], allow_nil: true
+  # Organization layouts start as empty snippets, so only a snippet created from scratch needs a body
+  validates_presence_of :body, on: :admin_create
 
   attr_accessor :skip_update
 

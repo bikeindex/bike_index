@@ -224,33 +224,6 @@ RSpec.describe User, type: :model do
     end
   end
 
-  describe "registration_show_redesign?" do
-    let(:user) { FactoryBot.create(:user_confirmed) }
-
-    it "is falsey when not in the rollout" do
-      expect(user.registration_show_toggleable?).to be_falsey
-      expect(user.registration_show_redesign?).to be_falsey
-    end
-
-    context "in the rollout" do
-      before { Flipper.enable_actor(:bike_show_redesign_toggle, user) }
-
-      it "is truthy" do
-        expect(user.registration_show_toggleable?).to be_truthy
-        expect(user.registration_show_redesign?).to be_truthy
-      end
-
-      context "switched to the legacy view" do
-        let(:user) { FactoryBot.create(:user_confirmed, feature_registration_show_legacy: true) }
-
-        it "is toggleable, but not the redesign" do
-          expect(user.registration_show_toggleable?).to be_truthy
-          expect(user.registration_show_redesign?).to be_falsey
-        end
-      end
-    end
-  end
-
   describe "superuser?" do
     let(:user) { User.new }
     it "is true for superuser attribute" do
@@ -401,6 +374,13 @@ RSpec.describe User, type: :model do
       user2 = FactoryBot.build(:user, username: "COOLNAME")
       expect(user2.valid?).to be_falsey
       expect(user2.errors[:username]).to include("has already been taken")
+    end
+
+    it "doesn't reslugify an unchanged username" do
+      user = FactoryBot.create(:user)
+      user.update_column :username, "-legacy--name"
+      user.reload.update(name: "New name")
+      expect(user.reload.username).to eq "-legacy--name"
     end
   end
 
@@ -659,9 +639,26 @@ RSpec.describe User, type: :model do
       user.send_magic_link_email
       expect {
         user.send_magic_link_email
-      }.to change(EmailJobs::ResetPasswordJob.jobs, :size).by(0)
+      }.to change(EmailJobs::MagicLoginLinkJob.jobs, :size).by(0)
       user.reload
       expect(user.magic_link_token).to eq token
+    end
+
+    it "resends the unexpired token, and replaces it once past half the expiry" do
+      user = FactoryBot.create(:user)
+      user.update_auth_token("magic_link_token", 5.minutes.ago.to_i)
+      token = user.magic_link_token
+      expect {
+        user.send_magic_link_email
+      }.to change(EmailJobs::MagicLoginLinkJob.jobs, :size).by(1)
+      expect(user.reload.magic_link_token).to eq token
+
+      user.update_auth_token("magic_link_token", (Time.current - User::AUTH_TOKEN_EXPIRY / 2 - 1.minute).to_i)
+      token = user.magic_link_token
+      expect {
+        user.send_magic_link_email
+      }.to change(EmailJobs::MagicLoginLinkJob.jobs, :size).by(1)
+      expect(user.reload.magic_link_token).to_not eq token
     end
   end
 

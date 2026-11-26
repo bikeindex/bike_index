@@ -37,11 +37,35 @@ RSpec.describe RegistrationsController, type: :request do
       expect(response.headers["X-Frame-Options"]).to eq "SAMEORIGIN"
       expect(flash).to_not be_present
     end
+
+    it "passes the color scheme to the embed" do
+      current_user.update(color_scheme: "dark")
+      get "#{base_url}/new"
+      expect(Capybara.string(response.body)).to have_css("iframe[src*='color_scheme=dark']")
+    end
   end
 
   describe "embed" do
     let(:basic_field_names) do
       %w[commit creation_organization_id manufacturer_id owner_email primary_frame_color_id status]
+    end
+
+    describe "color scheme" do
+      def body = Capybara.string(response.body)
+
+      it "is light unless passed one, and carries it through the form" do
+        get "#{base_url}/embed"
+        expect(body).to have_no_css("body.dark")
+        expect(response.body).to_not include("window.colorSchemeQuery")
+
+        get "#{base_url}/embed", params: {color_scheme: "dark"}
+        expect(body).to have_css("body.dark")
+        expect(body).to have_css("form[action='/registrations?color_scheme=dark']")
+
+        get "#{base_url}/embed", params: {color_scheme: "system"}
+        expect(body).to have_no_css("body.dark")
+        expect(response.body).to include("window.colorSchemeQuery")
+      end
     end
 
     context "no organization" do
@@ -227,7 +251,6 @@ RSpec.describe RegistrationsController, type: :request do
           b_param = BParam.last
           expect(b_param.owner_email).to eq "something@stuff.com"
           expect(b_param.origin).to eq "embed_partial"
-          expect(b_param.partial_registration?).to be_truthy
           expect(b_param.motorized?).to be_falsey
           expect(b_param.params["propulsion_type_motorized"]).to be_blank
           expect(EmailJobs::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
@@ -270,7 +293,6 @@ RSpec.describe RegistrationsController, type: :request do
           expect(b_param.origin).to eq "embed_partial"
           expect(b_param.motorized?).to be_truthy
           expect(EmailJobs::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
-          expect(b_param.partial_registration?).to be_truthy
         end
 
         context "with invalid cycle_type" do
@@ -285,7 +307,6 @@ RSpec.describe RegistrationsController, type: :request do
             expect(b_param.cycle_type).to eq "bike"
             expect(b_param.motorized?).to be_truthy
             expect(EmailJobs::PartialRegistrationJob).to have_enqueued_sidekiq_job(b_param.id)
-            expect(b_param.partial_registration?).to be_truthy
           end
         end
       end

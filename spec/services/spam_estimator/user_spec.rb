@@ -117,6 +117,20 @@ RSpec.describe SpamEstimator::User do
       end
     end
 
+    context "account-reseller profile" do
+      let(:user) do
+        User.new(show_bikes: true, name: "RevolutAcc00012", username: "revolutacc00012", title: "Buy Revolut Accounts",
+          description: "PVAExpress.com provides verified Revolut accounts designed for users who need secure " \
+            "and ready-to-use financial profiles.\r\n\r\nVisit us at:https://pvaexpress.com/product/buy-verified-revolut-account-secure-usa/")
+      end
+
+      it "is above the spam threshold" do
+        expect(described_class.seo_spam_matches(user)).to eq({"buy revolut accounts" => 1,
+          "verified revolut accounts" => 1, "buy verified" => 1})
+        expect(described_class.estimate(user)).to be > SpamEstimator::User::MARK_SPAM_PERCENT
+      end
+    end
+
     context "real names that contain spam terms as substrings" do
       # usernames are auto-generated random strings, so substring matching would ban real people
       it "does not count them as references" do

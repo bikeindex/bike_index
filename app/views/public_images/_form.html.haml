@@ -1,15 +1,5 @@
 = form_for @public_image do |f|
-  - if @public_image.errors.any?
-    #alert-block
-      .alert-error
-        %a.close{ herf: "#", data: {dismiss: "alert"}}
-          x
-        %h4
-          - count = pluralize(@public_image.errors.count, t(".error"))
-          = t(".errors_prevented_photo_from_saving", errors_count: count)
-        %ul
-          - @public_image.errors.full_messages.each do |msg|
-            %li= msg
+  = render(UI::Alerts::ObjectError::Component.new(object: @public_image, dismissable: true))
 
   %section.padded
     .form
@@ -18,7 +8,7 @@
         .controls
           = f.text_field :name
       .clearfix
-        .alert.alert-notice
+        = render(UI::Alerts::Base::Component.new(kind: :notice)) do
           %p
             = t(".use_this_if_youd_like_to_attach_a_photo")
           .control-group.padded

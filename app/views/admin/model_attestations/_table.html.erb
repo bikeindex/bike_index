@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "created_at", header_classes: "tw:text-xs", lower_right: ->(record) { tag.span(record.id, class: "only-dev-visible") }) do |model_attestation| %>
     <%= render UI::Time::Component.new(time: model_attestation.created_at) %>
   <% end %>
@@ -16,7 +16,7 @@
     <strong><%= model_audit.mnfg_name %></strong>
     <%= helpers.model_audit_frame_model_display(model_audit, truncate: true) %>
 
-    <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_model_audit_id: model_audit.id)), class: "display-sortable-link small" %>
+    <%= link_to search_emoji, url_for(sort_state.search_params.merge(search_model_audit_id: model_audit.id)), class: "display-sortable-link tw:text-sm" %>
 
     <% if model_attestation.organization_id.present? %>
       <%= link_to "view in org", organization_model_audit_path(model_attestation.model_audit_id, organization_id: model_attestation.organization&.to_param), class: "twlink tw:text-xs tw:inline-block less-strong" %>
@@ -34,7 +34,7 @@
   <% table.column(sortable: "organization_id") do |model_attestation| %>
     <% if model_attestation.organization %>
       <%= link_to model_attestation.organization.short_name || model_attestation.organization_id, organization_model_audits_path(organization_id: model_attestation.organization.to_param), class: "twlink" %>
-      <%= link_to search_emoji, url_for(sort_state.search_params.merge(organization_id: model_attestation.organization.to_param)), class: "display-sortable-link small" %>
+      <%= link_to search_emoji, url_for(sort_state.search_params.merge(organization_id: model_attestation.organization.to_param)), class: "display-sortable-link tw:text-sm" %>
     <% end %>
   <% end %>
 
@@ -51,7 +51,7 @@
 
     <% if model_attestation.url.present? %>
       <small>
-        <%= link_to truncate(model_attestation.url), model_attestation.url, class: "twlink" %>
+        <%= link_to Urlifyer.display(model_attestation.url, length: 30), model_attestation.url, class: "twlink" %>
       </small>
     <% end %>
   <% end %>

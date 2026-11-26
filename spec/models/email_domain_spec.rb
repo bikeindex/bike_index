@@ -21,6 +21,14 @@ RSpec.describe EmailDomain, type: :model do
   end
 
   describe "validate domain" do
+    context "without a domain" do
+      it "is invalid, whatever stands in for it" do
+        ["", " ", "@", nil].each do |domain|
+          expect(FactoryBot.build(:email_domain, domain:)).not_to be_valid
+        end
+      end
+    end
+
     context "without ." do
       let(:email_domain) { FactoryBot.build(:email_domain, domain: "@somethingcom") }
       it "is invalid" do

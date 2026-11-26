@@ -82,6 +82,14 @@ RSpec.describe Admin::MailSnippetsController, type: :request do
       expect(flash[:errors]).to be_blank
       expect(MailSnippet.last).to have_attributes params
     end
+
+    it "re-renders the form without a body" do
+      expect { post base_url, params: {mail_snippet: valid_params.merge(body: "")} }.not_to change(MailSnippet, :count)
+
+      expect(response.status).to eq 422
+      expect(response).to render_template(:new)
+      expect(response.body).to match(/Body can.+t be blank/)
+    end
   end
 
   describe "update" do

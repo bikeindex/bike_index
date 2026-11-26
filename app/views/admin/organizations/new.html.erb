@@ -1,4 +1,4 @@
-<h1>New Organizaton</h1>
+<%= render(Pages::Admin::Headers::Nav::Component.new(title: "New Organization")) %>
 
 <%= render(Pages::Admin::Organizations::Form::TabForm::Component.new(organization: @organization, submit_text: "Create",
       fields_component: Pages::Admin::Organizations::Form::Wrapper::Component,

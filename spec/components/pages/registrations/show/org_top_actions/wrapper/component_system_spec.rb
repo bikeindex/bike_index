@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, :js, type: :system do
-  let(:preview_path) { "/rails/view_components/pages/registrations/show/org_top_actions/wrapper/component/default" }
+  let(:preview_path) { "/rails/view_components/pages/registrations/show/org_top_actions/wrapper/component/staff" }
   # The preview renders against the seeded brakebills org, so every feature-gated action shows
   let!(:organization) { FactoryBot.create(:organization_brakebills) }
   # It renders as lookbook_user, which finds the first user - and the message action needs
@@ -12,7 +12,7 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, :j
 
   # The preview stacks a section per scenario, each its own accordion
   def scenario(label)
-    find("section", text: label)
+    find("h2", exact_text: label).ancestor("section")
   end
 
   it "opens one panel at a time, keeping the open panel in the URL" do

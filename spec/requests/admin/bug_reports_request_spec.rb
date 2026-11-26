@@ -76,6 +76,28 @@ RSpec.describe Admin::BugReportsController, type: :request do
       end
     end
 
+    context "with search_tag" do
+      let!(:bug_report_both) { FactoryBot.create(:bug_report, tags: %w[bug parking]) }
+      let!(:bug_report_bug) { FactoryBot.create(:bug_report, tags: %w[bug]) }
+
+      it "matches reports with every selected tag" do
+        expect(bug_report.tags).to eq(["parking"])
+        get "#{base_url}.json", params: {search_tag: "bug", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to match_array([bug_report_both.id, bug_report_bug.id])
+
+        get "#{base_url}.json", params: {search_tag: "parking,bug", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_both.id])
+      end
+
+      it "keeps the selection in the combobox" do
+        get base_url, params: {search_tag: "parking,bug", search_status: "all"}
+        expect(response.body).to match(%r{tags: <code[^>]*>bug, parking</code>})
+        expect(response.body).to include('value="bug,parking"')
+        options = Nokogiri::HTML(response.body).css("[role=option] span[class*='font-mono']").map(&:text)
+        expect(options).to include("bug", "parking")
+      end
+    end
+
     context "with search_receiver" do
       let!(:bug_report_support) { FactoryBot.create(:bug_report, receiver: "support@bikeindex.org") }
 
@@ -94,7 +116,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
       it "names the search in the count detail" do
         get base_url, params: {search_receiver: "support@bikeindex.org", search_status: "all"}
         expect(response.body).to match(/1<\/strong>\s*Matching/)
-        expect(response.body).to include("receiver: <code>support@bikeindex.org</code>")
+        expect(response.body).to match(%r{receiver: <code[^>]*>support@bikeindex.org</code>})
       end
     end
 
@@ -130,6 +152,16 @@ RSpec.describe Admin::BugReportsController, type: :request do
       get "#{base_url}/#{bug_report.to_param}"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
+      expect(response.body).not_to include("View the full feedback")
+    end
+
+    context "from the feedback panel" do
+      let(:bug_report) { FactoryBot.create(:bug_report, body: %(<a href="https://bikeindex.org/admin/feedbacks/12">read full message</a>)) }
+
+      it "links to the feedback" do
+        get "#{base_url}/#{bug_report.to_param}"
+        expect(response.body).to include(%(href="/admin/feedbacks/12"))
+      end
     end
 
     context "json" do
@@ -216,7 +248,8 @@ RSpec.describe Admin::BugReportsController, type: :request do
       post "#{base_url}/tag_chips", params: {combobox_values: "search,Not Yet Normalized", for_id: "bug_report_tags"},
         as: :turbo_stream
       expect(response.status).to eq(200)
-      expect(response.body.scan(/<span>([^<]+)<\/span>/).flatten).to eq(["search", "Not Yet Normalized"])
+      chips = Nokogiri::HTML.fragment(response.body).css("[data-hw-combobox-chip] span[class*='font-mono']")
+      expect(chips.map { it.text.strip }).to eq(["search", "Not Yet Normalized"])
       expect(response.body).to include('data-hw-combobox-value-param="Not Yet Normalized"')
     end
   end

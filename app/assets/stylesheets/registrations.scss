@@ -67,7 +67,6 @@ $border-radius-sm: 1px;
 
 // Components
 // @import "bootstrap/animation";
-// @import "bootstrap/dropdown";
 // @import "bootstrap/button-group";
 @import "bootstrap/input-group";
 @import "bootstrap/custom-forms";
@@ -160,7 +159,6 @@ $border-radius-sm: 1px;
 // @import "revised/pages/bikes/show_photo"; // separated because it's a lot
 
 // User pages
-// @import "revised/pages/my_accounts/show";
 // @import "revised/pages/my_accounts/edit";
 
 // Error pages
@@ -187,7 +185,6 @@ $border-radius-sm: 1px;
 
 // // LEGACY PAGES general styles - replace as soon as all pages have been restyled
 // @import "revised/sections/legacy_content"; // general legacy content styles
-// @import "revised/pages/legacy_stolen"; // legacy stolen page - including multi-serial search
 
 // html { background: $black-off; }
 // .currently-hidden { display: none; }
@@ -249,6 +246,10 @@ img {
 // REGISTRATION FORM SPECIFIC STYLES
 //
 #binx_registration_widget {
+  // tailwind's unlayered body rule would otherwise reach the widget by inheritance
+  font-family: $font-family-base;
+  color: $body-color;
+
   margin: 0 auto;
   position: relative;
   border-radius: $border-radius;
@@ -260,6 +261,7 @@ img {
 
   h2 {
     font-size: 30px;
+    font-weight: $strong-font-weight;
     margin: $vertical-height 0 (1.5 * $vertical-height);
   }
 
@@ -280,6 +282,7 @@ img {
       margin: 0;
       text-align: center;
       font-size: 21px;
+      font-weight: $strong-font-weight;
     }
   }
 

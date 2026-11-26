@@ -65,19 +65,19 @@ RSpec.describe "Bikes API V2", type: :request do
 
     context "special error" do
       let!(:color) { FactoryBot.create(:color, name: "White") }
-      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Trek") }
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Specialized") }
       let(:organization) { FactoryBot.create(:organization, name: "Pro's Closet", short_name: "tpc") }
       let(:user) { FactoryBot.create(:organization_user, organization: organization) }
       let(:bike_attrs) do
         {
           serial: "WTU171G0193G",
-          manufacturer: "Trek",
-          description: "2012 Trek Superfly 100 AL Elite Mountain Bike 19in 29\" Alloy Shimano XT 10s Fox",
-          year: "2012",
+          manufacturer: "Specialized",
+          description: "2025 Specialized Globe Haul ST Cargo Bike One Size 20\" Alloy microSHIFT 9s",
+          year: "2025",
           frame_material: "aluminum",
           owner_email: "developers@example.com",
           color: "white",
-          frame_model: "Superfly 100 AL Elite",
+          frame_model: "Haul ST",
           access_token: token.token,
           organization_slug: "TPC",
           external_image_urls: ["https://s3-us-west-2.amazonaws.com/theproscloset-img/BMT12479_BJ_01.jpg", "https://s3-us-west-2.amazonaws.com/theproscloset-img/BMT12479_BJ_02.jpg"],
@@ -85,28 +85,24 @@ RSpec.describe "Bikes API V2", type: :request do
         }
       end
       it "creates", :flaky do
-        VCR.use_cassette("bikes_v2-create-matching-bike-book", match_requests_on: [:path]) do
-          expect(manufacturer.reload.name).to eq "Trek"
-          expect(Bike.count).to eq 0
-          expect {
-            post "/api/v2/bikes?access_token=#{token.token}",
-              params: bike_attrs.to_json,
-              headers: json_headers
-          }.to change(Ownership, :count).by 1
-          expect(response.code).to eq("201")
-          expect(Bike.count).to eq 1
-          result = json_result["bike"]
-          expect(Bike.last.mnfg_name).to eq "Trek" # For some reason, fixed a flaky spec
-          expect(result["manufacturer_name"]).to eq bike_attrs[:manufacturer]
-          %i[serial year frame_model].each do |k|
-            pp k unless bike_attrs[k].downcase == result[k]&.to_s&.downcase
-            expect(bike_attrs[k].downcase).to eq result[k].to_s.downcase
-          end
-          expect(result["description"]).to match bike_attrs[:description]
-          expect(result["frame_colors"]).to eq(["White"])
-          expect(result["frame_material_slug"]).to eq("aluminum")
-          expect(result["components"].count).to be > 10
+        sync_bikebook_models
+        expect {
+          post "/api/v2/bikes?access_token=#{token.token}",
+            params: bike_attrs.to_json,
+            headers: json_headers
+        }.to change(Ownership, :count).by 1
+        expect(response.code).to eq("201")
+        expect(Bike.count).to eq 1
+        result = json_result["bike"]
+        expect(Bike.last.mnfg_name).to eq "Specialized"
+        expect(result["manufacturer_name"]).to eq bike_attrs[:manufacturer]
+        %i[serial year frame_model].each do |k|
+          expect(bike_attrs[k].downcase).to eq result[k].to_s.downcase
         end
+        expect(result["description"]).to match bike_attrs[:description]
+        expect(result["frame_colors"]).to eq(["White"])
+        expect(result["frame_material_slug"]).to eq("aluminum")
+        expect(result["components"].count).to be > 10
       end
     end
 
@@ -115,7 +111,7 @@ RSpec.describe "Bikes API V2", type: :request do
       FactoryBot.create(:ctype, name: "wheel")
       FactoryBot.create(:ctype, name: "Headset")
       front_gear_type = FactoryBot.create(:front_gear_type)
-      handlebar_type_slug = "bmx"
+      handlebar_type_slug = "forward"
       components = [
         {
           manufacturer: manufacturer.name,
@@ -237,6 +233,8 @@ RSpec.describe "Bikes API V2", type: :request do
       expect(bike.current_stolen_record_id).to be_present
       expect(bike.current_stolen_record.police_report_number).to eq(bike_attrs[:stolen_record][:police_report_number])
       expect(bike.current_stolen_record.phone).to eq("1")
+      expect(bike.current_stolen_record.street).to eq "278 Broadway"
+      expect(bike.current_stolen_record.postal_code).to eq "10007"
     end
   end
 
@@ -275,6 +273,14 @@ RSpec.describe "Bikes API V2", type: :request do
         post "/api/v2/bikes/check_if_registered?access_token=#{token.token}", params: bike_phone_attrs.merge(serial: "ffff").to_json, headers: json_headers
         expect(response.code).to eq("201")
         expect(json_result[:registered].to_s).to eq "false"
+      end
+
+      it "returns 400 for a multipart owner_email with invalid bytes" do
+        body = "--b\r\nContent-Disposition: form-data; name=\"owner_email\"\r\n\r\n1\xFF\xFE\r\n--b--\r\n".b
+        post "/api/v2/bikes/check_if_registered?access_token=#{token.token}", params: body,
+          headers: {"CONTENT_TYPE" => "multipart/form-data; boundary=b"}
+        expect(response.code).to eq("400")
+        expect(json_result[:error]).to match(/invalid encoding/i)
       end
     end
   end

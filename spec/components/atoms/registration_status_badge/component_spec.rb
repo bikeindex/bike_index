@@ -3,6 +3,10 @@ require "rails_helper"
 RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
   let(:component) { described_class.new(bike:) }
 
+  it "has a border for every colour a status can badge as" do
+    expect(described_class::BORDER_CLASSES.keys).to include(*described_class::COLORS.values.uniq)
+  end
+
   context "with owner (default)" do
     let(:bike) { FactoryBot.create(:bike) }
     it "shows registered, explained by a tooltip" do
@@ -81,6 +85,22 @@ RSpec.describe Atoms::RegistrationStatusBadge::Component, type: :component do
     it "shows found" do
       render_inline(component)
       expect(page).to have_text("Found")
+    end
+  end
+
+  describe ".event_time" do
+    it "is nil for a registered bike" do
+      expect(described_class.event_time(FactoryBot.create(:bike))).to be_nil
+    end
+
+    context "abandoned by a parking notification" do
+      let(:parking_notification) { FactoryBot.create(:parking_notification, kind: "appears_abandoned_notification", created_at: Time.current - 2.days) }
+      let(:bike) { parking_notification.bike.reload }
+
+      it "is when the notification marked it" do
+        expect(bike.status).to eq "status_abandoned"
+        expect(described_class.event_time(bike)).to match_time parking_notification.created_at
+      end
     end
   end
 

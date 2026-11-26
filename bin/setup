@@ -18,8 +18,8 @@ def shared_root
 end
 
 FileUtils.chdir APP_ROOT do
-  # Untracked state too big or too stateful to duplicate comes from the root
-  # checkout rather than being rebuilt per workspace
+  # Untracked state too stateful to duplicate comes from the root checkout rather
+  # than being rebuilt per workspace
   if (root = shared_root)
     puts "== Setting up workspace against #{root} =="
 
@@ -48,12 +48,13 @@ FileUtils.chdir APP_ROOT do
     end
     FileUtils.ln_sf root_storage, "storage"
 
-    # Symlink node_modules so every workspace shares one install
+    # A clone (APFS clonefile) shares the root install's disk blocks, where npm writes a
+    # full 160MB copy per workspace. npm replaces a symlinked node_modules, so it can't be one
     root_node_modules = File.join(root, "node_modules")
-    FileUtils.mkdir_p root_node_modules unless Dir.exist?(root_node_modules)
-    puts "Symlinking node_modules from #{root_node_modules}..."
-    FileUtils.rm_rf "node_modules"
-    FileUtils.ln_sf root_node_modules, "node_modules"
+    if Dir.exist?(root_node_modules) && !Dir.exist?("node_modules")
+      puts "Cloning node_modules from #{root_node_modules}..."
+      system("cp", "-Rc", root_node_modules, "node_modules")
+    end
 
     # Copy Facebook VCR cassettes
     fb_cassettes = File.join(root, "spec/vcr_cassettes/facebook")
@@ -83,41 +84,19 @@ FileUtils.chdir APP_ROOT do
   puts "== Starting redis so database can be migrated =="
   system "redis-server &"
 
-  # Install JavaScript dependencies
-  system("npm install")
-
-  puts "\n== Preparing database =="
-
-  # NOTE: only loading db:schema on primary, because primary_replica is the same db in dev
-  system "bin/rake db:create db:schema:load:primary db:schema:load:analytics db:migrate"
+  npm_install = spawn("npm install")
 
   # The layout needs tailwind.css and emails (which seeding sends) need email.css; without
   # the build Sprockets tries compiling email.scss with sassc
-  puts "\n== Building stylesheets =="
-  system! "bin/rails tailwindcss:build dartsass:build"
-
+  tasks = %w[db:prepare tailwindcss:build dartsass:build log:clear]
   unless without_seeds
-    # db:seed isn't idempotent: a re-run over seeded records dies on duplicates
-    if system("bin/rails runner 'exit Bike.unscoped.exists?'")
-      puts "\n== Database already seeded =="
-    else
-      puts "\n== Seeding database =="
-      system! "bin/rake db:seed"
-    end
-
+    tasks += %w[db:seed setup:load_counts]
     # Opt-in, matching lib/tasks/parallel_migrate.rake
-    unless ENV["PARALLEL_MIGRATIONS"].to_s.strip.empty?
-      puts "\n== Preparing parallel test databases =="
-      system! "bin/rake parallel:prepare"
-    end
-
-    # Autocomplete (typeahead) is loaded by db:seed above; here we just load counts
-    puts "\n== loading bike counts =="
-    system! "bin/rake setup:load_counts"
+    tasks += %w[parallel:create parallel:prepare] unless ENV["PARALLEL_MIGRATIONS"].to_s.strip.empty?
   end
-
-  puts "\n== Removing old logs and tempfiles =="
-  system! "bin/rails log:clear tmp:clear"
+  puts "\n== Running #{tasks.join(" ")} =="
+  system!("bin/rails", *tasks)
+  Process.wait(npm_install)
 
   puts "\n== Restarting application server =="
   system! "bin/rails restart"

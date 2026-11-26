@@ -56,22 +56,30 @@ RSpec.describe SharedBlocks::Navbar::OrgSidebar::Component, type: :component do
     expect(search["data-ui--active-link-match-paths-value"])
       .to eq "/o/#{organization.to_param}/registrations"
 
-    # Editing a page of a sequence is its own path, off the sequences one
-    sequences = rows.find { |row| row.text.strip == "Registration sequences" }
-    expect(sequences["data-ui--active-link-match-paths-value"])
-      .to eq "/o/#{organization.to_param}/registration_sequences/** " \
-        "/o/#{organization.to_param}/registration_sequence_pages/**"
+    # Editing a page of a course is its own path, off the courses one
+    courses = rows.find { |row| row.text.strip == "Education courses" }
+    expect(courses["data-ui--active-link-match-paths-value"])
+      .to eq "/o/#{organization.to_param}/education_courses/** " \
+        "/o/#{organization.to_param}/education_course_pages/**"
   end
 
-  # The old view puts both rows on organized/bikes#new, so the param tells them apart
-  it "matches the two add-a-bike rows on the param" do
-    rows = component.css("nav a[data-ui--active-link-match-params-value*='parking_notification']")
+  it "links the unregistered notification row to its own page" do
+    expect(component).to have_css "nav a[href='/o/#{organization.to_param}/parking_notifications/new']",
+      text: "New unregistered notification"
+  end
 
-    expect(rows.map { |row| row["href"] })
-      .to eq(["/o/#{organization.to_param}/registrations/new",
-        "/o/#{organization.to_param}/bikes/new?parking_notification=true"])
-    expect(rows.map { |row| row["data-ui--active-link-match-params-value"] })
-      .to eq([{parking_notification: [""]}.to_json, {parking_notification: ["true"]}.to_json])
+  # The old view puts it on organized/bikes#new, which the legacy unregistered notification
+  # page shares, so the param tells them apart
+  context "with the old registration page" do
+    let(:instance) { described_class.new(organization:, current_user:, old_register_view: true) }
+
+    it "matches add a registration on the param" do
+      rows = component.css("nav a[data-ui--active-link-match-params-value*='parking_notification']")
+
+      expect(rows.map { |row| row["href"] }).to eq(["/o/#{organization.to_param}/bikes/new"])
+      expect(rows.map { |row| row["data-ui--active-link-match-params-value"] })
+        .to eq([{parking_notification: [""]}.to_json])
+    end
   end
 
   # Which group holds the current page is the browser's to say, so the server opens the

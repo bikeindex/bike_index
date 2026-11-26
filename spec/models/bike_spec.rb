@@ -74,6 +74,22 @@ RSpec.describe Bike, type: :model do
       end
     end
 
+    describe ".previous_owner" do
+      let(:user) { FactoryBot.create(:user_confirmed) }
+      let!(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      let(:bike_transferred) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      let(:bike_returned) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      before do
+        FactoryBot.create(:ownership, bike: bike_transferred)
+        FactoryBot.create(:ownership, bike: bike_returned)
+        FactoryBot.create(:ownership_claimed, bike: bike_returned, creator: user)
+      end
+
+      it "excludes bikes the user owns again" do
+        expect(Bike.previous_owner(user.id).pluck(:id)).to eq([bike_transferred.id])
+      end
+    end
+
     describe ".currently_stolen_in" do
       context "given no matching state or country" do
         it "returns none" do
@@ -444,6 +460,18 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "unfinished_registration?" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment_pending, bike:) }
+
+    it "is true until the safety rules are agreed to" do
+      expect(bike.unfinished_registration?).to be_truthy
+
+      acknowledgment.update(acknowledged_at: Time.current)
+      expect(bike.unfinished_registration?).to be_falsey
+    end
+  end
+
   describe "visible_by?" do
     let(:owner) { User.new }
     let(:superuser) { FactoryBot.create(:superuser) }
@@ -797,6 +825,14 @@ RSpec.describe Bike, type: :model do
       end
     end
 
+    it "distinguishes small from extra small and large from extra large" do
+      {"small" => "s", "x-small" => "xs", "Extra Small" => "xs", "large" => "l", "x-large" => "xl", "extra large" => "xl"}.each do |input, size|
+        bike = Bike.new(frame_size: input)
+        bike.send(:clean_frame_size)
+        expect(bike.frame_size).to eq(size), "#{input} => #{bike.frame_size}"
+      end
+    end
+
     context "ordinal string" do
       let(:frame_size) { "Med" }
       it "is sets on save" do
@@ -867,6 +903,21 @@ RSpec.describe Bike, type: :model do
       bike = Bike.new
       errors.each { |e| bike.errors.add(:base, e) }
       expect(bike.cleaned_error_messages.length).to eq(1)
+    end
+  end
+
+  describe "duplicate_bikes" do
+    let(:bike) { FactoryBot.create(:bike, serial_number: "ABCDEF12 GHIJKL34") }
+    let!(:duplicate_bike) { FactoryBot.create(:bike, serial_number: bike.serial_number) }
+
+    it "lists a bike matching on two segments once" do
+      [bike, duplicate_bike].each do |matching_bike|
+        matching_bike.create_normalized_serial_segments
+        BikeJobs::DuplicateBikeFinderJob.new.perform(matching_bike.id)
+      end
+      expect(bike.duplicate_bike_groups.count).to eq 3
+      expect(bike.duplicate_bikes.pluck(:id)).to eq([duplicate_bike.id])
+      expect(bike.duplicate_bikes.count).to eq 1
     end
   end
 
@@ -1318,6 +1369,32 @@ RSpec.describe Bike, type: :model do
     end
   end
 
+  describe "current? and current_with_user_hidden?" do
+    let(:bike) { Bike.new(user_hidden:, example:) }
+    let(:user_hidden) { false }
+    let(:example) { false }
+    it "is current" do
+      expect(bike.current?).to be_truthy
+      expect(bike.current_with_user_hidden?).to be_truthy
+    end
+
+    context "user_hidden" do
+      let(:user_hidden) { true }
+      it "is current_with_user_hidden, not current" do
+        expect(bike.current?).to be_falsey
+        expect(bike.current_with_user_hidden?).to be_truthy
+      end
+    end
+
+    context "example" do
+      let(:example) { true }
+      it "is neither" do
+        expect(bike.current?).to be_falsey
+        expect(bike.current_with_user_hidden?).to be_falsey
+      end
+    end
+  end
+
   describe "bike_sticker and no_bike_sticker" do
     let(:organization1) { FactoryBot.create(:organization) }
     let(:organization2) { FactoryBot.create(:organization) }
@@ -1383,6 +1460,15 @@ RSpec.describe Bike, type: :model do
         bike.save
         expect(bike.owner_email).to eq user_email.email
       end
+    end
+  end
+
+  describe "education_course_applies?" do
+    it "is only an e-vehicle's, and never an unregistered parking notification's" do
+      expect(Bike.new(propulsion_type: "foot-pedal").education_course_applies?).to be_falsey
+      expect(Bike.new(propulsion_type: "pedal-assist").education_course_applies?).to be_truthy
+      expect(Bike.new(propulsion_type: "pedal-assist", status: "unregistered_parking_notification")
+        .education_course_applies?).to be_falsey
     end
   end
 
@@ -1453,6 +1539,7 @@ RSpec.describe Bike, type: :model do
           expect(bike.serial_display).to eq "Hidden"
           expect(bike.serial_display(bike.user)).to eq "HELLO PARTY"
           expect(bike.serial_display(impound_user)).to eq "HELLO PARTY"
+          expect(bike.serial_display(organization: impound_record.organization)).to eq "HELLO PARTY"
         end
       end
       context "when user shares an organization with the bike" do
@@ -1466,6 +1553,11 @@ RSpec.describe Bike, type: :model do
           expect(bike.authorized?(org_user)).to be_falsey
           expect(bike.send(:can_see_hidden_serial?, org_user)).to be_truthy
           expect(bike.serial_display(org_user)).to eq "HELLO PARTY"
+        end
+
+        it "shows serial for the organization, without a user" do
+          expect(bike.reload.serial_display(organization:)).to eq "HELLO PARTY"
+          expect(bike.serial_display(organization: FactoryBot.create(:organization))).to eq "Hidden"
         end
       end
     end
@@ -1483,7 +1575,7 @@ RSpec.describe Bike, type: :model do
           creation_registration_info: {street: "102 Washington Pl", city: "State College"})
       end
       # let(:ownership) { FactoryBot.create(:ownership, creator: user, user: nil, bike: bike) }
-      let(:target_address) { {city: "State College", country: "United States", latitude: 40.7933949, longitude: -77.8600012, state: "PA", street: "102 Washington Pl", zipcode: "16801", street_2: nil} }
+      let(:target_address) { {city: "State College", latitude: 40.7933949, longitude: -77.8600012, region: "PA", street: "102 Washington Pl"} }
       include_context :geocoder_real
       it "is exportable" do
         # Referencing the same address and the same cassette from a different spec, b/c I'm terrible ;)
@@ -1492,12 +1584,11 @@ RSpec.describe Bike, type: :model do
           expect(bike.reload.user&.id).to eq user.id
           # We test that the bike has a location saved
           expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "initial_creation"
-          expect(bike.registration_address(true).except("latitude", "longitude", "zipcode")).to eq(target_address.as_json.except("latitude", "longitude", "zipcode"))
+          expect(bike.registration_address_record).to have_attributes(target_address.except(:latitude, :longitude))
           expect(bike.to_coordinates.map(&:round)).to eq([target_address[:latitude].round, target_address[:longitude].round])
           expect(bike.latitude).to be_present
           expect(bike.longitude).to be_present
           expect(bike.owner_name).to eq "some name"
-          expect(bike.registration_address["street"]).to eq "102 Washington Pl"
           expect(bike.avery_exportable?).to be_truthy
           FactoryBot.create(:impound_record_with_organization, bike: bike, organization: organization)
           bike.update(updated_at: Time.current) # Bump current_impound_record
@@ -1508,13 +1599,10 @@ RSpec.describe Bike, type: :model do
     end
   end
 
-  describe "registration_address" do
+  describe "registration_address_record" do
     let(:bike) { Bike.new }
-    let(:b_param) { BParam.new }
-    it "returns nil when no b_param and with a b_param without address" do
-      expect(bike.registration_address).to eq({})
-      allow(bike).to receive(:b_params) { [b_param] }
-      expect(bike.registration_address).to eq({})
+    it "returns nil without an address" do
+      expect(bike.registration_address_record).to be_nil
     end
     context "with user with address" do
       let(:country) { Country.united_states }
@@ -1524,17 +1612,15 @@ RSpec.describe Bike, type: :model do
       let(:bike) { ownership.bike }
       let(:ownership) { FactoryBot.create(:ownership_claimed, user: user) }
       it "returns the user's address" do
-        expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
         expect(BikeServices::CalculateLocation.registration_address_source(bike)).to eq "user"
-        expect(bike.registration_address(true)).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
+        expect(bike.registration_address_record).to eq address_record
       end
       context "ownership creator" do
         let(:ownership) { FactoryBot.create(:ownership_claimed, creator: user, user: FactoryBot.create(:user_confirmed)) }
         it "returns nothing" do
-          expect(user.address_hash_legacy).to eq default_location_registration_address.merge("latitude" => nil, "longitude" => nil, "country" => "United States", "street_2" => nil)
           expect(bike.user).to_not eq user
           expect(BikeServices::CalculateLocation.registration_address_source(bike)).to be_blank
-          expect(bike.registration_address.values.compact).to eq([])
+          expect(bike.registration_address_record).to be_nil
         end
       end
     end
@@ -1545,7 +1631,7 @@ RSpec.describe Bike, type: :model do
     let(:bike) { FactoryBot.create(:bike_organized, creation_organization: organization) }
 
     it "is falsey without registration address" do
-      expect(bike.registration_address).to eq({})
+      expect(bike.registration_address_record).to be_nil
       expect(bike.valid_mailing_address?).to be_falsey
     end
 
@@ -1555,13 +1641,12 @@ RSpec.describe Bike, type: :model do
       it "is falsey when address matches organization default" do
         expect(organization.default_location).to be_present
         expect(user.address_record).to be_present
-        # Use Bike.find to get a fresh instance (avoids memoization from factory)
         reloaded_bike = Bike.find(bike.id)
         expect(reloaded_bike.user).to eq user
         expect(reloaded_bike.user.address_set_manually).to be_truthy
         expect(BikeServices::CalculateLocation.registration_address_source(reloaded_bike)).to eq "user"
-        expect(reloaded_bike.registration_address).to be_present
-        expect(reloaded_bike.registration_address).to eq organization.default_location.address_hash_legacy
+        expect(reloaded_bike.registration_address_record.internal_address_attrs)
+          .to eq organization.default_location.address_record.internal_address_attrs
         expect(reloaded_bike.valid_mailing_address?).to be_falsey
       end
     end
@@ -1571,10 +1656,9 @@ RSpec.describe Bike, type: :model do
       let!(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, user: user, creation_organization: organization) }
       it "is truthy when address differs from organization default" do
         expect(organization.default_location).to be_present
-        # Use Bike.find to get a fresh instance (avoids memoization from factory)
         reloaded_bike = Bike.find(bike.id)
-        expect(reloaded_bike.registration_address).to be_present
-        expect(reloaded_bike.registration_address).to_not eq organization.default_location.address_hash_legacy
+        expect(reloaded_bike.registration_address_record.internal_address_attrs)
+          .to_not eq organization.default_location.address_record.internal_address_attrs
         expect(reloaded_bike.valid_mailing_address?).to be_truthy
       end
     end
@@ -1715,7 +1799,7 @@ RSpec.describe Bike, type: :model do
       bike.update(year: 1999, frame_material: "steel",
         secondary_frame_color_id: FactoryBot.create(:color).id,
         tertiary_frame_color_id: FactoryBot.create(:color).id,
-        handlebar_type: "bmx",
+        handlebar_type: "forward",
         propulsion_type: "throttle",
         cycle_type: "unicycle",
         frame_size: "56", frame_size_unit: "foo",
@@ -1725,6 +1809,16 @@ RSpec.describe Bike, type: :model do
       expect(bike.current_stolen_record_id).to eq(stolen_record.id)
       expect(bike.propulsion_type_throttle?).to be_truthy
       expect(bike.propulsion_type_pedal_assist?).to be_falsey
+    end
+  end
+
+  describe "fetch_current_stolen_record" do
+    let(:bike) { FactoryBot.create(:bike) }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:) }
+    it "repairs a stale current_stolen_record_id on save" do
+      bike.update_column :current_stolen_record_id, nil
+      Bike.find(bike.id).save
+      expect(bike.reload.current_stolen_record_id).to eq stolen_record.id
     end
   end
 
@@ -1873,7 +1967,7 @@ RSpec.describe Bike, type: :model do
       before { bike.update(updated_at: Time.current) } # bump thumb path
       it "is the public image" do
         expect(bike.reload.thumb_path).to be_present
-        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
+        expect(PublicImage::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
         expect(bike.image_url).to eq public_image.image_url
         # reload so the version URL reconstructs from the stored identifier (generation is backgrounded)
         expect(bike.image_url(:medium)).to eq public_image.reload.image_url(:medium)
@@ -1885,14 +1979,6 @@ RSpec.describe Bike, type: :model do
       it "does not call blank? on the uploader" do
         expect_any_instance_of(ImageUploader).not_to receive(:blank?)
         bike.reload.image_url
-      end
-      it "with REMOTE_IMAGE_FALLBACK_URLS true return URL" do
-        stub_const("BikeAttributable::REMOTE_IMAGE_FALLBACK_URLS", true)
-        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_truthy
-        # Approximates what happens for local dev with remote images
-        allow_any_instance_of(ImageUploader).to receive(:blank?) { true }
-        image_url = public_image.image_url
-        expect(bike.reload.image_url).to eq image_url.gsub("http://test.host", "https://files.bikeindex.org")
       end
       context "activestorage backed public_image" do
         let!(:public_image) { FactoryBot.create(:public_image, :with_attached_file, imageable: bike) }
@@ -1908,7 +1994,7 @@ RSpec.describe Bike, type: :model do
       # This happens sometimes when images are deleted
       before { bike.update_column(:thumb_path, "https://files.bikeindex.org/uploads/Pu/33333/adsf.jpg") }
       it "is nil" do
-        expect(Bike::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
+        expect(PublicImage::REMOTE_IMAGE_FALLBACK_URLS).to be_falsey
         expect(bike.reload.image_url).to be_blank
       end
     end
@@ -1969,6 +2055,13 @@ RSpec.describe Bike, type: :model do
       let!(:user_alert) { FactoryBot.create(:user_alert_stolen_bike_without_location, bike: bike, user: owner) }
       it "counts all them" do
         expect(bike.reload.messages_count).to eq 4
+      end
+    end
+    context "organization_message" do
+      let!(:organization_message) { FactoryBot.create(:organization_message) }
+      let(:bike) { organization_message.bike }
+      it "is 1" do
+        expect(bike.reload.messages_count).to eq 1
       end
     end
   end

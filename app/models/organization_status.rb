@@ -90,7 +90,7 @@ class OrganizationStatus < AnalyticsRecord
   def bulk_imports
     return BulkImport.none unless Organization.ascend_or_broken_ascend_kinds.include?(pos_kind)
 
-    b_imports = BulkImport.where("created_at >= ?", start_at)
+    b_imports = BulkImport.where(organization_id:).where("created_at >= ?", start_at)
     ended? ? b_imports.where("created_at < ?", end_at) : b_imports
   end
 

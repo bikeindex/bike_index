@@ -71,7 +71,7 @@ RSpec.describe Pages::Admin::Bikes::Index::Filters::Component, type: :component 
     let(:options) { {origin_search_type: "web"} }
 
     it "names it on the dropdown" do
-      expect(dropdown_names).to include a_string_ending_with("menu Web")
+      expect(dropdown_names).to include a_string_ending_with("menu web")
     end
   end
 end

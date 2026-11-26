@@ -78,6 +78,17 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
               expect(response.body).to include 'name="organization_landing_page[enabled]"'
             end
           end
+
+          context "routed by its previous slug" do
+            let(:organization) { FactoryBot.create(:organization, short_name: "Brakebills University", previous_slug: "brakebills") }
+
+            it "links to the previous slug" do
+              get "#{base_url}/landing_page/edit"
+              expect(response.status).to eq(200)
+              expect(response.body).to include "href=\"#{root_url}brakebills\""
+              expect(response.body).to_not include "href=\"#{root_url}#{organization.to_param}\""
+            end
+          end
         end
 
         context "with a landing page" do
@@ -104,7 +115,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
             it "recommends the shade step 1 would derive" do
               get "#{base_url}/landing_page/edit"
-              expect(response.body).to include "<code>&amp;button_hover=29527a</code>"
+              expect(response.body).to match(%r{<code[^>]*>&amp;button_hover=29527a</code>})
             end
 
             context "one that names its hover too" do
@@ -112,7 +123,7 @@ RSpec.describe Admin::Organizations::CustomLayoutsController, type: :request do
 
               it "says nothing" do
                 get "#{base_url}/landing_page/edit"
-                expect(response.body).to_not include "<code>&amp;button_hover"
+                expect(response.body).to_not match(%r{<code[^>]*>&amp;button_hover})
               end
             end
           end

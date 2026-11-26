@@ -217,29 +217,6 @@
       "note": "Redirects to Stripe checkout session URL returned by Stripe API, not user-controlled"
     },
     {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "28616f4cc25f00229e47ee4352af80f905d7452a995ff9cbb76495f1fa980ce4",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/controllers/admin/email_domains_controller.rb",
-      "line": 80,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"REVERSE(domain) #{sort_direction}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Admin::EmailDomainsController",
-        "method": "ordered_email_domains"
-      },
-      "user_input": "sort_direction",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": "sort_direction validated to only allow 'asc' or 'desc' via SortableTable concern"
-    },
-    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "291665b6116d5f36cbc91110dfeb3dce1ba903b78f74b8f0fa455fd99ca49570",
@@ -448,20 +425,20 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 2,
-      "fingerprint": "4bf92dd97cc7d2637f63a334523e1379acaacb4a59d1be98bed00db0950c13bf",
+      "fingerprint": "d20bb555e57f69ef9fc929b66148d573da9959351da1645038e3dd00d50a7837",
       "check_name": "CrossSiteScripting",
       "message": "Unescaped model attribute",
       "file": "app/views/news/show.html.haml",
       "line": 33,
       "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "Blog.friendly_find(\"end-2020-with-a-donation-to-bike-index\").body",
+      "code": "Blog.friendly_find(params[:id]).body",
       "render_path": [
         {
           "type": "controller",
-          "class": "InfoController",
-          "method": "why_donate",
-          "line": 65,
-          "file": "app/controllers/info_controller.rb",
+          "class": "NewsController",
+          "method": "show",
+          "line": 40,
+          "file": "app/controllers/news_controller.rb",
           "rendered": {
             "name": "news/show",
             "file": "app/views/news/show.html.haml"
@@ -478,39 +455,6 @@
         79
       ],
       "note": "Blog.body is admin-authored markdown, intentionally rendered as HTML via HAML :markdown filter"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "4fa18c3eb274a5d4739a7199624aedb14d56c4ed3aae53b98d5541386c62f871",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/landing_pages/_social_post.html.haml",
-      "line": 9,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, \"tweet-display\", \"tweet-align-#{SocialPost.friendly_find(nil).alignment}\")",
-      "render_path": [
-        {
-          "type": "template",
-          "name": "admin/social_posts/_display",
-          "line": 51,
-          "file": "app/views/admin/social_posts/_display.html.haml",
-          "rendered": {
-            "name": "landing_pages/_social_post",
-            "file": "app/views/landing_pages/_social_post.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "landing_pages/_social_post"
-      },
-      "user_input": "SocialPost.friendly_find(nil).alignment",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "SocialPost.alignment is validated against VALID_ALIGNMENTS allowlist before storage"
     },
     {
       "warning_type": "Dynamic Render Path",
@@ -595,19 +539,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "651809dafcd743c22afeb1dd2c7cca62a326b3211f77053f8b4994a2e341f1e9",
+      "fingerprint": "db1d41ed77c458d0e94a691a8a35fcd5abd6971ae02e7a38c4ccd49043951b52",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/payments/_display.html.haml",
-      "line": 23,
+      "line": 13,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(Payment.find(params[:id]).stripe_id.truncate(20), Payment.find(params[:id]).stripe_admin_url, :title => Payment.find(params[:id]).stripe_id)",
+      "code": "link_to(Payment.find(params[:id]).stripe_id.truncate(20), Payment.find(params[:id]).stripe_admin_url, :title => Payment.find(params[:id]).stripe_id, :class => \"twlink\")",
       "render_path": [
         {
           "type": "controller",
           "class": "Admin::PaymentsController",
           "method": "edit",
-          "line": 21,
+          "line": 22,
           "file": "app/controllers/admin/payments_controller.rb",
           "rendered": {
             "name": "admin/payments/edit",
@@ -617,7 +561,7 @@
         {
           "type": "template",
           "name": "admin/payments/edit",
-          "line": 6,
+          "line": 3,
           "file": "app/views/admin/payments/edit.html.haml",
           "rendered": {
             "name": "admin/payments/_display",
@@ -639,19 +583,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "706a89d842fc179ed2e9293fcca79e3adf05da033d47d3c7adf7a11cb6f831ba",
+      "fingerprint": "aa2bf0e8be7147341ee5560a9cb6a2dcd608b4a270ac5bddaeef0fab64011902",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/external_registry_bikes/show.html.haml",
-      "line": 35,
+      "line": 17,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(ExternalRegistryBike.find(params[:id]).url, ExternalRegistryBike.find(params[:id]).url, :target => :_blank)",
+      "code": "link_to(ExternalRegistryBike.find(params[:id]).url, ExternalRegistryBike.find(params[:id]).url, :target => :_blank, :class => \"twlink\")",
       "render_path": [
         {
           "type": "controller",
           "class": "Admin::ExternalRegistryBikesController",
           "method": "show",
-          "line": 14,
+          "line": 15,
           "file": "app/controllers/admin/external_registry_bikes_controller.rb",
           "rendered": {
             "name": "admin/external_registry_bikes/show",
@@ -702,29 +646,6 @@
         79
       ],
       "note": "SocialPost.body_html is generated by auto_link_text() which creates safe anchor tags with hardcoded URL patterns"
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "770a3703fbf8ef4b8ae5ba3a5aa0fb4e120dcf12aaa000ef55d76d9ff05e9841",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/controllers/admin/email_domains_controller.rb",
-      "line": 76,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"COALESCE((data -> 'bike_count')::integer, 0) #{sort_direction}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Admin::EmailDomainsController",
-        "method": "ordered_email_domains"
-      },
-      "user_input": "sort_direction",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": "sort_direction validated to only allow 'asc' or 'desc' via SortableTable concern"
     },
     {
       "warning_type": "Dangerous Send",
@@ -865,84 +786,6 @@
       "note": "org_id_for_org() returns a database integer ID, not a user-controlled string"
     },
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "9fc9d54b1dbe3379a5134279a033cc19d42b5f03e77c9a319146700e3f27b5f1",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped parameter value",
-      "file": "app/views/organized/parking_notifications/_show_details.html.haml",
-      "line": 179,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "impound_claims.find(params[:id]).impound_record.parking_notification.latitude",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Organized::ImpoundClaimsController",
-          "method": "show",
-          "line": 15,
-          "file": "app/controllers/organized/impound_claims_controller.rb",
-          "rendered": {
-            "name": "organized/impound_claims/show",
-            "file": "app/views/organized/impound_claims/show.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "organized/impound_claims/show",
-          "line": 18,
-          "file": "app/views/organized/impound_claims/show.html.haml",
-          "rendered": {
-            "name": "organized/parking_notifications/_show_details",
-            "file": "app/views/organized/parking_notifications/_show_details.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "organized/parking_notifications/_show_details"
-      },
-      "user_input": "params[:id]",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "Latitude is a numeric database field used in Haml attribute, not raw HTML output"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "9fdbce3b9a7b935f6b9854d4107a64bacfb41e84a9c692771499729060b57270",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/organized/model_audits/show.html.haml",
-      "line": 49,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, status_display_class(ModelAudit.find(params[:id]).certification_status))",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Organized::ModelAuditsController",
-          "method": "show",
-          "line": 24,
-          "file": "app/controllers/organized/model_audits_controller.rb",
-          "rendered": {
-            "name": "organized/model_audits/show",
-            "file": "app/views/organized/model_audits/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "organized/model_audits/show"
-      },
-      "user_input": "ModelAudit.find(params[:id]).certification_status",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "status_display_class() returns only hardcoded CSS class names from a case/when allowlist"
-    },
-    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "a743bd471cdf4bb187bd3b07f9be19b8aca52624fee37000482ee30b9be07d55",
@@ -991,13 +834,13 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "b1febf55f2f395b7732c651773270d28fd1ea68339acca5c4ee76732e2aaed0e",
+      "fingerprint": "eb47976003f5808844b209be0faf195be1132ba24f476e12572f01c4477232ad",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/organized/model_audits/show.html.haml",
-      "line": 105,
+      "line": 76,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(truncate((Unresolved Model).new.url), (Unresolved Model).new.url)",
+      "code": "link_to(Urlifyer.display((Unresolved Model).new.url, :length => 30), (Unresolved Model).new.url)",
       "render_path": [
         {
           "type": "controller",
@@ -1025,19 +868,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "bd60c52737d1d650780cb1b3d1837759750056482c0040582ea2ae2d7a0fb43a",
+      "fingerprint": "cf67c4d450644db6dfa8503bda560a24ce891ca5c55cd10c1cb60ec2e463ba24",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/bulk_imports/show.html.haml",
-      "line": 37,
+      "line": 16,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(BulkImport.find(params[:id]).file_url, BulkImport.find(params[:id]).file_url)",
+      "code": "link_to(BulkImport.find(params[:id]).file_url, BulkImport.find(params[:id]).file_url, :class => \"twlink\")",
       "render_path": [
         {
           "type": "controller",
           "class": "Admin::BulkImportsController",
           "method": "show",
-          "line": 15,
+          "line": 17,
           "file": "app/controllers/admin/bulk_imports_controller.rb",
           "rendered": {
             "name": "admin/bulk_imports/show",
@@ -1059,19 +902,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "be2ce00918c2c3877cf571e2ab007fca6ad86fc744198b859c0c646bdcffb2c7",
+      "fingerprint": "102fceef19c1ba15d5c86270df3ff98722f19fbbf11dc2935d737ee8f4aece30",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/theft_alerts/edit.html.haml",
-      "line": 88,
+      "line": 87,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(\"Facebook post\", TheftAlert.find(params[:id]).facebook_post_url, :target => \"_blank\")",
+      "code": "link_to(\"Facebook post\", TheftAlert.find(params[:id]).facebook_post_url, :target => \"_blank\", :class => \"twlink\")",
       "render_path": [
         {
           "type": "controller",
           "class": "Admin::TheftAlertsController",
           "method": "edit",
-          "line": 20,
+          "line": 21,
           "file": "app/controllers/admin/theft_alerts_controller.rb",
           "rendered": {
             "name": "admin/theft_alerts/edit",
@@ -1171,94 +1014,6 @@
       "note": "image_url is a CarrierWave-generated path, not user-controlled HTML"
     },
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "c92595b02fb88252584c7f1f976b37a682ec73bbc86d64047008133e79f132f7",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/review_impound_claims/_display.html.haml",
-      "line": 56,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(image_tag((Unresolved Model).new.image_url(:small), :class => \"d-inline-block\"), (Unresolved Model).new.image_url)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "ReviewImpoundClaimsController",
-          "method": "show",
-          "line": 6,
-          "file": "app/controllers/review_impound_claims_controller.rb",
-          "rendered": {
-            "name": "review_impound_claims/show",
-            "file": "app/views/review_impound_claims/show.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "review_impound_claims/show",
-          "line": 10,
-          "file": "app/views/review_impound_claims/show.html.haml",
-          "rendered": {
-            "name": "review_impound_claims/_display",
-            "file": "app/views/review_impound_claims/_display.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "review_impound_claims/_display"
-      },
-      "user_input": "(Unresolved Model).new.image_url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "image_url is a CarrierWave-generated path, not user-controlled HTML"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "c92595b02fb88252584c7f1f976b37a682ec73bbc86d64047008133e79f132f7",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/review_impound_claims/_display.html.haml",
-      "line": 61,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(image_tag((Unresolved Model).new.image_url(:small), :class => \"d-inline-block\"), (Unresolved Model).new.image_url)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "ReviewImpoundClaimsController",
-          "method": "show",
-          "line": 6,
-          "file": "app/controllers/review_impound_claims_controller.rb",
-          "rendered": {
-            "name": "review_impound_claims/show",
-            "file": "app/views/review_impound_claims/show.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "review_impound_claims/show",
-          "line": 10,
-          "file": "app/views/review_impound_claims/show.html.haml",
-          "rendered": {
-            "name": "review_impound_claims/_display",
-            "file": "app/views/review_impound_claims/_display.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "review_impound_claims/_display"
-      },
-      "user_input": "(Unresolved Model).new.image_url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "image_url is a CarrierWave-generated path, not user-controlled HTML"
-    },
-    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "118b36de15d95b326e918220562b9e6210d26ee7ee0c7350a6cb1a9a62117bfc",
@@ -1284,19 +1039,19 @@
     {
       "warning_type": "Cross-Site Scripting",
       "warning_code": 4,
-      "fingerprint": "cfcf6efef605caaaf1b33b383c0629079cb7029fbd478c1a45ccd80308d5075f",
+      "fingerprint": "7e6d6edab1f4a23516b85228840fb41b00ec70bb71b78b65db91dcf3c7c3897e",
       "check_name": "LinkToHref",
       "message": "Potentially unsafe model attribute in `link_to` href",
       "file": "app/views/admin/memberships/show.html.haml",
-      "line": 82,
+      "line": 34,
       "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to(Membership.find(params[:id]).stripe_id.truncate(20), Membership.find(params[:id]).stripe_admin_url, :title => Membership.find(params[:id]).stripe_id)",
+      "code": "link_to(Membership.find(params[:id]).stripe_id.truncate(20), Membership.find(params[:id]).stripe_admin_url, :title => Membership.find(params[:id]).stripe_id, :class => \"twlink\")",
       "render_path": [
         {
           "type": "controller",
           "class": "Admin::MembershipsController",
           "method": "show",
-          "line": 39,
+          "line": 40,
           "file": "app/controllers/admin/memberships_controller.rb",
           "rendered": {
             "name": "admin/memberships/show",
@@ -1314,50 +1069,6 @@
         79
       ],
       "note": "Admin-only view. stripe_admin_url is a computed URL from stored Stripe ID, not user input"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "d207641f3346940c9923289f9e2089525ded14cfc9ac33067010171ad426f109",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/admin/components/_table.html.haml",
-      "line": 49,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, ((Unresolved Model).new.manufacturer_id = Manufacturer.other.id ? (\"stolen-color\") : (\"\")))",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::DashboardController",
-          "method": "maintenance",
-          "line": 23,
-          "file": "app/controllers/admin/dashboard_controller.rb",
-          "rendered": {
-            "name": "admin/dashboard/maintenance",
-            "file": "app/views/admin/dashboard/maintenance.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "admin/dashboard/maintenance",
-          "line": 9,
-          "file": "app/views/admin/dashboard/maintenance.html.haml",
-          "rendered": {
-            "name": "admin/components/_table",
-            "file": "app/views/admin/components/_table.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "admin/components/_table"
-      },
-      "user_input": "(Unresolved Model).new",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "Admin-only view. Ternary returns hardcoded CSS class string, not user input"
     },
     {
       "warning_type": "Dangerous Send",
@@ -1404,40 +1115,6 @@
         77
       ],
       "note": "Admin-only. params[:search_scope] validated against searchable_scopes allowlist before send()"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "d7aae98890d9207d0f5ce2bd318ed2b6194bb3ab89f9678ae74c60a6503117b2",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/admin/theft_alerts/edit.html.haml",
-      "line": 7,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, theft_alert_status_class(TheftAlert.find(params[:id])))",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::TheftAlertsController",
-          "method": "edit",
-          "line": 20,
-          "file": "app/controllers/admin/theft_alerts_controller.rb",
-          "rendered": {
-            "name": "admin/theft_alerts/edit",
-            "file": "app/views/admin/theft_alerts/edit.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "admin/theft_alerts/edit"
-      },
-      "user_input": "TheftAlert.find(params[:id])",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "Admin-only view. theft_alert_status_class() returns hardcoded CSS class names"
     },
     {
       "warning_type": "Command Injection",
@@ -1566,63 +1243,6 @@
       "note": "Blog.body is admin-authored markdown, intentionally rendered as HTML via HAML :markdown filter"
     },
     {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "e992c1889a540fee346c85f703160de7cac838b4c01d1286f49ed1d749b00faa",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/organized/model_audits/show.html.haml",
-      "line": 93,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, status_display_class((Unresolved Model).new.kind))",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Organized::ModelAuditsController",
-          "method": "show",
-          "line": 24,
-          "file": "app/controllers/organized/model_audits_controller.rb",
-          "rendered": {
-            "name": "organized/model_audits/show",
-            "file": "app/views/organized/model_audits/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "organized/model_audits/show"
-      },
-      "user_input": "(Unresolved Model).new.kind",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "status_display_class() returns only hardcoded CSS class names from a case/when allowlist"
-    },
-    {
-      "warning_type": "SQL Injection",
-      "warning_code": 0,
-      "fingerprint": "edb866697f1e67d1b9d52fc1411723f8341a6f7237bca677b46dc782e6756799",
-      "check_name": "SQL",
-      "message": "Possible SQL injection",
-      "file": "app/controllers/admin/email_domains_controller.rb",
-      "line": 78,
-      "link": "https://brakemanscanner.org/docs/warning_types/sql_injection/",
-      "code": "Arel.sql(\"COALESCE((data -> 'spam_score')::integer, 0) #{sort_direction}\")",
-      "render_path": null,
-      "location": {
-        "type": "method",
-        "class": "Admin::EmailDomainsController",
-        "method": "ordered_email_domains"
-      },
-      "user_input": "sort_direction",
-      "confidence": "Medium",
-      "cwe_id": [
-        89
-      ],
-      "note": "sort_direction validated to only allow 'asc' or 'desc' via SortableTable concern"
-    },
-    {
       "warning_type": "Dangerous Send",
       "warning_code": 23,
       "fingerprint": "f264e5a6cc8f62dc9ffb2cf65c00f441582a2f6e6831463554b1d5633b2d3345",
@@ -1667,84 +1287,6 @@
         77
       ],
       "note": "Admin-only. params[:search_status] validated against searchable_statuses allowlist before send()"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 4,
-      "fingerprint": "f282beba64aac07297182ab9ead947bae2b1b8029eda5ad5e746f32af9e5820a",
-      "check_name": "LinkToHref",
-      "message": "Potentially unsafe model attribute in `link_to` href",
-      "file": "app/views/admin/stripe_subscriptions/_table.html.haml",
-      "line": 62,
-      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
-      "code": "link_to((Unresolved Model).new.stripe_id.truncate(20), (Unresolved Model).new.stripe_admin_url, :title => (Unresolved Model).new.stripe_id)",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::MembershipsController",
-          "method": "show",
-          "line": 39,
-          "file": "app/controllers/admin/memberships_controller.rb",
-          "rendered": {
-            "name": "admin/memberships/show",
-            "file": "app/views/admin/memberships/show.html.haml"
-          }
-        },
-        {
-          "type": "template",
-          "name": "admin/memberships/show",
-          "line": 107,
-          "file": "app/views/admin/memberships/show.html.haml",
-          "rendered": {
-            "name": "admin/stripe_subscriptions/_table",
-            "file": "app/views/admin/stripe_subscriptions/_table.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "admin/stripe_subscriptions/_table"
-      },
-      "user_input": "(Unresolved Model).new.stripe_admin_url",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "Admin-only view. stripe_admin_url is a computed URL from stored Stripe ID, not user input"
-    },
-    {
-      "warning_type": "Cross-Site Scripting",
-      "warning_code": 2,
-      "fingerprint": "f6b683235d7a57da4a2d21f24a0d32f6aef270a25a3ab67849dfd663d6369250",
-      "check_name": "CrossSiteScripting",
-      "message": "Unescaped model attribute",
-      "file": "app/views/admin/email_domains/show.html.haml",
-      "line": 98,
-      "link": "https://brakemanscanner.org/docs/warning_types/cross_site_scripting",
-      "code": "::Haml::AttributeBuilder.build_class(true, admin_email_domain_spam_color(EmailDomain.find(params[:id]).spam_score))",
-      "render_path": [
-        {
-          "type": "controller",
-          "class": "Admin::EmailDomainsController",
-          "method": "show",
-          "line": 36,
-          "file": "app/controllers/admin/email_domains_controller.rb",
-          "rendered": {
-            "name": "admin/email_domains/show",
-            "file": "app/views/admin/email_domains/show.html.haml"
-          }
-        }
-      ],
-      "location": {
-        "type": "template",
-        "template": "admin/email_domains/show"
-      },
-      "user_input": "EmailDomain.find(params[:id]).spam_score",
-      "confidence": "Weak",
-      "cwe_id": [
-        79
-      ],
-      "note": "Admin-only view. admin_email_domain_spam_color() returns hardcoded CSS color class"
     },
     {
       "warning_type": "Cross-Site Scripting",
@@ -1859,7 +1401,51 @@
         79
       ],
       "note": "github_pull_request is an integer column interpolated into a constant GitHub URL"
+    },
+    {
+      "warning_type": "Cross-Site Scripting",
+      "warning_code": 4,
+      "fingerprint": "bc59ec8f4ff54517ef1491f45a16ae17fdaaaea3a9a71b22c18cee8dec99ef71",
+      "check_name": "LinkToHref",
+      "message": "Potentially unsafe model attribute in `link_to` href",
+      "file": "app/views/review_impound_claims/_display.html.haml",
+      "line": 32,
+      "link": "https://brakemanscanner.org/docs/warning_types/link_to_href",
+      "code": "link_to(image_tag((Unresolved Model).new.image_url(:small), :class => \"tw:inline-block tw:w-[31%] tw:max-w-[150px] tw:mr-[3%]\"), (Unresolved Model).new.image_url)",
+      "render_path": [
+        {
+          "type": "controller",
+          "class": "ReviewImpoundClaimsController",
+          "method": "show",
+          "line": 6,
+          "file": "app/controllers/review_impound_claims_controller.rb",
+          "rendered": {
+            "name": "review_impound_claims/show",
+            "file": "app/views/review_impound_claims/show.html.haml"
+          }
+        },
+        {
+          "type": "template",
+          "name": "review_impound_claims/show",
+          "line": 10,
+          "file": "app/views/review_impound_claims/show.html.haml",
+          "rendered": {
+            "name": "review_impound_claims/_display",
+            "file": "app/views/review_impound_claims/_display.html.haml"
+          }
+        }
+      ],
+      "location": {
+        "type": "template",
+        "template": "review_impound_claims/_display"
+      },
+      "user_input": "(Unresolved Model).new.image_url",
+      "confidence": "Weak",
+      "cwe_id": [
+        79
+      ],
+      "note": "image_url is a CarrierWave-generated path, not user-controlled HTML"
     }
   ],
-  "brakeman_version": "8.0.4"
+  "brakeman_version": "8.1.0"
 }

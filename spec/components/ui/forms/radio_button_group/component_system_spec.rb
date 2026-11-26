@@ -7,6 +7,8 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, :js, type: :system do
   # match_style retries, so it waits out the color transition
   let(:purple) { {"background-color" => "rgb(113, 94, 178)"} }
   let(:white) { {"background-color" => "rgb(255, 255, 255)"} }
+  # secondary's resting bg-white/80
+  let(:translucent_white) { {"background-color" => "oklab(0.999994 0.0000455677 0.0000200868 / 0.8)"} }
   let(:transparent) { {"background-color" => "rgba(0, 0, 0, 0)"} }
 
   def label(text) = find("label", text:)
@@ -22,6 +24,10 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, :js, type: :system do
       expect(page).to have_css "input[name='search_status'][value=''][checked]", visible: :all
       expect_axe_clean
 
+      # Keyboard focus widens the selected chip's ring past is-active's ring-2
+      page.send_keys(:tab)
+      expect(computed_ring(label("All"))).to include("0px 0px 0px 3px")
+
       find("label", text: "Active").click
       expect(page).to have_css "input[name='search_status'][value='active']:checked", visible: :all
 
@@ -29,7 +35,7 @@ RSpec.describe UI::Forms::RadioButtonGroup::Component, :js, type: :system do
       expect(page).to have_css "input[name='search_status'][value='inactive']:checked", visible: :all
       # The is-active variant matches a label around a checked radio
       expect(label("Inactive")).to match_style(purple)
-      expect(label("Active")).to match_style(white)
+      expect(label("Active")).to match_style(translucent_white)
     end
   end
 

@@ -17,7 +17,7 @@ module OrganizedHelper
         concat(content_tag(:small, " #{bike.type}"))
       end
       if bike.deleted?
-        concat(content_tag(:em, " removed from Bike Index", class: "small text-danger"))
+        concat(content_tag(:em, " removed from Bike Index", class: "tw:text-sm #{UI::Alerts::Base::Component::TEXT_CLASSES[:error]}"))
       elsif bike.unregistered_parking_notification? # Only care if currently unregistered parking notification
         # If it's an unregistered bike, don't display where it was created
         # ... since it only could've been created in one place
@@ -55,42 +55,20 @@ module OrganizedHelper
     end
   end
 
-  def organized_container
-    fluid = %w[parking_notifications impound_records impound_claims graduated_notifications lines model_audits registrations]
-    return "container-fluid" if fluid.include?(controller_name)
-
-    if controller_name == "bulk_imports" && action_name == "show"
-      return "container-fluid"
-    end
-    "container"
-  end
-
-  def organized_include_javascript_pack?
-    return false if [controller_name, action_name] == %w[parking_notifications index]
-    return true if organized_container == "container-fluid"
-
-    [
-      %w[bikes recoveries],
-      %w[bikes incompletes],
-      %w[exports show],
-      %w[exports new],
-      %w[users new],
-      %w[dashboard index]
-    ].include?([controller_name, action_name])
-  end
-
   def status_display_class(status)
     return "" if status.blank?
 
+    text_classes = UI::Alerts::Base::Component::TEXT_CLASSES
+
     case status.downcase
     when "current", "paging", "being_helped"
-      "text-success"
+      text_classes[:success]
     when "stolen", /uncertified/
-      "text-warning"
+      text_classes[:warning]
     when "resolved_otherwise", "on_deck", /approved/, /retrieved/, "bike graduated", /certified_by/
-      "text-info"
+      text_classes[:notice]
     when /removed/, "impounded", "trashed", "failed_to_find", /denied/, "delivery failure"
-      UI::Alerts::Base::Component::TEXT_CLASSES[:error]
+      text_classes[:error]
     else
       "less-strong"
     end

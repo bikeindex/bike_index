@@ -1,0 +1,13 @@
+---
+en:
+  components:
+    pages:
+      landing_pages:
+        demo_modal:
+          field_message: Anything else we should know?
+          field_name: Your name
+          field_role: Your role
+          phone_hint: A phone number, with its digits
+          request_name: request
+          submit_text: Let's chat
+          title: Contact us for a free trial

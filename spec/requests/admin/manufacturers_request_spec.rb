@@ -8,7 +8,7 @@ RSpec.describe Admin::ManufacturersController, type: :request do
   let(:permitted_attributes) do
     {
       name: "new name and things",
-      slug: "new_name_and_things",
+      slug: "new-name-and-things",
       website: "http://stuff.com",
       frame_maker: true,
       open_year: 1992,
@@ -17,6 +17,11 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       twitter_name: "cool-name",
       motorized_only: true
     }
+  end
+
+  shared_context :slug_collision do
+    let!(:kona_company) { FactoryBot.create(:manufacturer, name: "Kona Bicycle Company") }
+    let!(:kona) { FactoryBot.create(:manufacturer, name: "Kona") }
   end
 
   describe "index" do
@@ -33,6 +38,55 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       expect(response.status).to eq(200)
       expect(assigns(:manufacturers).pluck(:id)).to eq([with_website.id])
     end
+
+    it "shows close_year undelimited, sortable" do
+      closed_later = FactoryBot.create(:manufacturer, close_year: 2015)
+      closed_earlier = FactoryBot.create(:manufacturer, close_year: 1992)
+
+      get base_url, params: {sort: "close_year"}
+      expect(response.status).to eq(200)
+      expect(assigns(:manufacturers).pluck(:id).first(2)).to eq([closed_earlier.id, closed_later.id])
+      expect(Capybara.string(response.body)).to have_css("td", text: /\A\s*2015\s*\z/)
+    end
+
+    context "authenticated with an API token" do
+      let(:current_user) { false }
+      include_context :admin_doorkeeper_token
+      let(:url) { "/admin/manufacturers.json" }
+      include_examples "rejects_unauthorized_token"
+
+      context "token for a manufacturers superuser" do
+        before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "manufacturers") }
+
+        it "renders the manufacturers with their priority" do
+          get url, params: token_param.merge(search_with_websites: true)
+          expect(response.status).to eq 200
+          expect(json_result["manufacturers"]).to eq([with_website.as_json(only: %w[id name slug secondary_slug previous_slugs website frame_maker motorized_only priority])])
+          expect(json_result["slug_collisions"]).to eq([])
+        end
+
+        context "with a slug collision" do
+          include_context :slug_collision
+
+          it "renders the collisions" do
+            get url, params: token_param
+            expect(json_result["slug_collisions"]).to eq([{"slug" => "kona",
+                                                           "manufacturer" => {"id" => kona.id, "name" => "Kona"},
+                                                           "previous_slug_manufacturers" => [{"id" => kona_company.id, "name" => "Kona Bicycle Company"}]}])
+          end
+        end
+      end
+    end
+
+    context "with a slug collision" do
+      include_context :slug_collision
+
+      it "renders an alert" do
+        get base_url
+        expect(response.status).to eq(200)
+        expect(Capybara.string(response.body)).to have_css("h4", text: "1 slug collision")
+      end
+    end
   end
 
   describe "show" do
@@ -40,6 +94,17 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       get "#{base_url}/#{subject.slug}"
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
+      expect(response.body).not_to match("slug collision")
+    end
+
+    context "with a slug collision" do
+      include_context :slug_collision
+
+      it "renders the collision" do
+        get "#{base_url}/#{kona_company.slug}"
+        expect(response.status).to eq(200)
+        expect(Capybara.string(response.body)).to have_css("h4", text: "1 slug collision")
+      end
     end
   end
 
@@ -66,6 +131,46 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       expect(flash[:success]).to be_present
       expect(subject.reload).to have_attributes permitted_attributes
     end
+
+    context "authenticated with an API token" do
+      let(:current_user) { false }
+      include_context :admin_doorkeeper_token
+      include_context :test_csrf_token
+      let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Cool Bikes") }
+      let(:url) { "/admin/manufacturers/#{manufacturer.slug}.json" }
+      include_examples "rejects_unauthorized_token", :patch
+
+      context "token for a manufacturers superuser" do
+        before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "manufacturers") }
+
+        it "updates" do
+          patch url, params: token_param.merge(manufacturer: {name: "Cool Bikes (Rad Bikes)"})
+          expect(response.status).to eq 200
+          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes (Rad Bikes)", "slug" => "cool-bikes", "secondary_slug" => "rad", "previous_slugs" => %w[cool], "priority" => 0)
+        end
+
+        context "with a name that is taken" do
+          let!(:other) { FactoryBot.create(:manufacturer, name: "Rad Bikes") }
+          it "returns the errors" do
+            patch url, params: token_param.merge(manufacturer: {name: "Rad Bikes"})
+            expect(response.status).to eq 422
+            expect(json_result["errors"]).to be_present
+            expect(manufacturer.reload.name).to eq "Cool Bikes"
+          end
+        end
+      end
+    end
+  end
+
+  describe "import" do
+    it "creates the manufacturers in the CSV" do
+      file = Rack::Test::UploadedFile.new(Rails.root.join("spec/fixtures/manufacturer-test-import.csv"), "text/csv")
+
+      expect { post "#{base_url}/import", params: {file:} }.to change(Manufacturer, :count)
+
+      expect(flash[:success]).to eq "Manufacturers imported"
+      expect(Manufacturer.friendly_find("Riese & Müller")).to be_present
+    end
   end
 
   describe "create" do
@@ -78,6 +183,37 @@ RSpec.describe Admin::ManufacturersController, type: :request do
       expect(flash[:success]).to be_present
       expect(new_manufacturer).to have_attributes permitted_attributes
       # permitted_attributes.each { |attribute, val| expect(target.send(attribute)).to eq val }
+    end
+
+    context "authenticated with an API token" do
+      let(:current_user) { false }
+      include_context :admin_doorkeeper_token
+      include_context :test_csrf_token
+      let(:url) { "/admin/manufacturers.json" }
+      include_examples "rejects_unauthorized_token", :post
+
+      context "token for a manufacturers superuser" do
+        before { FactoryBot.create(:superuser_ability, user: token_user, controller_name: "manufacturers") }
+
+        it "creates" do
+          expect {
+            post url, params: token_param.merge(manufacturer: {name: "Cool Bikes", frame_maker: true})
+          }.to change(Manufacturer, :count).by 1
+          expect(response.status).to eq 200
+          expect(json_result["manufacturer"]).to include("name" => "Cool Bikes", "slug" => "cool-bikes", "frame_maker" => true)
+        end
+
+        context "with a name that is taken" do
+          let!(:manufacturer) { FactoryBot.create(:manufacturer, name: "Cool Bikes") }
+          it "returns the errors" do
+            expect {
+              post url, params: token_param.merge(manufacturer: {name: "Cool Bikes"})
+            }.to_not change(Manufacturer, :count)
+            expect(response.status).to eq 422
+            expect(json_result["errors"]).to be_present
+          end
+        end
+      end
     end
   end
 end

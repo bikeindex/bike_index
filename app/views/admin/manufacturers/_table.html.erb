@@ -1,6 +1,6 @@
 <%# locals: (collection:, render_sortable: false) %>
 
-<%= render(UI::Table::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
+<%= render(UI::Table::Base::Component.new(records: collection, render_sortable:, sort_state:)) do |table| %>
   <% table.column(sortable: "name") do |manufacturer| %>
     <%= link_to manufacturer.name, admin_manufacturer_url(manufacturer), class: "twlink" %>
   <% end %>
@@ -11,6 +11,10 @@
 
   <% table.column(sortable: "motorized_only", label: "motorized", classes: "tw:text-center") do |manufacturer| %>
     <%= check_mark if manufacturer.motorized_only %>
+  <% end %>
+
+  <% table.column(sortable: "close_year") do |manufacturer| %>
+    <%= manufacturer.close_year %>
   <% end %>
 
   <% table.column(label: "Website") do |manufacturer| %>

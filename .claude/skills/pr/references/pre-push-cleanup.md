@@ -8,15 +8,17 @@ Invoke the `/simplify` command to review the changed code for reuse, simplificat
 
 Skip it when the diff has no code in it — a docs- or skill-only branch gives it nothing to review, and it fans out subagents to find that out. Config by file extension isn't the test: a `.github/workflows/*.yml` with a `run:` block is a shell script, and reviewing one is how the nightly-reseed branch found its only cleanup.
 
+**Tell each review agent to read other commits with `git show <ref>:<path>`, never a checkout.** They share the working tree, so one that checks out the base to compare leaves the others reading pre-branch files and reporting on code that isn't there — it happened on #4677.
+
 **Read `git diff` as soon as the agents return, before running anything.** An agent that stops mid-verification leaves its edit in the tree — including a sweeping edit it reverted to test, which then reads as your regression.
 
-**Brief the agents with the constraint, not the shape you think satisfies it.** "A cell block is instance_exec'd, so a component method is unreachable inside one" is a fact they can work from; "the lambda is required, judge only how it's used" is a conclusion, and it hid that `method(:…)` is how four sibling org tables already bind exactly that. Declining a finding is yours to do on the way back, not theirs to be told up front — the exception is a *second* run, where naming what a previous pass already triaged is what keeps them off it.
+**Brief the agents with the constraint, not the shape you think satisfies it.** "A cell block is instance_exec'd, so a component method is unreachable inside one" is a fact they can work from; "the lambda is required, judge only how it's used" is a conclusion, and it hid that `method(:…)` is how four sibling org tables already bind exactly that. Likewise "the user asked for a shared component" is a constraint, while "the user requested this new component" is a conclusion — it kept `UI::BulkTableCard` from the reuse reviewer, when the shared component was `UI::Table::InCard` extended. Declining a finding is yours to do on the way back, not theirs to be told up front — the exception is a *second* run, where naming what a previous pass already triaged is what keeps them off it.
 
 **On a second run against the same branch, scope it to the commits since the last one** — `/simplify` defaults to the whole branch diff, so re-running it resurfaces every finding already triaged, including the ones deliberately declined. Pass the range (`git diff <last-simplify-commit>..HEAD`) as its argument.
 
-**The previous run's merge from the base names that commit** — `rtk proxy git log --merges -1 --format=%h origin/main..HEAD`, since **Prepare the branch** merges before it cleans. A run that had nothing to merge left no commit, so the range can reach back further than the last run; that costs a re-triage, not a wrong scope.
+**The previous run's merge from the base names that commit** — `rtk proxy git log --merges -2 --format=%h origin/main..HEAD | tail -1`. It's the *second* one because **Prepare the branch** merges before it cleans, so this run's own merge is already the most recent by the time you get here, and `-1` scopes the range to that merge alone — an empty diff, which reads as a clean branch rather than a wrong range. A run that had nothing to merge left no commit, so the range can reach back further than the last run; that costs a re-triage, not a wrong scope. A merge made *between* runs — the user asking to merge main — errs the other way: it's newer than the last run, so the range silently drops the commits before it. Read the session for one before trusting the count.
 
-**That range breaks when earlier branch work was split into its own PRs and merged.** Those commits return through a merge from the base, so `<last-simplify-commit>..HEAD` includes all of them plus everything else the base gained — hundreds of files, none of it yours. Check `git log --oneline <last-simplify-commit>..HEAD`; if it lists the base's merges, scope to your own commits (`git show` each) instead. `--no-merges` doesn't rescue it — it hides the merge commits, not the commits they brought in.
+**That range breaks when earlier branch work was split into its own PRs and merged.** Those commits return through a merge from the base, so `<last-simplify-commit>..HEAD` includes all of them plus everything else the base gained — hundreds of files, none of it yours. Check `git log --oneline <last-simplify-commit>..HEAD`; if it lists the base's merges, scope to your own commits (`git show` each) instead. `--no-merges` doesn't rescue it — it hides the merge commits, not the commits they brought in. **Scoping to your own commits breaks too when one is a stacked PR squash-merged in**: the squash carries every base merge the stacked branch took, so `git show` lists the base's files as its own (#4882's squash into #4805 named 72, only 23 of which differ from main). Keep only the files that also appear in `git diff --name-only origin/main...HEAD`.
 
 Then run `bin/lint` to auto-format (it also picks up whatever `/simplify` just changed). Always `bin/lint`, never another formatter or `standardrb` directly. Scope it to the branch's files rather than walking the whole repo:
 
@@ -67,7 +69,7 @@ This applies to the branch's specs, not the suite's. Don't delete pre-existing e
 
 When the branch adds or edits `AGENTS.md` or anything under `.claude/skills/`, check every
 claim it makes against the code before pushing — a doc asserting *why* something is done is as capable of
-being wrong as a comment, and nothing runs it. The wrong ones read as obvious. Also check what the edit *moved* — a rule relocated into a skill is a rule
+being wrong as a comment, and nothing runs it. The wrong ones read as obvious. **Grep the file for the subject before adding a line** — a fact the branch states in one section is often already stated in another, and the two drift; #4425 added an architecture note restating the testing line it had edited in the same run, and got it wrong in the restating. Also check what the edit *moved* — a rule relocated into a skill is a rule
 that only loads when that skill triggers.
 
 ### The churn audit
@@ -99,15 +101,76 @@ The `+++ b/…` lines keep each hit attached to its file; the code-path filter k
 
 Judge each against the **Comments** section of `AGENTS.md` and reach a verdict of keep / razor / delete on every line — a comment survives only by carrying a *why* the code can't. Deleting is the common outcome, razoring the next most common; leaving a block untouched should be the exception you can justify. Watch hardest for the ones you wrote to explain your own reasoning as you worked: narration of the change, mechanism the code already shows, and a second sentence justifying the first.
 
+### The backfill audit
+
+**Required.** Ask whether rows already in the database still fit the branch's code. The shapes that leave them behind:
+
+- **A vocabulary stored as data** — an enum value, a jsonb key or list, a class name in a string column. #4458 replaced names `Export#options["headers"]` holds; `Backfills::NotificationDeliveryErrorRenameJob` is a rename.
+- **A new column whose value depends on existing data**, not its default — `Backfills::OrganizationRolePriorityJob`.
+- **A changed calculated attribute** — existing rows keep the old value until something re-saves them. `Backfills::OrganizationPaidMoneyJob`.
+
+Find what reads the old form before calling one due. A value nothing reads again doesn't need one, and one recording what happened — `Export#written_headers` describes the file that was written — shouldn't be rewritten.
+
+State the verdict in your reply to the user either way, naming the stored values you checked. When one is due, write it without asking — a job in `app/jobs/backfills/` with its spec — and lead the PR body with it (SKILL.md's **Write the summary body**).
+
+### The asset audit
+
+**Required when the branch adds a file under `app/assets/images/`.** List them:
+
+```bash
+rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/assets/images
+```
+
+Icons and images both go through the markup audit below, which checks each one for a file the repo already has.
+
+### The controller audit
+
+**Required when the branch adds a Stimulus controller or wires one to new markup.** List both:
+
+```bash
+rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- app/javascript/controllers
+rtk proxy git diff origin/main...HEAD -G 'data-controller|controller:' --name-only
+```
+
+For each controller named, look for one that already does its job — a shared one in `app/javascript/controllers/ui/` or the top level, or a sibling in another namespace — and for two in the branch's namespace doing the same thing. Fold a duplicate into the shared one, an option on it rather than a second controller, and delete the copy. `bikebook--center-current` into `ui--tabs` and `bikebook--image-fallback` into `image-fallback` are the pattern. Name each one you kept and what it does that nothing shared covers.
+
+### The component audit
+
+**Required when the branch adds a directory under `app/components/`.** List them:
+
+```bash
+rtk proxy git diff origin/main...HEAD --name-only --diff-filter=A -- 'app/components/**/component.rb'
+```
+
+For each, name the existing component it renders or duplicates. One that wraps a single `UI::*` component in chrome is that component with an argument — ask the user whether to fold it in, since a new `UI::*` argument needs their permission. `UI::BulkTableCard` into `UI::Table::InCard`'s `column_settings:` is the pattern.
+
+### The markup audit
+
+**Required when the branch adds markup or an icon.** Run the `use-existing-markup` skill. It converts the hand-written markup to existing components without asking, covering marketing pages, buttons, icons and shadows. **Whenever it changes anything, tell the user in your reply.** List each conversion with the visible change it makes, and the commit it landed in. A page that looks different after a PR update, with no word about why, is what this prevents. Put its callouts (big shadows, and hover states on things that aren't buttons) in the same reply. When it changes nothing, say so in one line.
+
 ### The cycle-type translation check
 
 `AGENTS.md`'s Translations section has the rule; this is how to find the branch's violations:
 
 ```bash
 rtk proxy git diff origin/main...HEAD -- '*.en.yml' 'config/locales/en.yml' | grep -in '^+[^+].*bike'
+rtk proxy git diff origin/main...HEAD -- '*.rb' | grep -in '^+[^+].*errors\.add.*bike'
 ```
 
+The second one is load-bearing: a model's `errors.add(:base, "…")` reaches a flash through `full_messages`, never passing a locale file, so the YAML grep can't see it. `Sale#seller_is_owner` interpolates the cycle type into one.
+
 Read each hit. Key names (`about_this_bike:`), the product name ("Bike Index"), and copy that really is bike-only are fine; a value saying "bike" about the registration is not. `Pages::Registrations::Show::CurrentAlerts::ClaimImpound` and `Pages::Registrations::Show::WrapperConsumer` are the pattern for fixing one, and `spec/components/pages/registrations/show/current_alerts/claim_impound/component_spec.rb` shows how to cover it.
+
+### The product-name check
+
+Copy spells the products "Bike Index" and "Bike Book" — never "BikeIndex", "Bike index", "BikeBook", "Bike book" or "Bikebook":
+
+```bash
+rtk proxy git diff origin/main...HEAD -- '*.yml' '*.erb' '*.haml' '*.rb' '*.js' '*.md' |
+  grep -nE '^\+[^+].*(BikeIndex|[Bb]ike index|BikeBook|Bike book|Bikebook)'
+```
+
+Fix every hit in copy. Code identifiers (`BikeIndexFormBuilder`, `BikeBookUpdateJob`, `Bikebook::`, `bikebook_path`) and the `BikeIndex.org` domain are fine.
 
 ### Only if you have rtk: `rtk proxy` anything you grep or count
 

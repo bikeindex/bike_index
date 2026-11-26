@@ -135,6 +135,61 @@ RSpec.describe Pages::Registrations::Show::OrgTopActions::Wrapper::Component, ty
   end
 
   # The panel keeps the sighting question - the org is the one who saw it sitting there
+  context "registered with the organization, with an active parking notification" do
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: owner).reload }
+    before { FactoryBot.create(:parking_notification, bike:, organization:, user: current_user) }
+
+    it "points the message panel at a new parking notification" do
+      expect(action_panels).to eq(%w[message impound parking notifications_show])
+      expect(page.all("p", visible: :all).map { it.text.strip }).to include("This registration has an active Parking Notification.",
+        "Send a new parking notification to message the owner:")
+      expect(page).to have_css("button[data-panel-name='parking'][data-action='registrations--show--action-panels#toggle']", text: "Send parking notification", visible: :all)
+      expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
+      expect(page).to_not have_css("div[data-panel-name='message'] input[type='radio']", visible: :all)
+    end
+  end
+
+  context "registered with the organization, with the owner's non-stolen notifications off" do
+    let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: false, phone: "7183914410") }
+    let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, creation_organization: organization, user: owner).reload }
+
+    it "renders the message action, saying there's nothing to send" do
+      expect(bike.contact_owner?(current_user, organization)).to be_falsey
+      expect(action_panels).to eq(%w[message impound parking notifications_show])
+      expect(page).to have_css("p", text: "This user has turned off notifications for non-stolen vehicles.", visible: :all)
+      expect(page).to_not have_css("div[data-panel-name='message'] input[type='radio']", visible: :all)
+      expect(page).to_not have_css("textarea[name='organization_message[message]']", visible: :all)
+    end
+
+    context "stolen" do
+      let(:bike) { FactoryBot.create(:bike_organized, :with_ownership_claimed, :with_stolen_record, creation_organization: organization, user: owner).reload }
+
+      it "renders the message forms" do
+        expect(action_panels).to include("message")
+        expect(page).to_not have_text("turned off notifications")
+        expect(page).to have_css("textarea[name='organization_message[message]']", visible: :all)
+      end
+    end
+
+    context "viewed by a non-member" do
+      let(:current_user) { FactoryBot.create(:user_confirmed) }
+
+      it "renders no message action" do
+        expect(action_panels).to_not include("message")
+      end
+    end
+  end
+
+  context "an unregistered parking notification" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, cycle_type: "bike", user: owner, status: "unregistered_parking_notification").reload }
+
+    it "renders no message action" do
+      expect(bike.contact_owner?(current_user, organization)).to be_truthy
+      expect(action_panels).to_not include("message")
+      expect(page).to_not have_button("Message Owner")
+    end
+  end
+
   context "when abandoned, viewed by a trusted organization's staff" do
     let(:owner) { FactoryBot.create(:user_confirmed, notification_unstolen: false) }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, status: :status_abandoned, user: owner).reload }

@@ -30,7 +30,7 @@ module Pages
             if @bike.current_ownership_id == ownership.id
               tag.span("Current", class: UI::Alerts::Base::Component::TEXT_CLASSES[:success])
             elsif ownership.current?
-              tag.small("Current but not set on Bike", class: "twless-strong")
+              tag.small("Current but not set on Bike", class: "less-strong")
             else
               tag.span("transferred", class: UI::Alerts::Base::Component::TEXT_CLASSES[:notice])
             end

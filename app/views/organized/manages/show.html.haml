@@ -1,5 +1,7 @@
 = render(UI::Header::Component.new(text: t(".org_settings", org_name: @organization.short_name), html_class: "uncap"))
 
+= render(UI::Alerts::ObjectError::Component.new(object: @organization))
+
 = form_for @organization, {url: organization_manage_path(id: @organization.id, organization_id: @organization.to_param), action: "update", html: {class: "organized-form"}} do |f|
 
   .form-group.row
@@ -25,6 +27,12 @@
       class: "form-control"
       %span.below-input-help
         = t(".org_email_address_html", org_name: @organization.name)
+      = render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :send_self_registration_email, class_name: "tw:mt-4")) do
+        = t(".send_self_registration_email_to_html", email: render(UI::Code::Inline::Component.new(text: @organization.auto_user&.email)))
+      %span.below-input-help
+        = t(".send_self_registration_email_note", email: @organization.auto_user&.email)
+        - if @organization.enabled?("parking_notifications")
+          = t(".send_self_registration_email_includes_unregistered")
 
   - unless Organization.admin_required_kinds.include?(@organization.kind)
     .form-group.row

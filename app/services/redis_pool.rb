@@ -13,7 +13,8 @@ module RedisPool
   #
 
   def pool
-    @pool ||= ConnectionPool.new(timeout: 1, size: 2) do
+    # One per thread of config/sidekiq.yml's concurrency; connections open lazily
+    @pool ||= ConnectionPool.new(timeout: 1, size: 10) do
       Redis.new(url: Bikeindex::Application.config.redis_default_url)
     end
   end

@@ -7,7 +7,6 @@ import { lazyLoadControllersFrom } from '@hotwired/stimulus-loading'
 
 import TimeLocalizer from '@bikeindex/time-localizer'
 
-// Fixes for hotwire_combobox 0.4.1's option lookup, Enter handling and typing over a selection
 import 'utils/hw_combobox_patch'
 
 /* global Turbo */
@@ -26,10 +25,9 @@ function localizeTime () {
   window.timeLocalizer.localize()
 }
 
-// A fetch still in flight when the page goes away rejects with a generic network
-// error, not an AbortError, so the message alone can't separate it from real
-// breakage - only treat these phrasings as noise while we're actually leaving.
-const NAVIGATION_FETCH_ERROR = /Failed to fetch|Load failed|Fetch is aborted|aborted a request/
+// A network failure, a module fetch included, reads the same whoever made it - so it reports
+// only with our code on the stack, and not while the page is going away
+const NETWORK_ERROR = /Failed to fetch|Load failed|Fetch is aborted|aborted a request|Importing a module script failed|error loading dynamically imported module/
 let navigatingAway = false
 
 // Load honeybadger dynamically so ad blockers don't break the entire app
@@ -42,8 +40,12 @@ if (honeybadgerApiKey) {
     .then(({ default: Honeybadger }) => {
       Honeybadger.configure({
         apiKey: honeybadgerApiKey,
-        environment: document.querySelector('meta[name="honeybadger-environment"]')?.content
+        environment: document.querySelector('meta[name="honeybadger-environment"]')?.content,
+        // One looping tab sent 59k notices in a day
+        maxErrors: 20
       })
+      // Turbo keeps one JS context across visits, so the cap would otherwise span the session
+      document.addEventListener('turbo:load', () => Honeybadger.resetMaxErrors())
       Honeybadger.beforeNotify((notice) => {
         // Filter out browser extension errors
         if (notice.backtrace?.some((frame) => /^(chrome|moz|safari)-extension:\/\//.test(frame.file))) {
@@ -53,7 +55,15 @@ if (honeybadgerApiKey) {
         if (notice.message?.includes('ResizeObserver loop')) {
           return false
         }
-        if (navigatingAway && NAVIGATION_FETCH_ERROR.test(notice.message)) {
+        // Honeybadger's bundle wraps fetch and timers, so its frames turn up under anyone's error
+        const fromOurCode = notice.backtrace?.some((frame) => /\/assets\/(?!@honeybadger-io)/.test(frame.file))
+        if (NETWORK_ERROR.test(notice.message) && (navigatingAway || !fromOurCode)) {
+          return false
+        }
+        // Injected scripts whose frames dodge the extension filter: Google's iOS apps (GSA, CriOS)
+        // recurse, filed by WebKit under the page's URL; Firefox extensions touch a torn-down
+        // window, filed as unknown:0
+        if (/Maximum call stack size exceeded|can't access dead object/.test(notice.message) && !fromOurCode) {
           return false
         }
       })
@@ -63,3 +73,4 @@ if (honeybadgerApiKey) {
 
 document.addEventListener('DOMContentLoaded', localizeTime)
 document.addEventListener('turbo:render', localizeTime)
+document.addEventListener('turbo:frame-render', localizeTime)

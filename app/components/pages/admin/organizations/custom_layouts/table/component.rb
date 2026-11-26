@@ -24,7 +24,7 @@ module Pages
                preview_label: "landing page preview",
                preview_path: organization_landing_path(organization_id: organization_param),
                content: @organization.organization_landing_page&.body?,
-               enabled: LandingPageOrganizations::SLUGS.include?(@organization.slug)}
+               enabled: @organization.landing_page_slug.present?}
             end
 
             def stolen_message_row
