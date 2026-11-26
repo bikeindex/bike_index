@@ -14,6 +14,13 @@
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: @bike.frame_material_name)) %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".frame_size"), value: @bike.frame_size&.upcase)) %>
       <%= render(UI::DefinitionList::Row::Component.new(label: translation(".handlebar_type"), value: @bike.handlebar_type_name)) %>
+
+      <% if bikebook_model_path %>
+        <%# A blank term, so the link lines up with the values beside it %>
+        <%= render(UI::DefinitionList::Row::Component.new(label: "\u00a0")) do %>
+          <%= link_to translation(".view_stock_on_bikebook", bike_type: @bike.type), bikebook_model_path, class: "twlink" %>
+        <% end %>
+      <% end %>
     <% end %>
   </div>
 <% end %>

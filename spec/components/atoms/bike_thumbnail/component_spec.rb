@@ -13,6 +13,15 @@ RSpec.describe Atoms::BikeThumbnail::Component, type: :component do
     end
   end
 
+  context "with a stock photo" do
+    let(:bike) { Bike.new(year: 2025, frame_model: "Haul ST", stock_photo_url: "https://bikebook.bikeindex.org/specialized/2025/haul-st.png") }
+
+    it "marks it in the corner" do
+      expect(component).to have_css("img[src='https://bikebook.bikeindex.org/specialized/2025/haul-st.png']")
+      expect(component).to have_css("button[aria-label='Stock photo of a 2025 Haul ST']", exact_text: "Stock")
+    end
+  end
+
   context "without a photo" do
     let(:bike) { nil }
 

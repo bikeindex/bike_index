@@ -90,6 +90,9 @@ module BikeServices
       bike.address_record&.street.present? || bike.creation_organization&.enabled?("reg_address")
     end
 
+    # Whether the photo it shows is its model's stock photo, as it has none of its own
+    def stock_photo?(bike) = bike.thumb_path.blank? && bike.stock_photo_url.present?
+
     def thumb_image_url(bike)
       return bike.thumb_path if bike.thumb_path.present?
       # Only the legacy bucket has small_ versions; the Bike Book catalog's photos are a single size

@@ -19,12 +19,12 @@
           class: "tw:aspect-4/3 tw:w-full tw:object-contain",
         ) %>
 
-        <%= hero_overlay %>
+        <%= hero_overlay(stock_badge(gallery: true)) %>
       </a>
 
-      <% if @bike.public_images.count > 1 %>
+      <% if thumbnail_images.size + (@bike.stock_photo_url.present? ? 1 : 0) > 1 %>
         <ul class="tw:flex tw:flex-wrap tw:gap-2">
-          <% @bike.public_images.select(&:image_url).each_with_index do |public_image, index| %>
+          <% thumbnail_images.each_with_index do |public_image, index| %>
             <li>
               <button
                 type="button"
@@ -45,6 +45,31 @@
             </li>
           <% end %>
 
+          <% if @bike.stock_photo_url.present? %>
+            <%# The badge beside the button rather than in it, as it's a tooltip's button %>
+            <li class="tw:relative">
+              <button
+                type="button"
+                data-registrations--show--photos-target="thumbnail"
+                data-action="click->registrations--show--photos#select"
+                data-large-url="<%= @bike.stock_photo_url %>"
+                data-original-url="<%= @bike.stock_photo_url %>"
+                data-photo-alt="<%= translation(".bike_photo", bike_type: @bike.type_titleize) %>"
+                data-stock="true"
+                aria-current="false"
+                class="
+                  tw:cursor-pointer tw:overflow-hidden tw:rounded-sm
+                  tw:border-2 tw:border-transparent
+                  tw:aria-[current=true]:border-blue-500
+                "
+              >
+                <%= image_tag @bike.stock_photo_url, alt: translation(".bike_photo", bike_type: @bike.type_titleize), class: "tw:h-16 tw:w-16 tw:bg-white tw:object-contain" %>
+              </button>
+
+              <%= render(Atoms::StockPhotoBadge::Component.new(bike: @bike, display: :word, html_class: "tw:absolute tw:bottom-1 tw:left-1")) %>
+            </li>
+          <% end %>
+
           <% if @owner %>
             <li><%= add_photo_box %></li>
           <% end %>
@@ -58,14 +83,9 @@
         tw:bg-gray-100 tw:lg:mx-0 tw:lg:rounded-2xl tw:dark:bg-gray-900
       "
     >
-      <h3 class="tw:p-2 tw:text-sm tw:opacity-65">
-        <%= translation(".stock_photo", year: @bike.year, model: @bike.frame_model) %>
-        <em><%= translation(".color_may_not_match") %></em>
-      </h3>
-
       <%= image_tag(@bike.stock_photo_url, alt: translation(".bike_photo", bike_type: @bike.type_titleize), class: "tw:aspect-4/3 tw:w-full tw:object-contain") %>
 
-      <%= hero_overlay %>
+      <%= hero_overlay(stock_badge) %>
     </div>
     <% if @owner %>
       <%= add_photo_box %>
