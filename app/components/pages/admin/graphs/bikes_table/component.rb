@@ -12,8 +12,8 @@ module Pages
           # on an order across the chart's separate request. The shared chart palette runs out
           # well before Ownership.origins does
           ORIGIN_COLORS = Ownership.origins.zip(UI::Chart::Component::COLORS + %w[#4F46E5 #9333EA
-            #0D9488 #CA8A04 #E11D48 #2563EB #16A34A]).to_h.freeze
-          POS_SEARCH_KINDS = %w[lightspeed_pos ascend_pos does_not_need_pos no_pos].freeze
+            #0D9488 #CA8A04 #E11D48 #2563EB #16A34A #C026D3]).to_h.freeze
+          POS_SEARCH_KINDS = (Organization.pos_kinds - Organization.broken_pos_kinds - %w[other_pos]).freeze
           IOS_VERSION_SQL = "ownerships.registration_info ->> 'ios_version'"
 
           def self.ios_version_bikes(bikes)
