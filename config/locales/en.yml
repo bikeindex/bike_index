@@ -1979,11 +1979,12 @@ en:
             if you think you should be able to.
       users:
         create:
-          insufficient_invitations: >-
-            You tried to invite %{invite_count} users, but %{org_name} only can invite
-            *%{remaining_invite_count} more*. Invite fewer or contact support.
+          already_invited: Everyone you entered has already been invited to %{org_name}.
           no_remaining_user_invitations: "%{org_name} is out of user invitations.
             Contact support@bikeindex.org."
+          too_many_invitations: >-
+            You tried to invite %{invite_count} users, but %{org_name} only can invite
+            %{remaining_invite_count} more. Invite fewer or contact support.
           user_was_invited: "%{invited_email} was invited to %{org_name}!"
           users_invited: "%{invite_count} users invited to %{org_name}"
         destroy:
@@ -4482,27 +4483,33 @@ en:
         stickers: Stickers
         unclaimed: Unclaimed
     users:
+      back_link:
+        manage_users: Manage users
       edit:
-        confirmation: >-
-          Are you sure you want to remove %{user_name} from %{org_name}? (They will
-          still be to use their personal account)
-        edit_organization_role_html: Edit membership for <em class="small">%{email}</em>
-        email: Email
+        confirm_removal: >-
+          Are you sure you want to remove %{user_name} from %{org_name}? They will
+          still be able to use their personal account.
+        details: Details
         has_not_signed_up_html: "%{name} <strong>has still not signed up</strong>"
         invited: Invited
+        invited_by: Invited by
         last_login: Last login
         last_login_ip: Last login ip
-        remove_from_organization: remove from organization
+        remove_from_org: Remove from organization
+        role: Role
         signed_up: Signed up
-        update: Update
+        update_role: Update role
       index:
         admin: admin
         claimed: Claimed
         created: Created
-        current_users: Current users
+        current_users_count_html: "<strong>%{count}</strong> current users"
         emails_are_currently_sent_from_html: Emails are currently sent from <em>%{email}</em>.
         find_by_name_or_email: Find by name or email
+        invitations_remaining_html: "<strong>%{count}</strong> invitations remaining."
         invite_more_users: Invite more users
+        invite_users: Invite users
+        invited_by: Invited by
         manage_users: Manage Users
         manually_invite_email: manually invite emails
         matching_user: Matching user
@@ -4511,36 +4518,40 @@ en:
         permitted_domain_info_html: >-
           You have a permitted domain, anyone signing up with an email address ending
           in <code>%{email_suffix}</code> will be a member of %{org_name}.
-        remaining_invites_html: You can add <strong>%{invitations_count}</strong>
-          more
         role: Role
         search: Search
-        sender: Sender
-        to: To
         update_email: Update email
-        user: user
+        user_column: User
+        view: View
         you_can_also: You can also
-        you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
       new:
-        1_email_per_line: 1 email per line
         automatic_passwordless: >-
           Your organization is set up with automatic passwordless log in. Emails you
           invite will be able to sign in by using the "Emailed sign in link" button
           on the sign in page.
-        email_youre_inviting: Email you're inviting
-        invite_multiple_emails: Invite multiple emails
-        invite_user: Invite user
-        multiple_emails: Multiple emails
+        emails: Emails
+        emails_count:
+          one: "%{count} email"
+          other: "%{count} emails"
+        invitations_remaining_html: "<strong>%{count}</strong> invitations remaining."
+        invite_users_heading: Invite users
+        invited_so_far_html:
+          one: You've invited <strong>%{number} user</strong>.
+          other: You've invited <strong>%{number} users</strong>.
+        not_valid_email: 'Not a valid email: %{emails}'
+        one_email_per_line: One email per line. Commas and spaces also work.
+        only_invitations_left:
+          one: You only have %{count} invitation left.
+          other: You only have %{count} invitations left.
         organization_role: Organization Role
-        remaining_invites_html: You can add <strong>%{invitations_count}</strong>
-          more
+        role: Role
         send_invitation: Send invitation
+        send_invitations: Send %{count} invitations
         signing_in_with_permitted_domain_html: >-
           Signing in with an "Emailed sign in link" using an address that ends with
           <code>%{email_suffix}</code> will automatically make you a member of %{org_name}.
-        user: user
+        who_are_you_inviting: Who are you inviting?
         you_have_a_permitted_domain: You have a permitted domain
-        you_have_invited_html: 'You have invited: <strong>%{users_count}</strong>'
       organization_role_fields:
         admin_access: Full organization access
         admin_of_organization: Admin of organization
@@ -4550,7 +4561,6 @@ en:
         member_no_bikes_access: Same access as Member, but can not edit organization
           bikes
         member_of_organization: Member of organization
-        role_type: Role type
   organized_mailer:
     custom_message:
       subject: "%{org_name} - the location of your %{mnfg_name}"

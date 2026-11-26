@@ -53,6 +53,9 @@ RSpec.describe Organized::UsersController, type: :request do
         expect(response).to render_template :index
         expect(assigns(:current_organization)).to eq current_organization
         expect(assigns(:organization_roles).pluck(:user_id)).to match_array([current_user.id, user2.id])
+        expect(response.body).to include("invitations remaining")
+        expect(response.body).to include("Invite users")
+        expect(response.body).to include(edit_organization_user_path(user2.organization_roles.first.id, organization_id: current_organization.to_param))
         current_organization.reload
         expect(current_organization.organization_roles.admin_text_search("jill").pluck(:user_id)).to eq([user2.id])
         expect(current_organization.organization_roles.admin_text_search("monica").pluck(:user_id)).to eq([user2.id])
@@ -70,6 +73,8 @@ RSpec.describe Organized::UsersController, type: :request do
         get "#{base_url}/new", params: {organization_id: current_organization.to_param}
         expect(response.code).to eq("200")
         expect(response).to render_template :new
+        expect(response.body).to include("multiple_emails_invited")
+        expect(response.body).to include("checked=\"checked\" value=\"member\"").or include("value=\"member\" checked=\"checked\"")
       end
       context "passwordless_users with a permitted domain" do
         let(:current_organization) do
@@ -92,7 +97,32 @@ RSpec.describe Organized::UsersController, type: :request do
           get "#{base_url}/#{organization_role.id}/edit", params: {organization_id: current_organization.to_param}
           expect(assigns(:organization_role)).to eq organization_role
           expect(response.code).to eq("200")
+          expect(response.body).to include(organization_role.invited_email)
+          expect(response.body).to include("Remove from organization")
+          expect(response.body).to include("Last login")
+          expect(Capybara.string(response.body)).to have_css("form[action$='/users/#{organization_role.id}'] input[type=radio]:not([disabled])", count: 3)
           expect(response).to render_template :edit
+        end
+      end
+    end
+
+    describe "edit" do
+      context "unclaimed organization_role" do
+        let(:organization_role) { FactoryBot.create(:organization_role, organization: current_organization) }
+        it "has no login details to show" do
+          get "#{base_url}/#{organization_role.id}/edit"
+          expect(response.code).to eq("200")
+          expect(response.body).to_not include("Last login")
+        end
+      end
+      context "own organization_role" do
+        let(:organization_role) { current_user.organization_roles.first }
+        it "offers neither removing nor changing the role" do
+          get "#{base_url}/#{organization_role.id}/edit"
+          expect(response.code).to eq("200")
+          expect(response.body).to_not include("Remove from organization")
+          expect(response.body).to_not include("Update role")
+          expect(Capybara.string(response.body)).to have_css("form[action$='/users/#{organization_role.id}'] input[type=radio][disabled]", count: 3)
         end
       end
     end
@@ -110,6 +140,14 @@ RSpec.describe Organized::UsersController, type: :request do
             organization_role.reload
             expect(organization_role.role).to eq "admin"
             expect(organization_role.user).to eq og_user
+          end
+        end
+        context "unclaimed organization_role" do
+          let(:organization_role) { FactoryBot.create(:organization_role, organization: current_organization, role: "member", invited_email: "unclaimed@bikes.com") }
+          it "names the invited email in the flash" do
+            put "#{base_url}/#{organization_role.id}", params: {organization_role: {role: "admin"}}
+            expect(flash[:success]).to eq "Updated membership for unclaimed@bikes.com."
+            expect(organization_role.reload.role).to eq "admin"
           end
         end
         context "marking self member" do
@@ -257,8 +295,41 @@ RSpec.describe Organized::UsersController, type: :request do
             expect(ActionMailer::Base.deliveries.empty?).to be_falsey
           end
         end
+        context "separated by commas and semicolons" do
+          it "invites each" do
+            expect {
+              post base_url, params: {organization_role: organization_role_params, multiple_emails_invited: "a@stuff.com, b@stuff.com;c@stuff.com\nd@stuff.com"}
+            }.to change(OrganizationRole, :count).by 4
+            expect(current_organization.organization_roles.pluck(:invited_email)).to include("a@stuff.com", "b@stuff.com", "c@stuff.com", "d@stuff.com")
+          end
+        end
+        context "case differs, or already invited" do
+          let!(:existing_role) { FactoryBot.create(:organization_role, organization: current_organization, invited_email: "stuff@stuff.com") }
+          it "invites each address once, without spending an invitation on an existing one" do
+            expect(current_organization.remaining_invitation_count).to eq 3
+            expect {
+              post base_url, params: {organization_role: organization_role_params, multiple_emails_invited: "Stuff@Stuff.com new@stuff.com NEW@stuff.com"}
+            }.to change(OrganizationRole, :count).by 1
+            expect(flash[:success]).to eq "new@stuff.com was invited to #{current_organization.name}!"
+            expect(current_organization.reload.remaining_invitation_count).to eq 2
+          end
+          it "says so when nobody is new" do
+            expect {
+              post base_url, params: {organization_role: organization_role_params, multiple_emails_invited: "STUFF@stuff.com"}
+            }.to_not change(OrganizationRole, :count)
+            expect(response).to render_template :new
+            expect(flash.now[:error]).to include "already been invited"
+          end
+        end
         context "more than available" do
           let(:current_organization) { FactoryBot.create(:organization, available_invitation_count: 3) }
+          it "renders the error for this request only" do
+            post base_url, params: {organization_role: organization_role_params, multiple_emails_invited: multiple_emails_invited.join("\n")}
+            expect(response).to render_template :new
+            expect(flash.now[:error]).to include "only can invite 2 more"
+            get base_url
+            expect(flash[:error]).to be_blank
+          end
           it "renders error, doesn't create any" do
             Sidekiq::Testing.inline! do
               ActionMailer::Base.deliveries = []

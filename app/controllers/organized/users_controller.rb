@@ -20,7 +20,7 @@ module Organized
 
     def update
       @organization_role.update(permitted_update_params)
-      flash[:success] = translation(:updated_organization_role, user_email: @organization_role.user&.email)
+      flash[:success] = translation(:updated_organization_role, user_email: @organization_role.user&.email || @organization_role.invited_email)
       redirect_to current_root_path
     end
 
@@ -31,7 +31,7 @@ module Organized
     end
 
     def new
-      @organization_role ||= OrganizationRole.new(organization_id: current_organization.id)
+      @organization_role ||= OrganizationRole.new(organization_id: current_organization.id, role: "member")
       @page_errors = @organization_role.errors
     end
 
@@ -41,19 +41,26 @@ module Organized
         redirect_to(current_root_path) && return
       end
       @organization_role = OrganizationRole.new(permitted_create_params)
-      if params[:multiple_emails_invited].present?
-        if current_organization.restrict_invitations? && (multiple_emails_invited.count > current_organization.remaining_invitation_count)
-          flash[:error] = translation(:insufficient_invitations,
-            invite_count: multiple_emails_invited.count,
+      emails = multiple_emails_invited
+      if emails.any?
+        new_emails = emails - current_organization.organization_roles.where(invited_email: emails).pluck(:invited_email)
+        remaining = current_organization.remaining_invitation_count
+        if new_emails.none?
+          flash.now[:error] = translation(:already_invited, org_name: current_organization.name)
+          render :new
+        elsif current_organization.restrict_invitations? && (new_emails.count > remaining)
+          flash.now[:error] = translation(:too_many_invitations,
+            invite_count: new_emails.count,
             org_name: current_organization.name,
-            remaining_invite_count: current_organization.remaining_invitation_count)
+            remaining_invite_count: remaining)
           render :new
         else
-          flash[:success] = translation(:users_invited,
-            invite_count: multiple_emails_invited.count,
-            org_name: current_organization.name)
-          multiple_emails_invited
-            .each { |email| OrganizationRole.create(permitted_create_params.merge(invited_email: email)) }
+          flash[:success] = if new_emails.one?
+            translation(:user_was_invited, invited_email: new_emails.first, org_name: current_organization.name)
+          else
+            translation(:users_invited, invite_count: new_emails.count, org_name: current_organization.name)
+          end
+          new_emails.each { |email| OrganizationRole.create(permitted_create_params.merge(invited_email: email)) }
 
           redirect_to(current_root_path) && return
         end
@@ -96,7 +103,7 @@ module Organized
     end
 
     def multiple_emails_invited
-      params[:multiple_emails_invited].split(/\s+/).flatten.reject(&:blank?).uniq
+      params[:multiple_emails_invited].to_s.split(/[\s,;]+/).filter_map { EmailNormalizer.normalize(it).presence }.uniq
     end
 
     def permitted_update_params

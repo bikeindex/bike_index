@@ -36,10 +36,16 @@ failed after the whole capture round — leaving a comment that can never hold i
 3. **Rewritten: stop.** Don't capture, host or retry — every retry stacks another
    rewrite. Update the comment to a body with no URLs: `## Screenshots` and a line
    saying the screenshots couldn't be posted from this session (that goes through).
+   `gh api -X PATCH … -F body=@file` is rewritten the same way, and the attachments
+   upload answers 415 through the sandbox proxy (#4921), so there is no other route.
    Then tell the user the sandbox's comment tools
    rewrite URLs, so the screenshots have to be captured and attached by hand — and
    skip the rest of this file.
 4. **Posted: carry on.** The probe is the comment you edit in place with the real body.
+   A pass doesn't promise the real post: on #4921 a lone `<img>` probe and, later, a
+   table-of-images probe each passed, yet every post of the full 14-image body was
+   rewritten. Read the real post back too, and when it was rewritten, reset the comment
+   as in step 3 and hand the user the PNGs — the hosted URLs still serve.
 
 ## Hosting
 
@@ -95,8 +101,8 @@ through `get_comments` since on a busy PR it won't be on the first page.
 
 `add_issue_comment` appends a Claude Code attribution footer the `pr` skill forbids —
 the tell is the session id in its link — and can backtick the URL inside an `<img src>`
-too (#4474), leaving an image with no `src`. `update_issue_comment` adds no footer but
-can rewrite URLs too (#4821) — so create the comment with `## Screenshots` alone, put
+too (#4474), leaving an image with no `src`. `update_issue_comment` can append it too (#4921) and
+can rewrite URLs (#4821) — so create the comment with `## Screenshots` alone, put
 the body in with an update once the probe has passed, then read it back.
 
 ## Verifying
