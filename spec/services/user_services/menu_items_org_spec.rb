@@ -148,7 +148,7 @@ RSpec.describe UserServices::MenuItemsOrg do
           "/o/#{slug}/parking_notifications/new", match_params: {kind: nil}))
       end
 
-      it "puts audits, the e-bike rules and education completions under e-vehicles" do
+      it "puts audits, the e-bike rules and education acknowledgments under e-vehicles" do
         expect(e_vehicles[:label]).to eq "E-Vehicles"
         expect(e_vehicles[:children]).to eq([
           link_item("Audits", "/o/#{slug}/model_audits", match_paths: "/o/#{slug}/model_audits/**"),
