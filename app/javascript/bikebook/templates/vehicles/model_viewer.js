@@ -150,8 +150,10 @@ class ModelViewer {
     Object.assign(this, { selectedSize, sizePath, outOfClassId, state, lettering })
   }
 
-  photo (photo, titleText, frame = 'tw:mb-6 tw:aspect-[3/2]') {
-    return html`<div class="tw:group tw:order-first" data-controller=${present(photo) ? 'image-fallback' : nothing} data-broken=${present(photo) ? nothing : ''}>${present(photo)
+  stockPhoto (frame) {
+    const { stock_photo: photo, manufacturer, model } = this.vehicle
+    const titleText = [manufacturer, model].filter(present).join(' ')
+    return html`<div class="tw:group" data-controller=${present(photo) ? 'image-fallback' : nothing} data-broken=${present(photo) ? nothing : ''}>${present(photo)
       ? html`<a target="_blank" rel="noopener" class="${frame} tw:block tw:group-data-broken:hidden"
         href=${photo}><img alt=${titleText} loading="lazy" class="tw:size-full tw:rounded-sm tw:object-contain" data-action="error->image-fallback#fallBack" src=${photo}></a>`
       : nothing}<div class="${frame} tw:hidden tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:rounded-md tw:p-1
@@ -249,16 +251,6 @@ class ModelViewer {
 
   onSizes (content, names) {
     return names ? join(compact([content, `on ${this.sizeRange(names)}`]), ' ') : content
-  }
-
-  differs (...keys) {
-    const dig = (vehicle) => keys.reduce((value, key) => value?.[key], vehicle)
-    return this.others.some((other) => !equal(dig(other), dig(this.vehicle)))
-  }
-
-  stockPhoto (frame) {
-    const { vehicle } = this
-    return this.photo(vehicle.stock_photo, [vehicle.manufacturer, vehicle.model].filter(present).join(' '), frame)
   }
 
   basics () {

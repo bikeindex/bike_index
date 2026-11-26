@@ -75,7 +75,7 @@ export class VehicleViewer {
     const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} ${comparing
       ? 'tw:twpagebleed'
       : 'tw:max-[500px]:twpagebleed tw:lg:twpagebleed tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
-    // each vehicle's `field` on a card of its own, named as its full card is, after whatever `lead` shows, with the overview's ×
+    // each vehicle's `field` on a card of its own, after whatever `lead` shows, with the overview's ×
     // `keyed`, each topped in its frame's color in the overlay
     const cards = (field, none, content, { lead, keyed = false } = {}) => vehicles.map(({ data, value, key }, index) => {
       const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
@@ -84,8 +84,7 @@ export class VehicleViewer {
         tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)] tw:dark:border-gray-700 tw:dark:bg-gray-800
         ${keyed ? seriesBorders(compared.frames, index).top : ''} ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${removeLink({
         label: `Remove ${name}`,
-        href: removePath(index),
-        corner: true
+        href: removePath(index)
       })}<header data-align-row="header" class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${
         vehicleTitle({ manufacturer, model, data, value, ...this.card, heading: 'h3' })}</div><div
         class="tw:shrink-0">${photoOf({ presenter, data }, 'tw:h-14 tw:w-21')}</div></header>${lead ? html`<div data-align-row="lead">${lead(data, key)}</div>` : nothing}${present(data[field])

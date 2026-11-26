@@ -52,15 +52,13 @@ const paint = (year) => JSON.stringify(array(year.colorways).map(({ name, colors
 // The years sharing a paint, oldest first
 const yearsHeading = (years) => html`<div class="tw:text-xs tw:font-bold tw:tabular-nums">${years.map(({ year }) => year).toReversed().join(', ')}</div>`
 
-// the newest colorways, to choose between where there are several, and behind a link that shows them with each one's
-// years, each paint the earlier years had, but the newest's, all of them choices once there are any, the `picked` one
-// chosen and shown
+// The newest colorways, a choice where there are several; behind "View previous years colors", each paint's years and
+// every earlier paint. The `picked` one is chosen and shown
 const colors = (presenter, vehicle, key, picked) => {
-  const [newestYears = [], ...earlier] = Map.groupBy(colorwayYears(vehicle), paint).values()
-  const [newest] = newestYears
-  if (!newest) return null
+  const [newestYears, ...earlier] = Map.groupBy(colorwayYears(vehicle), paint).values()
+  if (!newestYears) return null
 
-  const latest = array(newest.colorways)
+  const latest = array(newestYears[0].colorways)
   const selected = chosenColorway(vehicle, picked).value
   // a toggle scrolling out to its cell's edges where one's name is wider than it
   const toggle = (each, year) => html`<div class="twgutter-bleed tw:overflow-x-auto tw:[--gutter:--spacing(2.5)]">${radioButtonGroup({
@@ -155,8 +153,7 @@ const compared = (vehicles, fields, frames, sectionClasses, corner) => html`<sec
       return {
         label: html`${vehicle.photo('tw:mb-2 tw:aspect-[4/3]')}${removeLink({
           label: `Remove ${[vehicle.manufacturer, vehicle.model].filter(present).join(' ')}`,
-          href: vehicle.removeHref,
-          corner: true
+          href: vehicle.removeHref
         })}${vehicle.title}`,
         classes: 'tw:px-2.5! tw:py-2! tw:align-top',
         headerClasses: `tw:relative ${border.top}`,
