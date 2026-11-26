@@ -346,7 +346,7 @@ module BikeServices
       clear_stale_report(b_param, bike_params["status"])
       set_auto_organization(b_param, register_with_organization)
       b_param.clean_params(step_2_params(bike_params, image_signed_id:, completed:, registrant_country:,
-        bikebook_model: b_param.params["bikebook_model"]).as_json)
+        saved_frame_model: b_param.bike["frame_model"]).as_json)
       b_param.save if b_param.errors.none?
       b_param.errors.add(:base, translation(:name_required)) unless completed
       completed
@@ -667,7 +667,7 @@ module BikeServices
 
     # Blank values keep what step 1 saved - except the additional colors, where
     # blank is the "remove color" button clearing one
-    def step_2_params(bike_params, image_signed_id:, completed:, registrant_country:, bikebook_model:)
+    def step_2_params(bike_params, image_signed_id:, completed:, registrant_country:, saved_frame_model:)
       bike_params = bike_params.reject { |key, value| value.blank? && !key.in?(%w[secondary_frame_color_id tertiary_frame_color_id]) }
       # The unit only means something alongside a numeric size
       bike_params = bike_params.except("frame_size_unit") if bike_params["frame_size_number"].blank?
@@ -675,10 +675,7 @@ module BikeServices
       bike_params = bike_params.merge("frame_model" => BikebookModel.frame_model(frame_model)) if frame_model
       # A pick in the model combobox submits its catalog id or citation key. A re-save submits the name it was saved as,
       # so only typing another name over it drops it
-      if frame_model
-        picked = {bikebook_model: frame_model[Integrations::Bikebook::Catalog::MODEL_ID] ||
-          (bikebook_model if BikebookModel.frame_model(bikebook_model) == frame_model)}
-      end
+      picked = {bikebook_model: frame_model[Integrations::Bikebook::Catalog::MODEL_ID]} if frame_model && frame_model != saved_frame_model
       # The photo went browser -> bucket before submit, so only its signed id rides along.
       # Dropped when blank rather than merged, which would clobber an id already stored.
       {details_completed: completed, bike: bike_params, image_signed_id: image_signed_id.presence,
