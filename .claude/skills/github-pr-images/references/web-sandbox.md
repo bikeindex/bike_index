@@ -22,15 +22,12 @@ failed after the whole capture round — leaving a comment that can never hold i
 
 1. Make sure the `## Screenshots` comment exists — when it doesn't, create it with
    `add_issue_comment` and a body of just `## Screenshots` — then **update** it with
-   `update_issue_comment` to this body, shaped like the real one — images inside table
-   cells. #4921's lone `<img>` line passed and its real table body was rewritten:
+   `update_issue_comment` to this body:
 
    ```
    ## Screenshots
 
-   | Desktop | Mobile |
-   | --- | --- |
-   | <img src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook.png" width="40"> | <img src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook.png" width="20"> |
+   <img alt="probe" src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook.png" width="40" />
    ```
 
 2. Read it back with `get_comments`. It posted if the body still holds a literal
@@ -45,6 +42,10 @@ failed after the whole capture round — leaving a comment that can never hold i
    rewrite URLs, so the screenshots have to be captured and attached by hand — and
    skip the rest of this file.
 4. **Posted: carry on.** The probe is the comment you edit in place with the real body.
+   A pass doesn't promise the real post: on #4921 a lone `<img>` probe and, later, a
+   table-of-images probe each passed, yet every post of the full 14-image body was
+   rewritten. Read the real post back too, and when it was rewritten, reset the comment
+   as in step 3 and hand the user the PNGs — the hosted URLs still serve.
 
 ## Hosting
 
