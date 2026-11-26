@@ -887,9 +887,32 @@ RSpec.describe BikeServices::Creator do
         end
       end
 
-      context "with a model the catalog lacks, and a vehicle_specification in the request" do
+      context "picked in registration" do
+        let(:bike_params) { super().merge(frame_model: "Haul ST custom") }
+        let(:b_param) { BParam.create(creator: user, params: {bike: bike_params, bikebook_model: "m/specialized/2025/haul-st@CA"}) }
+
+        it "creates the bike with its picked model's data, in its market" do
+          bike = instance.create_bike(b_param)
+
+          expect(bike.description).to include("up to 100 km")
+          expect(bike.vehicle_specification).to have_attributes(bikebook_model:, bikebook_market: "CA")
+        end
+
+        context "without a year" do
+          let(:bike_params) { super().merge(year: nil) }
+
+          it "creates the bike without its data or a vehicle specification" do
+            bike = instance.create_bike(b_param)
+
+            expect(bike.description).to eq "Input description"
+            expect(bike.vehicle_specification).to be_nil
+          end
+        end
+      end
+
+      context "with a model the catalog lacks, and another manufacturer's bikebook_model in the request" do
         let(:bike_params) { super().merge(frame_model: "Not a real model") }
-        let(:b_param) { BParam.create(creator: user, params: {bike: bike_params, vehicle_specification: {bikebook_model_id: bikebook_model.id}}) }
+        let(:b_param) { BParam.create(creator: user, params: {bike: bike_params, bikebook_model: "m/aventon/2022/level-2"}) }
 
         it "creates the bike without a vehicle specification" do
           bike = instance.create_bike(b_param)
