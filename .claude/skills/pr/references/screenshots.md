@@ -4,13 +4,9 @@ This is SKILL.md's **Screenshots** section — read it once the PR exists and **
 
 The flow: decide what to capture → capture the branch → capture the same URLs on the base branch → post one `## Screenshots` PR comment, which uploads the images. Screenshots go in a **comment**, never the PR body, so the human-written summary stays first and recaptures don't churn the description.
 
-## Preflight: no `gh`, no screenshots
+## Preflight: can this session upload?
 
-**This phase needs `gh`. Without it, skip the whole thing** — don't capture, don't upload, don't post anything in its place. Say in your summary that screenshots need `gh`, and hand back the PR URL. Run `github-pr-images`' preflight here, before step 1 — it upgrades a `gh` too old to `--attach`.
-
-**The web sandbox is the exception to that skip.** `gh` doesn't work there, but it hosts in the PR branch's own history instead — capture and post normally, following `github-pr-images`' [references/web-sandbox.md](../../github-pr-images/references/web-sandbox.md) for the hosting. Those URLs last only as long as the branch's objects, so say in your summary that a merged PR's screenshots aren't archival.
-
-**Run that file's probe before anything else in this phase** — before the dev server, the captures and the hosting commits. Some sessions' comment tools rewrite every image URL into inert text, which only shows after the capture round, and the probe finds out for two calls. When it fails, the phase ends there: its one-line update to the `## Screenshots` comment is the only thing posted — the exception to the next paragraph — and your summary gives the user the reason.
+**Run `github-pr-images`' preflight before anything else in this phase** — before the dev server and the captures. When it says this session can't upload, skip the whole thing — don't capture, don't post anything in its place — say so in your summary, and hand back the PR URL. The one exception: the web sandbox's failed probe leaves a one-line update to the `## Screenshots` comment, and your summary gives the user the reason.
 
 **Skipping means posting nothing at all**, not posting something else. Substitute evidence — a rendered-HTML diff, a note about what couldn't be captured — leaves a comment the next run can't find or replace, because it isn't the `## Screenshots` comment; that's how #4126 ended up with three comments telling one story. If it's worth having, put it in your summary and let the user decide where it goes.
 
@@ -49,7 +45,7 @@ Invoke the `frontend-screenshots` skill with the `(url-path, page-slug)` pairs f
 
 If it returns failures it couldn't diagnose, report them and leave the PR without screenshots — don't post partial results. Abandoning the phase after a capture is the one path where nothing else closes the browser, so close it yourself.
 
-Collect the PNG paths, keyed by `(page-slug, viewport)`. Nothing is uploaded until step 4 posts — `--attach` uploads as part of the post.
+Collect the PNG paths, keyed by `(page-slug, viewport)`.
 
 ## 3. Capture the same URLs on the base branch
 
@@ -70,7 +66,7 @@ Two things the checkout itself does, either side of it:
 
 `browser_close` first — the captures are done and posting doesn't use the browser. Then write the body to a temp file and invoke `github-pr-images` with it. That skill owns the comment — finding the existing one, creating or editing it, verifying it rendered — and it posts what you hand it verbatim. Everything below is what goes *in* the body.
 
-Each `src` is the PNG's repo-relative path (`tmp/pr_screenshots/…png`); `github-pr-images` uploads each one and swaps the path for its asset URL. **In the sandbox**, host both sets in one `commit_images.sh` call first and use the URLs it prints instead.
+Each `src` is the PNG's repo-relative path (`tmp/pr_screenshots/…png`); `github-pr-images` uploads each one and swaps the path for its asset URL. When the preflight sent it to the sandbox's fallback, host both sets in one `commit_images.sh` call first and use the URLs it prints instead.
 
 Its first line is always `## Screenshots`, because that heading is the handle it's found by next time.
 

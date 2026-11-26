@@ -33,4 +33,15 @@ RSpec.describe Pages::Admin::Users::Show::Bikes::Component, type: :component do
         href: "/admin/bikes?search_status_deleted_only=true&search_status_example=true&user_id=#{user.id}")
     end
   end
+
+  context "with a previously owned bike" do
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    before { FactoryBot.create(:ownership, bike:) }
+
+    it "counts it after" do
+      expect(heading).to eq "Bikes 0 (view in admin/bikes) - 1 bike previously owned"
+      expect(component).to have_link("1 bike previously owned",
+        href: "/admin/bikes?search_previous_owner=true&user_id=#{user.id}")
+    end
+  end
 end
