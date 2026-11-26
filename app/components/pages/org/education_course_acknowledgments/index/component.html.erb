@@ -13,7 +13,7 @@
 
 <p class="tw:my-4">
   <%= translation(".matching_count_html", count: helpers.number_display(@pagy.count)) %>
-  <em><%= render(UI::TimeRange::Component.new(time_range: @time_range, period: @period)) %></em>
+  <em><%= render(UI::TimeRange::Component.new(time_range: @start_time..@end_time, period: @period)) %></em>
 </p>
 
 <%= render(UI::Table::Base::Component.new(records: @acknowledgments, render_sortable: true, sort_state: @sort_state)) do |table| %>

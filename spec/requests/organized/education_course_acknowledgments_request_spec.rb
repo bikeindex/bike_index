@@ -37,9 +37,7 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
           bike: FactoryBot.create(:bike_organized))
       end
 
-      def emails = %w[agreed defaulted pending].select { response.body.include?("#{it}@example.com") }
-
-      def email_order = emails.sort_by { response.body.index("#{it}@example.com") }
+      def emails = response.body.scan(/(\w+)@example\.com/).flatten
 
       it "lists the acknowledgments on the organization's bikes, unfinished ones too" do
         get base_url
@@ -47,24 +45,23 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
         expect(response.body).to include("E-Vehicle Education Acknowledgments", "Unfinished")
         expect(response.body).to match(/3<\/span> matching acknowledgments/)
         expect(response.body).to include("/bikes/#{bike.id}?organization_id=#{current_organization.to_param}")
-        expect(response.body).to_not include("elsewhere@example.com")
-        expect(email_order).to eq %w[pending defaulted agreed]
+        expect(emails).to eq %w[pending defaulted agreed]
 
         get base_url, params: {sort: "acknowledged_at", direction: "asc"}
-        expect(email_order).to eq %w[agreed defaulted pending]
+        expect(emails).to eq %w[agreed defaulted pending]
 
         get base_url, params: {sort: "owner_email", direction: "asc"}
-        expect(email_order).to eq %w[agreed defaulted pending]
+        expect(emails).to eq %w[agreed defaulted pending]
 
         get base_url, params: {search_status: "acknowledged"}
-        expect(emails).to eq %w[agreed defaulted]
+        expect(emails).to eq %w[defaulted agreed]
 
         get base_url, params: {search_status: "unfinished"}
         expect(emails).to eq %w[pending]
 
         # The period is of the registrations
         get base_url, params: {period: "custom", start_time: 50.hours.ago.to_i}
-        expect(emails).to eq %w[defaulted pending]
+        expect(emails).to eq %w[pending defaulted]
       end
     end
   end

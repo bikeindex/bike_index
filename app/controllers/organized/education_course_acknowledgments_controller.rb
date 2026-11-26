@@ -5,14 +5,13 @@ module Organized
     before_action :ensure_access_to_education_courses!
 
     def index
-      status = Pages::Org::EducationCourseAcknowledgments::Index::Component::STATUSES.find { it == params[:search_status] }
+      status = params[:search_status].presence_in(Pages::Org::EducationCourseAcknowledgments::Index::Component::STATUSES)
       pagy, acknowledgments = pagy(:countish, matching_acknowledgments(status)
-        .preload(:bike, education_course: :organization).reorder(sort_order),
+        .preload(:bike, education_course: :organization).reorder(sortable_order((sort_column == "created_at") ? Bike : EducationCourseAcknowledgment)),
         limit: permitted_per_page, page: permitted_page)
 
       render Pages::Org::EducationCourseAcknowledgments::Index::Component.new(pagy:, acknowledgments:,
-        organization: current_organization, sort_state:, status:, period: @period, start_time: @start_time,
-        end_time: @end_time, time_range: @time_range)
+        organization: current_organization, sort_state:, status:, period: @period, start_time: @start_time, end_time: @end_time)
     end
 
     private
@@ -20,10 +19,6 @@ module Organized
     # created_at is the registration's, which an unfinished acknowledgment has as well
     def sortable_columns
       %w[created_at acknowledged_at owner_email].freeze
-    end
-
-    def sort_order
-      (sort_column == "created_at") ? sortable_order("bikes.created_at") : sortable_order(EducationCourseAcknowledgment)
     end
 
     def matching_acknowledgments(status)

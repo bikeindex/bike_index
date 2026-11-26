@@ -8,7 +8,7 @@ module Pages
         class Component < ApplicationComponent
           STATUSES = %w[acknowledged unfinished].freeze
 
-          def initialize(pagy:, acknowledgments:, organization:, sort_state:, status:, period:, start_time:, end_time:, time_range:)
+          def initialize(pagy:, acknowledgments:, organization:, sort_state:, status:, period:, start_time:, end_time:)
             @pagy = pagy
             @acknowledgments = acknowledgments
             @organization = organization
@@ -17,19 +17,14 @@ module Pages
             @period = period
             @start_time = start_time
             @end_time = end_time
-            @time_range = time_range
           end
 
           private
 
           def status_entries
-            [nil, *STATUSES].map do |status|
-              label = case status
-              when "acknowledged" then translation(".acknowledged")
-              when "unfinished" then translation(".unfinished")
-              else translation(".all")
-              end
-              ComponentStructs::Shapes.entry(label, href: url_for(@sort_state.search_params.merge(search_status: status, page: nil)),
+            {nil => translation(".all"), "acknowledged" => translation(".acknowledged"),
+             "unfinished" => translation(".unfinished")}.map do |status, label|
+              ComponentStructs::Shapes.entry(label, href: url_for(@sort_state.search_params.merge(search_status: status)),
                 active: @status == status)
             end
           end
