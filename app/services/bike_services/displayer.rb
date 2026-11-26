@@ -103,7 +103,7 @@ module BikeServices
       bike.stock_photo_url.sub(%r{/(?=[^/]+\z)}, "/small_")
     end
 
-    # Its own public photos, then its model's stock photo - which has no alt
+    # A stock photo's alt is nil, for the caller to word
     def photos(bike)
       own = bike.public_images.select(&:image_url).map do |image|
         Photo.new(url: image.image_url, large_url: image.image_url(:large), small_url: image.image_url(:small), alt: image.image_alt, stock: false)
