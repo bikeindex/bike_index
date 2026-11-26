@@ -5733,6 +5733,9 @@ es:
         updated_at: Actualizado en
       vehicle_type_badges:
         e_vehicle: Vehículo eléctrico
+      stock_photo_badge:
+        stock: Existencias
+        stock_photo_of: Foto de archivo de un %{model}
     pages:
       messages:
         thread_show:
@@ -6046,6 +6049,7 @@ es:
             title: "%{bike_type} detalles"
             vehicle_type: Tipo de vehículo
             year: Año
+            view_stock_on_bikebook: Ver stock %{bike_type} en Bike Book
           bike_index_card:
             activity: Actividad
             frame_material: Material del marco
@@ -6230,8 +6234,6 @@ es:
           photos:
             add_photo: Añadir foto
             bike_photo: "%{bike_type} foto"
-            color_may_not_match: "¡El color puede no coincidir!"
-            stock_photo: Foto de archivo de un %{year} %{model}
           primary_colors:
             primary_color:
               one: Color primario
@@ -6292,6 +6294,7 @@ es:
             not_registered_phone_message: No se dispone de otros datos de contacto
               del propietario, ya que este %{bike_type} no está registrado en su organización.
             show_phone: Mostrar teléfono
+            stock_photo: "%{bike_type} foto de archivo"
           marketplace_listing_card:
             condition: Condición
             contact_seller: Contacta con el vendedor
@@ -6943,6 +6946,7 @@ es:
             looks_like_cm: Parece que son centímetros, no pulgadas, así que lo cambiamos.
             looks_like_inches: Parece que son pulgadas, no centímetros, así que lo
               cambiamos.
+            unknown_model_year: No tenemos los detalles de ese año de ese modelo.
           color_fields:
             add_another_color: Añade otro color
             color: Color

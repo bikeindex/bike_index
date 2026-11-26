@@ -5651,6 +5651,9 @@ nl:
         updated_at: Bijgewerkt op
       vehicle_type_badges:
         e_vehicle: E-voertuig
+      stock_photo_badge:
+        stock: Voorraad
+        stock_photo_of: Stockfoto van een %{model}
     pages:
       messages:
         thread_show:
@@ -5969,6 +5972,7 @@ nl:
             title: "%{bike_type} details"
             vehicle_type: 'Voertuigtype:'
             year: jaar
+            view_stock_on_bikebook: Bekijk voorraad %{bike_type} op Bike Book
           bike_index_card:
             activity: Activiteit
             frame_material: Frame materiaal
@@ -6153,8 +6157,6 @@ nl:
           photos:
             add_photo: Foto toevoegen
             bike_photo: "%{bike_type} foto"
-            color_may_not_match: Kleur komt mogelijk niet overeen!
-            stock_photo: Stock foto van een %{year} %{model}
           primary_colors:
             primary_color:
               one: Primaire kleur
@@ -6216,6 +6218,7 @@ nl:
               niet beschikbaar, aangezien dit %{bike_type} niet bij uw organisatie
               is geregistreerd.
             show_phone: Toon telefoon
+            stock_photo: "%{bike_type} stockfoto"
           marketplace_listing_card:
             condition: Voorwaarde
             contact_seller: Neem contact op met de verkoper
@@ -6860,6 +6863,8 @@ nl:
               we het aangepast.
             looks_like_inches: Dat lijkt op inches en niet op centimeters, dus hebben
               we het aangepast.
+            unknown_model_year: We hebben geen details over dat specifieke jaar van
+              dat model.
           color_fields:
             add_another_color: Voeg nog een kleur toe
             color: Kleur
