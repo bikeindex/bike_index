@@ -35,6 +35,13 @@ class ImpoundConfiguration < ApplicationRecord
     organization.impound_records.distinct.pluck(:display_id_prefix).reject(&:blank?)
   end
 
+  # Keyed by prefix, "" for none; a prefix with no records starts at 1
+  def next_display_id_integers
+    nexts = ImpoundRecord.where(organization_id:).where.not(display_id_integer: nil).group(:display_id_prefix)
+      .maximum(:display_id_integer).to_h { |prefix, integer| [prefix.to_s, integer + 1] }
+    nexts.merge(display_id_prefix.to_s => display_id_next_integer || nexts.fetch(display_id_prefix.to_s, 1))
+  end
+
   def calculated_display_id_next
     "#{display_id_prefix}#{calculated_display_id_next_integer}"
   end

@@ -42,7 +42,7 @@ RSpec.describe Organized::ManageImpoundingsController, type: :request do
       it "renders" do
         get "#{base_url}/edit"
         expect(response.status).to eq(200)
-        expect(response).to render_template :edit
+        expect(response.body).to match(/impound settings/i)
         expect(assigns(:current_organization)).to eq current_organization
       end
       context "organization doesn't have access" do

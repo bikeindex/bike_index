@@ -1,0 +1,169 @@
+<%= render UI::Header::Component.new(text: translation(".impound_settings_html", org_name: @organization.name),
+    subtitle: translation(".subtitle"), html_class: "uncap") %>
+
+<%= form_for @impound_configuration, url: organization_manage_impounding_path(organization_id: @organization.to_param), html: {data: {controller: "org--impound-settings",
+      "org--impound-settings-saved-prefix-value": @impound_configuration.display_id_prefix_was.to_s,
+      "org--impound-settings-next-ids-value": next_ids.to_json}} do |f| %>
+  <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
+    <span class="twlabel tw:sm:text-right"><%= translation(".public_search") %></span>
+
+    <div class="tw:sm:col-span-2">
+      <%= render UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :public_view,
+          label: translation(".public_page")) %>
+
+      <p
+        class="
+          tw:mt-1 tw:mb-0 tw:pl-6 tw:text-xs tw:text-gray-500
+          tw:dark:text-gray-400
+        "
+      >
+        <% public_page_path = organization_impounded_bikes_path(organization_id: @organization.to_param) %>
+        <%= translation(".public_page_helper_html", link: link_to(public_page_path, public_page_path, class: "twlink")) %>
+      </p>
+    </div>
+  </div>
+
+  <% if @organization.enabled?("impound_bikes_locations") %>
+    <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
+      <span class="twlabel tw:sm:text-right"><%= translation(".impound_location") %></span>
+
+      <div class="tw:text-sm tw:sm:col-span-2">
+        <% default_location = @organization.default_impound_location %>
+        <% locations_path = locations_organization_manage_path(organization_id: @organization.to_param) %>
+
+        <% if default_location.present? %>
+          <p class="tw:mb-0">
+            <%= translation(".default_location_html", name: tag.strong(default_location.name)) %>
+          </p>
+          <%= link_to translation(".update_locations"), locations_path, class: "twlink tw:text-xs" %>
+        <% else %>
+          <%= link_to translation(".set_locations"), locations_path, class: "twlink" %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+
+  <hr class="twhr tw:mb-6">
+
+  <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
+    <%= f.label :email, translation(".impound_email"), class: "twlabel tw:sm:text-right tw:sm:pt-2" %>
+
+    <div class="tw:max-w-md tw:sm:col-span-2">
+      <%= render UI::Forms::Email::Component.new(form_builder: f, attribute: :email,
+          html_options: {placeholder: @organization.auto_user&.email, "aria-describedby": "impound_email_helper"}) %>
+
+      <p
+        id="impound_email_helper"
+        class="tw:mt-1 tw:mb-0 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"
+      >
+        <%= translation(".impound_email_helper_html") %>
+      </p>
+    </div>
+  </div>
+
+  <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
+    <%= f.label :display_id_prefix, translation(".id_prefix"), class: "twlabel tw:sm:text-right tw:sm:pt-2" %>
+
+    <div class="tw:max-w-md tw:sm:col-span-2">
+      <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :display_id_prefix,
+          html_options: {"aria-describedby": "impound_prefix_helper",
+                         data: {"org--impound-settings-target": "prefix", action: "input->org--impound-settings#preview"}}) %>
+
+      <p
+        id="impound_prefix_helper"
+        class="tw:mt-1 tw:mb-0 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"
+      >
+        <%= translation(".id_prefix_helper_html", example: render(UI::Code::Inline::Component.new(text: "{prefix}1", small: true))) %>
+      </p>
+
+      <div
+        class="
+          tw:mt-3 tw:flex tw:items-center tw:gap-2 tw:rounded-sm tw:border
+          tw:border-gray-200 tw:bg-gray-50 tw:px-3 tw:py-2.5 tw:text-sm
+          tw:dark:border-gray-700 tw:dark:bg-gray-800
+        "
+      >
+        <span><%= translation(".next_id") %></span>
+
+        <strong data-org--impound-settings-target="nextId">
+          <%= render UI::Code::Inline::Component.new(text: next_id) %>
+        </strong>
+
+        <span
+          class="tw:ml-auto tw:hidden"
+          data-org--impound-settings-target="unsaved"
+        >
+          <%= render UI::Badge::Component.new(text: translation(".unsaved"), color: :warning, size: :xs) %>
+        </span>
+      </div>
+
+      <p
+        class="
+          tw:mt-2 tw:mb-0 tw:flex tw:flex-wrap tw:items-center tw:gap-1.5
+          tw:text-xs tw:text-gray-500 tw:dark:text-gray-400
+        "
+      >
+        <%= translation(".previous_prefixes") %>
+        <em><%= translation(".no_prefix") %></em>
+
+        <% @impound_configuration.previous_prefixes.each do |prefix| %>
+          <%= render UI::Button::Component.new(text: prefix, color: :secondary, size: :sm,
+              title: translation(".use_this_prefix"),
+              data: {action: "org--impound-settings#use", "org--impound-settings-prefix-param": prefix}) %>
+        <% end %>
+      </p>
+    </div>
+  </div>
+
+  <div class="tw:mb-6 tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
+    <%= f.label :expiration_period_days, translation(".expiration"), class: "twlabel tw:sm:text-right tw:sm:pt-2" %>
+
+    <div class="tw:max-w-md tw:sm:col-span-2">
+      <div class="tw:flex tw:w-40">
+        <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :expiration_period_days,
+            kind: :number_field, html_options: {step: 1, min: 0, class: "tw:min-w-0 tw:rounded-r-none",
+                                                "aria-describedby": "impound_expiration_helper"}) %>
+
+        <span
+          class="
+            tw:flex tw:items-center tw:rounded-r-sm tw:border tw:border-l-0
+            tw:border-gray-200 tw:bg-gray-50 tw:px-2.5 tw:text-sm
+            tw:text-gray-600 tw:dark:border-gray-700 tw:dark:bg-gray-800
+            tw:dark:text-gray-400
+          "
+        >
+          <%= translation(".days") %>
+        </span>
+      </div>
+
+      <p
+        id="impound_expiration_helper"
+        class="tw:mt-1 tw:mb-0 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400"
+      >
+        <%= translation(".expiration_helper_html") %>
+      </p>
+    </div>
+  </div>
+
+  <div class="tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
+    <div class="tw:sm:col-span-2 tw:sm:col-start-2">
+      <%= render UI::Button::Component.new(text: translation(".save"), color: :primary, size: :lg, type: "submit") %>
+    </div>
+  </div>
+<% end %>
+
+<% if @organization.enabled?("show_bulk_import_impound") %>
+  <hr class="twhr tw:mt-10 tw:mb-6">
+
+  <div class="tw:gap-x-8 tw:sm:grid tw:sm:grid-cols-3">
+    <span class="twlabel tw:sm:text-right"><%= translation(".bulk_import") %></span>
+
+    <div class="tw:sm:col-span-2">
+      <%= link_to translation(".import_impounded_bikes"), new_organization_bulk_import_path(organization_id: @organization.to_param, kind: "impounded"), class: "twlink tw:text-sm tw:font-semibold" %>
+
+      <p class="tw:mt-1 tw:mb-0 tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">
+        <%= translation(".upload_csv") %>
+      </p>
+    </div>
+  </div>
+<% end %>

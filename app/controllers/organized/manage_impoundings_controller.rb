@@ -1,6 +1,7 @@
 module Organized
   class ManageImpoundingsController < Organized::AdminController
     before_action :assign_organization
+    before_action :force_html_response, only: :edit
 
     # IDK, may want to render something here sometime
     def show
@@ -10,6 +11,7 @@ module Organized
     def edit
       @organization.ensure_auto_user
       @page_title = "#{@organization.short_name} impound settings"
+      render_settings
     end
 
     def update
@@ -18,11 +20,15 @@ module Organized
         redirect_back(fallback_location: edit_organization_manage_impounding_path(organization_id: current_organization.to_param))
       else
         @page_errors = @impound_configuration.errors
-        render :edit
+        render_settings
       end
     end
 
     private
+
+    def render_settings
+      render Pages::Org::ImpoundSettings::Component.new(organization: @organization, impound_configuration: @impound_configuration)
+    end
 
     def assign_organization
       @organization = current_organization

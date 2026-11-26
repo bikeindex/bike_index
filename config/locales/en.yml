@@ -4396,10 +4396,6 @@ en:
         find_an_impound_record: Find an impound record
         impound_records: Impound Records
         search_impound_records: Search impound records
-    manage_impoundings:
-      edit:
-        impound_settings_html: Manage <em>%{org_name}</em> impound settings
-        save: Save
     manages:
       location_fields:
         address: Address
