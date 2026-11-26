@@ -35,6 +35,7 @@ en:
             show_phone: Show phone
             showing_recent: Showing the %{count} most recent
             sticker_code: Sticker code
+            stock_photo: "%{bike_type} stock photo"
             unregistered_owner: >-
               This %{bike_type} is not registered to a user. It was added to track
               parking notifications.

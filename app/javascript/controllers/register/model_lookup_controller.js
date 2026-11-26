@@ -1,14 +1,16 @@
 import { Controller } from '@hotwired/stimulus'
 import { catalogAt, mountCatalogCombobox, pickedVehicle, showPhoto } from 'bikebook/catalog'
-import { soldYears, yearPhoto } from 'bikebook/colorways'
+import { knownYear, soldYears, yearPhoto } from 'bikebook/colorways'
+import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='register--model-lookup'
 // The model field as /bikebook's search of the registration's manufacturer's models, once the catalog loads, in place of
 // the text field it starts as - what's typed there meanwhile carries over. A pick submits its catalog id, which saving
 // the step names it by, fills in the newest year it was sold, and shows its stock photo for the year entered. The year
-// stays free to change, as the catalog may not have all of a model's years
+// stays free to change, as the catalog may not have all of a model's years - one it doesn't have says so in the photo's
+// place
 export default class extends Controller {
-  static targets = ['combobox', 'slot', 'photo', 'year']
+  static targets = ['combobox', 'slot', 'photo', 'year', 'unknownYear']
   static values = { manifestUrl: String }
 
   async connect () {
@@ -47,8 +49,9 @@ export default class extends Controller {
   // A year typed partway keeps the photo it has
   showPhoto () {
     const year = this.yearTarget.value.trim()
-    if (this.field && (!year || /^\d{4}$/.test(year))) {
-      showPhoto(this.photoTarget, this.picked, (this.picked && yearPhoto(this.picked.data, Number(year))) ?? null)
-    }
+    if (!this.field || (year && !/^\d{4}$/.test(year))) return
+
+    showPhoto(this.photoTarget, this.picked, (this.picked && yearPhoto(this.picked.data, Number(year))) ?? null)
+    collapse(this.picked && year && !knownYear(this.picked.data, Number(year)) ? 'show' : 'hide', this.unknownYearTarget)
   }
 }

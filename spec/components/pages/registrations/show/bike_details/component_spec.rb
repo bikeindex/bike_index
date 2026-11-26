@@ -12,6 +12,32 @@ RSpec.describe Pages::Registrations::Show::BikeDetails::Component, type: :compon
     expect(page).to have_text("Manufacturer")
     expect(page).to have_text(bike.manufacturer.name)
     expect(page).to have_text("Rocket")
+    expect(page).to have_no_link(href: /bikebook/)
+  end
+
+  context "registered as a Bike Book model" do
+    let(:bike) { FactoryBot.create(:bike, year: 2025, frame_model: "Haul ST") }
+    let(:bikebook_model) do
+      BikebookModel.create!(catalog_id: "m/specialized/2025/haul-st", manufacturer: bike.manufacturer,
+        name: "Haul ST", model_slug: "haul-st", first_year: 2025)
+    end
+
+    before { VehicleSpecification.create!(bike_obj: bike, bikebook_model:) }
+
+    it "links to its page, last" do
+      render_inline(component)
+      expect(page).to have_css("dl > div:last-child a[href='/bikebook?vehicle_models=m/specialized/2025/haul-st']",
+        text: "View stock bike on Bike Book")
+    end
+
+    context "the catalog has dropped" do
+      before { bikebook_model.destroy }
+
+      it "doesn't link" do
+        render_inline(described_class.new(bike: bike.reload))
+        expect(page).to have_no_link(href: /bikebook/)
+      end
+    end
   end
 
   context "non-standard vehicle" do

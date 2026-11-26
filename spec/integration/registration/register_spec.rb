@@ -377,11 +377,14 @@ RSpec.describe "Register flow", :js, type: :system do
     # The newest year it was sold, through its newest record as it's current
     expect(page).to have_field("Model year", with: "2026")
 
-    # A year the catalog has no record of has no photo, as the catalog may not have all its years
+    # A year the catalog has no record of says so in place of the photo, as the catalog may not have all its years
+    unknown_year = "We don't have the details for that year of that model."
     fill_in "Model year", with: "2020"
     expect(page).to have_no_css(photo)
+    expect(page).to have_content(unknown_year)
     fill_in "Model year", with: "2025"
     expect(page).to have_css(photo)
+    expect(page).to have_no_content(unknown_year)
 
     # Typed over, it's the text that submits, so the pick's name and photo go
     type_into(model, "Haul ST custom")
@@ -403,6 +406,7 @@ RSpec.describe "Register flow", :js, type: :system do
     expect(page).to have_field("bike_frame_model", with: "Specialized Fuse FOUR (2007)")
     expect(page).to have_field("Model year", with: "2008")
     expect(page).to have_no_css(photo)
+    expect(page).to have_content(unknown_year)
 
     type_into("#bike_primary_frame_color_id", "Red")
     click_combobox_option("Red")
