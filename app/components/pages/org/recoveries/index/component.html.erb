@@ -1,0 +1,138 @@
+<%= render(UI::Header::Component.new(text: translation(".recoveries"), subtitle: translation(".subtitle"))) %>
+
+<%#
+  The filters sit outside the form, joined to it by its id, since the period chips'
+  custom range is a form of its own
+%>
+
+<form
+  id="<%= FORM_ID %>"
+  action="<%= organization_recoveries_path(@organization.to_param) %>"
+  method="get"
+>
+  <%= hidden_field_tag :search_result_view, @result_view, id: nil %>
+
+  <% if @period == "custom" %>
+    <%= hidden_field_tag :start_time, @start_time.to_i, id: nil %>
+    <%= hidden_field_tag :end_time, @end_time.to_i, id: nil %>
+  <% end %>
+
+  <%# A disabled select doesn't submit, so unticking the checkbox would lose the distance %>
+  <% if @only_organization && distance_filterable? %>
+    <%= hidden_field_tag :search_distance, @distance, id: nil %>
+  <% end %>
+</form>
+
+<div
+  class="tw:mb-4 tw:flex tw:flex-wrap tw:items-center tw:gap-x-7 tw:gap-y-2"
+  data-controller="org--recoveries-filters"
+>
+  <% if distance_filterable? %>
+    <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+      <%= label_tag :search_distance, translation(".within"), class: "twlabel tw:m-0" %>
+
+      <%= select_tag :search_distance, distance_options, class: "twinput tw:w-36! tw:disabled:cursor-not-allowed tw:disabled:opacity-50", form: FORM_ID,
+          disabled: @only_organization, data: {action: "change->org--recoveries-filters#submit"} %>
+
+      <span>
+        <%= translation(".of_organization", org_name: @organization.short_name) %>
+
+        <% if organization_location.present? %>
+          <span class="tw:text-gray-500 tw:dark:text-gray-400">(<%= organization_location %>)</span>
+        <% end %>
+      </span>
+    </div>
+  <% end %>
+
+  <%= render(UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, form: FORM_ID)) %>
+
+  <% if distance_filterable? %>
+    <%= render(UI::Forms::Checkbox::Component.new(name: "search_only_organization", checked: @only_organization,
+      class_name: "tw:m-0", html_options: {id: "search_only_organization", form: FORM_ID,
+                                           data: {action: "change->org--recoveries-filters#submit"}})) do %>
+      <%= translation(".only_organization", org_name: @organization.short_name) %>
+      <span class="tw:font-normal tw:text-gray-500 tw:dark:text-gray-400"><%= translation(".any_distance") %></span>
+    <% end %>
+  <% end %>
+</div>
+
+<div class="tw:px-5 tw:pt-4 tw:pb-6 <%= UI::Table::InCard::Component::CARD_CLASSES %>">
+  <div class="tw:mb-5 tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-3">
+    <p class="tw:mb-0 tw:text-gray-500 tw:dark:text-gray-400">
+      <%= translation(".matching_html", count: @pagy.count, number: number_display(@pagy.count)) %>
+    </p>
+
+    <div class="tw:flex tw:items-center tw:gap-2">
+      <span
+        class="
+          tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-400
+          tw:uppercase
+        "
+      >
+        <%= translation(".view_as") %>
+      </span>
+
+      <%= render(UI::ButtonGroup::Component.new(entries: result_view_entries, kind: :toggle)) %>
+    </div>
+
+    <p class="tw:mb-0 tw:ml-auto tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
+      <%= translation(".ordered_by_recovered") %>
+    </p>
+  </div>
+
+  <% if @recoveries.none? %>
+    <p class="tw:my-8 tw:text-center tw:text-gray-500 tw:dark:text-gray-400">
+      <%= translation(".no_recoveries") %>
+    </p>
+  <% elsif @result_view == :table %>
+    <% organization = @organization %>
+    <% distance_texts = @recoveries.to_h { [it.id, distance_text(it)] } %>
+
+    <div class="tw:-mx-5">
+      <%= render(UI::Table::Base::Component.new(records: @recoveries, sort_state:)) do |table| %>
+        <% table.column(label: translation(".recovered"), sortable: "recovered_at", sort_indicator: "recovered_at") do |stolen_record| %>
+          <%= link_to bike_path(stolen_record.bike, organization_id: organization.to_param), class: "twlink tw:font-bold" do %>
+            <%= render(UI::Time::Component.new(time: stolen_record.recovered_at)) %>
+          <% end %>
+        <% end %>
+
+        <% table.column(label: translation(".stolen")) do |stolen_record| %>
+          <%= render(UI::Time::Component.new(time: stolen_record.date_stolen)) %>
+        <% end %>
+
+        <% table.column(label: translation(".manufacturer")) do |stolen_record| %>
+          <strong><%= stolen_record.bike.mnfg_name %></strong>
+        <% end %>
+
+        <% table.column(label: translation(".model")) do |stolen_record| %>
+          <%= stolen_record.bike.frame_model_truncated %>
+        <% end %>
+
+        <% table.column(label: translation(".color")) do |stolen_record| %>
+          <%= render(Atoms::FrameColors::Component.new(bike: stolen_record.bike)) %>
+        <% end %>
+
+        <% table.column(label: translation(".theft_location")) do |stolen_record| %>
+          <%= stolen_record.formatted_address_string(visible_attribute: :postal_code) %>
+        <% end %>
+
+        <% table.column(label: translation(".distance"), classes: "tw:text-right tw:whitespace-nowrap") do |stolen_record| %>
+          <%= distance_texts[stolen_record.id] %>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <ul class="tw:m-0 tw:list-none tw:p-0 <%= list_classes %>">
+      <% @recoveries.each do |stolen_record| %>
+        <%= render(Pages::Org::Recoveries::Result::Component.new(stolen_record:, organization: @organization,
+          distance_text: distance_text(stolen_record), organized: organized?(stolen_record), result_view: @result_view)) %>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <% if @pagy.pages > 1 %>
+    <div class="tw:mt-6">
+      <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @params)) %>
+    </div>
+  <% end %>
+</div>

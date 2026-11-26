@@ -1,0 +1,10 @@
+---
+en:
+  components:
+    pages:
+      org:
+        recoveries:
+          result:
+            recovered: Recovered
+            stolen: Stolen
+            stolen_from: Stolen from %{location}

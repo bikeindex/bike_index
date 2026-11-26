@@ -1,0 +1,34 @@
+---
+en:
+  components:
+    pages:
+      org:
+        recoveries:
+          index:
+            any_distance: "(any distance)"
+            color: Color
+            distance: Distance
+            distance_miles:
+              one: "%{count} mile"
+              other: "%{count} miles"
+            manufacturer: Manufacturer
+            matching_html:
+              one: "%{number} match"
+              other: "%{number} matches"
+            miles_away_html: "%{number} mi away"
+            model: Model
+            no_recoveries: No recoveries match these filters. Try a wider distance
+              or date range.
+            of_organization: of %{org_name}
+            only_organization: Only %{org_name} registrations
+            ordered_by_recovered: Ordered by Recovered, descending
+            recovered: Recovered
+            recoveries: Recoveries
+            stolen: Stolen
+            subtitle: Stolen bikes that made it home in your community.
+            theft_location: Theft location
+            view_as: View as
+            view_cards: Cards
+            view_list: List
+            view_table: Table
+            within: Within

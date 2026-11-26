@@ -13,7 +13,7 @@ module UserServices
       return [] if organization.nil? || current_user.nil?
 
       # Rails.cache.fetch gets none of the locale ApplicationComponentHelper#cache folds into fragments
-      Rails.cache.fetch(["menu_items_org_v6", organization, current_user,
+      Rails.cache.fetch(["menu_items_org_v7", organization, current_user,
         old_register_view, I18n.locale]) do
         build_items(organization, current_user, old_register_view)
       end
@@ -47,6 +47,8 @@ module UserServices
           model_audits_link(organization),
           graduated_link(organization),
           hot_sheet_link(organization, admin),
+          enabled_link(organization, "show_recoveries", translation(:recoveries),
+            routes.organization_recoveries_path(organization_id: organization.to_param), icon: "shield-check"),
           reports_link(organization)],
         [settings_group(organization, admin), info_link(organization)]]
     end
@@ -88,8 +90,6 @@ module UserServices
           routes.incompletes_organization_bikes_path(organization.to_param)),
         ComponentStructs::Shapes.link(translation(:multi_search),
           routes.multi_search_organization_registrations_path(organization.to_param)),
-        enabled_link(organization, "show_recoveries", translation(:recoveries),
-          routes.recoveries_organization_bikes_path(organization.to_param)),
         enabled_link(organization, "bike_stickers", translation(:registration_stickers),
           routes.organization_stickers_path(organization_id: organization.to_param), section: true)
       ]
