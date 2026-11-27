@@ -110,6 +110,7 @@ RSpec.describe Notification, type: :model do
         expect(notification.sender).to eq user
         expect(notification.recipient_users).to eq([notifiable.user])
         expect(Notification.notifications_sent_or_received_by(user).pluck(:id)).to eq([notification.id])
+        expect(Notification.user_sender.pluck(:id)).to eq([notification.id])
       end
 
       it "requires the admin, rather than falling back to the report's user" do
