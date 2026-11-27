@@ -15,13 +15,14 @@ module BikebookCatalogHelpers
     end
   end
 
-  # The fixture catalog, its index synced to BikebookModel, creating the manufacturers it lists
+  # The fixture catalog, its index and blocks synced to BikebookModel, creating the manufacturers it lists
   def sync_bikebook_models
     stub_bikebook_catalog
     JSON.parse(FIXTURES.join("index.json").read)["manufacturers"].each_value do
       Manufacturer.friendly_find(it) || FactoryBot.create(:manufacturer, name: it)
     end
     BikebookModelsSyncJob.new.perform
+    BikebookModelsDataSyncJob.new.perform
   end
 
   # The catalog as it is once it publishes again: a new vocabulary, Segway's 2025 block with a new description, and a

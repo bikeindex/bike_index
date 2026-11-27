@@ -28,7 +28,7 @@ class BikebookModelsSyncJob < ScheduledJob
     synced = [index, Manufacturer.maximum(:updated_at)]
     return if index.blank? || Rails.cache.read(SYNCED_KEY) == synced
 
-    models = Integrations::Bikebook::Catalog.index_models(index)
+    models = Integrations::Bikebook::Catalog.file_models(index)
     return if models.blank?
 
     manufacturer_ids = Manufacturer.where(slug: models.pluck("manufacturer").uniq).pluck(:slug, :id).to_h
@@ -36,6 +36,7 @@ class BikebookModelsSyncJob < ScheduledJob
     rows.each_slice(1_000) { BikebookModel.upsert_all(it, unique_by: :catalog_id) }
     BikebookModel.where.not(catalog_id: rows.pluck(:catalog_id)).update_all(deleted_at: Time.current)
     Rails.cache.write(SYNCED_KEY, synced)
+    BikebookModelsDataSyncJob.perform_async
   end
 
   private

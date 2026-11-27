@@ -29,6 +29,7 @@ RSpec.describe BikebookModelsSyncJob, type: :job do
       name: "Haul ST", model_slug: "haul-st", first_year: 2025, final_year: nil, markets: ["US", "CA"])
     expect(BikebookModel.find_by(catalog_id: "m/kris-holm/2023/kh24").manufacturer).to eq kris_holm
     expect(BikebookModel.find_by(catalog_id: dropped.catalog_id)).to be_nil
+    expect(BikebookModelsDataSyncJob.jobs.count).to eq 1
 
     BikebookModel.where(manufacturer: aventon).delete_all
     instance.perform

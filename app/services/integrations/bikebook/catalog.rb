@@ -62,8 +62,9 @@ module Integrations
         EbikeRuleServices::Places::EU_MEMBERS.include?(iso) ? "EU" : iso
       end
 
-      # The index's models, nil while the catalog doesn't answer. Too big to cache, and read by a job, outside rack-timeout
-      def index_models(path)
+      # The models of the index or a block, nil while the catalog doesn't answer. Uncached, as they're read by the
+      # syncing jobs, outside rack-timeout
+      def file_models(path)
         read(path, timeout: 60)["models"]
       rescue *FAILURES
         nil
