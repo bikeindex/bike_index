@@ -113,9 +113,8 @@ RSpec.describe Notification, type: :model do
         expect(Notification.user_sender.pluck(:id)).to eq([notification.id])
       end
 
-      it "requires the admin, rather than falling back to the report's user" do
-        notification = Notification.new(notifiable:, kind:, message_channel_target: notifiable.email)
-        expect(notification).not_to be_valid
+      it "doesn't fall back to the report's user" do
+        notification = Notification.create!(notifiable:, kind:, message_channel_target: notifiable.email)
         expect(notification.user_id).to be_nil
       end
     end

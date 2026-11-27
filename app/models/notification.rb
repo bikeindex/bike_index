@@ -54,7 +54,6 @@ class Notification < ApplicationRecord
   belongs_to :user # RECEIVER of the notification, unless a :user_sender notification
   belongs_to :bike
   belongs_to :notifiable, polymorphic: true
-  validates_presence_of :user_id, if: :user_sender?
 
   before_validation :set_calculated_attributes
 
