@@ -12,7 +12,7 @@ class OrganizationNameValidator < ActiveModel::Validator
     pages payments pghero primary_activities privacy protect_your_bike public_images rails
     recede_historical_location recovery_stories refresh_historical_location register registrations
     resources resume_historical_location reverse_geocode review_impound_claims roadmap sales search
-    security serials session shop sidekiq signup spokecard sso stickers stolen stolen_bike_listings
+    security serials session shop shopify_integration sidekiq signup spokecard sso stickers stolen stolen_bike_listings
     stolen_bikes stolen_notifications store strava_integration strava_search support support_bike_index
     support_the_bike_index support_the_index terms theft_alerts theft_ring ucmerced up update_browser
     user_alerts user_emails user_embeds user_home user_phones user_root_url_redirect users vendor_signup

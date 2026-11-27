@@ -349,6 +349,15 @@ RSpec.describe CredibilityScorer do
         expect(subject.organization_trusted?(organization1)).to be_truthy
         expect(subject.organization_trusted?(organization2)).to be_truthy
       end
+
+      context "set to no pos or a broken pos" do
+        let(:organization1) { FactoryBot.create(:organization, manual_pos_kind: "no_pos") }
+        let(:organization2) { FactoryBot.create(:organization, manual_pos_kind: "broken_shopify_pos") }
+        it "is falsey" do
+          expect(subject.organization_trusted?(organization1)).to be_falsey
+          expect(subject.organization_trusted?(organization2)).to be_falsey
+        end
+      end
     end
   end
 

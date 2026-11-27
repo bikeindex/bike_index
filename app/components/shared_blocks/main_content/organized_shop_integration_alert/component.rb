@@ -3,9 +3,9 @@
 module SharedBlocks
   module MainContent
     module OrganizedShopIntegrationAlert
-      # The point-of-sale integration callout shown to bike shops without a working
-      # Lightspeed/Ascend connection - one card per POS plus a manual-registration
-      # fallback, dismissible per organization
+      # The point-of-sale integration callout shown to bike shops without a working POS
+      # connection - one card per POS plus a manual-registration fallback, dismissible
+      # per organization
       class Component < ApplicationComponent
         def initialize(current_organization:, controller_name:, action_name:)
           @current_organization = current_organization
