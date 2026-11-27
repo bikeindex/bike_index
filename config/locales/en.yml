@@ -4900,9 +4900,13 @@ en:
       add_a_registration: Add a registration
       add_an_impounded_vehicle: Add an Impounded Vehicle
       ascend_imports: Ascend Imports
+      audits: Audits
       bulk_import_and_export: Bulk Import & Export
       bulk_imports: Bulk Imports
       discuss: Discuss
+      e_vehicles: E-Vehicles
+      ebike_rules: E-Bike Rules
+      education_acknowledgments: Education Acknowledgments
       education_courses: Education courses
       exports: Exports
       getting_started: Getting started
@@ -4915,7 +4919,6 @@ en:
       lightspeed_integration_panel: Lightspeed Integration Panel
       manage_users: Manage users
       messaging: Messaging
-      model_audits: E-Vehicle audits
       multi_search: Multi search
       org_dashboard: "%{org_name} Dashboard"
       org_information: "%{org_name} Information"
@@ -4951,6 +4954,9 @@ en:
         be different within their first 30 characters. Choose another name, or contact
         support@bikeindex.org if it's yours
       name_too_short: Organization name needs at least two letters or numbers
+      phone_invalid: Please enter a valid phone number
+      postal_code_invalid: Please enter a valid postal code
+      website_invalid: Please enter a valid website, like example.com
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}

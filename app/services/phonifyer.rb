@@ -1,6 +1,10 @@
 module Phonifyer
   extend Functionable
 
+  # Seven digits, and an extension ("x4", ", ext. 4", "#4"). En dashes come with numbers pasted from
+  # documents. Also a pattern attribute, which takes no flags - so no /i
+  REGEX = %r{\A\s*\+?[\s\(\)\.\-\/,–—]*(\d[\s\(\)\.\-\/,–—]*){7,}(([eE]?[xX][a-zA-Z]*|#)[\s.:]*\d+)?\s*\z} # rubocop:disable Style/RedundantRegexpEscape -- the v flag needs them
+
   def phonify(string)
     return nil unless string.present?
 
@@ -43,7 +47,7 @@ module Phonifyer
     return nil unless number.present?
 
     # Formatting bits that we don't care about
-    number.gsub(/\s|\.|-|\(|\)|\//, "")
+    number.gsub(%r{[[:space:].()/\-–—]}, "")
   end
 
   def split_with_country_code(number)
@@ -62,14 +66,16 @@ module Phonifyer
   end
 
   def split_with_extension(number)
-    return [number] unless number.match?(/x/i)
+    # A # with nothing after it ends a dial string, so it isn't one
+    extension_marker = /e?x[a-z]*|#(?=\s*\d+\s*\z)/i
+    return [number] unless number.match?(extension_marker)
 
-    number, extension = number.split(/e?x[a-z]*/i)
+    number, extension = number.split(extension_marker, 2)
     return [number, nil] unless extension.present?
 
     # Remove things we don't care about
     extension = extension.strip.gsub(/\A(-|\.|:)/, "")
-    [number.strip, "x#{extension.strip}"]
+    [number.strip.delete_suffix(","), "x#{extension.strip}"]
   end
 
   conceal :strip_ignored_parts, :split_with_country_code, :split_with_extension

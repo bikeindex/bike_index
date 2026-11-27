@@ -1,29 +1,20 @@
 import { Controller } from '@hotwired/stimulus'
-import { storage } from 'utils/storage'
 
-const KEY = 'bikebook_tips_dismissed'
+// gone until the page loads again, through the empty state's in-page re-renders
+let dismissed = false
 
 // Connects to data-controller='bikebook--tips'
-// The empty page's tips, or once they're dismissed the prompt that brings them back. Each swap moves focus to
-// what replaced the button pressed
+// The empty page's tips, until they're dismissed
 export default class extends Controller {
-  static targets = ['tips', 'prompt', 'restore']
+  static targets = ['tips']
 
-  // a classification's card, shown alone, has neither
-  connect () {
-    if (this.hasTipsTarget) this.#show(!this.#dismissed)
+  tipsTargetConnected (tips) {
+    tips.hidden = dismissed
   }
 
   dismiss () {
-    storage.setItem(KEY, '1')
-    this.#show(false)
-    this.restoreTarget.focus()
-  }
-
-  restore () {
-    storage.removeItem(KEY)
-    this.#show(true)
-    this.tipsTarget.firstElementChild.focus()
+    dismissed = true
+    this.tipsTarget.hidden = true
   }
 
   // for the search, which opens its own list, and its filter panel
@@ -33,14 +24,5 @@ export default class extends Controller {
 
   filters () {
     this.dispatch('filters')
-  }
-
-  #show (tips) {
-    this.tipsTarget.hidden = !tips
-    this.promptTarget.hidden = tips
-  }
-
-  get #dismissed () {
-    return storage.getItem(KEY) === '1'
   }
 }

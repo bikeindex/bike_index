@@ -37,6 +37,13 @@ RSpec.describe "Me API V3", type: :request do
           {type: "link", label: "Add a registration", path: "/o/#{organization.slug}/registrations/new",
            icon: "plus-circle", match_params: {parking_notification: nil}},
           {type: "divider"},
+          {type: "group", key: "e_vehicles", label: "E-Vehicles", icon: "bolt",
+           children: [
+             {type: "link", label: "E-Bike Rules", path: "/ebike-rules", icon: nil, match_paths: "/ebike-rules/**"},
+             {type: "link", label: "Education Acknowledgments",
+              path: "/o/#{organization.slug}/education_course_acknowledgments", icon: nil}
+           ]},
+          {type: "divider"},
           {type: "link", label: "#{organization.short_name} Information",
            path: "/o/#{organization.slug}/info", icon: nil}
         ]

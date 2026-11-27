@@ -20,7 +20,7 @@ RSpec.describe SharedBlocks::Navbar::OrgSidebar::Component, type: :component do
 
     expect(component.css("[aria-controls^='org_sidebar_group_']").map { |button| button.text.strip })
       .to eq(["Brakebills Registrations", "Impounded Vehicles", "Parking Notifications",
-        "Bulk Import & Export", "Brakebills Settings"])
+        "Bulk Import & Export", "E-Vehicles", "Brakebills Settings"])
 
     # The sidebar stands in for the navbar, so it carries the account menu too -- whose rows
     # are SharedBlocks::Navbar::AccountMenu's spec's, not this one's

@@ -1,11 +1,13 @@
 import { Controller } from '@hotwired/stimulus'
 import { clearCombobox } from 'utils/hw_combobox_patch'
+import { toggleRequired } from 'utils/required_toggle'
 
 // Connects to data-controller='ui--forms--address-group'
-// US addresses use a state combobox; other countries a free-text region field
+// US addresses use a state combobox; other countries a free-text region field.
+// A country without postal codes makes the postal code optional
 export default class extends Controller {
-  static targets = ['country', 'state', 'region']
-  static values = { usId: Number, required: Boolean }
+  static targets = ['country', 'state', 'region', 'postalCode']
+  static values = { usId: Number, required: Boolean, withoutPostalCodeIds: Array }
 
   // A country restored before this connected (form-persist, the browser's own reload
   // restore) fired its change with nothing listening
@@ -21,6 +23,9 @@ export default class extends Controller {
     if (!isUs) clearCombobox(this.stateTarget.querySelector('.hw-combobox'))
     this.stateInput.required = this.requiredValue && isUs
     this.regionInput.required = this.requiredValue && !isUs
+    if (this.requiredValue) {
+      toggleRequired(this.postalCodeTarget, !this.withoutPostalCodeIdsValue.includes(Number(this.countryTarget.value)))
+    }
   }
 
   get isUs () { return Number(this.countryTarget.value) === this.usIdValue }

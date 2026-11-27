@@ -4,10 +4,6 @@ module Pages
   module LandingPages
     module DemoModal
       class Component < ApplicationComponent
-        # A digit and no @ (an email in the wrong field) - extensions and vanity numbers
-        # are written too many ways to pin down further
-        PHONE_PATTERN = "[^@]*[0-9][^@]*"
-
         # role_options: [label, value] pairs, for a page that asks the visitor's role
         def initialize(feedback:, feedback_type:, modal_id:, name_label:, return_to:, title: nil, submit_text: nil,
           submit_color: :yellow, role_options: nil)

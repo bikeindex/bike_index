@@ -6,6 +6,8 @@ RSpec.describe UserServices::MenuItemsOrg do
   describe "for" do
     subject(:items) { described_class.for(organization:, current_user:) }
 
+    let(:e_vehicles) { items.find { |item| item[:key] == :e_vehicles } }
+
     define_method(:link_item) do |label, path, icon: nil, **attributes|
       {type: :link, label:, path:, icon:, **attributes}
     end
@@ -57,6 +59,11 @@ RSpec.describe UserServices::MenuItemsOrg do
           link_item("Add a registration", "/o/#{organization.to_param}/registrations/new",
             icon: "plus-circle", match_params: {parking_notification: nil}),
           {type: :divider},
+          group_item(:e_vehicles, "E-Vehicles", "bolt", [
+            link_item("E-Bike Rules", "/ebike-rules", match_paths: "/ebike-rules/**"),
+            link_item("Education Acknowledgments", "/o/#{organization.to_param}/education_course_acknowledgments")
+          ]),
+          {type: :divider},
           link_item("#{organization.short_name} Information", "/o/#{organization.to_param}/info")
         ]
       end
@@ -101,12 +108,12 @@ RSpec.describe UserServices::MenuItemsOrg do
 
       it "groups the menu the way the design lays it out" do
         expect(items.map { |item| item[:type] }).to eq(%i[group link divider group group group link
-          link link link link divider group link])
+          group link link link divider group link])
 
         groups = items.select { |item| item[:type] == :group }
-        expect(groups.map { |group| group[:key] }).to eq(%i[registrations impounded parking bulk settings])
+        expect(groups.map { |group| group[:key] }).to eq(%i[registrations impounded parking bulk e_vehicles settings])
         expect(groups.map { |group| group[:icon] })
-          .to eq(%w[bike impound map-pin import-export gear])
+          .to eq(%w[bike impound map-pin import-export bolt gear])
       end
 
       it "fills the registrations group with the design's five children" do
@@ -144,6 +151,15 @@ RSpec.describe UserServices::MenuItemsOrg do
           match_params: {kind: "impound_notification"}))
         expect(parking[:children].last).to eq(link_item("New unregistered notification",
           "/o/#{slug}/parking_notifications/new", match_params: {kind: nil}))
+      end
+
+      it "puts audits, the e-bike rules and education acknowledgments under e-vehicles" do
+        expect(e_vehicles[:label]).to eq "E-Vehicles"
+        expect(e_vehicles[:children]).to eq([
+          link_item("Audits", "/o/#{slug}/model_audits", match_paths: "/o/#{slug}/model_audits/**"),
+          link_item("E-Bike Rules", "/ebike-rules", match_paths: "/ebike-rules/**"),
+          link_item("Education Acknowledgments", "/o/#{slug}/education_course_acknowledgments")
+        ])
       end
 
       it "points reports at the overview dashboard" do
@@ -188,7 +204,7 @@ RSpec.describe UserServices::MenuItemsOrg do
       let(:organization) { FactoryBot.create(:organization_brakebills) }
 
       it "drops the settings group and messaging" do
-        expect(items.map { |item| item[:key] }.compact).to eq(%i[registrations impounded parking bulk])
+        expect(items.map { |item| item[:key] }.compact).to eq(%i[registrations impounded parking bulk e_vehicles])
         expect(items.map { |item| item[:label] }).to_not include("Messaging")
       end
 

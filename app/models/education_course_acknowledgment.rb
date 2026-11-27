@@ -46,6 +46,9 @@ class EducationCourseAcknowledgment < ApplicationRecord
   scope :for_organization_or_default, ->(organization) {
     joins(:education_course).where(education_courses: {organization_id: [organization.id, nil]})
   }
+  scope :for_organization_bikes, ->(organization) {
+    for_organization_or_default(organization).where(bike_id: organization.bike_organizations.select(:bike_id))
+  }
 
   class << self
     # The pages are acknowledged one at a time on the b_param; this is the moment they're
