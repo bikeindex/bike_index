@@ -40,7 +40,7 @@ RSpec.describe UI::Forms::Group::Component, :js, type: :system do
       wait_for_stimulus("ui--forms--format-message")
 
       click_on "Submit"
-      expect(validation_message("validated[phone]")).to eq "Enter a phone number with at least 7 digits, like 503 555 0123"
+      expect(validation_message("validated[phone]")).to eq "Enter a phone number with at least 7 digits"
 
       fill_in "Phone", with: "503 555 0123"
       click_on "Submit"

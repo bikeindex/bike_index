@@ -222,6 +222,20 @@ RSpec.describe OrgServices::Signup do
       end
     end
 
+    context "pasted with non-breaking spaces" do
+      let(:address) { {street: "10544 82 Ave NW", city: "Edmonton", postal_code: "T6E\u00A02A4", country_id: Country.canada_id.to_s} }
+      let(:saved) do
+        described_class.save_details(organization_signup, website: "\u00A0shiftybikes.com", phone: "718\u00A0383\u00A09999",
+          publicly_visible: "1", address:)
+      end
+
+      it "completes, with plain spaces" do
+        expect(saved).to be_truthy
+        expect(organization_signup.reload).to have_attributes(website: "shiftybikes.com", phone: "718 383 9999")
+        expect(organization_signup.address["postal_code"]).to eq "T6E 2A4"
+      end
+    end
+
     context "a formatted phone, and a website with its scheme" do
       let(:saved) do
         described_class.save_details(organization_signup, website: "https://www.shiftybikes.com/shop", phone: "+1 (718) 383-9999 ext. 2",

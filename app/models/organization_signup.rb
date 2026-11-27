@@ -59,7 +59,7 @@ class OrganizationSignup < ApplicationRecord
 
   def malformed_details
     {website:, phone:, postal_code: address["postal_code"]}
-      .filter_map { |attribute, value| attribute if value.present? && !value.strip.match?(DETAIL_FORMATS[attribute]) }
+      .filter_map { |attribute, value| attribute if value.present? && !value.match?(DETAIL_FORMATS[attribute]) }
   end
 
   # A resend reuses the token, so it lasts from the latest email - which promises that long
@@ -74,6 +74,11 @@ class OrganizationSignup < ApplicationRecord
   # The organization would strip markup from the name anyway, so the steps and the email show what it'll be called
   def set_calculated_attributes
     self.name = Organization.sanitize_name(name) if name.present?
-    self.website = website&.strip.presence
+    self.website = normalized(website)
+    self.phone = normalized(phone)
+    self.address = address.merge("postal_code" => normalized(address["postal_code"])).compact
   end
+
+  # A pasted non-breaking space is whitespace to the browser's pattern, but not to Ruby's \s
+  def normalized(value) = value&.gsub(/[[:space:]]+/, " ")&.strip.presence
 end

@@ -44,11 +44,12 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
     it "renders a tel input, with the pattern the server checks and what it wants" do
       expect(component).to have_css("input[type='tel'][name='user[name]'][autocomplete='tel']")
       input = component.css("input").first
-      expect(input["title"]).to eq "Enter a phone number with at least 7 digits, like 503 555 0123"
+      expect(input["title"]).to eq "Enter a phone number with at least 7 digits"
       expect(input["data-ui--forms--format-message-message-value"]).to eq input["title"]
       expect(input["data-controller"]).to eq "ui--forms--format-message"
-      expect(["(718) 383-9999", "+44 20 7946 0958 x12"]).to all(match(pattern))
-      expect("callmemaybe").to_not match(pattern)
+      expect(["(718) 383-9999", " +44 20 7946 0958 x12 ", "718-383-9999, ext. 4", "718 383 9999 #4", "03–1234–5678"])
+        .to all(match(pattern))
+      expect(["callmemaybe", "1-800-BIKE-NOW", "12345"].grep(pattern)).to be_empty
     end
   end
 
@@ -58,8 +59,9 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
 
     it "renders a text input, with the pattern the server checks" do
       expect(component).to have_css("input[type='text'][inputmode='url'][autocomplete='url']")
-      expect(["example.com", "https://www.example.co.uk/shop"]).to all(match(pattern))
-      expect("http://not a website").to_not match(pattern)
+      expect(["example.com", " example.com ", "https://www.example.co.uk/shop", "example.com?ref=x",
+        "example.com#contact", "example.com:8080/shop"]).to all(match(pattern))
+      expect(["http://not a website", "notawebsite", "example.com:abc"].grep(pattern)).to be_empty
     end
 
     context "with an autocomplete" do
