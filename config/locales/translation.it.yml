@@ -5211,6 +5211,9 @@ it:
         altro nome oppure contatta support@bikeindex.org se è il tuo.'
       name_too_short: Il nome dell'organizzazione deve essere composto da almeno due
         lettere o numeri.
+      phone_invalid: Inserisci un numero di telefono valido
+      postal_code_invalid: Inserisci un codice postale valido
+      website_invalid: Inserisci un sito web valido, ad esempio example.com
   theft_alert_plans:
     theft_alert_plan:
       days: Giorni
@@ -5655,6 +5658,11 @@ it:
           state: Stato
         combobox:
           no_matches: Nessuna partita
+        input:
+          postal_code_format: Inserisci un codice postale di almeno 3 lettere o numeri,
+            come 97201 o T6E 2A4
+          telephone_format: Inserisci un numero di telefono di almeno 7 cifre
+          website_format: Inserisci un sito web, ad esempio example.com
       alerts:
         base:
           error: Errore
@@ -6639,10 +6647,9 @@ it:
             update_listing: Aggiorna l'elenco
           bike_alerts:
             add_it_now: Aggiungilo ora!
-            generally_connect_to_org: Alcune delle tue bici sono associate a %{org_name},
-              ma questa no. In genere, dovresti collegare tutte le tue bici a %{org_name}
-              -
             ignore_this_suggestion: Ignora questo suggerimento
+            connect_to_org: Alcune delle tue registrazioni sono collegate a %{org_name},
+              ma %{bike_title} no. In generale, dovresti collegarle tutte a %{org_name}.
           add_a_lock: "+ Aggiungi un lucchetto"
           add_a_lock_empty: Aggiungi un lucchetto
           bike_index_is_free: Bike Index è gratuito grazie al contributo di ciclisti
@@ -8098,7 +8105,6 @@ it:
           field_message: C'è qualcos'altro che dovremmo sapere?
           field_name: Il tuo nome
           field_role: Il tuo ruolo
-          phone_hint: Un numero di telefono, con le sue cifre
           request_name: richiesta
           submit_text: Parliamone
           title: Contattaci per una prova gratuita
