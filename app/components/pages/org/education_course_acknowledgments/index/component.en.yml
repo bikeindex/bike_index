@@ -9,8 +9,8 @@ en:
             all: All
             course: Course
             for_everyone_start_html: >-
-              General e-Vehicle Education Course started %{time}. Prior to that, users
-              did not do any education course.
+              The general e-Vehicle Education Course started %{time}. Prior to that,
+              users did not do any education course.
             header: E-Vehicle Education Acknowledgments
             matching_count_html: "%{count} matching acknowledgments"
             organization_start_html: >-
