@@ -36,7 +36,7 @@ class BikebookModelsSyncJob < ScheduledJob
     rows.each_slice(1_000) { BikebookModel.upsert_all(it, unique_by: :catalog_id) }
     BikebookModel.where.not(catalog_id: rows.pluck(:catalog_id)).update_all(deleted_at: Time.current)
     Rails.cache.write(SYNCED_KEY, synced)
-    BikebookModelsDataSyncJob.perform_async
+    BikebookModelsDataSyncJob.perform_async unless BikebookModelsDataSyncJob.enqueued?
   end
 
   private

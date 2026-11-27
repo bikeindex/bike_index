@@ -38,7 +38,7 @@ class BikebookModel < ApplicationRecord
   # The name of a catalog id or a market variant's citation key (…/haul-st@CA), which a pick in registration's model
   # combobox submits. Anything else, typed rather than picked, as it is
   def self.frame_model(value)
-    (find_by(catalog_id: Integrations::Bikebook::Catalog.base_id(value))&.name if value.to_s.match?(Integrations::Bikebook::Catalog::MODEL_ID)) || value
+    (where(catalog_id: Integrations::Bikebook::Catalog.base_id(value)).pick(:name) if value.to_s.match?(Integrations::Bikebook::Catalog::MODEL_ID)) || value
   end
 
   # The model's record with its `market`'s variant laid over it

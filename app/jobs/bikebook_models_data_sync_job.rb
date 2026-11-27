@@ -14,7 +14,8 @@ class BikebookModelsDataSyncJob < ScheduledJob
     stale_files(blocks).each do |file|
       # A file the catalog doesn't answer ends the run, as the rest likely wouldn't answer either
       records = Integrations::Bikebook::Catalog.file_models(file) || break
-      records.group_by { |key, _| Integrations::Bikebook::Catalog.base_id(key) }.then do |by_model|
+      by_model = records.group_by { |key, _| Integrations::Bikebook::Catalog.base_id(key) }
+      BikebookModel.transaction do
         BikebookModel.where(catalog_id: by_model.keys).find_each { it.update!(data: by_model[it.catalog_id].to_h, data_file: file) }
       end
     end
