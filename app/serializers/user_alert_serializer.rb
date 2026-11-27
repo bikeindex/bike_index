@@ -1,5 +1,4 @@
-# The web alert's copy as plain text - its header, body and link or button - and the web
-# URL that resolves it, for clients that can't render the site's HTML and modals
+# The web alert's copy as plain text, for clients that can't render the site's HTML and modals
 class UserAlertSerializer < ApplicationSerializer
   attributes :id, :kind, :bike_id, :organization_id, :created_at
 

@@ -154,7 +154,7 @@ class UserAlert < ApplicationRecord
       .update_all(resolved_at: Time.current, updated_at: Time.current)
   end
 
-  # Recovering revisits only the user's stolen bikes, which no longer include this one
+  # update_stolen_bike_without_location only revisits bikes that are still stolen
   def self.resolve_recovered(user)
     user.user_alerts.active.where(kind: %w[stolen_bike_without_location theft_alert_without_photo])
       .includes(bike: :current_stolen_record).reject { it.displayable?(user) }.each(&:resolve!)
