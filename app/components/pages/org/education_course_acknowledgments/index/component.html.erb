@@ -37,6 +37,12 @@
     <%= link_to helpers.organized_bike_text(acknowledgment.bike, skip_creation: true), bike_path(acknowledgment.bike, organization_id:) %>
   <% end %>
 
+  <% table.column(label: translation(".source"), classes: "tw:leading-none") do |acknowledgment| %>
+    <small class="tw:text-gray-400">
+      <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: acknowledgment.bike.current_ownership)) %>
+    </small>
+  <% end %>
+
   <% table.column(label: translation(".course")) do |acknowledgment| %>
     <%= acknowledgment.education_course.display_name %>
   <% end %>

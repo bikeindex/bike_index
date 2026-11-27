@@ -7,7 +7,7 @@ module Organized
     def index
       status = params[:search_status].presence_in(Pages::Org::EducationCourseAcknowledgments::Index::Component::STATUSES)
       pagy, acknowledgments = pagy(:countish, matching_acknowledgments(status)
-        .preload(:bike, education_course: :organization).reorder(sortable_order((sort_column == "created_at") ? Bike : EducationCourseAcknowledgment)),
+        .preload({bike: :current_ownership}, education_course: :organization).reorder(sortable_order((sort_column == "created_at") ? Bike : EducationCourseAcknowledgment)),
         limit: permitted_per_page, page: permitted_page)
 
       render Pages::Org::EducationCourseAcknowledgments::Index::Component.new(pagy:, acknowledgments:,

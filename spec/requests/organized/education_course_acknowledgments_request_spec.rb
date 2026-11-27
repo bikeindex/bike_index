@@ -16,7 +16,7 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
       let(:current_organization) do
         FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["education_courses"])
       end
-      let(:bike) { FactoryBot.create(:bike_organized, creation_organization: current_organization, created_at: 3.days.ago) }
+      let(:bike) { FactoryBot.create(:bike_lightspeed_pos, creation_organization: current_organization, created_at: 3.days.ago) }
       let(:education_course) { FactoryBot.create(:education_course_active, organization: current_organization) }
       let!(:acknowledgment) do
         FactoryBot.create(:education_course_acknowledgment, education_course:, bike:,
@@ -45,6 +45,8 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
         expect(response.body).to include("E-Vehicle Education Acknowledgments", "Unfinished")
         expect(response.body).to match(/3<\/span> matching acknowledgments/)
         expect(response.body).to include("/bikes/#{bike.id}?organization_id=#{current_organization.to_param}")
+        # Source, the registration's origin
+        expect(response.body).to match(/>\s*lightspeed\s*</).and match(/>\s*web\s*</)
         expect(emails).to eq %w[pending defaulted agreed]
 
         get base_url, params: {sort: "acknowledged_at", direction: "asc"}
