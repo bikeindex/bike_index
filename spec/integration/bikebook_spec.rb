@@ -110,7 +110,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     # the search is an unusable placeholder until the catalog loads
     expect(page).to have_no_css("[inert]", wait: 10)
 
-    # Nothing picked shows how it works, until it's dismissed, which outlasts a reload
+    # Nothing picked shows how it works, until it's dismissed, which a reload undoes
     tips = "[aria-label='How to use Bike Book']"
     expect(page).to have_css(tips).and have_link("Trek Marlin 5 vs Specialized Rockhopper Sport", href: %r{vehicle_models=m/trek/2026/marlin-5-gen-3,})
     # and, filtered or not, some of the catalog to start from, cheapest first: each a cycle but a unicycle or trike (so no
@@ -155,14 +155,11 @@ RSpec.describe "Bike Book", :js, type: :system do
     check "Human powered (Acoustic)"
     expect(page).to have_text("15 models match your filters.")
     find("button[aria-label='Dismiss tips']").click
-    expect(page).to have_no_css(tips).and have_text(/nothing selected yet/i)
-    # focus moves to what replaced the button pressed
-    expect(page).to have_css("button:focus", exact_text: "Show tips")
-    visit bikebook_path
-    expect(page).to have_text(/nothing selected yet/i, wait: 10)
     expect(page).to have_no_css(tips)
-    click_on "Show tips"
-    expect(page).to have_css("#{tips}:focus")
+    # and stays gone as a filter re-renders what's under it
+    uncheck "Human powered (Acoustic)"
+    expect(page).to have_text("39 models to compare.")
+    expect(page).to have_no_css(tips)
     visit bikebook_path
     expect(page).to have_css(tips, wait: 10)
     asked.clear
@@ -1079,7 +1076,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     visit bikebook_path(price_max: 3000, vehicle_type: "cargo-rear")
     expect(page).to have_text("3 models match your filters.", wait: 10)
     # under the tips' card, over what they leave, as there are fewer than a page of them
-    expect(page).to have_css("[data-bikebook--tips-target='prompt'] + p", text: "3 models match your filters.")
+    expect(page).to have_css("[data-bikebook--tips-target='tips'] + p", text: "3 models match your filters.")
     featured = find("[aria-label='Models to compare']")
     expect(featured_ids).to eq %w[m/aventon/2024/abound-sr m/aventon/2025/abound-lr m/specialized/2025/haul-st]
     click_on "Search them"
@@ -2117,7 +2114,7 @@ RSpec.describe "Bike Book", :js, type: :system do
     visit bikebook_path(classifications: "evc/us/class-3")
     expect(page).to have_css("#classification-cards h3", exact_text: "Class 3", wait: 10)
     expect(page).to have_css(".hw-combobox__chip", text: "US Class 3").and have_css("[aria-label='Models to compare'] a", minimum: 1)
-      .and have_text(/models to compare\. Search them/).and have_no_css("[aria-label='How to use Bike Book']").and have_no_text("Nothing selected yet")
+      .and have_text(/models to compare\. Search them/).and have_no_css("[aria-label='How to use Bike Book']")
     expect(page).to have_current_path("/bikebook?classifications=evc/us/class-3&search=1")
 
     # a model that isn't complete says what it is in a badge after its name, in its option and its title
