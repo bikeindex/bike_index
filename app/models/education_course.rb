@@ -25,10 +25,7 @@
 class EducationCourse < ApplicationRecord
   acts_as_paranoid
 
-  # The admin index's filters. "default" is which course rather than which status - the
-  # default course is drafted, activated and archived like an organization's
-  STATUS_SCOPES = {"draft" => :draft, "active" => :active, "archived" => :archived, "default" => :defaults}.freeze
-  STATUSES = STATUS_SCOPES.keys.freeze
+  STATUSES = %w[draft active archived default].freeze
   COPIED_PAGE_ATTRS = %w[title heading subtitle body listing_order organization_specific].freeze
   # Follows "I, <registrant's name>," on the flow's final acknowledgment, for a course
   # without its own text
@@ -55,7 +52,7 @@ class EducationCourse < ApplicationRecord
   before_update :prevent_activated_change
   after_commit :enqueue_after_change_job
 
-  scope :defaults, -> { where(organization_id: nil) }
+  scope :default, -> { where(organization_id: nil) }
   # Everything activation hasn't frozen
   scope :draft, -> { where(start_at: nil) }
   scope :active, -> { where.not(start_at: nil).where(end_at: nil) }
@@ -86,10 +83,7 @@ class EducationCourse < ApplicationRecord
       draft.find_by!(organization:)
     end
 
-    def for_status(status)
-      scope = STATUS_SCOPES[status.to_s]
-      scope ? public_send(scope) : all
-    end
+    def for_status(status) = STATUSES.include?(status.to_s) ? public_send(status) : all
 
     private
 

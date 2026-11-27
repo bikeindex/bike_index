@@ -207,7 +207,7 @@ RSpec.describe EducationCourse, type: :model do
 
       expect(default_draft.reload).to be_archived
       expect(EducationCourse.active_default).to eq replacement
-      expect(EducationCourse.defaults.active.count).to eq 1
+      expect(EducationCourse.default.active.count).to eq 1
     end
 
     it "permits only one default draft" do
