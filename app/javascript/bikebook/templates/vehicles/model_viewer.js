@@ -154,8 +154,9 @@ class ModelViewer {
     const { stock_photo: photo, manufacturer, model } = this.vehicle
     const titleText = [manufacturer, model].filter(present).join(' ')
     return html`<div class="tw:group" data-controller=${present(photo) ? 'image-fallback' : nothing} data-broken=${present(photo) ? nothing : ''}>${present(photo)
-      ? html`<a target="_blank" rel="noopener" class="${frame} tw:block tw:group-data-broken:hidden"
-        href=${photo}><img alt=${titleText} loading="lazy" class="tw:size-full tw:rounded-sm tw:object-contain" data-action="error->image-fallback#fallBack" src=${photo}></a>`
+      // absolute, or Safari sizes the frame to the photo's natural height
+      ? html`<a target="_blank" rel="noopener" class="${frame} tw:relative tw:block tw:group-data-broken:hidden"
+        href=${photo}><img alt=${titleText} loading="lazy" class="tw:absolute tw:inset-0 tw:size-full tw:rounded-sm tw:object-contain" data-action="error->image-fallback#fallBack" src=${photo}></a>`
       : nothing}<div class="${frame} tw:hidden tw:flex-col tw:items-center tw:justify-center tw:gap-2 tw:rounded-md tw:p-1
       tw:border tw:border-dashed tw:border-gray-200 tw:dark:border-gray-700 tw:text-gray-400 tw:group-data-broken:flex tw:dark:text-gray-500"><img
       alt="" class="tw:aspect-square tw:h-16 tw:min-h-0 tw:w-auto" src=${this.kit.placeholder_url}><span class="tw:text-sm tw:leading-none">No photo</span></div></div>`
