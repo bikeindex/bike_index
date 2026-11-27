@@ -22,7 +22,6 @@ module BikebookCatalogHelpers
       Manufacturer.friendly_find(it) || FactoryBot.create(:manufacturer, name: it)
     end
     BikebookModelsSyncJob.new.perform
-    BikebookModelsDataSyncJob.new.perform
   end
 
   # The catalog as it is once it publishes again: a new vocabulary, Segway's 2025 block with a new description, and a

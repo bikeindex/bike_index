@@ -26,7 +26,7 @@
 #
 # A model in the Bike Book catalog's index, which BikebookModelsSyncJob copies here so that registering doesn't wait on
 # the index, the catalog's biggest file. `markets` are every market it's sold in, its market variants' too. `data` is
-# the records of the model and its market variants by citation key, which BikebookModelsDataSyncJob copies from
+# the records of the model and its market variants by citation key, which BikebookModelsSyncJob copies from
 # `data_file`, the model's block
 class BikebookModel < ApplicationRecord
   acts_as_paranoid

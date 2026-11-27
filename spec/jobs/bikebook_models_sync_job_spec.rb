@@ -29,7 +29,6 @@ RSpec.describe BikebookModelsSyncJob, type: :job do
       name: "Haul ST", model_slug: "haul-st", first_year: 2025, final_year: nil, markets: ["US", "CA"])
     expect(BikebookModel.find_by(catalog_id: "m/kris-holm/2023/kh24").manufacturer).to eq kris_holm
     expect(BikebookModel.find_by(catalog_id: dropped.catalog_id)).to be_nil
-    expect(BikebookModelsDataSyncJob.jobs.count).to eq 1
 
     BikebookModel.where(manufacturer: aventon).delete_all
     instance.perform
@@ -41,15 +40,80 @@ RSpec.describe BikebookModelsSyncJob, type: :job do
     expect(BikebookModel.where(manufacturer: segway).pluck(:catalog_id)).to eq ["m/segway/2025/gt3-pro"]
   end
 
+  describe "blocks" do
+    let(:block_url) { %r{\A#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}models/}o }
+    let(:haul_st) { BikebookModel.find_by!(catalog_id: "m/specialized/2025/haul-st") }
+    def expect_block_reads(times) = WebMock::API.assert_requested(:get, block_url, times:)
+
+    before { WebMock.reset_executed_requests! }
+
+    it "syncs each model's records from its block, reading only the blocks a publish changed" do
+      instance.perform
+      expect(BikebookModel.where(data: nil).count).to eq 0
+      expect(haul_st.data_file).to eq "models/specialized/2025.json"
+      expect(haul_st.data.keys).to match_array(["m/specialized/2025/haul-st", "m/specialized/2025/haul-st@CA"])
+      expect_block_reads(BikebookModel.distinct.count(:data_file))
+
+      WebMock.reset_executed_requests!
+      instance.perform
+      expect_block_reads(0)
+
+      FactoryBot.create(:manufacturer, name: "Segway")
+      stub_bikebook_catalog_update
+      Rails.cache.clear
+      Integrations::Bikebook::Catalog::Reads.reset
+      instance.perform
+      expect_block_reads(1)
+      gt3_pro = BikebookModel.find_by!(catalog_id: "m/segway/2025/gt3-pro")
+      expect(gt3_pro.data_file).to eq "models/segway/2025.v2.json"
+      expect(gt3_pro.market_data["description"]).to eq "Updated"
+    end
+
+    context "with a model added to a block already synced" do
+      it "reads the block again" do
+        instance.perform
+        haul_st.update!(data: nil, data_file: nil)
+
+        WebMock.reset_executed_requests!
+        instance.perform
+        expect_block_reads(1)
+        expect(haul_st.reload.data_file).to eq "models/specialized/2025.json"
+      end
+    end
+
+    context "with a block the catalog doesn't answer" do
+      it "keeps the data it has, reading no block past it" do
+        instance.perform
+        BikebookModel.update_all(data_file: nil)
+        Rails.cache.delete(described_class::SYNCED_MANIFEST_KEY)
+        WebMock.stub_request(:get, block_url).to_return(status: 500)
+
+        WebMock.reset_executed_requests!
+        instance.perform
+        expect_block_reads(1)
+        expect(BikebookModel.where(data: nil).count).to eq 0
+        expect(Rails.cache.read(described_class::SYNCED_MANIFEST_KEY)).to be_nil
+      end
+    end
+  end
+
+  context "while another run holds the lock" do
+    it "syncs nothing" do
+      described_class.new.with_redlock(nil) { instance.perform }
+      expect(BikebookModel.pluck(:catalog_id)).to eq [dropped.catalog_id]
+    end
+  end
+
   describe "enqueue_for" do
-    it "is enqueued by a manifest read naming an index it hasn't synced" do
+    it "is enqueued by a manifest read of a publish it hasn't synced" do
       Integrations::Bikebook::Catalog.manifest
       expect(described_class.jobs.count).to eq 1
 
       described_class.drain
-      synced = Rails.cache.read(described_class::SYNCED_KEY)
+      synced = Rails.cache.read(described_class::SYNCED_MANIFEST_KEY)
+      expect(synced).to be_present
       stub_bikebook_catalog
-      Rails.cache.write(described_class::SYNCED_KEY, synced)
+      Rails.cache.write(described_class::SYNCED_MANIFEST_KEY, synced)
       Integrations::Bikebook::Catalog.manifest
       expect(described_class.jobs.count).to eq 0
     end

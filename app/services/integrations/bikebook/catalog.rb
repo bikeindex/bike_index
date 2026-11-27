@@ -62,8 +62,8 @@ module Integrations
         EbikeRuleServices::Places::EU_MEMBERS.include?(iso) ? "EU" : iso
       end
 
-      # The models of the index or a block, nil while the catalog doesn't answer. Uncached, as they're read by the
-      # syncing jobs, outside rack-timeout
+      # The models of the index or a block, nil while the catalog doesn't answer. Uncached, as they're read by
+      # BikebookModelsSyncJob, outside rack-timeout
       def file_models(path)
         read(path, timeout: 60)["models"]
       rescue *FAILURES
@@ -145,8 +145,9 @@ module Integrations
         once(:fetched_manifest) do
           body = body(MANIFEST)
           manifest = JSON.parse(body)
-          BikebookModelsSyncJob.enqueue_for(manifest["index"])
-          {head: manifest.slice("format", "vocabulary").merge("digest" => Digest::SHA256.hexdigest(body)), manifest:}
+          digest = Digest::SHA256.hexdigest(body)
+          BikebookModelsSyncJob.enqueue_for(digest)
+          {head: manifest.slice("format", "vocabulary").merge("digest" => digest), manifest:}
         rescue *FAILURES
           nil
         end

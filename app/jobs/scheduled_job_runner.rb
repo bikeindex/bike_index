@@ -39,7 +39,6 @@ class ScheduledJobRunner < ScheduledJob
       BikeJobs::RemoveOrphanedImagesJob,
       BikeJobs::ScheduledBikePossiblyFoundNotificationJob,
       BikeJobs::UpdateTheftAlertFacebookJob,
-      BikebookModelsDataSyncJob,
       BikebookModelsSyncJob,
       CleanBParamsJob,
       CleanBulkImportJob,
