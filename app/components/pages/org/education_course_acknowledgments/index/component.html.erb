@@ -7,11 +7,11 @@
 
   <p class="tw:mt-2 tw:text-gray-500 tw:dark:text-gray-400">
     <% if @first_course&.started_before_everyone? %>
-      <%= translation(".organization_start_html", organization_name: @organization.name, time: render(UI::Time::Component.new(time: @first_course.start_at))) %>
+      <%= translation(".organization_start_html", organization_name: @organization.name, time: render(UI::Time::Component.new(time: @first_course.start_at, preposition: true))) %>
     <% else %>
-      <%= translation(".for_everyone_start_html", time: render(UI::Time::Component.new(time: Time.at(EducationCourse::FOR_EVERYONE_START)))) %>
+      <%= translation(".for_everyone_start_html", time: render(UI::Time::Component.new(time: Time.at(EducationCourse::FOR_EVERYONE_START), preposition: true))) %>
       <% if @first_course %>
-        <%= translation(".organization_started_html", organization_name: @organization.name, time: render(UI::Time::Component.new(time: @first_course.start_at))) %>
+        <%= translation(".organization_started_html", organization_name: @organization.name, time: render(UI::Time::Component.new(time: @first_course.start_at, preposition: true))) %>
       <% end %>
     <% end %>
   </p>

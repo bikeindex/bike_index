@@ -9,8 +9,9 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
     it "renders without an education course of the organization's own" do
       get base_url
       expect(response).to be_ok
-      expect(response.body).to include("General e-vehicle education course started at")
-      expect(response.body).to_not include("e-Vehicle Education Course started at")
+      expect(response.body).to include("General e-Vehicle Education Course started")
+      expect(response.body).to_not include("The #{current_organization.name} e-Vehicle Education Course")
+      expect(response.body).to include("localizeTime withPreposition")
     end
 
     context "with an education course" do
@@ -42,8 +43,8 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
         expect(response).to be_ok
         expect(response.body).to include("E-Vehicle Education Acknowledgments", "Unfinished")
         # Started after the general course, so it follows that course's start
-        expect(response.body).to include("General e-vehicle education course started at",
-          "The #{current_organization.name} e-Vehicle Education Course started at")
+        expect(response.body).to include("General e-Vehicle Education Course started",
+          "The #{current_organization.name} e-Vehicle Education Course started")
         expect(response.body).to match(/3<\/span> matching acknowledgments/)
         expect(response.body).to include("/bikes/#{bike.id}?organization_id=#{current_organization.to_param}")
         # Source, the registration's origin
@@ -69,8 +70,8 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
         early_start = Time.at(EducationCourse::FOR_EVERYONE_START) - 1.month
         FactoryBot.create(:education_course, organization: current_organization, start_at: early_start, end_at: early_start + 1.week)
         get base_url
-        expect(response.body).to include("The #{current_organization.name} e-Vehicle Education Course started at")
-        expect(response.body).to_not include("General e-vehicle education course started at")
+        expect(response.body).to include("The #{current_organization.name} e-Vehicle Education Course started")
+        expect(response.body).to_not include("General e-Vehicle Education Course started")
       end
     end
   end
