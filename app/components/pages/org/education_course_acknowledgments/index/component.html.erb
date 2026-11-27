@@ -6,7 +6,11 @@
   <%= render(UI::Header::Component.new(text: translation(".header"))) %>
 
   <p class="tw:mt-2 tw:text-gray-500 tw:dark:text-gray-400">
-    <%= translation(".for_everyone_start_html", time: render(UI::Time::Component.new(time: Time.at(EducationCourse::FOR_EVERYONE_START)))) %>
+    <% if @organization_start %>
+      <%= translation(".organization_start_html", organization_name: @organization.name, time: render(UI::Time::Component.new(time: @organization_start))) %>
+    <% else %>
+      <%= translation(".for_everyone_start_html", time: render(UI::Time::Component.new(time: Time.at(EducationCourse::FOR_EVERYONE_START)))) %>
+    <% end %>
   </p>
 </div>
 

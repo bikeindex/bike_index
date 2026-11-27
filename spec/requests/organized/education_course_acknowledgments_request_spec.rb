@@ -44,6 +44,7 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
         expect(response).to be_ok
         expect(response.body).to include("E-Vehicle Education Acknowledgments", "Unfinished")
         expect(response.body).to include("General e-vehicle education course started at")
+        expect(response.body).to_not include("e-Vehicle Education Course started at")
         expect(response.body).to match(/3<\/span> matching acknowledgments/)
         expect(response.body).to include("/bikes/#{bike.id}?organization_id=#{current_organization.to_param}")
         # Source, the registration's origin
@@ -65,6 +66,12 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
         # The period is of the registrations
         get base_url, params: {period: "custom", start_time: 50.hours.ago.to_i}
         expect(emails).to eq %w[pending defaulted]
+
+        early_start = Time.at(EducationCourse::FOR_EVERYONE_START) - 1.month
+        FactoryBot.create(:education_course, organization: current_organization, start_at: early_start, end_at: early_start + 1.week)
+        get base_url
+        expect(response.body).to include("The #{current_organization.name} e-Vehicle Education Course started at")
+        expect(response.body).to_not include("General e-vehicle education course started at")
       end
     end
   end

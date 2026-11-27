@@ -114,6 +114,24 @@ RSpec.describe EducationCourse, type: :model do
     end
   end
 
+  describe ".organization_start_before_everyone" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:for_everyone_start) { Time.at(EducationCourse::FOR_EVERYONE_START) }
+    let(:early_start) { for_everyone_start - 1.month }
+
+    it "is the organization's first course start, only when it was before the default course's" do
+      FactoryBot.create(:education_course, organization:)
+      FactoryBot.create(:education_course, start_at: early_start - 1.week)
+      expect(EducationCourse.organization_start_before_everyone(organization)).to be_nil
+
+      FactoryBot.create(:education_course_active, organization:, start_at: for_everyone_start + 1.day)
+      expect(EducationCourse.organization_start_before_everyone(organization)).to be_nil
+
+      FactoryBot.create(:education_course, organization:, start_at: early_start, end_at: early_start + 1.week)
+      expect(EducationCourse.organization_start_before_everyone(organization)).to be_within(1).of early_start
+    end
+  end
+
   describe "immutability once activated" do
     let(:organization) { FactoryBot.create(:organization) }
     let!(:course) { FactoryBot.create(:education_course, :with_pages, organization:) }

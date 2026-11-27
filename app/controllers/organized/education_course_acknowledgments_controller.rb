@@ -11,7 +11,8 @@ module Organized
         limit: permitted_per_page, page: permitted_page)
 
       render Pages::Org::EducationCourseAcknowledgments::Index::Component.new(pagy:, acknowledgments:,
-        organization: current_organization, sort_state:, status:, period: @period, start_time: @start_time, end_time: @end_time)
+        organization: current_organization, sort_state:, status:, period: @period, start_time: @start_time, end_time: @end_time,
+        organization_start: EducationCourse.organization_start_before_everyone(current_organization))
     end
 
     private

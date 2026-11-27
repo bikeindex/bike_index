@@ -13,6 +13,9 @@ en:
               people were not prompted to do the education course
             header: E-Vehicle Education Acknowledgments
             matching_count_html: "%{count} matching acknowledgments"
+            organization_start_html: >-
+              The %{organization_name} e-Vehicle Education Course started at %{time}.
+              Prior to that, people were not prompted to do the education course
             owner_email: Owner email
             registered: Registered
             registration: Registration
