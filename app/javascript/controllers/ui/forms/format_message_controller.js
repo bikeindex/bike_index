@@ -2,8 +2,7 @@ import { Controller } from '@hotwired/stimulus'
 
 // Connects to data-controller='ui--forms--format-message'
 //
-// Says what the pattern wants rather than "Please match the requested format". A blank
-// or missing value keeps the browser's own message
+// Says what the pattern wants rather than "Please match the requested format"
 export default class extends Controller {
   static values = { message: String }
 

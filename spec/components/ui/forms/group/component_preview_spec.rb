@@ -53,7 +53,7 @@ RSpec.describe UI::Forms::Group::ComponentPreview, type: :request do
     expect(response).to have_http_status(:ok)
     form = Nokogiri::HTML(response.body).css("form").find { it.at_css("[pattern]") }
     checked = form.css("input[pattern], input[type='email']")
-    # the address group's postal code is the fourth pattern
+    # the email, and the address group's postal code
     expect(checked.size).to eq validated_kinds.size + 2
     expect(checked.map { it["value"] }).to all(be_present)
     expect(form.css("button[type='submit']").size).to eq 1

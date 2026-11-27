@@ -49,8 +49,7 @@ module UI
 
         private
 
-        # What the format is, in place of the browser's "Please match the requested format" -
-        # the title is what a browser without JavaScript adds to that
+        # Without JavaScript, the browser appends the title to "Please match the requested format"
         def format_options
           message = format_message
           return {} if message.blank?
