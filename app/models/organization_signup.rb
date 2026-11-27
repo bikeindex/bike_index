@@ -80,5 +80,5 @@ class OrganizationSignup < ApplicationRecord
   end
 
   # A pasted non-breaking space is whitespace to the browser's pattern, but not to Ruby's \s
-  def normalized(value) = value&.gsub(/[[:space:]]+/, " ")&.strip.presence
+  def normalized(value) = value&.squish.presence
 end
