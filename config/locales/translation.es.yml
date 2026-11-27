@@ -5203,6 +5203,9 @@ es:
         nombre o póngase en contacto con support@bikeindex.org si es suyo.
       name_too_short: El nombre de la organización debe tener al menos dos letras
         o números.
+      phone_invalid: Por favor, introduzca un número de teléfono válido
+      postal_code_invalid: Por favor, introduzca un código postal válido.
+      website_invalid: Por favor, introduzca una dirección web válida, como example.com.
   theft_alert_plans:
     theft_alert_plan:
       days: Días
@@ -5648,6 +5651,11 @@ es:
           state: Estado
         combobox:
           no_matches: No hay coincidencias
+        input:
+          postal_code_format: Introduzca un código postal de al menos 3 letras o números,
+            como 97201 o T6E 2A4.
+          telephone_format: Introduce un número de teléfono de al menos 7 dígitos.
+          website_format: Introduce una dirección web, como por ejemplo.com.
       alerts:
         base:
           error: Error
@@ -8074,7 +8082,6 @@ es:
           field_message: "¿Hay algo más que debamos saber?"
           field_name: Su nombre
           field_role: Tu papel
-          phone_hint: Un número de teléfono, con sus dígitos
           request_name: pedido
           submit_text: Hablemos
           title: Contáctanos para una prueba gratuita.
