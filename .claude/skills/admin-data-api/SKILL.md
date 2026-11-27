@@ -79,7 +79,7 @@ It fetches sidekiq then pghero and prints a `summary:` line and an `OK`/`ABNORMA
 
 `show-bug-report` returns the one report — the same fields the index lists, so use it once a search has found the id. `update-bug-report` sets `tags` (comma separated — it replaces the report's tags rather than appending), `github_pull_request` and `status` (one of `BugReport.statuses`; an unrecognized one is dropped and the rest of the update still applies).
 
-`email-bug-reports` emails each report's sender the message, verbatim, as a reply from the address they wrote to, and returns `emailed_bug_report_ids`. Nothing stores the message.
+`email-bug-reports` emails each report's sender the message, verbatim, as a reply from the address they wrote to, and returns `emailed_bug_report_ids` — an email banned sender's id included, though their reply is never sent. The message is kept only in the inbox's BCC copy.
 
 Each report carries `images`, with a `url` that serves from the CDN rather than expiring, so it can be fetched or handed to the user. Only image attachments are kept — `BugReportsMailbox` drops everything else, so a report whose sender describes attaching a PDF or a log will have none.
 

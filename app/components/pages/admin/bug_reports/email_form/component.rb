@@ -4,8 +4,8 @@ module Pages
   module Admin
     module BugReports
       module EmailForm
-        # Emails the senders of bug reports. Given a bug_report it's a form of its own for that one;
-        # without, it's the table's card that admin--bug-report-email opens, sending the table form's checked rows
+        # Given a bug_report it's a form of its own; without, it's the table's card that
+        # admin--bug-report-email opens, sending the table form's checked rows
         class Component < ApplicationComponent
           BANNED_TEXT = "You are messaging a banned user - they will not receive the message"
 
@@ -21,7 +21,6 @@ module Pages
             alert = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mb-3", text: BANNED_TEXT))
             return alert if @bug_report
 
-            # Shown while a checked row's checkbox carries data-email-banned
             tag.div(alert, class: "tw:hidden", data: {"admin--bug-report-email-target": "bannedAlert"})
           end
 

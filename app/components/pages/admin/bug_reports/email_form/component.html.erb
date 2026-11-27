@@ -1,11 +1,10 @@
 <% fields = capture do %>
   <%= render(UI::Card::Component.new) do %>
-    <h3 class="tw:mb-3 tw:text-lg tw:font-bold"><%= title %></h3>
+    <%= render(UI::Header::Component.new(text: title, tag: :h3, html_class: "tw:mb-3!")) %>
 
     <%= banned_alert %>
 
     <%= render(UI::Forms::Group::Component.new(attribute: :email_message, label_text: "Message", required: true)) do %>
-      <%# Disabled while the table's card is closed, out of the form it shares %>
       <%= text_area_tag :email_message, nil, rows: @bug_report ? 8 : 4, required: true, form: table_form_id, disabled: table_form_id.present?,
         class: "twinput tw:w-full", data: ({"admin--bug-report-email-target": "message"} unless @bug_report) %>
     <% end %>

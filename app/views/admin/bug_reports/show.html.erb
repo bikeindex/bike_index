@@ -68,24 +68,22 @@
     <% end %>
   <% end %>
 
-  <div>
-    <%= form_with(model: [:admin, @bug_report]) do |f| %>
-      <%= render(UI::Forms::Group::Component.new(attribute: :status, form_builder: f, label_text: "Priority")) do %>
-        <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :status,
+  <%= form_with(model: [:admin, @bug_report]) do |f| %>
+    <%= render(UI::Forms::Group::Component.new(attribute: :status, form_builder: f, label_text: "Priority")) do %>
+      <%= render(UI::Forms::Select::Component.new(form_builder: f, attribute: :status,
         option_tags: BugReport.statuses.keys.map { [BugReport.status_display(it), it] })) %>
-      <% end %>
+    <% end %>
 
-      <%= render(UI::Forms::Group::Component.new(attribute: :tags, form_builder: f)) do %>
-        <%= render UI::Forms::Combobox::Component.new(name: :tags,
+    <%= render(UI::Forms::Group::Component.new(attribute: :tags, form_builder: f)) do %>
+      <%= render UI::Forms::Combobox::Component.new(name: :tags,
         options: tag_combobox_options, free_text: true, multiselect_chip_src: tag_chips_admin_bug_reports_path,
         html_options: {form: f, placeholder: "Select or create tags"}) %>
-      <% end %>
-
-      <%= render(UI::Forms::Group::Component.new(attribute: :github_pull_request, form_builder: f, kind: :number_field)) %>
-
-      <%= render UI::Button::Component.new(text: "Update", color: :primary, type: "submit") %>
     <% end %>
-  </div>
+
+    <%= render(UI::Forms::Group::Component.new(attribute: :github_pull_request, form_builder: f, kind: :number_field)) %>
+
+    <%= render UI::Button::Component.new(text: "Update", color: :primary, type: "submit") %>
+  <% end %>
 </div>
 
 <% if @bug_report.feedback_id.present? %>

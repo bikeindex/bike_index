@@ -5,7 +5,6 @@ module Admin
 
     token_accessible :index, :show, :update, :assign_tags, :email
 
-    # Keyed by the BugReport scope each filter applies
     USER_STATUS_FILTERS = {"member" => "Only members", "invoiced_organization" => "Only invoiced org",
                            "invoiced_organization_staff" => "Only invoiced org staff",
                            "banned" => "Only banned users", "not_banned" => "Only not banned users"}.freeze

@@ -284,7 +284,7 @@ class Notification < ApplicationRecord
 
   def calculated_user_id
     return notifiable&.receiver_id if sender_receiver_notifiable?
-    # The admin who wrote it, which the bug report's user never is
+    # The admin who wrote it, which the caller sets
     return if bug_report_reply?
 
     notifiable&.user_id if defined?(notifiable.user_id)
