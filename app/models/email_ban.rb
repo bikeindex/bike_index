@@ -34,6 +34,8 @@ class EmailBan < ApplicationRecord
   validate :is_not_duplicate_ban
 
   before_validation :set_calculated_attributes
+  # So the caches keyed on the user show the ban. touch_all, as a touch runs AfterUserChangeJob
+  after_commit { User.where(id: user_id).touch_all }
 
   # user_email_id is nil'd at create when the ban names the account's own address, and
   # a NULL user_id would make the NOT IN in User.no_email_bans match no rows at all
