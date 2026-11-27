@@ -214,13 +214,15 @@ class UserAlert < ApplicationRecord
     self.class.kind_humanized(kind)
   end
 
-  # Alerts outlive the bike, phone or organization they point at until a job resolves them
+  # Alerts outlive the bike, phone or organization they point at until a job resolves them,
+  # and nothing resolves the stolen kinds when the bike is recovered
   def displayable?(user)
     case kind
     when "unfinished_registration" then alertable&.unfinished_registration?(user)
     when "phone_waiting_confirmation" then alertable.present?
     when "unassigned_bike_org" then bike.present? && organization.present?
-    else bike.present?
+    when "stolen_bike_without_location" then bike&.current_stolen_record&.without_street?
+    when "theft_alert_without_photo" then bike&.current_stolen_record&.theft_alert_missing_photo?
     end
   end
 

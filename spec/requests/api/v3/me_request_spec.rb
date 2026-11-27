@@ -212,10 +212,11 @@ RSpec.describe "Me API V3", type: :request do
 
     context "with alerts" do
       let(:token) { create_doorkeeper_token(scopes: "read_user") }
-      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record, user:) }
       let(:organization) { FactoryBot.create(:organization) }
+      let(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record: bike.current_stolen_record, user:) }
       let!(:user_alert_photo) do
-        FactoryBot.create(:user_alert, user:, bike:, kind: "theft_alert_without_photo")
+        FactoryBot.create(:user_alert, user:, bike:, alertable: theft_alert, kind: "theft_alert_without_photo")
       end
       let!(:user_alert_org) do
         FactoryBot.create(:user_alert, user:, bike:, organization:, kind: "unassigned_bike_org")
@@ -271,6 +272,31 @@ RSpec.describe "Me API V3", type: :request do
                         url: "#{ENV["BASE_URL"]}/my_account/edit", bike_id: nil, organization_id: nil,
                         created_at: user_alert_phone.created_at.to_i}
         expect(json_result[:alerts]).to match_array((target_alerts + [target_phone]).as_json)
+
+        # Recovering doesn't resolve the stolen kinds
+        bike.current_stolen_record.add_recovery_information
+        user_alert_location.bike.current_stolen_record.add_recovery_information
+        expect(user.user_alerts.active.pluck(:id)).to include(user_alert_photo.id, user_alert_location.id)
+
+        get "/api/v3/me/alerts", params: {access_token: token.token}
+        expect(json_result[:alerts].pluck(:kind)).to match_array(%w[unassigned_bike_org phone_waiting_confirmation])
+      end
+
+      context "with a preferred_language" do
+        let(:user) { FactoryBot.create(:user_confirmed, preferred_language: "nl") }
+        let!(:user_alert_org) { nil }
+
+        it "responds in it" do
+          get "/api/v3/me/alerts", params: {access_token: token.token}
+          expect(response.response_code).to eq(200)
+          expect(json_result[:alerts].pluck(:kind, :title)).to match_array([
+            ["theft_alert_without_photo", "Voeg een foto toe"],
+            ["stolen_bike_without_location", "Voeg diefstallocatie toe"],
+            ["unfinished_registration", nil]
+          ])
+          expect(json_result[:alerts].find { it[:kind] == "unfinished_registration" }[:action])
+            .to eq "Voltooi de vereiste stappen."
+        end
       end
     end
   end
