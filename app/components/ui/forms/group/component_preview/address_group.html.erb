@@ -1,0 +1,7 @@
+<%= form_with(model: AddressRecord.new(postal_code:), url: "#", scope:, builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::AddressGroup::Component.new(form_builder: f, required: postal_code.present?)) %>
+
+  <% if postal_code %>
+    <%= render(UI::Button::Component.new(text: "Submit", color: :primary, type: "submit")) %>
+  <% end %>
+<% end %>
