@@ -4,6 +4,10 @@
 
 <div class="organized-page-header">
   <%= render(UI::Header::Component.new(text: translation(".header"))) %>
+
+  <p class="tw:mt-2 tw:text-gray-500 tw:dark:text-gray-400">
+    <%= translation(".for_everyone_start_html", time: render(UI::Time::Component.new(time: Time.at(EducationCourse::FOR_EVERYONE_START)))) %>
+  </p>
 </div>
 
 <div class="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">

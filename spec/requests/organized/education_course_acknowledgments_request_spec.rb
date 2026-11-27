@@ -43,6 +43,7 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
         get base_url
         expect(response).to be_ok
         expect(response.body).to include("E-Vehicle Education Acknowledgments", "Unfinished")
+        expect(response.body).to include("General e-vehicle education course started at")
         expect(response.body).to match(/3<\/span> matching acknowledgments/)
         expect(response.body).to include("/bikes/#{bike.id}?organization_id=#{current_organization.to_param}")
         # Source, the registration's origin

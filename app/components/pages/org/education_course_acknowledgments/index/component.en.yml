@@ -8,6 +8,9 @@ en:
             acknowledged: Acknowledged
             all: All
             course: Course
+            for_everyone_start_html: >-
+              General e-vehicle education course started at %{time}. Prior to that,
+              people were not prompted to do the education course
             header: E-Vehicle Education Acknowledgments
             matching_count_html: "%{count} matching acknowledgments"
             owner_email: Owner email

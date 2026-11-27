@@ -36,6 +36,9 @@ class EducationCourse < ApplicationRecord
     "e-vehicle safety rules above as a condition of registering my vehicle. I understand that " \
     "failure to comply may result in revocation of my registration and/or disciplinary action."
 
+  # When registrants without an organization course began being prompted with the default one
+  FOR_EVERYONE_START = 1794414987
+
   # What each status is called on screen
   STATUS_DISPLAY = {"draft" => "Draft", "active" => "Current", "archived" => "Previous"}.freeze
   # Both the admin and the organization screens warn with this before discarding
