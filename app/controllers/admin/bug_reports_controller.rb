@@ -16,9 +16,12 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 50)
-      bug_reports = matching_bug_reports.includes(:reply_notifications, user: %i[membership_active email_bans_active])
-      # Only the JSON serializes images
-      bug_reports = bug_reports.with_attached_images if request.format.json?
+      # Only the JSON serializes images, and only the table reads the rest
+      bug_reports = if request.format.json?
+        matching_bug_reports.with_attached_images
+      else
+        matching_bug_reports.includes(:reply_notifications, user: %i[membership_active email_bans_active])
+      end
       @pagy, @collection = pagy(:countish,
         bug_reports.reorder(sortable_order(BugReport)),
         limit: @per_page,

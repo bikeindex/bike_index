@@ -1,5 +1,5 @@
 import { Controller } from '@hotwired/stimulus'
-import { collapse } from 'utils/collapse_utils'
+import { collapse, collapseField } from 'utils/collapse_utils'
 
 // Connects to data-controller='admin--bug-report-email'
 // Opens the bug reports table's email card, ready to type into, and shows its banned alert
@@ -20,8 +20,9 @@ export default class extends Controller {
   }
 
   setOpen (open) {
-    collapse(open ? 'show' : 'hide', this.panelTarget)
-    this.triggerTargets.forEach((trigger) => trigger.setAttribute('aria-expanded', String(open)))
+    // Disabled while closed, so the required message doesn't block the table form's other submits
+    collapseField(this.panelTarget, open)
+    this.triggerTarget.setAttribute('aria-expanded', String(open))
     if (open) this.messageTarget.focus()
   }
 

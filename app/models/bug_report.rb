@@ -72,8 +72,8 @@ class BugReport < ApplicationRecord
   scope :member, -> { where(is_member: true) }
   scope :invoiced_organization, -> { where(is_invoiced_organization: true) }
   scope :invoiced_organization_staff, -> { where(is_invoiced_organization_staff: true) }
-  scope :sender_email_banned, -> { where(user_id: EmailBan.period_active.banning_account_email.select(:user_id)) }
-  scope :sender_not_email_banned, -> { where.not(id: sender_email_banned) }
+  scope :sender_email_banned, -> { where(user_id: User.email_banned.select(:id)) }
+  scope :sender_not_email_banned, -> { where(user_id: nil).or(where.not(user_id: User.email_banned.select(:id))) }
   # Includes unprioritized so reports the auto-prioritize job hasn't reached yet stay visible
   scope :investigate, -> { where(status: %i[unprioritized investigate_priority_high investigate_priority_low]) }
 
@@ -175,10 +175,7 @@ class BugReport < ApplicationRecord
     tags.intersect?(IGNORED_TAGS)
   end
 
-  # Matches sender_email_banned, from the preloaded bans
-  def sender_email_banned?
-    user&.email_bans_active&.any? { it.user_email_id.nil? } || false
-  end
+  def sender_email_banned? = user&.email_banned?
 
   private
 

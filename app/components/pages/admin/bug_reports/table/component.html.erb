@@ -15,8 +15,7 @@
         <%= render UI::Forms::Combobox::Component.new(name: :tags, options: @searchable_tags, free_text: true, html_options: {placeholder: "Select or create a tag"}) %>
       <% end %>
 
-      <%# formnovalidate, as the email card's message is required and belongs to this form %>
-      <%= render(UI::Button::Component.new(text: "Add tag to selected", color: :primary, size: :sm, type: :submit, formnovalidate: true)) %>
+      <%= render(UI::Button::Component.new(text: "Add tag to selected", color: :primary, size: :sm, type: :submit)) %>
 
       <%= render(UI::Button::Component.new(text: "Email selected senders", size: :sm, aria: {expanded: "false"},
       data: {"admin--bug-report-email-target": "trigger", action: "admin--bug-report-email#toggle"})) %>

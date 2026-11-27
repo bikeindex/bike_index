@@ -590,8 +590,9 @@ class User < ApplicationRecord
     user_phones.confirmed.limit(1).any?
   end
 
+  # banning_account_email, read off the association so a preloaded one costs no query
   def email_banned?
-    email_bans_active.banning_account_email.any?
+    email_bans_active.any? { it.user_email_id.nil? }
   end
 
   def set_calculated_attributes
