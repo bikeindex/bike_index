@@ -21,6 +21,13 @@
       admin_bug_report_path(bug_report), class: "twlink tw:text-xs" %>
   <% end %>
 
+  <% table.column(sortable: "github_pull_request", hideable: :pull_request_cell) do |bug_report| %>
+    <% if bug_report.github_pull_request.present? %>
+      <%= link_to "##{bug_report.github_pull_request}", bug_report.github_pull_request_url, class: "twlink" %>
+      <%= helpers.bug_report_search_link(search_pull_request: bug_report.github_pull_request) %>
+    <% end %>
+  <% end %>
+
   <% table.column(sortable: "email", hideable: :sender_cell) do |bug_report| %>
     <% if bug_report.user_id.present? %>
       <%= render Atoms::Admin::TableCells::User::Component.new(user: bug_report.user, user_id: bug_report.user_id) %>
@@ -76,13 +83,6 @@
 
     <% if bug_report.is_invoiced_organization_staff %>
       <small>staff</small>
-    <% end %>
-  <% end %>
-
-  <% table.column(sortable: "github_pull_request", hideable: :pull_request_cell) do |bug_report| %>
-    <% if bug_report.github_pull_request.present? %>
-      <%= link_to "##{bug_report.github_pull_request}", bug_report.github_pull_request_url, class: "twlink" %>
-      <%= helpers.bug_report_search_link(search_pull_request: bug_report.github_pull_request) %>
     <% end %>
   <% end %>
 <% end %>

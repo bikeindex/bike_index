@@ -6,14 +6,14 @@ module Pages
       module Table
         class Component < ApplicationComponent
           COLUMNS = {
+            pull_request_cell: "PR",
             sender_cell: "Sender",
             receiver_cell: "Receiver",
             subject_cell: "Subject",
             status_cell: "Status",
             tags_cell: "Tags",
             member_cell: "Member",
-            invoiced_cell: "Invoiced org",
-            pull_request_cell: "PR"
+            invoiced_cell: "Invoiced org"
           }.freeze
 
           def initialize(collection:, searchable_tags:, sort_state: ComponentStructs::SortState.new, render_sortable: false)
