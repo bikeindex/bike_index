@@ -1,6 +1,7 @@
 <%= render(UI::Table::InCard::Component.new(records: @collection, cache_key: self.class.cache_digest, render_sortable: @render_sortable, sort_state: @sort_state,
   column_settings: {storage_key: "adminBugReportsColumns", columns: COLUMNS, defaults: COLUMNS.keys, narrow_hidden: %i[receiver_cell member_cell invoiced_cell pull_request_cell]},
   form: {url: assign_tags_admin_bug_reports_path, method: :post},
+  cache_records: ->(bug_report) { bug_report.user&.email_bans_active.to_a },
   data: sortable_links_data)) do |table| %>
   <% table.with_actions do %>
     <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign", wrapper_class: "tw:mb-0 tw:min-w-64")) do %>
@@ -12,7 +13,8 @@
     <%= render(Pages::Admin::BugReports::EmailForm::Component.new) %>
   <% end %>
 
-  <% table.selection_column(param: "bug_reports_selected") %>
+  <% table.selection_column(param: "bug_reports_selected",
+    checkbox_options: ->(bug_report) { {data: {email_banned: bug_report.sender_email_banned?.presence}} }) %>
 
   <% table.column(sortable: "received_at", label: "Received", lower_right: ->(bug_report) { content_tag(:span, bug_report.id, class: "only-dev-visible") }) do |bug_report| %>
     <%= link_to render(UI::Time::Component.new(time: bug_report.received_at || bug_report.created_at)),

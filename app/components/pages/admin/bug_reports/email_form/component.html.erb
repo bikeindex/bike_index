@@ -12,6 +12,8 @@
       data-ui--collapse-target="content"
       class="tw:hidden <%= content_classes %>"
     >
+      <%= banned_alert %>
+
       <%= render(UI::Forms::Group::Component.new(attribute: :email_message, label_text: "Message")) do %>
         <%= text_area_tag :email_message, nil, rows: 8, class: "twinput tw:w-full" %>
       <% end %>

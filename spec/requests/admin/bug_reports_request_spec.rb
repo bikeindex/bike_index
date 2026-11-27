@@ -140,19 +140,27 @@ RSpec.describe Admin::BugReportsController, type: :request do
       end
     end
 
-    context "with search_membership" do
+    context "with search_user_status" do
       let!(:bug_report_invoiced) { FactoryBot.create(:bug_report, is_invoiced_organization: true) }
+      let(:email_ban) { FactoryBot.create(:email_ban) }
+      let!(:bug_report_banned) { FactoryBot.create(:bug_report, user: email_ban.user) }
 
-      it "filters by the membership snapshot" do
+      it "filters by the membership snapshot and by email ban" do
         expect(bug_report.is_invoiced_organization).to be_falsey
-        get "#{base_url}.json", params: {search_membership: "invoiced_organization", search_status: "all"}
+        get "#{base_url}.json", params: {search_user_status: "invoiced_organization", search_status: "all"}
         expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_invoiced.id])
+
+        get "#{base_url}.json", params: {search_user_status: "banned", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_banned.id])
+
+        get "#{base_url}.json", params: {search_user_status: "not_banned", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to match_array([bug_report.id, bug_report_invoiced.id])
       end
 
-      it "ignores an unknown membership filter" do
+      it "ignores an unknown user status filter" do
         expect(bug_report).to be_present
-        get "#{base_url}.json", params: {search_membership: "nonsense", search_status: "all"}
-        expect(json_result["bug_reports"].map { it["id"] }).to match_array([bug_report.id, bug_report_invoiced.id])
+        get "#{base_url}.json", params: {search_user_status: "nonsense", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to match_array([bug_report.id, bug_report_invoiced.id, bug_report_banned.id])
       end
     end
   end
@@ -205,6 +213,16 @@ RSpec.describe Admin::BugReportsController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(response.body).to include(admin_user_path(bug_report.user_id))
+        expect(response.body).not_to include("You are messaging a banned user")
+      end
+
+      context "who is email banned" do
+        before { FactoryBot.create(:email_ban, user: bug_report.user) }
+
+        it "warns that the email won't reach them" do
+          get "#{base_url}/#{bug_report.to_param}"
+          expect(response.body).to include("You are messaging a banned user - they will not receive the message")
+        end
       end
     end
   end

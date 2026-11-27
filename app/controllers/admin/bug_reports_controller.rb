@@ -6,8 +6,9 @@ module Admin
     token_accessible :index, :show, :update, :assign_tags, :email
 
     # Keyed by the BugReport scope each filter applies
-    MEMBERSHIP_FILTERS = {"member" => "Only members", "invoiced_organization" => "Only invoiced org",
-                          "invoiced_organization_staff" => "Only invoiced org staff"}.freeze
+    USER_STATUS_FILTERS = {"member" => "Only members", "invoiced_organization" => "Only invoiced org",
+                           "invoiced_organization_staff" => "Only invoiced org staff",
+                           "banned" => "Only banned users", "not_banned" => "Only not banned users"}.freeze
     STATUS_FILTER_ALL = "all"
     STATUS_FILTER_INVESTIGATE = "investigate"
 
@@ -100,7 +101,7 @@ module Admin
     end
 
     helper_method :matching_bug_reports, :searchable_tags, :tag_combobox_options, :searchable_receivers,
-      :membership_filters, :status_filters, :status_only_filters
+      :user_status_filters, :status_filters, :status_only_filters
 
     def searchable_tags
       @searchable_tags ||= BugReport.all_tags
@@ -114,8 +115,8 @@ module Admin
       @searchable_receivers ||= BugReport.all_receivers
     end
 
-    def membership_filters
-      MEMBERSHIP_FILTERS
+    def user_status_filters
+      USER_STATUS_FILTERS
     end
 
     # Ordered value => label. "Status: investigate" and "All" sit above the per-status options
@@ -147,19 +148,21 @@ module Admin
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
       bug_reports = bug_reports.where(github_pull_request: params[:search_pull_request]) if params[:search_pull_request].present?
       bug_reports = bug_reports.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%") if params[:search_email].present?
-      @searched_membership = params[:search_membership] if MEMBERSHIP_FILTERS.key?(params[:search_membership])
-      bug_reports = filter_by_membership(bug_reports)
+      @searched_user_status = params[:search_user_status] if USER_STATUS_FILTERS.key?(params[:search_user_status])
+      bug_reports = filter_by_user_status(bug_reports)
       bug_reports = filter_by_status(bug_reports)
       bug_reports = bug_reports.text_search(params[:query]) if params[:query].present?
       bug_reports.where(created_at: @time_range)
     end
 
     # Explicit scopes rather than a dynamic key, so no user input reaches the query
-    def filter_by_membership(bug_reports)
-      case @searched_membership
+    def filter_by_user_status(bug_reports)
+      case @searched_user_status
       when "member" then bug_reports.member
       when "invoiced_organization" then bug_reports.invoiced_organization
       when "invoiced_organization_staff" then bug_reports.invoiced_organization_staff
+      when "banned" then bug_reports.sender_email_banned
+      when "not_banned" then bug_reports.sender_not_email_banned
       else bug_reports
       end
     end

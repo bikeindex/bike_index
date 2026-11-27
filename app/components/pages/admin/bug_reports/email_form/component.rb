@@ -14,6 +14,19 @@ module Pages
 
           private
 
+          def banned_alert
+            return if @bug_report && !@bug_report.sender_email_banned?
+
+            alert = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mb-3",
+              text: "You are messaging a banned user - they will not receive the message"))
+            return alert if @bug_report
+
+            # A row's checkbox carries data-email-banned when its sender is
+            tag.div(class: "tw:hidden", data: {controller: "admin--bug-report-email-banned",
+                                               action: "table-multi-checkbox:change@window->admin--bug-report-email-banned#sync",
+                                               "admin--bug-report-email-banned-target": "alert"}) { alert }
+          end
+
           def storage_key = "admin-bug-report-email-#{@bug_report&.id || "selected"}"
 
           def content_classes
