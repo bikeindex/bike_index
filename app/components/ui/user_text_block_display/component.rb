@@ -6,7 +6,7 @@ module UI
       def initialize(text: nil, additional_classes: nil, max_height_class: "tw:max-h-80")
         @text = text&.strip
         overflow_class = "tw:overflow-y-auto" if max_height_class.present?
-        @classes = ["tw:whitespace-pre-wrap", overflow_class, additional_classes, max_height_class]
+        @classes = ["tw:whitespace-pre-wrap tw:wrap-anywhere", overflow_class, additional_classes, max_height_class]
       end
 
       def render?
