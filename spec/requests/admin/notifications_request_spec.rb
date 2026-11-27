@@ -27,13 +27,14 @@ RSpec.describe Admin::NotificationsController, type: :request do
 
       context "with search_bug_report_id" do
         let(:bug_report) { FactoryBot.create(:bug_report) }
-        let!(:notification) { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, sender: current_user, message_channel_target: bug_report.email) }
+        let!(:notification) { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, user: current_user, message_channel_target: bug_report.email) }
         let!(:notification_other) { FactoryBot.create(:notification) }
 
-        it "lists the bug report's notifications, with their sender" do
+        it "lists the bug report's notifications, with who sent it and who it went to" do
           get base_url, params: {search_bug_report_id: bug_report.id}
           expect(assigns(:notifications).pluck(:id)).to eq([notification.id])
           expect(response.body).to include(admin_user_path(current_user.id))
+          expect(response.body).to include(bug_report.email)
         end
       end
     end

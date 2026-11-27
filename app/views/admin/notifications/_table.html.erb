@@ -32,8 +32,11 @@
 
     <% unless skip_user %>
       <% table.column(sortable: "user_id") do |notification| %>
-        <% if notification.user_id.present? %>
-          <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: notification.user, email: notification.message_channel_target || notification.user&.email, render_search: render_sortable) %>
+        <%# A bug_report_reply's user is the admin who wrote it, so this shows who it went to %>
+        <% recipient = notification.recipient_users.first %>
+
+        <% if recipient.present? %>
+          <%= render Atoms::Admin::TableCells::User::Component.new(sort_state:, user: recipient, email: notification.message_channel_target || recipient.email, render_search: render_sortable) %>
         <% else %>
           <%= notification.message_channel_target %>
           <small class="less-strong">no user</small>

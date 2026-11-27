@@ -105,11 +105,17 @@ RSpec.describe Notification, type: :model do
       let(:user) { FactoryBot.create(:superuser) }
       let(:notifiable) { FactoryBot.create(:bug_report, user: FactoryBot.create(:user)) }
       let(:kind) { "bug_report_reply" }
-      let(:notification) { Notification.create!(notifiable:, kind:, sender: user, message_channel_target: notifiable.email) }
-      it "is the admin who sent it, and the report's user receives it" do
+      let(:notification) { Notification.create!(notifiable:, kind:, user:, message_channel_target: notifiable.email) }
+      it "is the admin who wrote it, and the report's user receives it" do
         expect(notification.sender).to eq user
-        expect(notification.user_id).to eq notifiable.user_id
+        expect(notification.recipient_users).to eq([notifiable.user])
         expect(Notification.notifications_sent_or_received_by(user).pluck(:id)).to eq([notification.id])
+      end
+
+      it "requires the admin, rather than falling back to the report's user" do
+        notification = Notification.new(notifiable:, kind:, message_channel_target: notifiable.email)
+        expect(notification).not_to be_valid
+        expect(notification.user_id).to be_nil
       end
     end
     context "user_alert" do

@@ -49,7 +49,7 @@
     <% end %>
 
     <% list.with_row(label: "Replies") do %>
-      <% @bug_report.reply_notifications.includes(:sender).each do |notification| %>
+      <% @bug_report.reply_notifications.includes(:user).each do |notification| %>
         <div>
           <%= link_to admin_notifications_path(search_bug_report_id: @bug_report.id), class: "twlink" do %>
             <%= render(UI::Time::Component.new(time: notification.created_at)) %>

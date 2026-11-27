@@ -115,7 +115,7 @@ class CustomerMailerPreview < ActionMailer::Preview
 
   def bug_report_reply
     bug_report = BugReport.last
-    notification = Notification.new(kind: :bug_report_reply, notifiable: bug_report, message_channel_target: bug_report.email)
+    notification = Notification.new(kind: :bug_report_reply, notifiable: bug_report, user: User.admins.last, message_channel_target: bug_report.email)
     CustomerMailer.bug_report_reply(notification, "Thanks for letting us know - this is fixed now.")
   end
 

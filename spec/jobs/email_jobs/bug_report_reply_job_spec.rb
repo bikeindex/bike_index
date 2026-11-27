@@ -8,7 +8,7 @@ RSpec.describe EmailJobs::BugReportReplyJob, type: :job do
       subject: "Search is broken", body: "Nothing happened")
   end
   let(:bug_report) { BugReport.find_by(inbound_email_id: inbound_email.id) }
-  let(:notification) { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, message_channel_target: bug_report.email) }
+  let(:notification) { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, user: FactoryBot.create(:superuser), message_channel_target: bug_report.email) }
 
   it "sends the reply threaded under the report once its inbound email is gone, and drops its BCC when it's forwarded back" do
     notification
@@ -24,5 +24,22 @@ RSpec.describe EmailJobs::BugReportReplyJob, type: :job do
     expect(notification.reload).to have_attributes(delivery_status: "delivery_success", message_id: be_present)
 
     expect { receive_inbound_email_from_source(mail.to_s) }.not_to change(BugReport, :count)
+  end
+
+  context "from an email banned sender" do
+    let(:reporter) { FactoryBot.create(:user_confirmed, email: "reporter@example.com") }
+    let(:notification) do
+      Notification.create!(kind: :bug_report_reply, notifiable: bug_report, user: FactoryBot.create(:superuser), message_channel_target: bug_report.email)
+    end
+
+    it "doesn't send, banned by the reporter's ban rather than the admin's" do
+      FactoryBot.create(:email_ban, user: reporter)
+      expect(bug_report.user).to eq reporter
+      ActionMailer::Base.deliveries = []
+      described_class.new.perform(notification.id, "Fixed it, thanks")
+
+      expect(ActionMailer::Base.deliveries).to be_empty
+      expect(notification.reload.delivery_status).to eq "delivery_banned"
+    end
   end
 end

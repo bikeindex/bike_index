@@ -2691,8 +2691,7 @@ CREATE TABLE public.notifications (
     message_channel_target character varying,
     delivery_status integer,
     delivery_error character varying,
-    message_id character varying,
-    sender_id bigint
+    message_id character varying
 );
 
 
@@ -7533,13 +7532,6 @@ CREATE INDEX index_notifications_on_notifiable_type_and_notifiable_id ON public.
 
 
 --
--- Name: index_notifications_on_sender_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_notifications_on_sender_id ON public.notifications USING btree (sender_id) WHERE (sender_id IS NOT NULL);
-
-
---
 -- Name: index_notifications_on_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8312,7 +8304,6 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20261127190000'),
 ('20261127170000'),
 ('20261125171521'),
 ('20261125162741'),

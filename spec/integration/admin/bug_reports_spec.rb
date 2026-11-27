@@ -36,6 +36,6 @@ RSpec.describe "Admin bug reports", :js, type: :system do
       click_button "Send email"
       expect(page).to have_content("Emailing 1 bug report sender")
     }.to change(Notification.bug_report_reply, :count).by 1
-    expect(Notification.bug_report_reply.last).to have_attributes(notifiable: bug_report, sender_id: user.id)
+    expect(Notification.bug_report_reply.last).to have_attributes(notifiable: bug_report, user_id: user.id)
   end
 end

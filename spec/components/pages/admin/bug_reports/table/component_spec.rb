@@ -20,7 +20,7 @@ RSpec.describe Pages::Admin::BugReports::Table::Component, type: :component do
   end
 
   context "with a reply" do
-    before { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, message_channel_target: bug_report.email) }
+    before { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, user: FactoryBot.create(:superuser), message_channel_target: bug_report.email) }
 
     it "checks the replied column" do
       expect(component).to have_css("td.replied_cell", text: "✓")

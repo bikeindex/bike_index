@@ -178,7 +178,7 @@ RSpec.describe Admin::BugReportsController, type: :request do
     end
 
     context "with a reply" do
-      let!(:notification) { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, sender: current_user, message_channel_target: bug_report.email) }
+      let!(:notification) { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, user: current_user, message_channel_target: bug_report.email) }
 
       it "links to the reply's notification, naming who sent it" do
         get "#{base_url}/#{bug_report.to_param}"
@@ -299,9 +299,8 @@ RSpec.describe Admin::BugReportsController, type: :request do
   describe "email" do
     let!(:bug_report_unselected) { FactoryBot.create(:bug_report) }
 
-    it "enqueues a reply to each selected bug report, touching it" do
+    it "enqueues a reply to each selected bug report" do
       Sidekiq::Job.clear_all
-      bug_report.update_column(:updated_at, 1.day.ago)
       expect {
         post "#{base_url}/email", params: {email_message: " Fixed! ", bug_reports_selected: {bug_report.id.to_s => bug_report.id}}
       }.to change(Notification, :count).by 1
@@ -310,9 +309,8 @@ RSpec.describe Admin::BugReportsController, type: :request do
 
       notification = Notification.last
       expect(notification).to have_attributes(kind: "bug_report_reply", notifiable: bug_report, message_channel_target: bug_report.email,
-        sender_id: current_user.id, user_id: nil)
+        user_id: current_user.id)
       expect(EmailJobs::BugReportReplyJob.jobs.map { it["args"] }).to eq([[notification.id, "Fixed!"]])
-      expect(bug_report.reload.updated_at).to be_within(1.minute).of(Time.current)
     end
 
     context "without a message" do

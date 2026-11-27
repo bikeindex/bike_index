@@ -83,11 +83,9 @@ module Admin
       end
 
       notifications = bug_reports.map do |bug_report|
-        Notification.create!(kind: :bug_report_reply, notifiable: bug_report, sender: current_user, message_channel_target: bug_report.email)
+        Notification.create!(kind: :bug_report_reply, notifiable: bug_report, user: current_user, message_channel_target: bug_report.email)
       end
       EmailJobs::BugReportReplyJob.perform_bulk(notifications.map { [it.id, message] })
-      # The table's rows are cached on the report, and show whether it was replied to
-      BugReport.where(id: bug_reports.map(&:id)).touch_all
       respond_to do |format|
         format.html do
           redirect_back(fallback_location: admin_bug_reports_path,
