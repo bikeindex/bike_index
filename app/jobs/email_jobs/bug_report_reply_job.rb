@@ -12,6 +12,8 @@ module EmailJobs
       Notifications::Deliver.track_email(notification) do
         CustomerMailer.bug_report_reply(notification, message).deliver_now
       end
+      # The bug reports table caches its rows on the report, and shows whether it was replied to
+      notification.notifiable&.touch
     end
   end
 end

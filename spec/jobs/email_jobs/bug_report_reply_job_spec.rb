@@ -22,6 +22,7 @@ RSpec.describe EmailJobs::BugReportReplyJob, type: :job do
       in_reply_to: inbound_email.message_id, references: inbound_email.message_id, tag: "bug_report_reply")
     expect(mail.body.to_s).to eq "Fixed it, thanks"
     expect(notification.reload).to have_attributes(delivery_status: "delivery_success", message_id: be_present)
+    expect(bug_report.reload.updated_at).to be > notification.created_at
 
     expect { receive_inbound_email_from_source(mail.to_s) }.not_to change(BugReport, :count)
   end

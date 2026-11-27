@@ -15,6 +15,11 @@ RSpec.describe EmailBan, type: :model do
         .to_not be_valid
       expect(FactoryBot.build(:email_ban, user:, reason: :email_duplicate)).to be_valid
     end
+
+    it "touches the user" do
+      user = FactoryBot.create(:user, updated_at: 1.day.ago)
+      expect { FactoryBot.create(:email_ban, user:) }.to change { user.reload.updated_at }
+    end
     context "end_at before now" do
       let(:end_at) { Time.current - 1.hour }
       it "is not email_banned" do
