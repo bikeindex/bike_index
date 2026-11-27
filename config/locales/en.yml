@@ -4236,15 +4236,6 @@ en:
         vehicle_type: Type
       new:
         registration_form_settings: Registration form settings
-      recoveries:
-        description: Description
-        mfg_model_color_html: manufacturer, model, <span class="less-strong">color</span>
-        org_recoveries_html: "<em>%{org_name}</em> Recoveries"
-        owner: Owner
-        recovered_at: Date Recovered
-        recovery: recovery
-        render_chart: Show chart
-        show_only_organization_recoveries: Show only %{org_short_name} bikes
       sticker_header:
         connected_to_bike_html: It is connected to this %{bike_link}.
         enter_url_of_the_bike_html: >-

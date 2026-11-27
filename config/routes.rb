@@ -524,9 +524,10 @@ Rails.application.routes.draw do
         post :switches
       end
     end
+    resources :recoveries, only: %i[index]
+    get "bikes/recoveries", to: redirect("/o/%{organization_id}/recoveries")
     resources :bikes, only: %i[new create show update] do
       collection do
-        get :recoveries
         get :incompletes
         get :new_iframe
       end

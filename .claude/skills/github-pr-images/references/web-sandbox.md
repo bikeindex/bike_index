@@ -13,23 +13,25 @@ Posting is the last step and the only one a capture round can't recover from. In
 sessions (#4792) the comment tools rewrite every URL in a body: each wrapped in
 backticks, `<img` escaped to `&lt;img`, plain and reference-style links alike, and
 the footer appended. No retry or body form got past it, and nothing here deletes a
-comment — so find out first, before any capture or hosting commit.
+comment — so find out first, before any capture.
 
 **Probe with `update_issue_comment`, the call the real post ends in.** On #4821
 `add_issue_comment` left an `<img>` alone and `update_issue_comment` rewrote the same
 kind of tag, so a probe created with `add_issue_comment` passed and the real post
 failed after the whole capture round — leaving a comment that can never hold images.
 
+**Probe with an image this session hosted, not one already in the repo.** On #4935 a
+tag pointing at `bikebook.png` posted intact, at `main` or at any commit sha, and so did
+one pointing at a `tmp/pr_screenshots/` path that held nothing — while every tag naming
+a capture `commit_images.sh` had pushed was rewritten, through `update_issue_comment`
+and `gh api -X PATCH` alike.
+
 1. Make sure the `## Screenshots` comment exists — when it doesn't, create it with
-   `add_issue_comment` and a body of just `## Screenshots` — then **update** it with
-   `update_issue_comment` to this body:
-
-   ```
-   ## Screenshots
-
-   <img alt="probe" src="https://raw.githubusercontent.com/bikeindex/bike_index/main/app/assets/images/logos/bikebook.png" width="40" />
-   ```
-
+   `add_issue_comment` and a body of just `## Screenshots`. Host a throwaway copy
+   (`cp app/assets/images/logos/bikebook.png tmp/pr_screenshots/probe.png`, then
+   `commit_images.sh` on that file alone), and **update** the comment with
+   `update_issue_comment` to `## Screenshots` plus the `<img>` it printed, with
+   `width="40"`.
 2. Read it back with `get_comments`. It posted if the body still holds a literal
    `<img ` and no backtick sits beside the URL. It was rewritten if it holds `&lt;img`
    or a backtick before `https://`.
@@ -62,7 +64,7 @@ after the deletion while the PR's **Files changed** stays empty.
 the `pr` skill's table wants `width="500"` desktop, `"250"` mobile. Post them with
 `update_issue_comment` onto the probe's comment, and read it back.
 
-**Call it once, after every capture including the base branch's.** Each call costs
+**Call it once more after the probe, after every capture including the base branch's.** Each call costs
 two commits and a push, and it refuses on a detached HEAD, so it can't run mid-checkout
 anyway.
 
@@ -95,9 +97,10 @@ through `get_comments` since on a busy PR it won't be on the first page.
 
 `add_issue_comment` appends a Claude Code attribution footer the `pr` skill forbids —
 the tell is the session id in its link — and can backtick the URL inside an `<img src>`
-too (#4474), leaving an image with no `src`. `update_issue_comment` adds no footer but
-can rewrite URLs too (#4821) — so create the comment with `## Screenshots` alone, put
-the body in with an update once the probe has passed, then read it back.
+too (#4474), leaving an image with no `src`. `update_issue_comment` can rewrite URLs
+too (#4821), and in some sessions it and `gh api -X PATCH` append the footer as well
+(#4935), which nothing here can strip — so create the comment with `## Screenshots`
+alone, put the body in with an update once the probe has passed, then read it back.
 
 ## Verifying
 

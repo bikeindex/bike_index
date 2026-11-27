@@ -11,7 +11,6 @@ RSpec.describe Organized::BikesController, type: :request do
     let(:org_root_path) { organization_root_path(organization_id: current_organization) }
 
     it "redirects to the organization root" do
-      expect(get("#{base_url}/recoveries")).to redirect_to(org_root_path)
       expect(get("#{base_url}/incompletes")).to redirect_to(org_root_path)
       expect(get("#{base_url}/new")).to redirect_to(org_root_path)
       expect(post("#{base_url}/12/resend_incomplete_email")).to redirect_to(org_root_path)
@@ -321,46 +320,6 @@ RSpec.describe Organized::BikesController, type: :request do
           expect(impound_record.current?).to be_truthy
           expect(impound_record.unregistered_bike).to be_truthy
         end
-      end
-    end
-  end
-
-  describe "recoveries" do
-    let(:bike) { FactoryBot.create(:stolen_bike) }
-    let(:bike2) { FactoryBot.create(:stolen_bike) }
-    let(:recovered_record) { bike.fetch_current_stolen_record }
-    let(:recovered_record2) { bike2.fetch_current_stolen_record }
-    let!(:bike_organization) { FactoryBot.create(:bike_organization, bike: bike, organization: current_organization) }
-    let!(:bike_organization2) { FactoryBot.create(:bike_organization, bike: bike2, organization: current_organization) }
-    let(:date) { "2016-01-10 13:59:59" }
-    let(:recovery_information) do
-      {
-        recovered_description: "recovered it on a special corner",
-        index_helped_recovery: true,
-        can_share_recovery: true,
-        recovered_at: "2016-01-10 13:59:59"
-      }
-    end
-    before do
-      recovered_record.add_recovery_information
-      recovered_record2.add_recovery_information(recovery_information)
-    end
-    it "renders, assigns search_query_present and stolenness all" do
-      expect(recovered_record2.recovered_at.to_date).to eq Date.parse("2016-01-10")
-      get "#{base_url}/recoveries", params: {
-        period: "custom",
-        start_time: Time.parse("2016-01-01").to_i
-      }
-      expect(response.status).to eq(200)
-      expect(assigns(:recoveries).pluck(:id)).to eq([recovered_record.id, recovered_record2.id])
-      expect(response).to render_template :recoveries
-    end
-    context "organization without an invoice" do
-      let(:current_organization) { FactoryBot.create(:organization) }
-      it "redirects" do
-        expect(current_organization.reload.is_invoiced?).to be_falsey
-        get "#{base_url}/recoveries"
-        expect(response.location).to match(organization_registrations_path(organization_id: current_organization.to_param))
       end
     end
   end

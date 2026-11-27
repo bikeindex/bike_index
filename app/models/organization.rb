@@ -563,13 +563,6 @@ class Organization < ApplicationRecord
     Bike.unscoped.current.within_bounding_box(bounding_box)
   end
 
-  def nearby_recovered_records
-    return StolenRecord.none unless regional? && search_coordinates_set?
-
-    # Don't use recovered scope because it orders them
-    StolenRecord.recovered.within_bounding_box(bounding_box)
-  end
-
   def deliver_graduated_notifications?
     enabled?("graduated_notifications") && graduated_notification_interval.present?
   end

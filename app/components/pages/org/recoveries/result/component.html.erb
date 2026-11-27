@@ -1,0 +1,176 @@
+<%# The title's link stretches over the whole row or card %>
+<% photo = capture do %>
+  <% if thumb_image_url.present? %>
+    <%= image_tag(thumb_image_url, alt: @bike.title_string, skip_pipeline: true, class: "tw:h-full tw:w-full tw:rounded-[inherit] tw:object-cover") %>
+  <% else %>
+    <%= helpers.bike_placeholder_image_tag(alt: @bike.title_string, class: "tw:h-full tw:w-full tw:object-contain tw:p-6") %>
+  <% end %>
+<% end %>
+
+<% title = capture do %>
+  <%= link_to bike_href, class: "tw:twtext-color tw:hover:underline" do %>
+    <strong><%= [@bike.year, @bike.mnfg_name].compact.join(" ") %></strong>
+    <%= @bike.frame_model_truncated %>
+    <span class="tw:absolute tw:inset-0"></span>
+  <% end %>
+<% end %>
+
+<% color_and_type = capture do %>
+  <%= render(Atoms::FrameColors::Component.new(bike: @bike)) %>
+  <span><%= @bike.type_titleize %></span>
+<% end %>
+
+<% if @cards %>
+  <li
+    class="
+      tw:relative tw:flex tw:flex-col tw:rounded-lg tw:border
+      tw:border-gray-200 tw:bg-white tw:transition-all tw:duration-300
+      tw:hover:-translate-y-1.25 tw:hover:shadow-lg tw:dark:border-gray-700
+      tw:dark:bg-gray-800
+    "
+  >
+    <div
+      class="
+        tw:relative tw:h-37.5 tw:rounded-t-lg tw:bg-gray-100
+        tw:dark:bg-gray-900
+      "
+    >
+      <%= photo %>
+
+      <span class="tw:absolute tw:top-2.5 tw:right-2.5"><%= render(recovered_badge) %></span>
+    </div>
+
+    <div class="tw:flex tw:flex-col tw:gap-2 tw:px-3.5 tw:pt-3.5 tw:pb-4">
+      <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
+        <%= title %>
+      </h3>
+
+      <div
+        class="
+          tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-1
+          tw:text-sm tw:text-gray-500 tw:dark:text-gray-400
+        "
+      >
+        <%= color_and_type %>
+      </div>
+
+      <% if location.present? %>
+        <p class="tw:m-0 tw:text-sm tw:text-gray-500 tw:dark:text-gray-400">
+          <%= translation(".stolen_from", location:) %>
+
+          <% if @distance_text.present? %>
+            &middot; <%= @distance_text %>
+          <% end %>
+        </p>
+      <% end %>
+
+      <dl
+        class="
+          tw:m-0 tw:grid tw:grid-cols-2 tw:gap-2 tw:border-t
+          tw:border-gray-200 tw:pt-3 tw:text-sm tw:dark:border-gray-700
+        "
+      >
+        <div>
+          <dt
+            class="
+              tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-500
+              tw:uppercase tw:dark:text-gray-400
+            "
+          >
+            <%= translation(".stolen") %>
+          </dt>
+
+          <dd class="tw:m-0">
+            <%= render(UI::Time::Component.new(time: @stolen_record.date_stolen)) %>
+          </dd>
+        </div>
+
+        <div>
+          <dt
+            class="
+              tw:text-2xs tw:font-bold tw:tracking-wider tw:text-gray-500
+              tw:uppercase tw:dark:text-gray-400
+            "
+          >
+            <%= translation(".recovered") %>
+          </dt>
+
+          <dd class="tw:m-0">
+            <%= render(UI::Time::Component.new(time: @stolen_record.recovered_at)) %>
+          </dd>
+        </div>
+      </dl>
+
+      <% if @organized %>
+        <div>
+          <%= render(UI::Badge::Component.new(text: @organization.short_name, color: :purple)) %>
+        </div>
+      <% end %>
+    </div>
+  </li>
+<% else %>
+  <li
+    class="
+      tw:relative tw:flex tw:items-center tw:gap-4 tw:rounded-lg tw:border
+      tw:border-l-5 tw:border-gray-200 tw:border-l-green-600 tw:bg-white
+      tw:p-3 tw:transition-all tw:duration-300 tw:hover:shadow-lg
+      tw:dark:border-gray-700 tw:dark:border-l-green-600 tw:dark:bg-gray-800
+    "
+  >
+    <div
+      class="
+        tw:h-16 tw:w-24 tw:shrink-0 tw:rounded-md tw:bg-gray-100
+        tw:sm:h-23.5 tw:sm:w-35 tw:dark:bg-gray-900
+      "
+    >
+      <%= photo %>
+    </div>
+
+    <div class="tw:flex tw:min-w-0 tw:flex-col tw:gap-1.5">
+      <h3 class="tw:m-0 tw:font-sans tw:text-base tw:leading-snug tw:normal-case">
+        <span class="tw:mr-1"><%= render(recovered_badge) %></span>
+        <%= title %>
+      </h3>
+
+      <div
+        class="
+          tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-1.5
+          tw:text-sm tw:text-gray-500 tw:dark:text-gray-400
+        "
+      >
+        <%= color_and_type %>
+
+        <% if location.present? %>
+          <span>
+            <%= translation(".stolen_from", location:) %>
+
+            <% if @distance_text.present? %>
+              &middot; <%= @distance_text %>
+            <% end %>
+          </span>
+        <% end %>
+      </div>
+
+      <div
+        class="
+          tw:flex tw:flex-wrap tw:items-center tw:gap-x-4 tw:gap-y-1.5
+          tw:text-sm tw:text-gray-500 tw:dark:text-gray-400
+        "
+      >
+        <span>
+          <strong class="tw:twtext-color"><%= translation(".stolen") %></strong>
+          <%= render(UI::Time::Component.new(time: @stolen_record.date_stolen)) %>
+        </span>
+
+        <span>
+          <strong class="tw:twtext-color"><%= translation(".recovered") %></strong>
+          <%= render(UI::Time::Component.new(time: @stolen_record.recovered_at)) %>
+        </span>
+
+        <% if @organized %>
+          <%= render(UI::Badge::Component.new(text: @organization.short_name, color: :purple)) %>
+        <% end %>
+      </div>
+    </div>
+  </li>
+<% end %>

@@ -101,7 +101,7 @@ RSpec.describe UserServices::MenuItemsOrg do
 
       it "groups the menu the way the design lays it out" do
         expect(items.map { |item| item[:type] }).to eq(%i[group link divider group group group link
-          link link link link divider group link])
+          link link link link link divider group link])
 
         groups = items.select { |item| item[:type] == :group }
         expect(groups.map { |group| group[:key] }).to eq(%i[registrations impounded parking bulk settings])
@@ -109,7 +109,15 @@ RSpec.describe UserServices::MenuItemsOrg do
           .to eq(%w[bike impound map-pin import-export gear])
       end
 
-      it "fills the registrations group with the design's five children" do
+      it "puts recoveries between the hot sheet and reports" do
+        labels = items.map { |item| item[:label] }
+
+        expect(labels[labels.index("Stolen Bike Hot Sheet"), 3]).to eq(["Stolen Bike Hot Sheet", "Recoveries", "Reports"])
+        expect(items.find { |item| item[:label] == "Recoveries" })
+          .to eq(link_item("Recoveries", "/o/#{slug}/recoveries", icon: "shield-check"))
+      end
+
+      it "fills the registrations group with the design's four children" do
         registrations = items.find { |item| item[:key] == :registrations }
 
         expect(registrations[:label]).to eq "Brakebills Registrations"
@@ -117,7 +125,6 @@ RSpec.describe UserServices::MenuItemsOrg do
           link_item("Search Registrations", "/o/#{slug}/registrations"),
           link_item("Incomplete registrations", "/o/#{slug}/bikes/incompletes"),
           link_item("Multi search", "/o/#{slug}/registrations/multi_search"),
-          link_item("Recoveries", "/o/#{slug}/bikes/recoveries"),
           link_item("Registration stickers", "/o/#{slug}/stickers", match_paths: "/o/#{slug}/stickers/**")
         ])
       end
