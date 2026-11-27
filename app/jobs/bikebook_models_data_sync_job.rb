@@ -12,7 +12,7 @@ class BikebookModelsDataSyncJob < ScheduledJob
     return if blocks.blank?
 
     stale_files(blocks).each do |file|
-      # A file the catalog doesn't answer ends the run, as the rest likely wouldn't answer either
+      # Past a file the catalog doesn't answer, the rest likely wouldn't answer either
       records = Integrations::Bikebook::Catalog.file_models(file) || break
       by_model = records.group_by { |key, _| Integrations::Bikebook::Catalog.base_id(key) }
       BikebookModel.transaction do
