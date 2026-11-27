@@ -158,8 +158,7 @@ class UserAlert < ApplicationRecord
   # bike is still alerted on
   def self.resolve_recovered(user)
     user.user_alerts.active.where(kind: %w[stolen_bike_without_location theft_alert_without_photo])
-      .where(bike_id: Bike.unscoped.where(current_stolen_record_id: nil).select(:id))
-      .update_all(resolved_at: Time.current, updated_at: Time.current)
+      .where(bike_id: Bike.unscoped.where(current_stolen_record_id: nil).select(:id)).each(&:resolve!)
   end
 
   def self.update_unfinished_registration(user:, b_param:)
