@@ -1,0 +1,64 @@
+<%# Cell blocks run in the table component, which has neither %>
+<% organization_id = @organization.to_param %>
+<% unfinished = translation(".unfinished") %>
+
+<div class="organized-page-header">
+  <%= render(UI::Header::Component.new(text: translation(".header"))) %>
+
+  <p class="tw:mt-2 tw:text-gray-500 tw:dark:text-gray-400">
+    <% if @first_course&.started_before_everyone? %>
+      <%= translation(".organization_start_html", organization_name: @organization.name, time: render(UI::Time::Component.new(time: @first_course.start_at, preposition: true))) %>
+    <% else %>
+      <%= translation(".for_everyone_start_html", time: render(UI::Time::Component.new(time: Time.at(EducationCourse::FOR_EVERYONE_START), preposition: true))) %>
+      <% if @first_course %>
+        <%= translation(".organization_started_html", organization_name: @organization.name, time: render(UI::Time::Component.new(time: @first_course.start_at, preposition: true))) %>
+      <% end %>
+    <% end %>
+  </p>
+</div>
+
+<div class="tw:mt-4 tw:flex tw:flex-wrap tw:items-center tw:justify-between tw:gap-2">
+  <%= render(UI::ButtonGroup::Component.new(entries: status_entries, kind: :toggle)) %>
+  <%= render UI::PeriodSelect::Component.new(period: @period, start_time: @start_time, end_time: @end_time, sortable_search_params: @sort_state.search_params) %>
+</div>
+
+<p class="tw:my-4">
+  <%= translation(".matching_count_html", count: helpers.number_display(@pagy.count)) %>
+  <em><%= render(UI::TimeRange::Component.new(time_range: @start_time..@end_time, period: @period)) %></em>
+</p>
+
+<%= render(UI::Table::Base::Component.new(records: @acknowledgments, render_sortable: true, sort_state: @sort_state)) do |table| %>
+  <% table.column(sortable: "created_at", label: translation(".registered")) do |acknowledgment| %>
+    <%= render UI::Time::Component.new(time: acknowledgment.bike.created_at) %>
+  <% end %>
+
+  <% table.column(sortable: "acknowledged_at", label: translation(".acknowledged")) do |acknowledgment| %>
+    <% if acknowledgment.acknowledged_at.present? %>
+      <%= render UI::Time::Component.new(time: acknowledgment.acknowledged_at) %>
+    <% else %>
+      <%= render UI::Badge::Component.new(text: unfinished, color: :warning, size: :sm) %>
+    <% end %>
+  <% end %>
+
+  <% table.column(sortable: "owner_email", label: translation(".owner_email")) do |acknowledgment| %>
+    <%= acknowledgment.owner_email %>
+  <% end %>
+
+  <% table.column(label: translation(".registration")) do |acknowledgment| %>
+    <%= link_to helpers.organized_bike_text(acknowledgment.bike, skip_creation: true), bike_path(acknowledgment.bike, organization_id:) %>
+  <% end %>
+
+  <% table.column(label: translation(".source"), classes: "tw:leading-none") do |acknowledgment| %>
+    <small class="tw:text-gray-400">
+      <%= render(Atoms::Org::OriginDisplay::Component.new(ownership: acknowledgment.bike.current_ownership)) %>
+    </small>
+  <% end %>
+
+  <% table.column(label: translation(".course")) do |acknowledgment| %>
+    <%= acknowledgment.education_course.display_name %>
+  <% end %>
+<% end %>
+
+<div class="tw:py-4">
+  <%= render(UI::Pagination::Component.new(pagy: @pagy, page_params: @sort_state.search_params, size: :lg)) %>
+</div>

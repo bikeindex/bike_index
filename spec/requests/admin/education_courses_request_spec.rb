@@ -63,6 +63,10 @@ RSpec.describe Admin::EducationCoursesController, type: :request do
           expect(response.status).to eq(200)
           expect(assigns(:collection).pluck(:id)).to eq([draft.id])
           expect(response.body).to include("/admin/education_courses?organization_id=#{organization.id}&amp;search_status=draft")
+
+          default_course = FactoryBot.create(:education_course_default)
+          get base_url, params: {search_status: "default"}
+          expect(assigns(:collection).pluck(:id)).to eq([default_course.id])
         end
       end
     end

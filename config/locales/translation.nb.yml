@@ -4929,7 +4929,6 @@ nb:
       lightspeed_integration_panel: Lightspeed-integrasjonspanel
       manage_users: Administrer brukere
       messaging: Meldinger
-      model_audits: E-kjøretøyrevisjon
       multi_search: Multisøk
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} steder"
@@ -4954,6 +4953,10 @@ nb:
       registration_form_settings: Innstillinger for registreringsskjema
       education_courses: Utdanningskurs
       org_information: "%{org_name} Informasjon"
+      audits: Revisjoner
+      e_vehicles: Elbiler
+      ebike_rules: Regler for elsykkel
+      education_acknowledgments: Utdanningsanerkjennelser
     organization_signup:
       address_required: Vennligst skriv inn organisasjonens fullstendige adresse
       email_required: En gyldig e-postadresse er nødvendig
@@ -5775,6 +5778,24 @@ nb:
             qr_code: QR-kode
             set_a_password: Angi et passord
             your_public_registration_link: Din offentlige registreringslenke
+        education_course_acknowledgments:
+          index:
+            acknowledged: Anerkjent
+            all: Alle
+            course: Kurs
+            for_everyone_start_html: Det generelle opplæringskurset for elbiler startet
+              %{time}. Før det tok ikke brukerne noe opplæringskurs.
+            header: Takk til opplæring i elbiler
+            matching_count_html: "%{count} samsvarende takksigelser"
+            organization_start_html: "%{organization_name}-kurset i elbiler startet
+              %{time}. Før det tok ikke brukerne noen opplæringskurs."
+            organization_started_html: "%{organization_name}-kurset i elbiler startet
+              %{time}."
+            owner_email: E-post eier
+            registered: Registrert
+            registration: Registrering
+            source: Kilde
+            unfinished: Uferdig
       registrations:
         show:
           bike_details:

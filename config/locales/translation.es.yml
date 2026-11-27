@@ -5162,7 +5162,6 @@ es:
       lightspeed_integration_panel: Panel de integración Lightspeed
       manage_users: Gestionar usuarios
       messaging: Mensajería
-      model_audits: Auditorías de vehículos eléctricos
       multi_search: Búsqueda múltiple
       org_dashboard: "%{org_name} Panel de control"
       org_locations: "%{org_name} ubicaciones"
@@ -5187,6 +5186,10 @@ es:
       registration_form_settings: Configuración del formulario de registro
       education_courses: cursos de formación
       org_information: "%{org_name} Información"
+      audits: Auditorías
+      e_vehicles: Vehículos eléctricos
+      ebike_rules: Normativa para bicicletas eléctricas
+      education_acknowledgments: Agradecimientos en materia de educación
     organization_signup:
       address_required: Por favor, introduzca la dirección completa de la organización.
       email_required: Se requiere un correo electrónico válido.
@@ -6036,6 +6039,26 @@ es:
             qr_code: Código QR
             set_a_password: Establecer una contraseña
             your_public_registration_link: Enlace a su registro público
+        education_course_acknowledgments:
+          index:
+            acknowledged: Admitido
+            all: Todo
+            course: Curso
+            for_everyone_start_html: El curso general de formación sobre vehículos
+              eléctricos comenzó el %{time}. Anteriormente, los usuarios no habían
+              realizado ningún curso de formación.
+            header: Agradecimientos por la formación en vehículos eléctricos
+            matching_count_html: "%{count} Confirmaciones coincidentes"
+            organization_start_html: El curso de formación sobre vehículos eléctricos
+              %{organization_name} comenzó el %{time}. Antes de eso, los usuarios
+              no habían realizado ningún curso de formación.
+            organization_started_html: El curso de formación sobre vehículos eléctricos
+              %{organization_name} comenzó el %{time}.
+            owner_email: Correo electrónico del propietario
+            registered: Registrado
+            registration: Registro
+            source: Fuente
+            unfinished: Inconcluso
       registrations:
         show:
           bike_details:

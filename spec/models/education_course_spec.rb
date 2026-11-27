@@ -114,6 +114,26 @@ RSpec.describe EducationCourse, type: :model do
     end
   end
 
+  describe ".first_for" do
+    let(:organization) { FactoryBot.create(:organization) }
+    let(:for_everyone_start) { Time.at(EducationCourse::FOR_EVERYONE_START) }
+    let(:early_start) { for_everyone_start - 1.month }
+
+    it "is the organization's earliest started course, and whether it started before the general course" do
+      FactoryBot.create(:education_course, organization:)
+      FactoryBot.create(:education_course, start_at: early_start - 1.week)
+      expect(EducationCourse.first_for(organization)).to be_nil
+
+      active = FactoryBot.create(:education_course_active, organization:, start_at: for_everyone_start + 1.day)
+      expect(EducationCourse.first_for(organization)).to eq active
+      expect(active.started_before_everyone?).to be false
+
+      archived = FactoryBot.create(:education_course, organization:, start_at: early_start, end_at: early_start + 1.week)
+      expect(EducationCourse.first_for(organization)).to eq archived
+      expect(archived.started_before_everyone?).to be true
+    end
+  end
+
   describe "immutability once activated" do
     let(:organization) { FactoryBot.create(:organization) }
     let!(:course) { FactoryBot.create(:education_course, :with_pages, organization:) }
@@ -187,7 +207,7 @@ RSpec.describe EducationCourse, type: :model do
 
       expect(default_draft.reload).to be_archived
       expect(EducationCourse.active_default).to eq replacement
-      expect(EducationCourse.defaults.active.count).to eq 1
+      expect(EducationCourse.default.active.count).to eq 1
     end
 
     it "permits only one default draft" do
