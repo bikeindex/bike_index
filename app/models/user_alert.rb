@@ -154,6 +154,12 @@ class UserAlert < ApplicationRecord
       .update_all(resolved_at: Time.current, updated_at: Time.current)
   end
 
+  # Recovering revisits only the user's stolen bikes, which no longer include this one
+  def self.resolve_recovered(user)
+    user.user_alerts.active.where(kind: %w[stolen_bike_without_location theft_alert_without_photo])
+      .includes(bike: :current_stolen_record).reject { it.displayable?(user) }.each(&:resolve!)
+  end
+
   def self.update_unfinished_registration(user:, b_param:)
     user_alert = find_or_build_by(kind: "unfinished_registration",
       user_id: user.id, alertable: b_param)
@@ -170,7 +176,7 @@ class UserAlert < ApplicationRecord
     # scope to just active, to alert if the theft alert once again has no image
     user_alert = UserAlert.active.find_or_build_by(kind: "theft_alert_without_photo",
       user_id: user.id, alertable: theft_alert)
-    if theft_alert.missing_photo?
+    if theft_alert.missing_photo? && theft_alert.stolen_record.current?
       user_alert.bike_id = theft_alert.bike&.id
       user_alert.save
     else # Don't create just to resolve
@@ -214,15 +220,13 @@ class UserAlert < ApplicationRecord
     self.class.kind_humanized(kind)
   end
 
-  # Alerts outlive the bike, phone or organization they point at until a job resolves them,
-  # and nothing resolves the stolen kinds when the bike is recovered
+  # Alerts outlive the bike, phone, organization or theft they point at until a job resolves them
   def displayable?(user)
     case kind
     when "unfinished_registration" then alertable&.unfinished_registration?(user)
     when "phone_waiting_confirmation" then alertable.present?
     when "unassigned_bike_org" then bike.present? && organization.present?
-    when "stolen_bike_without_location" then bike&.current_stolen_record&.without_street?
-    when "theft_alert_without_photo" then bike&.current_stolen_record&.theft_alert_missing_photo?
+    when "stolen_bike_without_location", "theft_alert_without_photo" then bike&.current_stolen_record.present?
     end
   end
 

@@ -328,6 +328,27 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
     end
   end
 
+  describe "stolen bike recovered" do
+    let(:user) { FactoryBot.create(:user_confirmed) }
+    let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
+    let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:, street: " ") }
+    let!(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record:, user:) }
+
+    it "resolves its alerts" do
+      bike.update(updated_at: Time.current)
+      instance.perform(user.id)
+      expect(user.reload.alert_slugs).to eq %w[stolen_bike_without_location theft_alert_without_photo]
+
+      stolen_record.add_recovery_information
+      expect(bike.reload.current_stolen_record).to be_blank
+      instance.perform(user.id)
+      expect(user.reload.alert_slugs).to eq []
+      # Isn't recreated for the theft alert, whose stolen record is still missing a photo
+      instance.perform(user.id)
+      expect(user.user_alerts.active.count).to eq 0
+    end
+  end
+
   describe "bikes deleted or transferred away" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }

@@ -214,9 +214,8 @@ RSpec.describe "Me API V3", type: :request do
       let(:token) { create_doorkeeper_token(scopes: "read_user") }
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record, user:) }
       let(:organization) { FactoryBot.create(:organization) }
-      let(:theft_alert) { FactoryBot.create(:theft_alert, stolen_record: bike.current_stolen_record, user:) }
       let!(:user_alert_photo) do
-        FactoryBot.create(:user_alert, user:, bike:, alertable: theft_alert, kind: "theft_alert_without_photo")
+        FactoryBot.create(:user_alert, user:, bike:, kind: "theft_alert_without_photo")
       end
       let!(:user_alert_org) do
         FactoryBot.create(:user_alert, user:, bike:, organization:, kind: "unassigned_bike_org")
@@ -273,7 +272,7 @@ RSpec.describe "Me API V3", type: :request do
                         created_at: user_alert_phone.created_at.to_i}
         expect(json_result[:alerts]).to match_array((target_alerts + [target_phone]).as_json)
 
-        # Recovering doesn't resolve the stolen kinds
+        # Before the job resolves them
         bike.current_stolen_record.add_recovery_information
         user_alert_location.bike.current_stolen_record.add_recovery_information
         expect(user.user_alerts.active.pluck(:id)).to include(user_alert_photo.id, user_alert_location.id)
