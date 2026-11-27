@@ -146,7 +146,7 @@ RSpec.describe BikebookController, type: :request do
         let(:rows) { overview.all("dl > div").to_h { [it.find("dt").text, it.find("dd").text.squish] } }
 
         it "shows its photo and headline fields" do
-          expect(overview).to have_css("img[src='https://bikebook.bikeindex.org/segway/2025/gt3_pro.png'][alt='Segway GT3 Pro']")
+          expect(overview).to have_css("img[src='https://bikebook.bikeindex.org/segway/2025/gt3-pro.png'][alt='Segway GT3 Pro']")
             .and have_css("h2", text: "GT3 Pro")
             .and have_link("manufacturer's page", href: "https://store.segway.com/segway-superscooter-gt3-pro")
           expect(rows.except("Description")).to eq("Price" => "$2,699.99", "Years" => "2025 – current manufacturer's page",
@@ -155,7 +155,7 @@ RSpec.describe BikebookController, type: :request do
         end
 
         context "electric, with a frame's detail" do
-          let(:params) { {vehicle_models: "m/aventon/2025/abound_lr"} }
+          let(:params) { {vehicle_models: "m/aventon/2025/abound-lr"} }
 
           it "names its classes, the frame's detail and its step-through" do
             expect(rows.slice("Price", "Vehicle type", "Frame material", "E-vehicle class")).to eq("Price" => "$1,999",

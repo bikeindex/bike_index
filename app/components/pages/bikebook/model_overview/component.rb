@@ -4,7 +4,7 @@ module Pages
   module Bikebook
     module ModelOverview
       # A catalog model's photo and headline fields, as the browser's Overview has them, for a browser without
-      # JavaScript. vocabulary is Integrations::Bikebook::Catalog.vocabulary, without which it renders nothing
+      # JavaScript. vocabulary is Integrations::Bikebook::Catalog.display_names, without which it renders nothing
       class Component < ApplicationComponent
         def initialize(model:, vocabulary:)
           @model = model

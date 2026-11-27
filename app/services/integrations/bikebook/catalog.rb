@@ -88,6 +88,18 @@ module Integrations
       # What's at `keys` in the vocabulary, cached without the rest of the file. nil while the catalog doesn't answer
       def vocabulary_dig(*keys) = vocabulary&.then { file(it, *keys) }
 
+      # The names a model's values display by, its currencies, and its classifications' names, without their rules.
+      # nil while the catalog doesn't answer
+      def display_names
+        vocabulary&.then do |path|
+          cached(["bikebook_catalog/display_names", path], expires_in: 1.week) do
+            classifications = vocabulary_dig("e_vehicle_classifications") || raise(Unreachable)
+            {"names" => vocabulary_dig("names"), "currencies" => vocabulary_dig("currencies"),
+             "classifications" => classifications.transform_values { it["name"] }}
+          end
+        end
+      end
+
       # Whether the catalog answers in the format /bikebook reads
       def readable? = head&.dig("format") == FORMAT
 
