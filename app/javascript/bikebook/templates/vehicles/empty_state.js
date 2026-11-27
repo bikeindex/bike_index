@@ -38,16 +38,16 @@ const searchNote = ({ count, filtered, rotatable }) => html`<p class="tw:mt-3 tw
 const featuredCards = ({ featured, vehiclePath, ...card }) => html`<ul aria-label="Models to compare" class="tw:mt-3 ${MODEL_CARDS_CLASSES}"
   data-scroll-to="#vehicle-views">${featured.map((model) => modelCard({ model, href: vehiclePath(model.id), ...card }))}</ul>`
 
-// With nothing picked, how the page works and comparisons to start from, or once they're dismissed, a prompt, and under
-// either what the search leaves and some of it. A classification's card, shown alone, leaves out the first two
+// With nothing picked, how the page works and comparisons to start from, until they're dismissed, and under them what
+// the search leaves and some of it. A classification's card, shown alone, leaves out the first two
 export const emptyState = ({ url, filtered, count, featured, rotatable, ...cards }) => html`<div class="tw:mt-3" data-controller="bikebook--tips">${url.searchParams.get('classifications')
   ? nothing
   : tips(url)}${filtered || featured.length
   ? searchNote({ count, filtered, rotatable })
   : nothing}${featured.length ? featuredCards({ featured, ...cards }) : nothing}</div>`
 
-const tips = (url) => html`<div data-bikebook--tips-target="tips"><section aria-label="How to use Bike Book" tabindex="-1"
-  class="tw:relative tw:flex tw:flex-col tw:gap-5 tw:rounded-md tw:border tw:border-dashed tw:border-gray-300 tw:px-7 tw:py-6 tw:outline-none
+const tips = (url) => html`<div data-bikebook--tips-target="tips"><section aria-label="How to use Bike Book"
+  class="tw:relative tw:flex tw:flex-col tw:gap-5 tw:rounded-md tw:border tw:border-dashed tw:border-gray-300 tw:px-7 tw:py-6
   tw:dark:border-gray-600"><ol class="tw:m-0 tw:grid tw:list-none tw:gap-6 tw:p-0 tw:sm:grid-cols-3">${steps.map(([title, description], index) =>
     html`<li class="tw:flex tw:gap-3"><span aria-hidden="true" class="tw:flex tw:size-7 tw:shrink-0 tw:items-center tw:justify-center tw:rounded-full
     tw:bg-[#715eb2] tw:font-header tw:text-sm tw:font-bold tw:text-white">${index + 1}</span><div><h2 class="tw:text-[15px] tw:font-bold">${title}</h2><p
@@ -55,6 +55,4 @@ const tips = (url) => html`<div data-bikebook--tips-target="tips"><section aria-
   tw:items-center tw:gap-2.5 tw:border-t tw:border-gray-100 tw:pt-4 tw:dark:border-gray-700"><span class="tw:text-sm tw:text-gray-600
   tw:dark:text-gray-400">Or try an example:</span>${EXAMPLES.map((example) => exampleLink(url, example))}</div><button type="button" aria-label="Dismiss tips"
   data-action="bikebook--tips#dismiss" class="tw:absolute tw:top-2.5 tw:right-3 tw:p-1 tw:text-gray-400 tw:hover:text-gray-600
-  tw:dark:hover:text-gray-200">${x('tw:h-3 tw:w-3')}</button></section></div><div hidden data-bikebook--tips-target="prompt"><div class="tw:rounded-md
-  tw:border tw:border-dashed tw:border-gray-300 tw:px-4 tw:py-6 tw:text-center tw:dark:border-gray-600"><p class="tw:tweyebrow">Nothing selected yet</p><p class="tw:mt-1 tw:text-sm tw:text-gray-500">Pick a bike above to start
-  comparing. <button type="button" class="twlink" data-bikebook--tips-target="restore" data-action="bikebook--tips#restore">Show tips</button></p></div></div>`
+  tw:dark:hover:text-gray-200">${x('tw:h-3 tw:w-3')}</button></section></div>`
