@@ -6,8 +6,10 @@ module Pages
       module EmailForm
         # Template Dependency: UI::Card::Component
         # Emails the senders of bug reports. Given a bug_report it's a form of its own for that one;
-        # without, it sits inside the table's form and sends its checked rows, opening over the table
+        # without, it's the table's card that admin--bug-report-email opens, sending the table form's checked rows
         class Component < ApplicationComponent
+          BANNED_TEXT = "You are messaging a banned user - they will not receive the message"
+
           def initialize(bug_report: nil)
             @bug_report = bug_report
           end
@@ -17,23 +19,25 @@ module Pages
           def banned_alert
             return if @bug_report && !@bug_report.sender_email_banned?
 
-            alert = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mb-3",
-              text: "You are messaging a banned user - they will not receive the message"))
+            alert = render(UI::Alerts::Base::Component.new(kind: :error, margin_classes: "tw:mb-3", text: BANNED_TEXT))
             return alert if @bug_report
 
-            # A row's checkbox carries data-email-banned when its sender is
-            tag.div(class: "tw:hidden", data: {controller: "admin--bug-report-email-banned",
-                                               action: "table-multi-checkbox:change@window->admin--bug-report-email-banned#sync",
-                                               "admin--bug-report-email-banned-target": "alert"}) { alert }
+            # Shown while a checked row's checkbox carries data-email-banned
+            tag.div(alert, class: "tw:hidden", data: {"admin--bug-report-email-target": "bannedAlert"})
           end
 
-          def storage_key = "admin-bug-report-email-#{@bug_report&.id || "selected"}"
+          def title = @bug_report ? "Email sender" : "Email selected senders"
 
-          def content_classes
-            return "tw:mt-3" if @bug_report
+          def table_form_id = (Pages::Admin::BugReports::Table::Component::FORM_ID unless @bug_report)
 
-            "#{UI::Card::Component::BASE_CLASSES} tw:absolute tw:right-0 tw:top-full tw:z-10 tw:mt-2 " \
-              "tw:w-[min(32rem,90vw)] tw:rounded-lg tw:p-4 tw:shadow-lg"
+          def card_data
+            data = {controller: "form-persist", "form-persist-key-value": "admin-bug-report-email-#{@bug_report&.id || "selected"}",
+                    action: "input->form-persist#save"}
+            @bug_report ? data : data.merge("admin--bug-report-email-target": "panel")
+          end
+
+          def card_classes
+            "#{UI::Card::Component::BASE_CLASSES} tw:rounded-lg tw:p-4 #{"tw:hidden tw:mb-4 tw:ml-auto tw:max-w-3xl" unless @bug_report}"
           end
         end
       end

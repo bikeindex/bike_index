@@ -13,12 +13,12 @@ RSpec.describe "Admin bug reports", :js, type: :system do
     sign_in(user)
   end
 
-  it "warns while a selected sender is email banned" do
+  it "emails the selected senders from the card, warning while one is email banned" do
     visit admin_bug_reports_path(search_status: "all")
 
     check "bug_reports_selected[#{bug_report.id}]"
     click_button "Email selected senders"
-    expect(page).to have_field("Message")
+    expect(page).to have_field("Message", focused: true)
     expect(page).to have_no_content(banned_alert)
 
     check "bug_reports_selected[#{bug_report_banned.id}]"
@@ -26,5 +26,16 @@ RSpec.describe "Admin bug reports", :js, type: :system do
 
     uncheck "bug_reports_selected[#{bug_report_banned.id}]"
     expect(page).to have_no_content(banned_alert)
+
+    # The message is required, so sending without one stays put with the selection
+    click_button "Send email"
+    expect(page).to have_field("bug_reports_selected[#{bug_report.id}]", checked: true)
+
+    fill_in "Message", with: "Fixed, thanks!"
+    expect {
+      click_button "Send email"
+      expect(page).to have_content("Emailing 1 bug report sender")
+    }.to change(Notification.bug_report_reply, :count).by 1
+    expect(Notification.bug_report_reply.last).to have_attributes(notifiable: bug_report, sender_id: user.id)
   end
 end

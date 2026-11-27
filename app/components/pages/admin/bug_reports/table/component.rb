@@ -5,6 +5,8 @@ module Pages
     module BugReports
       module Table
         class Component < ApplicationComponent
+          FORM_ID = "adminBugReportsTableForm"
+
           COLUMNS = {
             pull_request_cell: "PR",
             sender_cell: "Sender",

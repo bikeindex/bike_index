@@ -34,7 +34,7 @@ RSpec.describe Pages::Admin::BugReports::Table::Component, type: :component do
     it "marks their checkbox, for the hidden banned alert" do
       expect(component).to have_css("input[data-email-banned]", count: 1)
       expect(component).to have_css("input[data-email-banned][value='#{bug_report_banned.id}']")
-      expect(component).to have_css("[data-admin--bug-report-email-banned-target=alert]", text: "You are messaging a banned user", visible: :all)
+      expect(component).to have_css("[data-admin--bug-report-email-target=bannedAlert]", text: "You are messaging a banned user", visible: :all)
     end
   end
 

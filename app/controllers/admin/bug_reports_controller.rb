@@ -146,7 +146,9 @@ module Admin
       @searched_receiver = params[:search_receiver]
       bug_reports = bug_reports.where(receiver: @searched_receiver) if @searched_receiver.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
-      bug_reports = bug_reports.where(github_pull_request: params[:search_pull_request]) if params[:search_pull_request].present?
+      # The table shows "#4064", so a search can carry the hash
+      pull_request = params[:search_pull_request].to_s.delete("^0-9")
+      bug_reports = bug_reports.where(github_pull_request: pull_request) if pull_request.present?
       bug_reports = bug_reports.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%") if params[:search_email].present?
       @searched_user_status = params[:search_user_status] if USER_STATUS_FILTERS.key?(params[:search_user_status])
       bug_reports = filter_by_user_status(bug_reports)

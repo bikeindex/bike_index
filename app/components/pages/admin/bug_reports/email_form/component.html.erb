@@ -1,35 +1,23 @@
-<% email_fields = capture do %>
-  <%# A restored draft opens the panel, so it isn't hidden behind the trigger %>
-  <div
-    class="tw:relative"
-    data-controller="ui--collapse form-persist"
-    data-form-persist-key-value="<%= storage_key %>"
-    data-action="input->form-persist#save form-persist:restored@window->ui--collapse#show"
-  >
-    <%= render(UI::Collapse::Component.new(text: @bug_report ? "Email sender" : "Email selected senders", chevron: :trailing, size: :sm)) %>
+<% fields = capture do %>
+  <h3 class="tw:mb-3 tw:text-lg tw:font-bold"><%= title %></h3>
 
-    <div
-      data-ui--collapse-target="content"
-      class="tw:hidden <%= content_classes %>"
-    >
-      <%= banned_alert %>
+  <%= banned_alert %>
 
-      <%= render(UI::Forms::Group::Component.new(attribute: :email_message, label_text: "Message")) do %>
-        <%= text_area_tag :email_message, nil, rows: 8, class: "twinput tw:w-full" %>
-      <% end %>
+  <%= render(UI::Forms::Group::Component.new(attribute: :email_message, label_text: "Message", required: true)) do %>
+    <%= text_area_tag :email_message, nil, rows: @bug_report ? 8 : 4, required: true, form: table_form_id, class: "twinput tw:w-full",
+      data: ({"admin--bug-report-email-target": "message"} unless @bug_report) %>
+  <% end %>
 
-      <%# formaction, since inside the table's form this button isn't its default action %>
-      <%= render(UI::Button::Component.new(text: "Send email", color: :primary, size: :sm, type: :submit,
-        formaction: email_admin_bug_reports_path, data: {action: "form-persist#clear"})) %>
-    </div>
-  </div>
+  <%# formaction, since in the table's form this button isn't its default action %>
+  <%= render(UI::Button::Component.new(text: "Send email", color: :primary, type: :submit, form: table_form_id,
+    formaction: email_admin_bug_reports_path, data: {action: "form-persist#clear"})) %>
 <% end %>
 
 <% if @bug_report %>
-  <%= form_with(url: email_admin_bug_reports_path) do %>
+  <%= form_with(url: email_admin_bug_reports_path, class: card_classes, data: card_data) do %>
     <%= hidden_field_tag "bug_reports_selected[#{@bug_report.id}]", @bug_report.id %>
-    <%= email_fields %>
+    <%= fields %>
   <% end %>
 <% else %>
-  <%= email_fields %>
+  <%= tag.div(fields, class: card_classes, data: card_data) %>
 <% end %>

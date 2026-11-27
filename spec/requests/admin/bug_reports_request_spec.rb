@@ -137,6 +137,9 @@ RSpec.describe Admin::BugReportsController, type: :request do
         get base_url, params: {search_pull_request: "4064", search_status: "all"}
         expect(assigns(:collection).pluck(:id)).to eq([bug_report_fixed.id])
         expect(response.body).to include("PR: ")
+
+        get base_url, params: {search_pull_request: "#4064", search_status: "all"}
+        expect(assigns(:collection).pluck(:id)).to eq([bug_report_fixed.id])
       end
     end
 
