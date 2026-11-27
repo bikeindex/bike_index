@@ -53,6 +53,9 @@ module Admin
         @bike = Bike.unscoped.friendly_find(params[:search_bike_id])
         notifications = notifications.where(bike_id: @bike.id) if @bike.present?
       end
+      if params[:search_bug_report_id].present?
+        notifications = notifications.where(notifiable_type: "BugReport", notifiable_id: params[:search_bug_report_id])
+      end
       if params[:query].present?
         notifications = notifications.search_message_channel_target(params[:query])
       end

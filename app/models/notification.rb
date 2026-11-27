@@ -18,6 +18,7 @@
 #  bike_id                :bigint
 #  message_id             :string
 #  notifiable_id          :bigint
+#  sender_id              :bigint
 #  user_id                :bigint
 #
 # Indexes
@@ -25,6 +26,7 @@
 #  index_notifications_on_bike_id                            (bike_id)
 #  index_notifications_on_message_channel_target_trgm        (message_channel_target) USING gin
 #  index_notifications_on_notifiable_type_and_notifiable_id  (notifiable_type,notifiable_id)
+#  index_notifications_on_sender_id                          (sender_id) WHERE (sender_id IS NOT NULL)
 #  index_notifications_on_user_id                            (user_id)
 #
 
@@ -54,6 +56,8 @@ class Notification < ApplicationRecord
   belongs_to :user # RECEIVER of the notification - unless it's a stolen_notification_blocked, which is sent to admin instead
   belongs_to :bike
   belongs_to :notifiable, polymorphic: true
+  # Set when an admin writes the message - otherwise the sender comes from the notifiable
+  belongs_to :sender, class_name: "User"
 
   before_validation :set_calculated_attributes
 
@@ -145,6 +149,7 @@ class Notification < ApplicationRecord
         .or(where(notifiable_type: "CustomerContact", notifiable_id: CustomerContact.where(creator_id: user_id).select(:id)))
         .or(where(notifiable_type: "StolenNotification", notifiable_id: StolenNotification.where(sender_id: user_id).select(:id)))
         .or(where(notifiable_type: "OrganizationMessage", notifiable_id: OrganizationMessage.where(sender_id: user_id).select(:id)))
+        .or(where(sender_id: user_id))
     end
   end
 
@@ -195,6 +200,7 @@ class Notification < ApplicationRecord
   # Update notifications_sent_or_received_by if changing
   def sender
     return nil if self.class.sender_auto_kinds.include?(kind)
+    return super if sender_id.present?
 
     if notifiable_type == "CustomerContact"
       notifiable&.creator

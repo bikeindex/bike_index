@@ -11,6 +11,7 @@ module Pages
             receiver_cell: "Receiver",
             subject_cell: "Subject",
             status_cell: "Status",
+            replied_cell: "Replied",
             tags_cell: "Tags",
             member_cell: "Member",
             invoiced_cell: "Invoiced org"

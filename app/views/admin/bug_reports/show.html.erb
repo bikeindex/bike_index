@@ -47,6 +47,23 @@
 
       <%= bug_report_search_link(search_pull_request: @bug_report.github_pull_request) %>
     <% end %>
+
+    <% list.with_row(label: "Replies") do %>
+      <% @bug_report.reply_notifications.includes(:sender).each do |notification| %>
+        <div>
+          <%= link_to admin_notifications_path(search_bug_report_id: @bug_report.id), class: "twlink" do %>
+            <%= render(UI::Time::Component.new(time: notification.created_at)) %>
+          <% end %>
+
+          <%= notification_delivery_display(notification.delivery_status) %>
+          <small class="less-strong"><%= notification.sender_display_name %></small>
+        </div>
+      <% end %>
+
+      <% if @bug_report.reply_notifications.none? %>
+        <span class="less-strong">none</span>
+      <% end %>
+    <% end %>
   <% end %>
 
   <div>

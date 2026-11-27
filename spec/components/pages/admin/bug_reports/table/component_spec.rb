@@ -16,6 +16,15 @@ RSpec.describe Pages::Admin::BugReports::Table::Component, type: :component do
     expect(component).to have_css("td code", text: bug_report.email)
     expect(component).to have_css("[role=tooltip]", text: "It & everything", visible: :all)
     expect(component).not_to have_css("input[data-email-banned]")
+    expect(component).not_to have_css("td.replied_cell", text: "✓")
+  end
+
+  context "with a reply" do
+    before { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, message_channel_target: bug_report.email) }
+
+    it "checks the replied column" do
+      expect(component).to have_css("td.replied_cell", text: "✓")
+    end
   end
 
   context "with an email banned sender" do

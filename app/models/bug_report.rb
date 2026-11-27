@@ -54,6 +54,7 @@ class BugReport < ApplicationRecord
   enum :status, STATUS_ENUM
 
   belongs_to :user
+  has_many :reply_notifications, -> { bug_report_reply.order(:id) }, as: :notifiable, class_name: "Notification"
   belongs_to :inbound_email, class_name: "ActionMailbox::InboundEmail"
 
   has_many_attached :images

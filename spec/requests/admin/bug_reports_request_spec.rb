@@ -171,6 +171,17 @@ RSpec.describe Admin::BugReportsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
       expect(response.body).not_to include("View the full feedback")
+      expect(response.body).not_to include(admin_notifications_path(search_bug_report_id: bug_report.id))
+    end
+
+    context "with a reply" do
+      let!(:notification) { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, sender: current_user, message_channel_target: bug_report.email) }
+
+      it "links to the reply's notification, naming who sent it" do
+        get "#{base_url}/#{bug_report.to_param}"
+        expect(response.body).to include(admin_notifications_path(search_bug_report_id: bug_report.id))
+        expect(response.body).to include(current_user.display_name)
+      end
     end
 
     context "from the feedback panel" do
@@ -294,7 +305,8 @@ RSpec.describe Admin::BugReportsController, type: :request do
       expect(flash[:success]).to be_present
 
       notification = Notification.last
-      expect(notification).to have_attributes(kind: "bug_report_reply", notifiable: bug_report, message_channel_target: bug_report.email)
+      expect(notification).to have_attributes(kind: "bug_report_reply", notifiable: bug_report, message_channel_target: bug_report.email,
+        sender_id: current_user.id, user_id: nil)
       expect(EmailJobs::BugReportReplyJob.jobs.map { it["args"] }).to eq([[notification.id, "Fixed!"]])
     end
 

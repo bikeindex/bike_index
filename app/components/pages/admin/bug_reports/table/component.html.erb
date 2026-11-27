@@ -1,7 +1,7 @@
 <%= render(UI::Table::InCard::Component.new(records: @collection, cache_key: self.class.cache_digest, render_sortable: @render_sortable, sort_state: @sort_state,
   column_settings: {storage_key: "adminBugReportsColumns", columns: COLUMNS, defaults: COLUMNS.keys, narrow_hidden: %i[receiver_cell member_cell invoiced_cell pull_request_cell]},
   form: {url: assign_tags_admin_bug_reports_path, method: :post},
-  cache_records: ->(bug_report) { bug_report.user&.email_bans_active.to_a },
+  cache_records: ->(bug_report) { [*bug_report.user&.email_bans_active, *bug_report.reply_notifications] },
   data: sortable_links_data)) do |table| %>
   <% table.with_actions do %>
     <%= render(UI::Forms::Group::Component.new(attribute: :tags, label_text: "Tag to assign", wrapper_class: "tw:mb-0 tw:min-w-64")) do %>
@@ -64,6 +64,10 @@
 
   <% table.column(sortable: "status", hideable: :status_cell) do |bug_report| %>
     <%= BugReport.status_display(bug_report.status) %>
+  <% end %>
+
+  <% table.column(hideable: :replied_cell, classes: "tw:text-center") do |bug_report| %>
+    <%= check_mark if bug_report.reply_notifications.any? %>
   <% end %>
 
   <% table.column(hideable: :tags_cell) do |bug_report| %>

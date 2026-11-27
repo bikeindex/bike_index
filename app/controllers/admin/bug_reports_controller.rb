@@ -16,7 +16,7 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 50)
-      bug_reports = matching_bug_reports.includes(user: %i[membership_active email_bans_active])
+      bug_reports = matching_bug_reports.includes(:reply_notifications, user: %i[membership_active email_bans_active])
       # Only the JSON serializes images
       bug_reports = bug_reports.with_attached_images if request.format.json?
       @pagy, @collection = pagy(:countish,
@@ -83,7 +83,7 @@ module Admin
       end
 
       notifications = bug_reports.map do |bug_report|
-        Notification.create!(kind: :bug_report_reply, notifiable: bug_report, user: bug_report.user, message_channel_target: bug_report.email)
+        Notification.create!(kind: :bug_report_reply, notifiable: bug_report, sender: current_user, message_channel_target: bug_report.email)
       end
       EmailJobs::BugReportReplyJob.perform_bulk(notifications.map { [it.id, message] })
       respond_to do |format|
