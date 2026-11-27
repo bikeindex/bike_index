@@ -4929,7 +4929,6 @@ nb:
       lightspeed_integration_panel: Lightspeed-integrasjonspanel
       manage_users: Administrer brukere
       messaging: Meldinger
-      model_audits: E-kjøretøyrevisjon
       multi_search: Multisøk
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} steder"
@@ -4954,6 +4953,10 @@ nb:
       registration_form_settings: Innstillinger for registreringsskjema
       education_courses: Utdanningskurs
       org_information: "%{org_name} Informasjon"
+      audits: Revisjoner
+      e_vehicles: Elbiler
+      ebike_rules: Regler for elsykkel
+      education_acknowledgments: Utdanningsanerkjennelser
     organization_signup:
       address_required: Vennligst skriv inn organisasjonens fullstendige adresse
       email_required: En gyldig e-postadresse er nødvendig
@@ -5482,6 +5485,9 @@ nb:
         updated_at: Oppdatert kl.
       vehicle_type_badges:
         e_vehicle: Elbil
+      stock_photo_badge:
+        stock: Lager
+        stock_photo_of: Arkivfoto av en %{model}
     pages:
       messages:
         thread_show:
@@ -5772,6 +5778,24 @@ nb:
             qr_code: QR-kode
             set_a_password: Angi et passord
             your_public_registration_link: Din offentlige registreringslenke
+        education_course_acknowledgments:
+          index:
+            acknowledged: Anerkjent
+            all: Alle
+            course: Kurs
+            for_everyone_start_html: Det generelle opplæringskurset for elbiler startet
+              %{time}. Før det tok ikke brukerne noe opplæringskurs.
+            header: Takk til opplæring i elbiler
+            matching_count_html: "%{count} samsvarende takksigelser"
+            organization_start_html: "%{organization_name}-kurset i elbiler startet
+              %{time}. Før det tok ikke brukerne noen opplæringskurs."
+            organization_started_html: "%{organization_name}-kurset i elbiler startet
+              %{time}."
+            owner_email: E-post eier
+            registered: Registrert
+            registration: Registrering
+            source: Kilde
+            unfinished: Uferdig
       registrations:
         show:
           bike_details:
@@ -5785,6 +5809,7 @@ nb:
             title: "%{bike_type} detaljer"
             vehicle_type: Bil type
             year: år
+            view_stock_on_bikebook: Se lagerbeholdning %{bike_type} på Bike Book
           bike_index_card:
             activity: Aktivitet
             frame_material: Rammemateriale
@@ -5966,8 +5991,6 @@ nb:
           photos:
             add_photo: Legg til bilde
             bike_photo: "%{bike_type} bilde"
-            color_may_not_match: Fargen stemmer kanskje ikke!
-            stock_photo: Arkivbilde av en %{year} %{model}
           primary_colors:
             primary_color:
               one: Primærfarge
@@ -6027,6 +6050,7 @@ nb:
               tilgjengelige, siden denne %{bike_type} ikke er registrert hos organisasjonen
               din.
             show_phone: Vis telefonen
+            stock_photo: "%{bike_type} arkivbilde"
           marketplace_listing_card:
             condition: Betingelse
             contact_seller: Kontakt selgeren
@@ -6652,6 +6676,7 @@ nb:
             change_back: Bytt tilbake
             looks_like_cm: Det ser ut som cm ikke tommer, så vi byttet det.
             looks_like_inches: Det ser ut som tommer, ikke cm, så vi byttet det.
+            unknown_model_year: Vi har ikke detaljene for det året for den modellen.
           color_fields:
             add_another_color: Legg til en annen farge
             color: Farge

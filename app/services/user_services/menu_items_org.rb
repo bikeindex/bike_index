@@ -13,7 +13,7 @@ module UserServices
       return [] if organization.nil? || current_user.nil?
 
       # Rails.cache.fetch gets none of the locale ApplicationComponentHelper#cache folds into fragments
-      Rails.cache.fetch(["menu_items_org_v6", organization, current_user,
+      Rails.cache.fetch(["menu_items_org_v10", organization, current_user,
         old_register_view, I18n.locale]) do
         build_items(organization, current_user, old_register_view)
       end
@@ -44,7 +44,7 @@ module UserServices
           bulk_group(organization, admin),
           lightspeed_link(organization),
           messaging_link(organization, admin),
-          model_audits_link(organization),
+          e_vehicles_group(organization),
           graduated_link(organization),
           hot_sheet_link(organization, admin),
           reports_link(organization)],
@@ -200,10 +200,16 @@ module UserServices
       end
     end
 
-    def model_audits_link(organization)
-      enabled_link(organization, "model_audits", translation(:model_audits),
-        routes.organization_model_audits_path(organization_id: organization.to_param),
-        icon: "bolt", section: true)
+    def e_vehicles_group(organization)
+      children = [
+        enabled_link(organization, "model_audits", translation(:audits),
+          routes.organization_model_audits_path(organization_id: organization.to_param), section: true),
+        ComponentStructs::Shapes.link(translation(:ebike_rules), routes.ebike_rules_path, section: true),
+        ComponentStructs::Shapes.link(translation(:education_acknowledgments),
+          routes.organization_education_course_acknowledgments_path(organization_id: organization.to_param))
+      ]
+
+      ComponentStructs::Shapes.group(:e_vehicles, translation(:e_vehicles), "bolt", children)
     end
 
     def graduated_link(organization)
@@ -279,7 +285,7 @@ module UserServices
 
     conceal :build_items, :organization_sections, :super_admin_link, :ambassador_items,
       :registrations_group, :registrations_links, :add_registration_link, :impounded_group,
-      :add_impounded_link, :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :model_audits_link, :graduated_link,
+      :add_impounded_link, :parking_group, :bulk_group, :lightspeed_link, :messaging_link, :e_vehicles_group, :graduated_link,
       :hot_sheet_link, :reports_link, :info_link, :settings_group, :org_root, :enabled_link, :translation, :routes
   end
 end

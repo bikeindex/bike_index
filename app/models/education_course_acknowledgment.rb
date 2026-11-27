@@ -1,8 +1,3 @@
-# The record that a registrant agreed to an e-vehicle education course.
-# Outlives the registration it came from - the b_param is swept once its bike exists.
-# Pending (no acknowledged_at) from when the bike is created until it's agreed to, which
-# holds the bike's finished registration email back.
-# What was agreed to is read off the course, which activation froze.
 # == Schema Information
 #
 # Table name: education_course_acknowledgments
@@ -27,6 +22,9 @@
 #  index_education_course_acknowledgments_one_per_b_param         (b_param_id) UNIQUE WHERE (b_param_id IS NOT NULL)
 #  index_education_course_acknowledgments_pending                 (b_param_id) WHERE (acknowledged_at IS NULL)
 #
+# Outlives the registration it came from - the b_param is swept once its bike exists.
+# Pending (no acknowledged_at) from when the bike is created until it's agreed to, which
+# holds the bike's finished registration email back.
 class EducationCourseAcknowledgment < ApplicationRecord
   # with_deleted: the course is soft-deleted with its organization, and this record
   # reads what was agreed to straight off it
@@ -47,6 +45,9 @@ class EducationCourseAcknowledgment < ApplicationRecord
   # What an organization's bike agreed to: its education course, or the default course where it stood in
   scope :for_organization_or_default, ->(organization) {
     joins(:education_course).where(education_courses: {organization_id: [organization.id, nil]})
+  }
+  scope :for_organization_bikes, ->(organization) {
+    for_organization_or_default(organization).where(bike_id: organization.bike_organizations.select(:bike_id))
   }
 
   class << self

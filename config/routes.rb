@@ -534,6 +534,7 @@ Rails.application.routes.draw do
       member { post :resend_incomplete_email }
     end
     resources :model_audits, only: %i[index create show]
+    resources :education_course_acknowledgments, only: %i[index]
     resources :exports, except: %i[edit]
     resources :bulk_imports, only: %i[index show new create]
     resources :emails, only: %i[index show edit update]

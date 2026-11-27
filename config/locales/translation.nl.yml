@@ -4424,7 +4424,6 @@ nl:
       lightspeed_integration_panel: Lightspeed-integratiepaneel
       manage_users: Gebruikers beheren
       messaging: Berichten
-      model_audits: Audits van e-voertuigen
       multi_search: Meerdere zoekopdrachten
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locaties"
@@ -4449,6 +4448,10 @@ nl:
       registration_form_settings: Instellingen voor het registratieformulier
       education_courses: Onderwijscursussen
       org_information: "%{org_name} Informatie"
+      audits: Audits
+      e_vehicles: Elektrische voertuigen
+      ebike_rules: Regels voor e-bikes
+      education_acknowledgments: Erkenningen met betrekking tot onderwijs
     organization_signup:
       address_required: Voer het volledige adres van de organisatie in.
       email_required: Een geldig e-mailadres is vereist.
@@ -5651,6 +5654,9 @@ nl:
         updated_at: Bijgewerkt op
       vehicle_type_badges:
         e_vehicle: E-voertuig
+      stock_photo_badge:
+        stock: Voorraad
+        stock_photo_of: Stockfoto van een %{model}
     pages:
       messages:
         thread_show:
@@ -5956,6 +5962,25 @@ nl:
             qr_code: QR-code
             set_a_password: Stel een wachtwoord in
             your_public_registration_link: Uw openbare registratielink
+        education_course_acknowledgments:
+          index:
+            acknowledged: Erkend
+            all: Alle
+            course: Cursus
+            for_everyone_start_html: De algemene e-Vehicle-educatiecursus is gestart
+              %{time}. Daarvoor volgden gebruikers geen educatiecursus.
+            header: 'E-voertuigeducatie: Dankbetuigingen'
+            matching_count_html: "%{count} overeenkomende erkenningen"
+            organization_start_html: De %{organization_name} e-Vehicle Education Course
+              is gestart %{time}. Daarvoor volgden gebruikers geen enkele educatieve
+              cursus.
+            organization_started_html: De %{organization_name} e-Vehicle Education
+              Course is %{time} van start gegaan.
+            owner_email: E-mailadres eigenaar
+            registered: Geregistreerd
+            registration: Registratie
+            source: Bron
+            unfinished: Onvoltooid
       registrations:
         show:
           bike_details:
@@ -5969,6 +5994,7 @@ nl:
             title: "%{bike_type} details"
             vehicle_type: 'Voertuigtype:'
             year: jaar
+            view_stock_on_bikebook: Bekijk voorraad %{bike_type} op Bike Book
           bike_index_card:
             activity: Activiteit
             frame_material: Frame materiaal
@@ -6153,8 +6179,6 @@ nl:
           photos:
             add_photo: Foto toevoegen
             bike_photo: "%{bike_type} foto"
-            color_may_not_match: Kleur komt mogelijk niet overeen!
-            stock_photo: Stock foto van een %{year} %{model}
           primary_colors:
             primary_color:
               one: Primaire kleur
@@ -6216,6 +6240,7 @@ nl:
               niet beschikbaar, aangezien dit %{bike_type} niet bij uw organisatie
               is geregistreerd.
             show_phone: Toon telefoon
+            stock_photo: "%{bike_type} stockfoto"
           marketplace_listing_card:
             condition: Voorwaarde
             contact_seller: Neem contact op met de verkoper
@@ -6860,6 +6885,8 @@ nl:
               we het aangepast.
             looks_like_inches: Dat lijkt op inches en niet op centimeters, dus hebben
               we het aangepast.
+            unknown_model_year: We hebben geen details over dat specifieke jaar van
+              dat model.
           color_fields:
             add_another_color: Voeg nog een kleur toe
             color: Kleur

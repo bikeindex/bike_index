@@ -25,16 +25,16 @@
 class EducationCourse < ApplicationRecord
   acts_as_paranoid
 
-  # The admin index's filters. "default" is which course rather than which status - the
-  # default course is drafted, activated and archived like an organization's
-  STATUS_SCOPES = {"draft" => :draft, "active" => :active, "archived" => :archived, "default" => :defaults}.freeze
-  STATUSES = STATUS_SCOPES.keys.freeze
+  STATUSES = %w[draft active archived default].freeze
   COPIED_PAGE_ATTRS = %w[title heading subtitle body listing_order organization_specific].freeze
   # Follows "I, <registrant's name>," on the flow's final acknowledgment, for a course
   # without its own text
   DEFAULT_ACKNOWLEDGMENT_TEXT = "have read, understood, and agree to comply with all of the " \
     "e-vehicle safety rules above as a condition of registering my vehicle. I understand that " \
     "failure to comply may result in revocation of my registration and/or disciplinary action."
+
+  # When the default EducationCourse was turned on for everyone
+  FOR_EVERYONE_START = 1794414987
 
   # What each status is called on screen
   STATUS_DISPLAY = {"draft" => "Draft", "active" => "Current", "archived" => "Previous"}.freeze
@@ -52,7 +52,7 @@ class EducationCourse < ApplicationRecord
   before_update :prevent_activated_change
   after_commit :enqueue_after_change_job
 
-  scope :defaults, -> { where(organization_id: nil) }
+  scope :default, -> { where(organization_id: nil) }
   # Everything activation hasn't frozen
   scope :draft, -> { where(start_at: nil) }
   scope :active, -> { where.not(start_at: nil).where(end_at: nil) }
@@ -70,6 +70,8 @@ class EducationCourse < ApplicationRecord
     # course, falling back to the default every organization starts from
     def active_or_default_for(organization) = active_for(organization) || active_default
 
+    def first_for(organization) = where(organization:).where.not(start_at: nil).order(:start_at).first
+
     # The draft as it stands - draft_for opens one when there isn't one
     def existing_draft_for(organization) = draft.find_by(organization:)
 
@@ -81,10 +83,7 @@ class EducationCourse < ApplicationRecord
       draft.find_by!(organization:)
     end
 
-    def for_status(status)
-      scope = STATUS_SCOPES[status.to_s]
-      scope ? public_send(scope) : all
-    end
+    def for_status(status) = STATUSES.include?(status.to_s) ? public_send(status) : all
 
     private
 
@@ -141,6 +140,9 @@ class EducationCourse < ApplicationRecord
   # what a registrant agreed to has to keep saying the same thing - a change belongs in a
   # new draft, which activating supersedes this with.
   def activated? = !draft?
+
+  # Prompting registrants before the default course did
+  def started_before_everyone? = activated? && start_at.before?(Time.at(FOR_EVERYONE_START))
 
   # Moves page to position and re-sequences listing_order (drag-and-drop on the show page).
   # update_all skips the pages' own callbacks, so the guard is here too

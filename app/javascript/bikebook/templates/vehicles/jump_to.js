@@ -1,7 +1,7 @@
 import { html } from 'lit-html'
 import { tabs } from 'bikebook/templates/ui/tabs'
 
-export const VIEWS = { basics: 'Overview', geometry: 'Sizes & geometry', components: 'Components', motors: 'Motor & Battery', all: 'All' }
+export const VIEWS = { basics: 'Overview', geometry: 'Sizes & geometry', components: 'Components', motors: 'Motor & Battery' }
 
 // what an in-place link focuses once it renders, keeping the reader's place in the tabs
 export const CURRENT_VIEW = '#vehicle-views [aria-current]'

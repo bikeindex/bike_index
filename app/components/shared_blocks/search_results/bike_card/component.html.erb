@@ -43,6 +43,10 @@
       <span class="tw:absolute tw:top-2 tw:right-2">
         <%= render(status_badge(size: :md)) %>
       </span>
+
+      <% if BikeServices::Displayer.stock_photo?(@bike) %>
+        <%= render(Atoms::StockPhotoBadge::Component.new(bike: @bike, display: :word, html_class: "tw:absolute tw:bottom-2 tw:left-2")) %>
+      <% end %>
     </div>
 
     <div class="tw:flex tw:flex-col tw:gap-2 tw:px-3 tw:pt-3 tw:pb-3.5">

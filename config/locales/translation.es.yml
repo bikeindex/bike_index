@@ -5162,7 +5162,6 @@ es:
       lightspeed_integration_panel: Panel de integración Lightspeed
       manage_users: Gestionar usuarios
       messaging: Mensajería
-      model_audits: Auditorías de vehículos eléctricos
       multi_search: Búsqueda múltiple
       org_dashboard: "%{org_name} Panel de control"
       org_locations: "%{org_name} ubicaciones"
@@ -5187,6 +5186,10 @@ es:
       registration_form_settings: Configuración del formulario de registro
       education_courses: cursos de formación
       org_information: "%{org_name} Información"
+      audits: Auditorías
+      e_vehicles: Vehículos eléctricos
+      ebike_rules: Normativa para bicicletas eléctricas
+      education_acknowledgments: Agradecimientos en materia de educación
     organization_signup:
       address_required: Por favor, introduzca la dirección completa de la organización.
       email_required: Se requiere un correo electrónico válido.
@@ -5733,6 +5736,9 @@ es:
         updated_at: Actualizado en
       vehicle_type_badges:
         e_vehicle: Vehículo eléctrico
+      stock_photo_badge:
+        stock: Existencias
+        stock_photo_of: Foto de archivo de un %{model}
     pages:
       messages:
         thread_show:
@@ -6033,6 +6039,26 @@ es:
             qr_code: Código QR
             set_a_password: Establecer una contraseña
             your_public_registration_link: Enlace a su registro público
+        education_course_acknowledgments:
+          index:
+            acknowledged: Admitido
+            all: Todo
+            course: Curso
+            for_everyone_start_html: El curso general de formación sobre vehículos
+              eléctricos comenzó el %{time}. Anteriormente, los usuarios no habían
+              realizado ningún curso de formación.
+            header: Agradecimientos por la formación en vehículos eléctricos
+            matching_count_html: "%{count} Confirmaciones coincidentes"
+            organization_start_html: El curso de formación sobre vehículos eléctricos
+              %{organization_name} comenzó el %{time}. Antes de eso, los usuarios
+              no habían realizado ningún curso de formación.
+            organization_started_html: El curso de formación sobre vehículos eléctricos
+              %{organization_name} comenzó el %{time}.
+            owner_email: Correo electrónico del propietario
+            registered: Registrado
+            registration: Registro
+            source: Fuente
+            unfinished: Inconcluso
       registrations:
         show:
           bike_details:
@@ -6046,6 +6072,7 @@ es:
             title: "%{bike_type} detalles"
             vehicle_type: Tipo de vehículo
             year: Año
+            view_stock_on_bikebook: Ver stock %{bike_type} en Bike Book
           bike_index_card:
             activity: Actividad
             frame_material: Material del marco
@@ -6230,8 +6257,6 @@ es:
           photos:
             add_photo: Añadir foto
             bike_photo: "%{bike_type} foto"
-            color_may_not_match: "¡El color puede no coincidir!"
-            stock_photo: Foto de archivo de un %{year} %{model}
           primary_colors:
             primary_color:
               one: Color primario
@@ -6292,6 +6317,7 @@ es:
             not_registered_phone_message: No se dispone de otros datos de contacto
               del propietario, ya que este %{bike_type} no está registrado en su organización.
             show_phone: Mostrar teléfono
+            stock_photo: "%{bike_type} foto de archivo"
           marketplace_listing_card:
             condition: Condición
             contact_seller: Contacta con el vendedor
@@ -6943,6 +6969,7 @@ es:
             looks_like_cm: Parece que son centímetros, no pulgadas, así que lo cambiamos.
             looks_like_inches: Parece que son pulgadas, no centímetros, así que lo
               cambiamos.
+            unknown_model_year: No tenemos los detalles de ese año de ese modelo.
           color_fields:
             add_another_color: Añade otro color
             color: Color
