@@ -18,7 +18,7 @@ RSpec.describe BugReportsMailbox do
     expect(BugReport.last).to have_attributes(email: user.email, user_id: user.id,
       receiver: "bugs@bikeindex.org", subject: "Search is broken",
       body: "I searched and nothing happened",
-      inbound_email_id: ActionMailbox::InboundEmail.last.id)
+      inbound_email_id: ActionMailbox::InboundEmail.last.id, message_id: ActionMailbox::InboundEmail.last.message_id)
     expect(BugReport.last.received_at).to be_present
     expect(BugReportAutoPrioritizeJob.jobs.map { it["args"] }).to eq([[BugReport.last.id]])
   end

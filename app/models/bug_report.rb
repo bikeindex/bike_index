@@ -19,6 +19,7 @@
 #  created_at                     :datetime         not null
 #  updated_at                     :datetime         not null
 #  inbound_email_id               :bigint
+#  message_id                     :text
 #  user_id                        :bigint
 #
 # Indexes

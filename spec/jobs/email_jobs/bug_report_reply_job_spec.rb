@@ -10,7 +10,9 @@ RSpec.describe EmailJobs::BugReportReplyJob, type: :job do
   let(:bug_report) { BugReport.find_by(inbound_email_id: inbound_email.id) }
   let(:notification) { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, message_channel_target: bug_report.email) }
 
-  it "sends the reply threaded under the report, and drops its BCC when it's forwarded back" do
+  it "sends the reply threaded under the report once its inbound email is gone, and drops its BCC when it's forwarded back" do
+    notification
+    inbound_email.destroy!
     ActionMailer::Base.deliveries = []
     described_class.new.perform(notification.id, "Fixed it, thanks")
 

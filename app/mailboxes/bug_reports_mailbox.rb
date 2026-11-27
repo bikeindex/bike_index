@@ -9,6 +9,7 @@ class BugReportsMailbox < ApplicationMailbox
     body = body_text
     bug_report = BugReport.create!(
       inbound_email:,
+      message_id: mail.message_id,
       email:,
       from_name:,
       receiver: BugReport.receiver_from_mail(mail),
