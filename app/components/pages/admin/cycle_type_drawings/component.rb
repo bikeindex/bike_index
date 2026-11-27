@@ -12,50 +12,37 @@ module Pages
         end
 
         # by Bike Book vehicle type, those that start collapsed though they have a catalog example
-        COLLAPSED_TYPES = %w[skateboard wheelchair unicycle].freeze
-
-        # the CycleType slugs Bike Book's vehicle types name differently
-        BIKEBOOK_TYPES = {
-          trailer: "bike_trailer",
-          cargo: "cargo_bike",
-          "cargo-rear": "cargo_bike_rear",
-          "cargo-trike": "cargo_tricycle",
-          "cargo-trike-rear": "cargo_tricycle_rear",
-          "personal-mobility": "epamd",
-          "non-e-scooter": "scooter",
-          "non-e-skateboard": "skateboard",
-          elliptical: "elliptical_bike"
-        }.freeze
+        COLLAPSED_TYPES = %w[non-e-skateboard wheelchair unicycle].freeze
 
         # by Bike Book vehicle type, or type/type_detail, the catalog model that fills in the most of its drawing
         EXAMPLE_MODELS = {
-          "bike" => "m/specialized/2025/aethos_comp_shimano_105_di2_ca",
-          "bike/step_through" => "m/aventon/2025/level_3_step_through",
-          "bike/bench_seat" => "m/cycrown/2026/run_mini",
-          "tandem" => "m/co_motion/2018/kalapuya_shimano_ultegra_r8000_2x11",
-          "tandem/step_through" => "m/sun/2025/brickell_tandem_cb_step_thru",
-          "unicycle" => "m/nimbus_unicycles/2014/muni_24",
-          "tricycle" => "m/sun/2022/miami_sun_traditional_24_step_thru",
-          "tricycle/tadpole" => "m/reactive_adaptations/2025/hammerhead",
-          "recumbent" => "m/hp_velotechnik/2019/scorpion_fx_20",
-          "bike_trailer" => "m/retrospec/2024/rover_plus",
+          "bike" => "m/specialized/2025/aethos-comp-shimano-105-di2-ca",
+          "bike/step_through" => "m/aventon/2025/level-3-step-through",
+          "bike/bench-seat" => "m/cycrown/2026/run-mini",
+          "tandem" => "m/co-motion/2018/kalapuya-shimano-ultegra-r8000-2x11",
+          "tandem/step_through" => "m/sun/2025/brickell-tandem-cb-step-thru",
+          "unicycle" => "m/nimbus-unicycles/2014/muni-24",
+          "tricycle" => "m/sun/2022/miami-sun-traditional-24-step-thru",
+          "tricycle/tadpole" => "m/reactive-adaptations/2025/hammerhead",
+          "recumbent" => "m/hp-velotechnik/2019/scorpion-fx-20",
+          "trailer" => "m/retrospec/2024/rover-plus",
           "wheelchair" => "m/bowhead/2025/era",
-          "cargo_bike" => "m/riese_and_muller/2024/load4_60_touring",
-          "cargo_bike_rear" => "m/mongoose/2019/envoy_26in",
-          "cargo_tricycle" => "m/sun/2022/atlas_cargo_24_step_thru",
-          "trail_behind" => "m/trek/2016/mountain_train_206",
-          "e_scooter" => "m/segway/2025/max_g3",
-          "epamd" => "m/inmotion/2024/v11y",
-          "scooter" => "m/jetson/2018/flex_wood_2_in_1_scooter",
-          "skateboard" => "m/isinwheel/2024/v10",
-          "e_motorcycle" => "m/sur_ron/2024/ultra_bee_r",
-          "elliptical_bike" => "m/elliptigo/2022/11r",
-          "balance_bike" => "m/strider/2014/12_sport"
+          "cargo" => "m/riese-and-muller/2024/load4-60-touring",
+          "cargo-rear" => "m/mongoose/2019/envoy-26in",
+          "cargo-trike" => "m/sun/2022/atlas-cargo-24-step-thru",
+          "trail-behind" => "m/trek/2016/mountain-train-206",
+          "e-scooter" => "m/segway/2025/max-g3",
+          "personal-mobility" => "m/inmotion/2024/v11y",
+          "non-e-scooter" => "m/jetson/2018/flex-wood-2-in-1-scooter",
+          "non-e-skateboard" => "m/isinwheel/2024/v10",
+          "e-motorcycle" => "m/sur-ron/2024/ultra-bee-r",
+          "elliptical" => "m/elliptigo/2022/11r",
+          "balance-bike" => "m/strider/2014/12-sport"
         }.freeze
 
         def initialize(cycle_types:, manifest_url:)
           @rows = cycle_types.map do |cycle_type|
-            type = BIKEBOOK_TYPES[cycle_type.slug] || cycle_type.slug.to_s.underscore
+            type = cycle_type.slug.to_s
             Row.new(name: cycle_type.name, type:, example_model: EXAMPLE_MODELS[type])
           end.partition { !it.collapsed }.flatten
           @manifest_url = manifest_url

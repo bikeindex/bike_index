@@ -41,6 +41,15 @@ class OrganizedMailer < ApplicationMailer
     end
   end
 
+  def shop_welcome(organization, user)
+    component = Emails::ShopWelcome::Component.new(organization:)
+
+    I18n.with_locale(user.preferred_language) do
+      mail(reply_to:, to: user.email, subject: I18n.t("organized_mailer.shop_welcome.subject"),
+        tag: __callee__) { |format| format.html { render component } }
+    end
+  end
+
   def finished_registration(ownership)
     bike = Bike.unscoped.find_id(ownership.bike_id)
     @organization = ownership.organization

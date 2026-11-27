@@ -4,6 +4,8 @@ RSpec.describe PropulsionType, type: :model do
   describe "find_sym" do
     it "finds" do
       expect(PropulsionType.find_sym("hand cycle")).to eq :"hand-pedal"
+      expect(PropulsionType.find_sym("hand-cycle")).to eq :"hand-pedal"
+      expect(PropulsionType.find_sym("Pedal Assist & Throttle")).to eq :"pedal-assist-and-throttle"
     end
   end
   describe "normalized name" do

@@ -21,7 +21,7 @@
     <%= call_to_action_buttons %>
   </div>
 
-  <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", width: 1768, height: 1320,
+  <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.webp", alt: "", width: 840, height: 628,
     class: "tw:h-auto tw:w-full tw:max-w-[420px] tw:justify-self-center" %>
 <% end %>
 
@@ -76,7 +76,7 @@
   <% end %>
 </section>
 
-<section class="tw:bg-gray-50 tw:dark:bg-gray-900">
+<section class="<%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>">
   <div class="tw:flex tw:flex-col tw:gap-8 tw:py-16 <%= SECTION_CLASSES %>">
     <%= render(SharedBlocks::Marketing::SectionHeading::Component.new(heading: translation(".across_town_heading"),
       intro: translation(".across_town_intro"), html_class: "tw:max-w-[760px]")) %>

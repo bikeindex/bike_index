@@ -15,6 +15,7 @@
 #  likely_spam                :boolean          default(FALSE), not null
 #  name                       :string
 #  phone                      :string
+#  pos_kind                   :integer
 #  publicly_visible           :boolean          default(TRUE), not null
 #  return_to                  :string
 #  website                    :string
@@ -37,6 +38,8 @@ class OrganizationSignup < ApplicationRecord
   DETAIL_FORMATS = {website: Urlifyer::WEBSITE_REGEX, phone: Phonifyer::REGEX, postal_code: Geocodeable::POSTAL_CODE_REGEX}.freeze
 
   enum :kind, Organization::KIND_ENUM
+  # What a shop said it uses, rather than Organization#pos_kind's integration status
+  enum :pos_kind, {lightspeed_pos: 0, ascend_pos: 1, shopify_pos: 2, other_or_none_pos: 3}
 
   belongs_to :organization
 

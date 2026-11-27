@@ -4,7 +4,7 @@ import { definitionListRow } from 'bikebook/templates/ui/definition_list/row'
 import { join, present } from 'bikebook/templates/values'
 import { ulBadges } from 'bikebook/templates/vehicles/page_badges'
 
-const NOT_CYCLES = { e_scooter: 'scooter', e_motorcycle: 'motorcycle', epamd: 'personal mobility' }
+const NOT_CYCLES = { 'e-scooter': 'scooter', 'e-motorcycle': 'motorcycle', 'e-atv': 'ATV', 'personal-mobility': 'personal mobility' }
 
 // Pages::EbikeRules::BikeSummary::Component, its UL badges copies of the ones the page renders
 export const bikeSummary = ({ vehicleType, tiles, specs, ul2849, ul2271, others }) => html`<div class="tw:flex tw:flex-col tw:gap-5">${present(tiles)

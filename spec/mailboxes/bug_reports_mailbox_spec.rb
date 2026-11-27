@@ -80,6 +80,39 @@ RSpec.describe BugReportsMailbox do
     end
   end
 
+  context "a feedback panel notification" do
+    let(:sender) { "contact@bikeindex.org" }
+    let(:in_reply_to) { nil }
+    let(:mail) do
+      Mail.new(from: sender, reply_to: "sender@example.com", to: "contact@bikeindex.org", subject: "Found Bike",
+        in_reply_to:, body: %(Help me\nread full message: https://bikeindex.org/admin/feedbacks/12))
+    end
+
+    it "tags it feedback" do
+      receive_inbound_email_from_source(mail.to_s)
+      expect(BugReport.last.tags).to eq %w[feedback]
+    end
+
+    context "from someone else" do
+      let(:sender) { "sender@example.com" }
+
+      it "does not tag it" do
+        receive_inbound_email_from_source(mail.to_s)
+        expect(BugReport.last.tags).to eq []
+      end
+    end
+
+    context "replying to the notification" do
+      let(:sender) { "staff@bikeindex.org" }
+      let(:in_reply_to) { "<original@bikeindex.org>" }
+
+      it "does not tag it" do
+        receive_inbound_email_from_source(mail.to_s)
+        expect(BugReport.last.tags).to eq []
+      end
+    end
+  end
+
   context "sent by us, without a Reply-To" do
     let(:mail) do
       Mail.new do

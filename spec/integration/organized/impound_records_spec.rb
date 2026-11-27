@@ -65,6 +65,13 @@ RSpec.describe "Organized impound records index", :js, type: :system do
 
   def shared_with(order) = visible_column_order & order
 
+  def frozen_headers = evaluate_script(<<~JS)
+    [...document.querySelectorAll("thead th")].filter(th => {
+      const style = getComputedStyle(th)
+      return style.display !== "none" && style.position === "sticky"
+    }).map(th => th.textContent.trim())
+  JS
+
   it "loads results via turbo, filters by unregisteredness, then applies multi-updates" do
     # The results-frame component opts the page out of Turbo's snapshot cache
     expect(page).to have_css('meta[name="turbo-cache-control"][content="no-cache"]', visible: :all)
@@ -206,8 +213,9 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     # Back navigation restores the unfiltered listing (all 4 rows)
     expect(page).to have_css("turbo-frame#impound_records_results_frame table tbody tr", count: 4, wait: 10)
 
-    # Cells are hidden until the user opts into multi-update.
+    # Cells are hidden until the user opts into multi-update, and View is frozen in their place
     expect(page).not_to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
+    expect(frozen_headers).to eq ["View"]
 
     click_button "Update multiple records"
 
@@ -215,6 +223,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     # inside it, so its visibility is the signal the Stimulus controller has run.
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 10)
     expect(page).to have_css("input[type=checkbox][name='ids[#{registered.id}]']", visible: true)
+    expect(frozen_headers).to eq ["✓"]
     # Opening reflects in the URL (via replaceState — no new history entry)
     expect(page).to have_current_path(/multi_update=true/)
 
@@ -245,6 +254,7 @@ RSpec.describe "Organized impound records index", :js, type: :system do
     # "hide update" collapses the panel; clicking the toggle again reopens it
     click_button "Hide update"
     expect(page).to have_select("impound_record_update_kind", visible: :hidden, wait: 5)
+    expect(frozen_headers).to eq ["View"]
     expect(page).not_to have_current_path(/multi_update=true/)
     click_button "Update multiple records"
     expect(page).to have_select("impound_record_update_kind", visible: true, wait: 5)

@@ -10,6 +10,7 @@
 
     <%# Saved with step 1 - until then, nothing else holds it %>
     <%= hidden_field_tag :return_to, @organization_signup.return_to if @organization_signup.new_record? %>
+    <%= f.hidden_field :pos_kind if @organization_signup.new_record? %>
 
     <%= render Pages::Register::Parts::SectionLabel::Component.new(text: translation(".your_organization")) %>
 

@@ -7,6 +7,8 @@ import HwComboboxController from 'controllers/hw_combobox_controller'
 // gem's lazy turbo-frame (`source.prime(controller)`), in the browser rather than asking the server
 export const localSources = new WeakMap()
 
+const searchesLocally = (combobox) => !!localSources.get(combobox.element)?.filter
+
 // Pressing the list - an option, a label, "No matches" - or the field beside its chips would blur the input
 // onto the page, leaving it open with nothing focused to hear Escape or to blur from. The click back in still
 // selects the display, as it did after that blur
@@ -23,6 +25,7 @@ HwComboboxController.prototype.connect = function () {
   if (source?.prime) this.element.querySelector('.hw_combobox__pagination__wrapper turbo-frame')?.remove()
   this.element.addEventListener('mousedown', keepFocusOnPick)
   connect.call(this)
+  this.picked = { value: this._fieldValueString, display: this._fullQuery }
   source?.prime?.(this)
   searchEarlyTyping(this)
 }
@@ -83,10 +86,15 @@ HwComboboxController.prototype._filterAsync = async function (inputType) {
 }
 
 // Closing on Enter clears a query that matches nothing, so it stays open to say so - unless it's free text to
-// keep. And a multiselect's Escape makes no chip of the option the gem locks in, but the gem still announces it
+// keep. And a multiselect's Escape makes no chip of the option the gem locks in, but the gem still announces it.
+// A local source's single select picks as it's typed into, which Escape would lock in, so it goes back to its pick
 const close = HwComboboxController.prototype.close
 HwComboboxController.prototype.close = function (inputType) {
   if (inputType === 'hw:keyHandler:enter' && this._isQueried && !this._allowNew && !this._visibleOptionElements.length) return
+  if (inputType === 'hw:keyHandler:escape' && this._isSingleSelect && this._isOpen && searchesLocally(this)) {
+    this.expandedValue = false
+    return this.restore(this.picked)
+  }
 
   this.dismissing = this._isMultiselect && inputType === 'hw:keyHandler:escape'
   close.call(this, inputType)
@@ -95,7 +103,10 @@ HwComboboxController.prototype.close = function (inputType) {
 
 const dispatchSelectionEvent = HwComboboxController.prototype._dispatchSelectionEvent
 HwComboboxController.prototype._dispatchSelectionEvent = function (previousValue) {
-  if (!this.dismissing) dispatchSelectionEvent.call(this, previousValue)
+  if (this.dismissing) return
+
+  dispatchSelectionEvent.call(this, previousValue)
+  this.picked = { value: this._fieldValueString, display: this._fullQuery }
 }
 
 // The gem swallows Enter whether or not the listbox is open, so a combobox with
@@ -104,7 +115,7 @@ HwComboboxController.prototype._dispatchSelectionEvent = function (previousValue
 const navigate = HwComboboxController.prototype.navigate
 // A query in a local source's combobox is to pick from, though it's closed, rather than submit
 HwComboboxController.prototype.navigate = function (event) {
-  if (event.key === 'Enter' && localSources.get(this.element)?.filter && this._fullQuery) {
+  if (event.key === 'Enter' && searchesLocally(this) && this._fullQuery) {
     if (this.edits !== this.answeredEdits) {
       this.enterPending = true
       return event.preventDefault()
@@ -173,6 +184,12 @@ const listenForClickIntoFocus = function (input) {
 
 HwComboboxController.prototype.comboboxTargetConnected = listenForClickIntoFocus
 HwComboboxController.prototype.dialogComboboxTargetConnected = listenForClickIntoFocus
+
+// Chrome puts a scrolling list in the tab order, but the gem listens for the arrow keys and Enter on the input
+const leaveTabOrder = (listbox) => { listbox.tabIndex = -1 }
+
+HwComboboxController.prototype.listboxTargetConnected = leaveTabOrder
+HwComboboxController.prototype.dialogListboxTargetConnected = leaveTabOrder
 
 // The dialog is the small-screen picker, but the gem measures the window the combobox is
 // in - so an iframe narrower than the breakpoint got it on a desktop, where it can't

@@ -26,6 +26,8 @@ module Pages
 
             def deleted_bikes_count = @deleted_bikes_count ||= Bike.unscoped.current_owner(@user.id).only_deleted.count
 
+            def previous_bikes_count = @previous_bikes_count ||= Bike.current_with_user_hidden.previous_owner(@user.id).count
+
             def index_path = admin_bikes_path(user_id: @user.id)
 
             def parenthetical

@@ -29,6 +29,11 @@ module Pages
             @b_param.type
           end
 
+          def bikebook_models? = BikebookModel.exists?(manufacturer_id: @b_param.manufacturer_id)
+
+          # Where the registrant is, which the model search offers that market's versions for
+          def bikebook_market = Integrations::Bikebook::Catalog.market(request.env["HTTP_CF_IPCOUNTRY"])
+
           # A theft report and an e-vehicle's safety pages both come after this form, so it
           # doesn't always finish the registration. Which statuses have one is rechecked
           # client-side, since the status is picked in this form rather than known when it

@@ -8,7 +8,6 @@ module Pages
         SECTION_CLASSES = SharedBlocks::Marketing::Wrapper::Component::CONTAINER_CLASSES
         MUTED = Pages::LandingPages::ForBikeShops::Component::MUTED
         HEADING_CLASSES = Pages::LandingPages::ForBikeShops::Component::HEADING_CLASSES
-        BAND = Pages::LandingPages::ForBikeShops::Component::BAND
         ASCEND_GUIDE_URL = "https://help.ascendrms.com/reporting/send-purchase-and-registration-information-to-bike-index"
         SHOPS_EMAIL = "bikeshops@bikeindex.org"
 

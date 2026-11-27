@@ -912,9 +912,10 @@ RSpec.describe BParam, type: :model do
 
       context "with the safety rules still to agree to" do
         let!(:acknowledgment) { FactoryBot.create(:education_course_acknowledgment_pending, b_param:) }
+        let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user: creator) }
 
         it "alerts until they're agreed to" do
-          b_param.update(created_bike_id: FactoryBot.create(:bike).id)
+          b_param.update(created_bike_id: bike.id)
 
           expect(b_param.unfinished_registration?).to be_truthy
           expect(BParam.unfinished_registrations.pluck(:id)).to eq [b_param.id]
@@ -928,7 +929,7 @@ RSpec.describe BParam, type: :model do
         end
 
         it "doesn't expire until they're agreed to" do
-          b_param.update(created_bike_id: FactoryBot.create(:bike).id, created_at: Time.current - BParam::TOKEN_EXPIRATION - 1.day)
+          b_param.update(created_bike_id: bike.id, created_at: Time.current - BParam::TOKEN_EXPIRATION - 1.day)
 
           expect(b_param.unfinished_registration?).to be_truthy
           expect(BParam.unexpired_with_token(b_param.id_token).pluck(:id)).to eq [b_param.id]
@@ -938,6 +939,23 @@ RSpec.describe BParam, type: :model do
 
           expect(b_param.unfinished_registration?).to be_falsey
           expect(BParam.unexpired_with_token(b_param.id_token).pluck(:id)).to eq []
+        end
+
+        context "once the bike is gone" do
+          before { b_param.update(created_bike_id: bike.id) }
+
+          it "isn't unfinished after the bike is deleted" do
+            bike.destroy
+
+            expect(BParam.find(b_param.id).unfinished_registration?).to be_falsey
+          end
+
+          it "isn't unfinished after the bike is transferred" do
+            BikeServices::OwnershipTransferer.find_or_create(bike, updator: creator,
+              new_owner_email: "new-owner@example.com")
+
+            expect(BParam.find(b_param.id).unfinished_registration?).to be_falsey
+          end
         end
       end
     end

@@ -30,6 +30,20 @@ RSpec.describe Pages::Registrations::Show::WrapperOrgAdmin::Component, type: :co
     end
   end
 
+  describe "photo archive" do
+    let(:stock_photo_url) { "https://bikebook.bikeindex.org/specialized/2025/haul-st.png" }
+
+    before { bike.update(year: 2025, frame_model: "Haul ST", stock_photo_url:) }
+
+    it "has the stock photo, last after the bike's own" do
+      FactoryBot.create(:public_image, imageable: bike)
+      render_inline(described_class.new(bike: bike.reload, current_user:, organization:, org_role: :staff))
+
+      expect(page).to have_css("li:last-child a[href='#{stock_photo_url}'] img[src='#{stock_photo_url}']")
+      expect(page).to have_css("li:last-child button[aria-label='Stock photo of a 2025 Haul ST']", text: "Stock")
+    end
+  end
+
   describe "notes" do
     include_context :with_paper_trail
 

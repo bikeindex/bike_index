@@ -2,7 +2,7 @@ class OrganizationNameValidator < ActiveModel::Validator
   # The top level of routes, and /register's pages - anything else under /register is an organization slug
   INVALID_NAMES = %w[400 401 404 422 500 about accept_terms accept_vendor_terms admin ambassadors ambassadors_current
     ambassadors_how_to api ascend assets auth bike_creation_graph bike_shop_packages bike_stickers
-    bike_versions bikebook bikes blogs cable choose_registration components confirm contact contact_us
+    bike_versions bikebook bikebook_schemas bikes blogs cable choose_registration components confirm contact contact_us
     csp_reports dev_and_design discourse_authentication discuss documentation donate e_bike_rules
     ebike_rules edit_my_account embed evc false feedbacks for_advocacy for_bike_shops for_cities
     for_community_groups for_law_enforcement for_schools for_shops goodbye help how_it_works

@@ -48,14 +48,14 @@ module OrgServices
     # A signed in user's own address is the one confirmed - they aren't asked for it, and a
     # confirmed account has already proven it. Changing the address makes the link already
     # sent useless, so it's replaced
-    def save_start(signup, user:, name:, kind:, email:, additional: nil)
+    def save_start(signup, user:, name:, kind:, email:, pos_kind: nil, additional: nil)
       email = EmailNormalizer.normalize(user&.email || email)
       if email != signup.email
         signup.assign_attributes(email_confirmation_token: nil, email_confirmed_at: nil)
       end
       signup.email_confirmed_at ||= Time.current if user&.confirmed?
       signup.assign_attributes(name:, email:, kind: (kind if Organization.user_creatable_kinds.include?(kind)),
-        likely_spam: signup.likely_spam || additional.present?)
+        pos_kind: (OrganizationSignup.pos_kinds.key?(pos_kind) ? pos_kind : signup.pos_kind), likely_spam: signup.likely_spam || additional.present?)
       start_errors(signup).each { signup.errors.add(:base, it) }
       signup.errors.none? && signup.save
     end
@@ -118,7 +118,8 @@ module OrgServices
       end
       return organization unless organization.persisted?
 
-      AdminNotifier.new.for_organization(organization:, user:, type: "organization_created")
+      AdminNotifier.new.for_organization(organization:, user:, type: "organization_created",
+        details: ("POS: #{signup.pos_kind.delete_suffix("_pos").humanize}" if signup.pos_kind))
       organization
     end
 

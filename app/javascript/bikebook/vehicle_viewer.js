@@ -2,7 +2,7 @@ import { html, nothing } from 'lit-html'
 import { basics } from 'bikebook/templates/vehicles/basics'
 import { withColorwayPhoto } from 'bikebook/colorways'
 import { chosenSizes } from 'bikebook/sizes'
-import { groupId, openJson, pickedColorways, pickedSizes, vehicleIds, vehicleKeys, vehiclesOf, withGroup, withoutVehicle, withSize, withVehicles } from 'bikebook/vehicle_models'
+import { groupId, pickedColorways, pickedSizes, vehicleIds, vehicleKeys, vehiclesOf, withGroup, withoutVehicle, withSize, withVehicles } from 'bikebook/vehicle_models'
 import { comparisonTable } from 'bikebook/templates/vehicles/comparison_table'
 import { cycleDrawing } from 'bikebook/templates/vehicles/cycle_drawing'
 import { emptyState } from 'bikebook/templates/vehicles/empty_state'
@@ -13,7 +13,7 @@ import { modelCard } from 'bikebook/templates/vehicles/model_card'
 import { modelGroup } from 'bikebook/templates/vehicles/model_group'
 import { removeLink } from 'bikebook/templates/vehicles/remove_link'
 import { vehicleTitle } from 'bikebook/templates/vehicles/vehicle_title'
-import { componentsOf, modelViewer, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
+import { componentsOf, motorsOf, photoOf, runningGearOf, sizesOf } from 'bikebook/templates/vehicles/model_viewer'
 import { array, present } from 'bikebook/templates/values'
 import { searching, toQuery } from 'bikebook/query'
 import { VehiclePresenter } from 'bikebook/vehicle_presenter'
@@ -23,16 +23,16 @@ export const MAX_COMPARE = 10
 
 // The compared vehicles' cards, from catalog blocks
 export class VehicleViewer {
-  // `jurisdiction`'s out of class marker, evc/out_of_class/us/ca, where its law bars a Class 3's throttle, as
+  // `jurisdiction`'s out of class marker, evc/out-of-class/us/ca, where its law bars a Class 3's throttle, as
   // EbikeRuleServices::StateLaws.out_of_class_ids has them, and as a state, whose /ebike-rules says why a model isn't
   // an e-bike there. Model cards name the markets of those `market` doesn't sell
-  constructor (kit, vocabulary, { jurisdiction, market } = {}) {
-    this.presenter = new VehiclePresenter(kit, vocabulary)
+  constructor (vocabulary, { jurisdiction, market } = {}) {
+    this.presenter = new VehiclePresenter(vocabulary)
     const barred = Object.values(vocabulary.e_vehicle_classifications)
       .some((record) => record.jurisdiction === `US-${jurisdiction}` && record.class_3_throttle === false)
-    this.outOfClassId = barred ? `evc/out_of_class/us/${jurisdiction.toLowerCase()}` : null
+    this.outOfClassId = barred ? `evc/out-of-class/us/${jurisdiction.toLowerCase()}` : null
     this.state = jurisdiction && jurisdiction !== 'US' ? jurisdiction : null
-    this.card = { placeholderUrl: kit.placeholder_url, currencies: vocabulary.currencies, market, configurations: kit.model_configurations }
+    this.card = { placeholderUrl: vocabulary.kit.placeholder_url, currencies: vocabulary.currencies, market, configurations: vocabulary.kit.model_configurations }
   }
 
   // The vehicles at `url` in the view it picks, each under its key, whose links keep its other params, compared in the
@@ -62,7 +62,6 @@ export class VehicleViewer {
     const selectedSizes = new Map(vehicles.map(({ key }, index) => [key, sizes[index]?.name]))
     const baseline = vehicles[0]
     const others = (key) => key === baseline.key ? [] : [baseline.data]
-    const json = openJson(url)
     const removePath = (index) => pathWith(withoutVehicle(url, vehicles[index].key))
     const sizePath = (key) => (name) => pathWith(withSize(url, key, name))
     // a figure's letter lights it on each drawing, card and table row, until it's clicked again
@@ -76,7 +75,7 @@ export class VehicleViewer {
     const cardRow = (margin, cards, aligned = false) => html`<div ?data-comparison=${comparing} data-controller=${comparing && aligned ? 'bikebook--align-rows' : nothing} class="${margin} ${comparing
       ? 'tw:twpagebleed'
       : 'tw:max-[500px]:twpagebleed tw:lg:twpagebleed tw:lg:px-4'}"><div class="tw:flex tw:gap-8 ${rowClasses}">${cards}</div></div>`
-    // each vehicle's `field` on a card of its own, named as its full card is, after whatever `lead` shows, with the overview's ×
+    // each vehicle's `field` on a card of its own, after whatever `lead` shows, with the overview's ×
     // `keyed`, each topped in its frame's color in the overlay
     const cards = (field, none, content, { lead, keyed = false } = {}) => vehicles.map(({ data, value, key }, index) => {
       const { manufacturer, model } = presenter.named(presenter.kit.schemas.vehicle, data)
@@ -85,8 +84,7 @@ export class VehicleViewer {
         tw:rounded-sm tw:border tw:border-gray-200 tw:bg-white tw:pt-4 tw:pb-6 tw:[--gutter:--spacing(6)] tw:dark:border-gray-700 tw:dark:bg-gray-800
         ${keyed ? seriesBorders(compared.frames, index).top : ''} ${comparing ? 'tw:md:max-w-[56rem] tw:lg:flex-1' : 'tw:lg:w-[56rem] tw:lg:shrink-0'}">${removeLink({
         label: `Remove ${name}`,
-        href: removePath(index),
-        corner: true
+        href: removePath(index)
       })}<header data-align-row="header" class="tw:flex tw:items-start tw:justify-between tw:gap-4"><div>${
         vehicleTitle({ manufacturer, model, data, value, ...this.card, heading: 'h3' })}</div><div
         class="tw:shrink-0">${photoOf({ presenter, data }, 'tw:h-14 tw:w-21')}</div></header>${lead ? html`<div data-align-row="lead">${lead(data, key)}</div>` : nothing}${present(data[field])
@@ -98,7 +96,7 @@ export class VehicleViewer {
     const drawing = (data, size, { figure, legend, typicalKind }) => {
       const notes = [legend.some(({ calculated }) => calculated) && 'Light purple figures are calculated from the listed ones.',
         legend.some(({ listed, calculated }) => !listed && !calculated) &&
-          `Gray figures aren't listed, so they're estimated from ${typicalKind ? 'typical' : 'average'} values on ${typicalKind ?? typeName(presenter, data).toLowerCase()}s.`]
+          `Gray figures aren't listed, so they're estimated from ${typicalKind ? 'typical' : 'average'} values on ${typicalKind ?? typeNoun(presenter, data)}s.`]
         .filter(Boolean)
       return html`<figure class="tw:space-y-1"><div class="tw:mx-auto tw:max-w-xl tw:text-gray-800 tw:dark:text-gray-200">${figure}</div>${notes.length
         ? html`<figcaption class="tw:text-center tw:text-xs tw:text-gray-500 tw:dark:text-gray-400">${present(size?.name) && array(data.sizes).length > 1 ? `${size.name} drawn. ` : ''}${notes.join(' ')}</figcaption>`
@@ -167,18 +165,12 @@ export class VehicleViewer {
         return cardRow('tw:mt-6', cards('components', 'No components listed', (data, key) => components.get(key),
           { lead: (data, key) => runningGearOf({ presenter, data, others: others(key) }) }), true)
       },
-      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, key) => motorsOf({ presenter, data, others: others(key), outOfClassId, state }))),
-      all: () => {
-        const full = vehicles.map(({ data, value, key }, index) => modelViewer({
-          presenter, data, value, key, jsonOpen: Boolean(json[key]), market: this.card.market, comparing, idSuffix: index + 1, others: others(key), removePath: removePath(index), selectedSize: selectedSizes.get(key), sizePath: sizePath(key), outOfClassId, state
-        }))
-        return cardRow('tw:mt-6', full)
-      }
+      motors: () => cardRow('tw:mt-6', cards('motors', 'No motor', (data, key) => motorsOf({ presenter, data, others: others(key), outOfClassId, state })))
     }
     // a model opened alone, its search hidden, has a tab to show it filtered to its type: "Search other cargo bikes"
     const lone = !searching(url) && vehicles.length === 1 && vehicles[0].data
     const searchTab = lone && {
-      label: `Search other ${typeName(presenter, lone).toLowerCase()}s`,
+      label: `Search other ${typeNoun(presenter, lone)}s`,
       href: pathWith(url, { search: '1', vehicle_type: lone.type || 'bike' })
     }
     return html`${this.similarModels(baseline, similar, url, photos)}${jumpTo(view, (each) => pathWith(url, { view: each === 'basics' ? '' : each }), shown, searchTab)}${views[view]()}`
@@ -207,7 +199,7 @@ export class VehicleViewer {
     return {
       vehicle: value,
       current,
-      type: typeName(this.presenter, data).toLowerCase(),
+      type: typeNoun(this.presenter, data),
       complete: (data.model_configuration ?? 'complete') === 'complete',
       settings: similar,
       groups: similar.results?.groups,
@@ -218,7 +210,7 @@ export class VehicleViewer {
   // What opens the models most like the first of `vehicles` from the search's More filters lines, where `similar` offers them
   compareToggle (vehicles, similar) {
     if (!similar) return nothing
-    return compareToggle({ type: typeName(this.presenter, vehicles[0].data).toLowerCase(), model: modelName(this.presenter, vehicles[0].data), waiting: similar.waiting })
+    return compareToggle({ type: typeNoun(this.presenter, vehicles[0].data), model: modelName(this.presenter, vehicles[0].data), waiting: similar.waiting })
   }
 
   // The cards of the models most like the first at `url`, those it compares showing `photos`' photo of them
@@ -232,7 +224,7 @@ export class VehicleViewer {
     const picked = vehiclesOf(url)
     const active = picked.some(({ id }) => id === model.id)
     const next = active ? picked.filter(({ id }) => id !== model.id) : [...picked, { id: model.id }]
-    const id = `${idPrefix}-${model.id.replaceAll('/', '-')}`
+    const id = `${idPrefix}-${model.id.replace(/[/@]/g, '-')}`
     return modelCard({
       model: photos.has(model.id) ? { ...model, stock_photo: photos.get(model.id) } : model,
       href: active || picked.length < MAX_COMPARE ? pathWith(withVehicles(url, next)) : null,
@@ -261,5 +253,13 @@ const pathWith = (url, params = {}) => {
   const query = toQuery({ ...Object.fromEntries(url.searchParams), ...params })
   return query ? `${url.pathname}?${query}` : url.pathname
 }
-const typeName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike'
+// A type mid-sentence, "other cargo bikes", where its vocabulary name doesn't read as one: "Cargo Bike Rear"
+const TYPE_NOUNS = {
+  'cargo-rear': 'rear-loading cargo bike',
+  'cargo-trike-rear': 'rear-loading cargo tricycle',
+  'personal-mobility': 'e-personal mobility device',
+  'trail-behind': 'trail-behind bike',
+  'e-atv': 'e-ATV'
+}
+const typeNoun = (presenter, data) => TYPE_NOUNS[data.type] ?? (presenter.named(presenter.kit.schemas.vehicle, data).type || 'bike').toLowerCase()
 const modelName = (presenter, data) => presenter.named(presenter.kit.schemas.vehicle, data).model

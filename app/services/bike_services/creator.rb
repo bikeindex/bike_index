@@ -185,14 +185,18 @@ module BikeServices
     end
 
     def add_bike_book_data(b_param = nil)
-      return nil unless b_param&.bike.present? && b_param.manufacturer_id.present?
-      return nil unless b_param.bike["frame_model"].present? && b_param.bike["year"].present?
+      return nil if b_param&.bike.blank?
 
-      bb_data = Integrations::Bikebook::Data.new.get_model({
-        manufacturer: Manufacturer.find(b_param.bike["manufacturer_id"]).name,
+      specification = Integrations::Bikebook::Data.vehicle_specification({
+        manufacturer_id: b_param.bike["manufacturer_id"],
         year: b_param.bike["year"],
-        frame_model: b_param.bike["frame_model"]
+        frame_model: b_param.bike["frame_model"],
+        market: b_param.address_record.country_iso.presence || b_param.params["registrant_country"],
+        bikebook_model: b_param.params["bikebook_model"]
       })
+      # Request params reach b_param unfiltered, so this is what associate records
+      b_param.params["bikebook_model"] = specification&.bikebook_id
+      bb_data = Integrations::Bikebook::Data.get_model(specification, year: b_param.bike["year"])
 
       return true unless bb_data && bb_data["bike"].present?
 
@@ -208,7 +212,6 @@ module BikeServices
         end
       end
       b_param.params["bike"]["rear_wheel_bsd"] = bb_data["bike"]["rear_wheel_bsd"] if bb_data["bike"]["rear_wheel_bsd"].present?
-      b_param.params["bike"]["rear_tire_narrow"] = bb_data["bike"]["rear_tire_narrow"] if bb_data["bike"]["rear_tire_narrow"].present?
       b_param.params["bike"]["stock_photo_url"] = bb_data["bike"]["stock_photo_url"] if bb_data["bike"]["stock_photo_url"].present?
       b_param.params["components"] = bb_data["components"] && bb_data["components"].map { |c| c.merge("is_stock" => true) }
       b_param.clean_params # if we just rely on the before_save filter, b_param needs to be reloaded
@@ -254,6 +257,7 @@ module BikeServices
         bike.update(likely_spam: true)
       end
       CallbackJobs::AfterBikeSaveJob.perform_async(bike.id)
+      BikebookModelsSyncJob.enqueue_unsynced
       if b_param.bike_sticker_code.present? && bike.creation_organization.present?
         bike_sticker = BikeSticker.lookup_with_fallback(b_param.bike_sticker_code, organization_id: bike.creation_organization.id)
         bike_sticker&.claim_if_permitted(user: bike.creator, bike: bike.id,
@@ -267,6 +271,7 @@ module BikeServices
       create_parking_notification(b_param, bike) if b_param&.status_abandoned? || b_param&.unregistered_parking_notification?
       create_bike_organizations(ownership)
       ComponentCreator.new(bike: bike, b_param: b_param).create_components_from_params
+      VehicleSpecification.cited(b_param.params["bikebook_model"])&.update!(bike_obj: bike)
       bike.create_normalized_serial_segments
       assign_user_attributes(bike, ownership&.user)
       BikeServices::StolenRecordUpdator.new(bike: bike, b_param: b_param).update_records
