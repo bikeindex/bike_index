@@ -368,6 +368,7 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       expect(user.reload.alert_slugs).to eq %w[unfinished_registration]
     end
 
+    # Bike's default scope hides the bike, so its alerts were resolved and recreated every run
     context "with the stolen bike hidden by the user" do
       let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:, marked_user_hidden: true) }
 
