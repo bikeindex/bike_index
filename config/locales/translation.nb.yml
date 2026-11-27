@@ -4969,6 +4969,9 @@ nb:
         – navnene må være forskjellige innenfor de første 30 tegnene. Velg et annet
         navn, eller kontakt support@bikeindex.org hvis det er ditt.
       name_too_short: Organisasjonsnavnet må inneholde minst to bokstaver eller tall
+      phone_invalid: Vennligst skriv inn et gyldig telefonnummer
+      postal_code_invalid: Vennligst skriv inn et gyldig postnummer
+      website_invalid: Vennligst skriv inn et gyldig nettsted, som for eksempel.com
   theft_alert_plans:
     theft_alert_plan:
       days: Dager
@@ -5398,6 +5401,11 @@ nb:
           state: Stat
         combobox:
           no_matches: Ingen treff
+        input:
+          postal_code_format: Skriv inn et postnummer på minst tre bokstaver eller
+            tall, for eksempel 97201 eller T6E 2A4
+          telephone_format: Skriv inn et telefonnummer med minst 7 sifre
+          website_format: Skriv inn et nettsted, som for eksempel.com
       alerts:
         base:
           error: Feil
@@ -6350,10 +6358,9 @@ nb:
             update_listing: Oppdater oppføring
           bike_alerts:
             add_it_now: Legg det til nå!
-            generally_connect_to_org: Noen av syklene dine er assosiert med %{org_name},
-              men denne er det ikke. Vanligvis bør du koble alle syklene dine til
-              %{org_name} -
             ignore_this_suggestion: Ignorer dette forslaget
+            connect_to_org: Noen av registreringene dine er koblet til %{org_name},
+              men ikke %{bike_title}. Generelt sett bør du koble alle til %{org_name}.
           add_a_lock: "+ Legg til en lås"
           add_a_lock_empty: Legg til en lås
           bike_index_is_free: Bike Index er gratis fordi syklister som deg bidrar.
@@ -7705,7 +7712,6 @@ nb:
           field_message: Noe annet vi burde vite?
           field_name: Navnet ditt
           field_role: Din rolle
-          phone_hint: Et telefonnummer, med sifrene
           request_name: forespørsel
           submit_text: La oss prate
           title: Kontakt oss for en gratis prøveperiode

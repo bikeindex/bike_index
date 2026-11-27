@@ -137,7 +137,7 @@ class UserAlert < ApplicationRecord
   # after_commit that would resolve them
   def self.resolve_finished_registrations(user)
     user.user_alerts.active.unfinished_registration.includes(:alertable)
-      .reject { |user_alert| user_alert.alertable&.unfinished_registration?(user) }
+      .reject { it.displayable?(user) }
       .each(&:resolve!)
   end
 
@@ -152,6 +152,13 @@ class UserAlert < ApplicationRecord
   def self.resolve_without_bike(user, bike_ids: alert_bike_ids(user))
     user.user_alerts.active.where.not(bike_id: nil).where.not(bike_id: bike_ids)
       .update_all(resolved_at: Time.current, updated_at: Time.current)
+  end
+
+  # AfterUserChangeJob only revisits bikes that are still stolen. Unscoped, since a hidden
+  # bike is still alerted on
+  def self.resolve_recovered(user)
+    user.user_alerts.active.where(kind: %w[stolen_bike_without_location theft_alert_without_photo])
+      .where(bike_id: Bike.unscoped.where(current_stolen_record_id: nil).select(:id)).each(&:resolve!)
   end
 
   def self.update_unfinished_registration(user:, b_param:)
@@ -170,7 +177,7 @@ class UserAlert < ApplicationRecord
     # scope to just active, to alert if the theft alert once again has no image
     user_alert = UserAlert.active.find_or_build_by(kind: "theft_alert_without_photo",
       user_id: user.id, alertable: theft_alert)
-    if theft_alert.missing_photo?
+    if theft_alert.missing_photo? && theft_alert.stolen_record.current?
       user_alert.bike_id = theft_alert.bike&.id
       user_alert.save
     else # Don't create just to resolve
@@ -212,6 +219,16 @@ class UserAlert < ApplicationRecord
 
   def kind_humanized
     self.class.kind_humanized(kind)
+  end
+
+  # Alerts outlive the bike, phone, organization or theft they point at until a job resolves them
+  def displayable?(user)
+    case kind
+    when "unfinished_registration" then alertable&.unfinished_registration?(user)
+    when "phone_waiting_confirmation" then alertable.present?
+    when "unassigned_bike_org" then bike.present? && organization.present?
+    when "stolen_bike_without_location", "theft_alert_without_photo" then bike&.current_stolen_record.present?
+    end
   end
 
   def dismissable?
