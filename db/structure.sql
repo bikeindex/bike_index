@@ -729,6 +729,44 @@ ALTER SEQUENCE public.bike_versions_id_seq OWNED BY public.bike_versions.id;
 
 
 --
+-- Name: bikebook_models; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.bikebook_models (
+    id bigint NOT NULL,
+    catalog_id character varying NOT NULL,
+    manufacturer_id bigint NOT NULL,
+    name character varying NOT NULL,
+    model_slug character varying NOT NULL,
+    first_year integer NOT NULL,
+    final_year integer,
+    markets character varying[] DEFAULT '{}'::character varying[] NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL,
+    deleted_at timestamp(6) without time zone
+);
+
+
+--
+-- Name: bikebook_models_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.bikebook_models_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: bikebook_models_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.bikebook_models_id_seq OWNED BY public.bikebook_models.id;
+
+
+--
 -- Name: bikes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -3067,7 +3105,8 @@ CREATE TABLE public.organization_signups (
     return_to character varying,
     organization_id bigint,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    pos_kind integer
 );
 
 
@@ -4639,6 +4678,40 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
+-- Name: vehicle_specifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.vehicle_specifications (
+    id bigint NOT NULL,
+    bike_obj_type character varying NOT NULL,
+    bike_obj_id bigint NOT NULL,
+    bikebook_model_id bigint,
+    bikebook_market character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: vehicle_specifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.vehicle_specifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: vehicle_specifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.vehicle_specifications_id_seq OWNED BY public.vehicle_specifications.id;
+
+
+--
 -- Name: wheel_sizes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -4789,6 +4862,13 @@ ALTER TABLE ONLY public.bike_stickers ALTER COLUMN id SET DEFAULT nextval('publi
 --
 
 ALTER TABLE ONLY public.bike_versions ALTER COLUMN id SET DEFAULT nextval('public.bike_versions_id_seq'::regclass);
+
+
+--
+-- Name: bikebook_models id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bikebook_models ALTER COLUMN id SET DEFAULT nextval('public.bikebook_models_id_seq'::regclass);
 
 
 --
@@ -5471,6 +5551,13 @@ ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_
 
 
 --
+-- Name: vehicle_specifications id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.vehicle_specifications ALTER COLUMN id SET DEFAULT nextval('public.vehicle_specifications_id_seq'::regclass);
+
+
+--
 -- Name: wheel_sizes id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -5619,6 +5706,14 @@ ALTER TABLE ONLY public.bike_stickers
 
 ALTER TABLE ONLY public.bike_versions
     ADD CONSTRAINT bike_versions_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: bikebook_models bikebook_models_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.bikebook_models
+    ADD CONSTRAINT bikebook_models_pkey PRIMARY KEY (id);
 
 
 --
@@ -6398,6 +6493,14 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: vehicle_specifications vehicle_specifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.vehicle_specifications
+    ADD CONSTRAINT vehicle_specifications_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: wheel_sizes wheel_sizes_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -6655,6 +6758,20 @@ CREATE INDEX index_bike_versions_on_owner_id ON public.bike_versions USING btree
 --
 
 CREATE INDEX index_bike_versions_on_primary_activity_id ON public.bike_versions USING btree (primary_activity_id);
+
+
+--
+-- Name: index_bikebook_models_on_catalog_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_bikebook_models_on_catalog_id ON public.bikebook_models USING btree (catalog_id);
+
+
+--
+-- Name: index_bikebook_models_on_manufacturer_id_and_model_slug; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_bikebook_models_on_manufacturer_id_and_model_slug ON public.bikebook_models USING btree (manufacturer_id, model_slug);
 
 
 --
@@ -8058,6 +8175,20 @@ CREATE INDEX index_users_on_username ON public.users USING btree (username) WHER
 
 
 --
+-- Name: index_vehicle_specifications_on_bike_obj; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_vehicle_specifications_on_bike_obj ON public.vehicle_specifications USING btree (bike_obj_type, bike_obj_id);
+
+
+--
+-- Name: index_vehicle_specifications_on_bikebook_model_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_vehicle_specifications_on_bikebook_model_id ON public.vehicle_specifications USING btree (bikebook_model_id);
+
+
+--
 -- Name: unique_assignment_to_ambassador; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8172,6 +8303,11 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261125171521'),
+('20261125162741'),
+('20261125050000'),
+('20261123074039'),
+('20261121050440'),
 ('20261119180000'),
 ('20261119102802'),
 ('20261118155803'),

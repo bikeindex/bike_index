@@ -18,6 +18,9 @@ cgroup_priorities.each do |name, priority|
   cgroup.update!(priority:)
 end
 
+# Inline: a bike's creation only enqueues it, which would finish after the seeded bikes picked their models
+BikebookModelsSyncJob.new.perform
+
 # NOTE: this does not seed manufacturers, primary_activities, components or wheel sizes, those are pulled via rake task
 require File.expand_path("db/seeds/seed_helpers", Rails.root)
 SeedHelpers.with_clock do
@@ -35,6 +38,7 @@ SeedHelpers.with_clock do
   require File.expand_path("db/seeds/seed_ios_review_bikes", Rails.root)
   require File.expand_path("db/seeds/seed_transfer_bike", Rails.root)
   require File.expand_path("db/seeds/seed_oauth_app", Rails.root)
+  require File.expand_path("db/seeds/seed_bug_reports", Rails.root)
   require File.expand_path("db/seeds/seed_stripe_prices", Rails.root)
 end
 require File.expand_path("db/seeds/seed_counts", Rails.root)

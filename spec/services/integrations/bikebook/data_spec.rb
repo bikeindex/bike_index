@@ -1,79 +1,113 @@
 require "rails_helper"
 
 RSpec.describe Integrations::Bikebook::Data do
-  let(:re_record_interval) { 30.days }
+  before { sync_bikebook_models }
 
   describe "get_model" do
-    it "returns a hash with the model for Co-motion" do
-      VCR.use_cassette("bike_book_integration-comotion", re_record_interval:) do
-        manufacturer = FactoryBot.create(:manufacturer, name: "Co-Motion")
-        bike = {manufacturer: manufacturer.name, frame_model: "Americano Rohloff", year: 2014}
-        response = Integrations::Bikebook::Data.new.get_model(bike)
-        expect(response[:bike][:frame_model]).to eq("Americano Rohloff")
-        # fork = {ctype: "fork", description: "Easton EC 90X"}
-        expect(response[:components].count).to eq(8)
+    let(:manufacturer_id) { Manufacturer.friendly_find("Specialized").id }
+    let(:options) { {manufacturer_id:, frame_model: "Haul ST", year: 2025} }
+    let(:result) { described_class.get_model(described_class.vehicle_specification(options), year: options[:year]) }
+
+    it "returns the model's bike and component params" do
+      expect(result[:bike]).to match(cycle_type: "cargo-rear", paint_description: nil, description: /\AWhatever you’re into.* 60 miles/,
+        rear_wheel_bsd: 406, stock_photo_url: "https://bikebook.bikeindex.org/specialized/2025/haul-st.png")
+      expect(result[:components].count).to eq 32
+      expect(result[:components]).to include({component_type: "Grips/Tape", description: "Globe closed end slip on type, 155mm",
+                                              manufacturer: "Globe", front: false, rear: false}.as_json)
+      expect(result[:components]).to include({component_type: "Brake", manufacturer: "Tektro", front: true, rear: true,
+                                              description: "Tektro HD-T535, 4 piston caliper, hydraulic disc, 203mm rotor"}.as_json)
+    end
+
+    context "with a year after the model's first" do
+      let(:options) { {manufacturer_id:, frame_model: "haul-st", year: "2026"} }
+
+      it "returns the model" do
+        expect(result[:bike][:cycle_type]).to eq "cargo-rear"
       end
     end
 
-    it "returns a hash of the model for Surly" do
-      VCR.use_cassette("bike_book_integration-surly", re_record_interval:) do
-        manufacturer = FactoryBot.create(:manufacturer, name: "Surly")
-        bike = {manufacturer: manufacturer.name, frame_model: "Pugsley", year: 2013}
-        response = Integrations::Bikebook::Data.new.get_model(bike)
-        expect(response[:bike][:frame_model]).to eq("Pugsley")
-        expect(response[:components].count).to eq(22)
+    context "in its market variant's market" do
+      let(:options) { {manufacturer_id:, frame_model: "Haul ST", year: 2025, market: "CA"} }
+
+      it "returns the variant" do
+        expect(result[:bike][:description]).to include("up to 100 km")
       end
     end
 
-    it "returns nothing if it fails" do
-      VCR.use_cassette("bike_book_integration-fail", re_record_interval:) do
-        manufacturer = FactoryBot.create(:manufacturer, name: "Some crazy manufacturer we have nothing on")
-        bike = {manufacturer: manufacturer.name, frame_model: "Pugsley", year: 2014}
-        response = Integrations::Bikebook::Data.new.get_model(bike)
-        expect(response).to be_nil
-      end
-    end
-  end
+    context "in a market without a variant" do
+      let(:options) { {manufacturer_id:, frame_model: "Haul ST", year: 2025, market: "MX"} }
 
-  describe "get_model_list" do
-    it "doesn't fail if bikebook is down" do
-      VCR.use_cassette("bike_book_integration-models", re_record_interval:) do
-        manufacturer = FactoryBot.create(:manufacturer, name: "Giant")
-        all_giants = Integrations::Bikebook::Data.new.get_model_list(manufacturer: manufacturer.name)
-        expect(all_giants.is_a?(Array)).to be_truthy
-        giants_from_2014 = Integrations::Bikebook::Data.new.get_model_list({manufacturer: manufacturer.name, year: 2014})
-        expect(giants_from_2014.is_a?(Array)).to be_truthy
-        expect(all_giants.count).to be > giants_from_2014.count
+      it "returns the model" do
+        expect(result[:bike][:description]).to include("60 miles")
       end
     end
 
-    it "returns an array with the models for Giant, and a smaller array for a specific year of giant" do
-      VCR.use_cassette("bike_book_integration-models-more", re_record_interval:) do
-        manufacturer = FactoryBot.create(:manufacturer, name: "Giant")
-        all_giants = Integrations::Bikebook::Data.new.get_model_list(manufacturer: manufacturer.name)
-        expect(all_giants.is_a?(Array)).to be_truthy
-        giants_from_2014 = Integrations::Bikebook::Data.new.get_model_list({manufacturer: manufacturer.name, year: 2014})
-        expect(giants_from_2014.is_a?(Array)).to be_truthy
-        expect(all_giants.count).to be > giants_from_2014.count
+    context "with a bike" do
+      let(:options) { FactoryBot.create(:bike, manufacturer: Manufacturer.friendly_find("Aventon"), frame_model: "Level 2", year: 2023) }
+
+      it "returns the model" do
+        expect(result[:bike][:cycle_type]).to eq "bike"
+        expect(result[:components]).to be_present
       end
     end
 
-    it "returns nothing if it fails" do
-      VCR.use_cassette("bike_book_integration-models-fail", re_record_interval:) do
-        manufacturer = FactoryBot.create(:manufacturer, name: "Some weird manufacturer")
-        response = Integrations::Bikebook::Data.new.get_model_list(manufacturer: manufacturer.name)
-        expect(response).to be_nil
-      end
+    context "with a manufacturer the catalog lacks" do
+      let(:manufacturer_id) { FactoryBot.create(:manufacturer, name: "Some crazy manufacturer we have nothing on").id }
+
+      it { expect(result).to be_nil }
+    end
+
+    context "with the catalog unreachable" do
+      before { stub_bikebook_catalog(status: 500) }
+
+      it { expect(result).to be_nil }
     end
   end
 
-  # Registration renders inline, so an unreachable bikebook has to drop rather than block
-  describe "make_request timing out" do
-    after { WebMock.reset! } # this stub is registered outside a VCR cassette
+  describe "vehicle_specification" do
+    let(:manufacturer_id) { Manufacturer.friendly_find("Specialized").id }
+    let(:options) { {manufacturer_id:, frame_model: "Haul ST", year: 2025, market: "CA"} }
+    let(:result) { described_class.vehicle_specification(options) }
 
-    it "returns nil" do
-      WebMock.stub_request(:get, /bikebook\.io/).to_timeout
-      expect(Integrations::Bikebook::Data.new.get_model_list(manufacturer: "Giant")).to be_nil
+    it "is the model matching the name and year, in the market" do
+      expect(result).to have_attributes(bikebook_model: BikebookModel.find_by!(catalog_id: "m/specialized/2025/haul-st"), bikebook_market: "CA",
+        new_record?: true)
+      expect(result.bikebook_id).to eq "m/specialized/2025/haul-st@CA"
+    end
+
+    context "with a picked bikebook_model" do
+      let(:options) { {manufacturer_id:, frame_model: "Something else", year: 2025, bikebook_model: "m/specialized/2025/haul-st@CA"} }
+
+      it "is the picked model, in its citation key's market" do
+        expect(result.bikebook_id).to eq "m/specialized/2025/haul-st@CA"
+      end
+
+      context "without a year" do
+        let(:options) { super().except(:year) }
+
+        it { expect(result).to be_nil }
+      end
+
+      context "of another manufacturer" do
+        let(:manufacturer_id) { Manufacturer.friendly_find("Aventon").id }
+
+        it { expect(result).to be_nil }
+      end
+
+      context "not sold in the year" do
+        let(:options) { super().merge(year: 2019) }
+
+        it { expect(result).to be_nil }
+      end
+    end
+
+    context "with a bike that has one" do
+      let(:options) { FactoryBot.create(:bike, manufacturer: Manufacturer.friendly_find("Specialized"), frame_model: "Not it", year: 2025) }
+      let!(:vehicle_specification) { VehicleSpecification.create!(bike_obj: options, bikebook_model: BikebookModel.find_by!(catalog_id: "m/specialized/2025/haul-st"), bikebook_market: "CA") }
+
+      it "is the bike's" do
+        expect(result).to eq vehicle_specification
+      end
     end
   end
 end

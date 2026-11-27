@@ -1,7 +1,6 @@
 import { html, nothing } from 'lit-html'
 import { listedFigure } from 'bikebook/cycle_drawings'
 import { OVERALL_LENGTH_ESTIMATE } from 'bikebook/frame_geometry'
-import { catalogValue, currentShape } from 'bikebook/legacy_shape'
 import { missing } from 'bikebook/templates/helpers'
 import { table } from 'bikebook/templates/ui/table'
 import { tooltip } from 'bikebook/templates/ui/tooltip'
@@ -25,7 +24,7 @@ const LIMITS = [['rider', 'Max rider weight'], ['payload', 'Max payload (rider +
 // none for a value that isn't compared. `parts` splits a value whose parts are each compared, and `amount` shows a
 // difference, given the number it's of
 export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], market, highlight, beside = false, corner = nothing }) => {
-  const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, currentShape(data)))
+  const named = vehicles.map(({ data }) => presenter.named(presenter.kit.schemas.vehicle, data))
   const [first] = named
   const show = (row, value, vehicle) => row.format?.(value, vehicle, presenter) ?? (row.unit ? presenter.measurement(value, row.unit, row.key) : value)
   const geometry = GEOMETRY.map((key) => {
@@ -47,7 +46,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
     label: html`Overall length (est.) ${tooltip({ text: `Overall length is ${OVERALL_LENGTH_ESTIMATE}` })}`,
     read: (vehicle) => {
       const listed = frames[named.indexOf(vehicle)]?.wheels
-      return specified(vehicle) ?? (listed ? presenter.rounded(sum(Object.values(listed))) : null)
+      return specified(vehicle) ?? (listed ? Math.round(sum(Object.values(listed))) : null)
     },
     format: (value, vehicle) => isNumber(specified(vehicle)) ? html`${show(wheelbase, value, vehicle)} ${tooltip({ text: 'This value is specified' })}` : null
   }
@@ -103,7 +102,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
     if (options.length < 2) return options[0]?.name ?? missing
     return html`<select class="twinput tw:w-auto tw:py-1 tw:text-sm" aria-label=${`Size of ${named[index].model}`} data-action="bikebook--page#pickSize"
       data-bikebook--page-vehicle-param=${key} data-bikebook--page-first-param=${index === 0}>${options.map((size) =>
-        html`<option value=${size.name} ?selected=${size === sizes[index]} data-size=${JSON.stringify({ name: size.name, geometry: Object.fromEntries(['top_tube_effective', 'reach', 'rider_height_min', 'rider_height_max'].map((key) => [key, catalogValue(size.geometry, key)])) })}>${size.name}</option>`)}</select>`
+        html`<option value=${size.name} ?selected=${size === sizes[index]} data-size=${JSON.stringify({ name: size.name, geometry: Object.fromEntries(['top_tube_effective', 'reach', 'rider_height_min', 'rider_height_max'].map((key) => [key, size.geometry?.[key]])) })}>${size.name}</option>`)}</select>`
   }
 
   const records = (rows) => rows.map((row) => [row, named.map((vehicle, index) => row.read(vehicle, sizes[index]))])
@@ -112,7 +111,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
       return {
         label: row.label,
         // lit as the drawings' `highlight` figure is
-        className: row.key && row.key === highlight ? 'tw:bg-[#3397dc]/10' : undefined,
+        className: row.key && row.key === highlight ? 'tw:bg-[#3397dc]/10' : row.className,
         cell: (index) => {
           if (!present(values[index])) return missing
           return row.parts
@@ -125,7 +124,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
   const sizeRows = sizes.some(Boolean) ? [size] : []
   const cargos = new Map(named.map((vehicle, index) => [vehicle, cargoAt(presenter, vehicles[index].data, sizes[index])]))
   const cargoRows = vehicles.some(({ data }) => isCargo(data)) ? records([{ label: 'Cargo', read: (vehicle) => cargos.get(vehicle) }]) : []
-  const typeRows = new Set(named.map(typeLabel)).size > 1 ? records([{ label: 'Vehicle type', read: typeLabel }]) : []
+  const typeRows = new Set(named.map(typeLabel)).size > 1 ? records([{ label: 'Vehicle type', read: typeLabel, className: 'tw:whitespace-normal!' }]) : []
   const rows = [...typeRows, ...records(wheelRows), ...cargoRows, ...sizeRows, ...records([...geometry, length, WEIGHT, ...LIMITS])]
   if (rows.length === 0) return nothing
 
@@ -144,7 +143,7 @@ export const comparisonTable = ({ presenter, vehicles, sizes, frames = [], marke
           }),
           classes: 'tw:min-w-48 tw:align-top',
           headerClasses: border.top,
-          // a model's name can wrap in its header, but not a value
+          // a model's name can wrap in its header, and its types, but not a value
           cellClass: (record) => `tw:whitespace-nowrap ${record.className ?? ''} ${record === rows.at(-1) ? border.bottom : ''}`,
           cell: (record) => record.cell(index)
         }

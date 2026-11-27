@@ -17,40 +17,24 @@ RSpec.describe BikeJobs::BikeBookUpdateJob, type: :job do
     BikeJobs::BikeBookUpdateJob.new.perform(bike.id)
   end
 
-  it "grabs the components but doesn't overwrite components if the bike isn't on bikebook", :flaky do
-    manufacturer = FactoryBot.create(:manufacturer, name: "SE Bikes")
-    bike = FactoryBot.create(:bike,
-      manufacturer_id: manufacturer.id,
-      year: 2014,
-      frame_model: "Draft")
-    ["fork",
-      "crankset",
-      "pedals",
-      "chain",
-      "wheel",
-      "tire",
-      "headset",
-      "handlebar",
-      "stem",
-      "grips/tape",
-      "saddle",
-      "seatpost"].each { |name| FactoryBot.create(:ctype, name: name) }
-    component1 = FactoryBot.create(:component,
-      bike: bike, ctype_id: Ctype.friendly_find("fork").id,
-      description: "SE straight Leg Hi-Ten w/ Fender Mounts & Wide Tire Clearance")
+  it "grabs the components but doesn't overwrite components if the bike isn't on bikebook" do
+    sync_bikebook_models
+    manufacturer = Manufacturer.friendly_find("Specialized")
+    bike = FactoryBot.create(:bike, manufacturer:, year: 2025, frame_model: "Haul ST")
+    %w[Fork Crankset Saddle].each { FactoryBot.create(:ctype, name: it) }
+    component1 = FactoryBot.create(:component, bike:, ctype: Ctype.friendly_find("fork"), description: "2022 Globe Fork")
     expect(component1.is_stock).to be_falsey
-    component2 = FactoryBot.create(:component,
-      bike: bike, ctype_id: Ctype.friendly_find("crankset").id,
-      description: "Sweet cranks")
-    VCR.use_cassette("bike_book_update_worker", re_record_interval: 1.month) do
-      BikeJobs::BikeBookUpdateJob.new.perform(bike.id)
-    end
+    component2 = FactoryBot.create(:component, bike:, ctype: Ctype.friendly_find("crankset"), description: "Sweet cranks")
+
+    BikeJobs::BikeBookUpdateJob.new.perform(bike.id)
+
     bike.reload
-    expect(bike.components.count).to eq(14)
-    expect(bike.components.where(id: component1.id).first.is_stock).to be_truthy
-    expect(bike.components.where(id: component2.id).first.is_stock).to be_falsey
-    expect(bike.components.where(is_stock: false).count).to eq(1)
+    expect(component1.reload.is_stock).to be_truthy
+    expect(component2.reload.is_stock).to be_falsey
+    expect(bike.components.where(is_stock: false).pluck(:id)).to eq([component2.id])
     expect(bike.components.where(ctype_id: component2.ctype_id).count).to eq(1)
-    expect(bike.components.pluck(:ctype_id).count).to eq 14
+    expect(bike.components.find_by(ctype: Ctype.friendly_find("saddle"))).to have_attributes(is_stock: true,
+      description: "Specialized Body Geometry Comfort Gel", mnfg_name: "Specialized")
+    expect(bike.components.count).to be > 3
   end
 end

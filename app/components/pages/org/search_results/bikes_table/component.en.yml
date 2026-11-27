@@ -12,5 +12,4 @@ en:
             link_sticker: link sticker
             more_notes: "+%{count} more"
             not_registered_with: Hidden because it is not registered with %{org_name}
-            toggle_all_checked: Toggle all checked
             view: View

@@ -25,7 +25,7 @@ export default class extends Controller {
 
   openPanel () {
     collapse('show', this.panelTarget)
-    this.cells.forEach(cell => cell.classList.remove('tw:hidden'))
+    this.element.toggleAttribute('data-table-selecting', true)
     this.refreshChecks()
     this.toggleTarget.textContent = this.openLabelValue
     this.refreshTableEdges()
@@ -34,7 +34,7 @@ export default class extends Controller {
 
   closePanel () {
     collapse('hide', this.panelTarget)
-    this.cells.forEach(cell => cell.classList.add('tw:hidden'))
+    this.element.toggleAttribute('data-table-selecting', false)
     this.toggleTarget.textContent = this.closedLabelValue
     this.refreshTableEdges()
     this.setUrlParam(false)
@@ -81,18 +81,14 @@ export default class extends Controller {
   }
 
   get anyChecked () {
-    return [...this.cells].some(cell =>
-      cell.querySelector('input[type=checkbox]')?.checked
-    )
+    return !!this.element.querySelector('input[data-update-kinds]:checked')
   }
 
   // Enable only the checkboxes whose row supports the selected kind
   refreshChecks () {
     const kind = this.kindSelectTarget.value
-    this.cells.forEach(cell => {
-      const checkbox = cell.querySelector('input[type=checkbox]')
-      if (!checkbox) return
-
+    this.checkboxes.forEach(checkbox => {
+      const cell = checkbox.closest('td')
       const allowed = checkbox.dataset.updateKinds.split(' ').includes(kind)
       checkbox.disabled = !allowed
       if (allowed) {
@@ -104,8 +100,8 @@ export default class extends Controller {
     })
   }
 
-  get cells () {
-    return this.element.querySelectorAll('.multi-update-cell')
+  get checkboxes () {
+    return this.element.querySelectorAll('input[data-update-kinds]')
   }
 
   get kindLabel () {

@@ -275,3 +275,17 @@ $alert-warning-color: #ffc107;
     height: auto;
   }
 }
+
+// Side-by-side cells that stack on a narrow screen
+@media screen and (max-width: 620px) {
+  .stack {
+    display: block !important;
+    width: 100% !important;
+    padding-right: 0 !important;
+  }
+
+  .stack-gap {
+    padding-top: 16px !important;
+    padding-left: 0 !important;
+  }
+}

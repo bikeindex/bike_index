@@ -1,19 +1,43 @@
 import { Controller } from '@hotwired/stimulus'
+import { collapse } from 'utils/collapse_utils'
 
 // Connects to data-controller='register--frame-size'
 //
-// Frame size is either an ordinal chip (XS-XL) or a number in inches - picking
-// one clears the other so only a single size is submitted.
+// Frame size is either an ordinal chip (XS-XL) or a number - picking one clears
+// the other so only a single size is submitted.
 export default class extends Controller {
-  static targets = ['chip', 'number']
+  static targets = ['chip', 'number', 'unit', 'wrongUnit']
 
   pickChip () {
     this.numberTarget.value = ''
+    this.hideWrongUnit()
   }
 
   pickNumber () {
     if (this.numberTarget.value === '') return
 
     this.chipTargets.forEach(chip => { chip.checked = false })
+  }
+
+  // On change rather than input: typing 56 passes through 5 on its way there
+  checkUnit () {
+    const size = parseFloat(this.numberTarget.value)
+    if (!(size > 0)) return
+
+    const unit = size >= 30 ? 'cm' : 'in' // Bike#clean_frame_size's split
+    if (unit === this.unitTarget.value) return
+
+    this.unitTarget.value = unit
+    this.wrongUnitTargets.forEach(message => collapse(message.dataset.unit === unit ? 'hide' : 'show', message))
+  }
+
+  // Dispatched so form-persist saves it, and hideWrongUnit hides the message
+  revert ({ currentTarget }) {
+    this.unitTarget.value = currentTarget.value
+    this.unitTarget.dispatchEvent(new Event('change', { bubbles: true }))
+  }
+
+  hideWrongUnit () {
+    collapse('hide', this.wrongUnitTargets)
   }
 }

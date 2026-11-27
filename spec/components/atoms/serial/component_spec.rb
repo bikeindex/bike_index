@@ -12,6 +12,15 @@ RSpec.describe Atoms::Serial::Component, type: :component do
     expect(component.to_html.strip).to eq '<span class="serial-span">FFF333</span>'
   end
 
+  context "with explanation: :serial_tooltip" do
+    let(:options) { {explanation: :serial_tooltip} }
+
+    it "makes the serial the tooltip's trigger" do
+      expect(component.css("button span.serial-span").text).to eq "FFF333"
+      expect(component.css("[role=tooltip]").text).to eq "Serial number: FFF333"
+    end
+  end
+
   context "serial unknown" do
     let(:bike) { FactoryBot.create(:bike, serial_number: "unknown") }
 
@@ -45,6 +54,15 @@ RSpec.describe Atoms::Serial::Component, type: :component do
         expect(component.css("em")).to be_blank
         expect(component.css("button").text).to eq "?"
         expect(component.css("[role=tooltip]").text).to eq "because tandem is impounded"
+      end
+    end
+
+    context "with explanation: :serial_tooltip" do
+      let(:options) { {explanation: :serial_tooltip} }
+
+      it "puts why in the serial's own tooltip" do
+        expect(component.css("button span.less-strong").text).to eq "hidden"
+        expect(component.css("[role=tooltip]").text).to eq "Serial number: hidden (because tandem is impounded)"
       end
     end
 

@@ -18,6 +18,9 @@ en:
             rule, a minimum age, and limits on paths.
           class_3_summary: Pedal-assist to 28 mph, with a speedometer.
           class_3_tag: Faster pedal-assist
+          class_3_throttle_barred: >-
+            In %{state}, a Class 3 e-bike can't have a throttle, so a Class 3 with
+            a throttle isn't an e-bike there.
           class_n: Class %{n}
           copy_id: Copy ID
           emoto_limits_body: >-

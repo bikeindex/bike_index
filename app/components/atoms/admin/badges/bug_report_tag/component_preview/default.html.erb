@@ -1,0 +1,5 @@
+<div class="tw:flex tw:flex-wrap tw:gap-1">
+  <% tags.each do |tag_name| %>
+    <%= render(Atoms::Admin::Badges::BugReportTag::Component.new(tag: tag_name)) %>
+  <% end %>
+</div>

@@ -74,7 +74,7 @@ RSpec.describe Manufacturer, type: :model do
     it "finds with dashes" do
       mnfg = FactoryBot.create(:manufacturer, name: "All City")
       expect(mnfg.secondary_name).to be_nil
-      expect(mnfg.previous_slugs).to eq ["all_city"]
+      expect(mnfg.previous_slugs).to eq []
       expect(Manufacturer.friendly_find("All-city ")&.id).to eq(mnfg.id)
     end
     it "finds an -amp- slug as -and-" do
@@ -85,15 +85,15 @@ RSpec.describe Manufacturer, type: :model do
     it "finds in the secondary_slug" do
       mnfg = FactoryBot.create(:manufacturer, name: "S & M (S and M Bikes) ")
       expect(mnfg.secondary_name).to eq "S and M Bikes"
-      expect(mnfg.secondary_slug).to eq "s_and_m"
+      expect(mnfg.secondary_slug).to eq "s-and-m"
       expect(Manufacturer.friendly_find("s & m")&.id).to eq mnfg.id
-      expect(Manufacturer.find_by_secondary_slug("s_and_m")&.id).to eq mnfg.id
+      expect(Manufacturer.find_by_secondary_slug("s-and-m")&.id).to eq mnfg.id
       expect(Manufacturer.friendly_find("s and m bikes")&.id).to eq mnfg.id
       expect(Manufacturer.friendly_find("s and m")&.id).to eq mnfg.id
 
       mnfg.update(name: "S & M (SandM)")
       expect(mnfg.reload.secondary_slug).to eq "sandm"
-      expect(Manufacturer.find_by_secondary_slug("s_and_m")).to be_nil
+      expect(Manufacturer.find_by_secondary_slug("s-and-m")).to be_nil
     end
     it "keeps the old name's slug when it was also the secondary slug" do
       mnfg = FactoryBot.create(:manufacturer, name: "Kona Bicycle Company (Kona)")
@@ -111,7 +111,7 @@ RSpec.describe Manufacturer, type: :model do
 
       it "finds each by its own identifier" do
         expect(manufacturer.to_param).to eq "#{other_manufacturer.id}-bikes"
-        expect(manufacturer.previous_slugs).to eq ["#{other_manufacturer.id}_bikes"]
+        expect(manufacturer.previous_slugs).to eq []
         expect(Manufacturer.friendly_find(manufacturer.to_param)).to eq manufacturer
         expect(Manufacturer.friendly_find("#{other_manufacturer.id}_bikes")).to eq manufacturer
         expect(Manufacturer.friendly_find(name)).to eq manufacturer

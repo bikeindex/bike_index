@@ -23,7 +23,7 @@ class PrimaryActivity < ApplicationRecord
   SPECIAL_SHORT_NAMES = {
     "road" => "road-biking",
     "track" => "track-racing",
-    "endurance" => "endurance-sportive"
+    "endurance" => "road-endurance-sportive"
   }.freeze
 
   belongs_to :primary_activity_family, class_name: "PrimaryActivity"
@@ -34,13 +34,10 @@ class PrimaryActivity < ApplicationRecord
   has_many :bike_versions
 
   validates_presence_of :name
-  # NOTE: This class has something very similar to FriendlySlugFindable
-  # But scopes the validation of uniqueness
+  # A flavor's name repeats across families (MTB: Bikepacking, ATB: Bikepacking), its slug doesn't
   validates_uniqueness_of :name, scope: [:primary_activity_family_id], allow_nil: false
-  validates_uniqueness_of :slug, scope: [:primary_activity_family_id], allow_nil: false
-  # require uniqueness for family categories
   validates_uniqueness_of :name, if: -> { primary_activity_family_id.nil? }
-  validates_uniqueness_of :slug, if: -> { primary_activity_family_id.nil? }
+  validates_uniqueness_of :slug
 
   before_validation :set_calculated_attributes
   after_create :assign_family_id_if_self
@@ -148,7 +145,8 @@ class PrimaryActivity < ApplicationRecord
 
   def set_calculated_attributes
     self.name = name&.strip
-    self.slug ||= Slugifyer.slugify(name)
+    # Everything from the parenthetical on is a gloss: "ATB (All Terrain Biking) — Gravel, Cyclocross, etc." is atb
+    self.slug = Slugifyer.slugify(display_name.sub(/\s?\(.*/, ""))
     self.priority ||= calculated_priority
     # If it doesn't have a family, assign primary_activity_family_id to its own ID, so it's searchable
     # EVEN if it's a flavor

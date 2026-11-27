@@ -59,7 +59,7 @@ export const geometryCard = ({ presenter, size, others, selected, href, letters 
   const cargoFields = { length, width, volume }
   // where its vehicle lists any, a row for each the compared ones do
   const cargoRows = Object.keys(cargoFields).some((key) => present(cargo?.[key]))
-    ? presenter.rowsFor(cargoFields, cargo, { others: otherCargos }).map(([label, value, unit, differs, key, ...rest]) => [label, value, unit, differs, `cargo.${key}`, ...rest])
+    ? presenter.rowsFor(cargoFields, cargo, { others: otherCargos, prefix: 'cargo.' })
     : []
   const heading = (text) => html`<h4 class="tw:tweyebrow tw:pt-2">${text}</h4>`
   const group = (text, rows) => rows.length

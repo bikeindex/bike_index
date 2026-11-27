@@ -7,18 +7,14 @@ module Pages
       # The page is a <template> bikebook--page fills in from the URL and the catalog,
       # and renders again for each pick and history step
       class Component < ApplicationComponent
-        # market is the visitor's CF-IPCountry, which Cloudflare sends as XX, or T1 over Tor, when it can't
-        # tell, and the catalog lists an EU member's models under the EU; state is theirs in the US. framed: in an
-        # iframe, whose autofocus would take its host page's focus. overview: a model picked alone's Pages::Bikebook::ModelOverview
+        # market is the visitor's CF-IPCountry; state is theirs in the US. framed: in an iframe, whose autofocus
+        # would take its host page's focus. overview: a model picked alone's Pages::Bikebook::ModelOverview
         def initialize(manifest_url:, market:, state:, query:, paint_colors:, framed: false, overview: nil)
           @manifest_url = manifest_url
           @overview = overview
           @framed = framed
           @paint_colors = paint_colors
-          @market = if %w[XX T1].include?(market) || market.blank? then "US"
-          elsif EbikeRuleServices::Places::EU_MEMBERS.include?(market) then "EU"
-          else market
-          end
+          @market = Integrations::Bikebook::Catalog.market(market)
           @jurisdiction = state&.dig(:abbr) || "US"
           @query = query
         end
@@ -30,12 +26,12 @@ module Pages
         def catalog_version = @catalog_version ||= EbikeRuleServices::StateLaws.version
 
         # Every visitor's and every query's, which bikebook--page and placeholder_class fill in around them
-        def page_cache_key(*parts) = [self.class.cache_digest, catalog_version, *parts]
+        def page_cache_key(*parts) = child_cache_key(self.class, *parts)
 
         # A component's own fragment inside the page's, under skip_digest: Rails' digest of this template would expire it
         # with any change here. Not cache_on: these also render on /ebike-rules, where the same tile twice would repeat
         # its tooltip's id
-        def child_cache_key(component, *parts) = [component.cache_digest, catalog_version, *parts]
+        def child_cache_key(component, *parts) = [component.cache_digest, 2, catalog_version, *parts]
 
         # The search until bikebook--page fills it in from the URL: hidden as searching() hides a lone model's, and blank
         # where the URL sets anything but picks, which it says are loading
@@ -76,8 +72,8 @@ module Pages
 
         # The US classes, then the states' own, which /ebike-rules shows too; a state without them uses the US ones
         def class_groups
-          us = [{id: "class_1", name: translation(".us_class_1")}, {id: "class_2", name: translation(".us_class_2")},
-            {id: "class_3", name: translation(".us_class_3")}, EbikeRuleServices::StateLaws::NOT_AN_EBIKE]
+          us = [{id: "class-1", name: translation(".us_class_1")}, {id: "class-2", name: translation(".us_class_2")},
+            {id: "class-3", name: translation(".us_class_3")}, EbikeRuleServices::StateLaws::NOT_AN_EBIKE]
           {"US" => us}.merge(EbikeRuleServices::StateLaws.own_classes)
         end
       end

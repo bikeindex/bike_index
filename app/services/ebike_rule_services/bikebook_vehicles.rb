@@ -7,9 +7,11 @@ module EbikeRuleServices
 
     # nil for an id the catalog lacks, a model with no motor, or a catalog that doesn't answer
     def find(id)
-      block = id.present? && Integrations::Bikebook::Catalog.manifest&.dig("blocks", id[Integrations::Bikebook::Catalog::MODEL_ID, 1])
-      record = block && Integrations::Bikebook::Catalog.file(block)&.dig("models", id)
-      Bike.new(**attributes_from(record)) if record && record["motors"].present?
+      record = Integrations::Bikebook::Catalog.model(id)
+      # a market variant's record has its base's id
+      Bike.new(**attributes_from(record), bikebook_id: id) if record && record["motors"].present?
+    rescue Integrations::Bikebook::Catalog::Unreachable
+      nil
     end
 
     # The classifications of the modes the model's record is sold with
@@ -27,12 +29,10 @@ module EbikeRuleServices
       modes = updated(motors.flat_map { it["operating_modes"] || [] })
       throttle_modes = modes.select { it["mode"] == "throttle" }
       assist_modes = modes.select { it["mode"] == "assist" }
-      # TODO: once every model the catalog publishes is at its 1.0.0 schema, read certifications alone
-      certifications = motors.flat_map { Array(it["certifications"]).presence || it["certification"].to_s.split(/,\s*/) }
+      certifications = motors.flat_map { [*it["certifications"], *it.dig("battery", "certifications")] }
       classifications = modes.flat_map { Array(it["e_vehicle_classifications"]) }.uniq
       tiers = classifications - EbikeRuleServices::StateLaws.e_bike_law_ids
       {
-        bikebook_id: record["id"],
         manufacturer_name: record["manufacturer"],
         model: record["model"],
         first_year: record["first_year"],

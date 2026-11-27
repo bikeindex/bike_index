@@ -18,7 +18,7 @@ const combobox = (root, name) => root.getElementById(`${name}-hw-hidden-field`).
 const panelOf = (root) => root.querySelector('[data-controller~="bikebook--catalog-filters"]')
 const MARKET_ATTRIBUTE = 'data-bikebook--catalog-filters-default-market-value'
 // CycleType::NOT_CYCLE_TYPE, by the catalog's slugs
-const NOT_CYCLE_TYPE = ['e_scooter', 'skateboard', 'epamd', 'stroller', 'wheelchair', 'e_motorcycle']
+const NOT_CYCLE_TYPE = ['e-scooter', 'non-e-skateboard', 'personal-mobility', 'stroller', 'wheelchair', 'e-motorcycle', 'e-atv']
 const JURISDICTION_ATTRIBUTE = 'data-bikebook--catalog-filters-default-jurisdiction-value'
 
 // "Select an e-scooter, choose multiple to compare them" once the first of `vehicles` is one that isn't a bike, both
@@ -47,7 +47,7 @@ const fillFields = (root, filters) => {
     root.getElementById('jurisdiction-hw-hidden-field').setAttribute('value', jurisdiction)
     combobox(root, 'jurisdiction').dataset.hwComboboxPrefilledDisplayValue = state.dataset.autocompletableAs
   }
-  // evc/out_of_class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
+  // evc/out-of-class is in a state's classes as well as the US ones; the jurisdiction's hidden ones uncheck on connecting
   for (const value of filters.electric.split(',')) root.querySelectorAll(`input[name="electric"][value="${CSS.escape(value)}"]`).forEach((input) => input.setAttribute('checked', ''))
 }
 
@@ -59,7 +59,7 @@ const legalClasses = (root, filters, { e_vehicle_classifications: classification
     return Object.keys(classifications).filter((id) => classifications[id].e_bike_law && classifications[id].jurisdiction === filters.market)
   }
   const classes = root.querySelector(`[data-jurisdiction="${CSS.escape(filters.jurisdiction)}"]`) ?? root.querySelector('[data-jurisdiction="US"]')
-  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'evc/out_of_class')
+  return [...classes.querySelectorAll('input[name="electric"]')].map(({ value }) => value).filter((value) => value !== 'evc/out-of-class')
 }
 
 // `url`'s filters, its ranges in order and an older link's "all" markets as any, without which the market and the
@@ -76,7 +76,7 @@ const urlFilters = (root, url) => {
 }
 
 // as the catalog reads them: a renamed slug as its new one, and a value naming no option dropped
-const filtersAt = ({ kit, options }, root, url) => {
+const filtersAt = ({ vocabulary: { kit }, options }, root, url) => {
   const filters = urlFilters(root, url)
   return {
     ...filters,
@@ -99,7 +99,7 @@ const unpicked = async (catalog, root, filters) => ({
 // no similar models' adjustments for the filters to hold
 export async function unpickedVehicles (catalog, page, url) {
   const filters = filtersAt(catalog, page, url)
-  return { vehicles: new VehicleViewer(catalog.kit, catalog.vocabulary, filters).render([], url, null, await unpicked(catalog, page, filters)), adjustments: nothing }
+  return { vehicles: new VehicleViewer(catalog.vocabulary, filters).render([], url, null, await unpicked(catalog, page, filters)), adjustments: nothing }
 }
 
 const pickedOf = (catalog, url, { market }) => catalog.vehicles(vehicleIds(url), { market })
@@ -124,7 +124,7 @@ const renderSimilarControls = (root, viewer, vehicles, similar) => {
 export async function rescoredSimilar (catalog, page, url, vehicle, settings) {
   const filters = filtersAt(catalog, page, url)
   const [picks, results] = await Promise.all([pickedOf(catalog, url, filters), catalog.similar(vehicle, settings, filters)])
-  return new VehicleViewer(catalog.kit, catalog.vocabulary, filters).similarResults(url, results, chosenPhotos(url, picks))
+  return new VehicleViewer(catalog.vocabulary, filters).similarResults(url, results, chosenPhotos(url, picks))
 }
 
 // the model group `url`'s overview shows, of one of its vehicles, in the `filters`' market
@@ -140,7 +140,7 @@ export async function pickedVehicles (catalog, page, url) {
   const filters = filtersAt(catalog, page, url)
   const [found, group] = await Promise.all([pickedOf(catalog, url, filters), groupOf(catalog, url, filters)])
   const vehicles = found.slice(0, MAX_COMPARE)
-  const viewer = new VehicleViewer(catalog.kit, catalog.vocabulary, filters)
+  const viewer = new VehicleViewer(catalog.vocabulary, filters)
   const similar = await similarOf(catalog, url, vehicles, filters)
   return { vehicles: viewer.render(vehicles, url, preferredSize(), {}, { group, similar }), adjustments: viewer.similarAdjustments(vehicles, similar) }
 }
@@ -154,7 +154,7 @@ export async function addComparison (catalog, page, url, current) {
   const similar = await similarOf(catalog, url, vehicles, filters)
   if (!vehicles.length || !current()) return
 
-  const viewer = new VehicleViewer(catalog.kit, catalog.vocabulary, filters)
+  const viewer = new VehicleViewer(catalog.vocabulary, filters)
   page.querySelector('[data-similar-waiting]')?.remove()
   page.querySelector('#vehicle-viewers').prepend(fragmentOf(viewer.similarModels(vehicles[0], similar, url, chosenPhotos(url, vehicles))))
   renderSimilarControls(page, viewer, vehicles, similar)
@@ -196,7 +196,7 @@ export async function picksShell (picks, shell, url, status) {
 
   renderChips(combobox(root, 'vehicle_models'), vehicles)
   const viewers = root.getElementById('vehicle-viewers')
-  const viewer = new VehicleViewer(picks.kit, picks.vocabulary, urlFilters(root, url))
+  const viewer = new VehicleViewer(picks.vocabulary, urlFilters(root, url))
   const similar = await similarOf(picks, url, vehicles)
   renderInto(viewers, viewer.render(vehicles, url, preferredSize(), {}, { similar }))
   renderSimilarControls(root, viewer, vehicles, similar)
@@ -216,7 +216,6 @@ const optionsOf = (options) => {
 // comboboxes answer from the catalog: the vehicle combobox through `source`, the filters' chips
 // from their own options
 export async function hydrate (catalog, source, shell, url) {
-  const { kit } = catalog
   const root = shell.content.cloneNode(true)
   panelOf(root).hidden = !searching(url)
   for (const name of [...LISTS, ...SINGLES]) root.getElementById(`${name}-hw-listbox`).append(optionsOf(catalog.options[name]))
@@ -252,9 +251,9 @@ export async function hydrate (catalog, source, shell, url) {
     if (display) combobox(root, name).dataset.hwComboboxPrefilledDisplayValue = display
   }
 
-  const viewer = new VehicleViewer(kit, catalog.vocabulary, filters)
+  const viewer = new VehicleViewer(catalog.vocabulary, filters)
   for (const input of root.querySelectorAll('input[name="electric"]')) {
-    const id = input.value.replace(/^class_/, 'evc/us/class_')
+    const id = input.value.replace(/^class-/, 'evc/us/class-')
     const classification = catalog.vocabulary.e_vehicle_classifications[id]
     // a marker's checkbox has the page's own tooltip
     if (classification && !classification.marker) input.closest('label').after(fragmentOf(tooltip({ text: classification.title, body: viewer.presenter.classificationTooltip(id) })))

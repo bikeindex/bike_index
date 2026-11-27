@@ -1,17 +1,13 @@
 import { Controller } from '@hotwired/stimulus'
 import { html, noChange, nothing, render } from 'lit-html'
 import { Directive, directive } from 'lit-html/directive.js'
-import { loadCatalog } from 'bikebook/catalog'
+import { catalogAt } from 'bikebook/catalog'
 import { withFigures } from 'bikebook/cycle_drawings'
 import { toQuery } from 'bikebook/query'
 import { chosenSizes } from 'bikebook/sizes'
 import { vehicleModels } from 'bikebook/vehicle_models'
 import { buttonClasses } from 'bikebook/templates/ui/button'
 import { cycleDrawing, letterBackground } from 'bikebook/templates/vehicles/cycle_drawing'
-
-const catalogs = new Map()
-// one catalog, and its worker, for every drawing on the page
-const catalogAt = (manifestUrl) => catalogs.get(manifestUrl) ?? catalogs.set(manifestUrl, loadCatalog(manifestUrl)).get(manifestUrl)
 
 // Its Sizes & geometry view, with the size drawn here picked
 const geometryPath = (id, size) => `/bikebook?${toQuery({ vehicle_models: vehicleModels([{ id, size: size?.name }]), view: 'geometry' })}`
@@ -40,7 +36,7 @@ export default class extends Controller {
     const catalog = await catalogAt(this.manifestUrlValue)
     // a model in the size Bike Book first shows it in
     const [found] = this.modelValue ? await catalog.vehicles([this.modelValue]) : [{ data: {} }]
-    this.kit = catalog.kit
+    this.kit = catalog.vocabulary.kit
     this.vehicle = found && { id: found.value, data: found.data, size: found.value && chosenSizes([found])[0] }
     this.vehicle
       ? this.draw()

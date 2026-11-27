@@ -365,6 +365,48 @@ RSpec.describe UsersController, type: :request do
     end
   end
 
+  describe "new in a format it has no template for" do
+    it "is not acceptable" do
+      get "#{base_url}/new", headers: {"Accept" => "application/json"}
+      expect(response).to have_http_status(:not_acceptable)
+
+      get "#{base_url}/new", headers: {"Accept" => "text/vnd.turbo-stream.html"}
+      expect(response).to have_http_status(:not_acceptable)
+    end
+
+    context "with different view paths" do
+      around do |example|
+        original_view_paths = UsersController.view_paths
+        UsersController.view_paths = view_paths
+        example.run
+      ensure
+        UsersController.view_paths = original_view_paths
+      end
+
+      context "with only a turbo_stream template" do
+        let(:view_paths) { [Rails.root.join("spec/fixtures/turbo_stream_only_views").to_s] }
+
+        it "raises for html, which every page must have" do
+          expect { get "#{base_url}/new" }.to raise_error(ActionView::MissingTemplate)
+
+          get "#{base_url}/new", headers: {"Accept" => "application/json"}
+          expect(response).to have_http_status(:not_acceptable)
+        end
+      end
+
+      context "with no template in any format" do
+        let(:view_paths) { [] }
+
+        it "raises, whatever the format" do
+          expect { get "#{base_url}/new", headers: {"Accept" => "text/vnd.turbo-stream.html"} }
+            .to raise_error(ActionView::MissingTemplate)
+          expect { get "#{base_url}/new", headers: {"Accept" => "application/json"} }
+            .to raise_error(ActionView::MissingTemplate)
+        end
+      end
+    end
+  end
+
   describe "update" do
     include_context :request_spec_logged_in_as_user
 

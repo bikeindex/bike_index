@@ -48,6 +48,12 @@ module Pages
         end
 
         def emoto_card
+          barred_state = if EbikeRuleServices::StateLaws.out_of_class_ids.include?(@catalog_id)
+            EbikeRuleServices::StateLaws::STATES.find { EbikeRuleServices::StateLaws.out_of_class_id(it[:abbr]) == @catalog_id }
+          end
+          # Its speed and power are a Class 3's, so neither is why
+          return {title: unbroken_hyphen(translation(".not_an_ebike")), body: translation(".class_3_throttle_barred", state: barred_state[:name])} if barred_state
+
           rules = @place && EbikeRuleServices::StateLaws.emoto_rules(@place[:abbr]).presence
           {either: true, title: unbroken_hyphen(translation(".not_an_ebike")),
            speed: translation(".emoto_speed"), motor: translation(".emoto_motor"), rules:,

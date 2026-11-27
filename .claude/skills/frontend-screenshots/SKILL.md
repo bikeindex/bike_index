@@ -38,10 +38,12 @@ From a session with history, hand this skill to a subagent the way `AGENTS.md`'s
 - `eval "$(ruby bin/env --export)"` so `$BASE_URL` is set.
 - `curl -fs "$BASE_URL/" >/dev/null` — run it every time, even if an earlier check in the session failed; the user may have started it since. If it fails now, **stop and ask the user to start it — unless this is a spawned `.claude/worktrees/…` checkout or the web sandbox, where you start it yourself**. `bin/env` resolves `$DEV_PORT`/`$BASE_URL` from the workspace ID, so whoever starts bin/dev binds the same port and DB this skill expects.
 - **A 200 doesn't prove the server is this checkout's.** Confirm `ruby bin/env --export` names a `WORKSPACE_ID` first — without one the curl reaches the main checkout. See the `sandbox-test-setup` skill. The web sandbox (`/home/user/bike_index`) gets a `WORKSPACE_ID` like anywhere else — its setup script runs `bin/workspace_setup` — but it's the only checkout in that container, so whatever `$BASE_URL` resolves to is the right one.
-- A 200 there doesn't promise the next page renders. A merge from the base can leave the dev DB
-  unmigrated, and `CheckPending` only re-raises once the evented file watcher notices `db/migrate`
-  moved — so a passing curl can be followed by `ActiveRecord::PendingMigrationError` on every page.
-  `bundle exec rails db:migrate`, and read `log/development.log` before blaming the capture.
+- A merge from the base can leave the dev DB unmigrated, and `-f` fails the curl on the 500 that
+  follows exactly as on a server that isn't running — check `-w '%{http_code}'` before asking anyone
+  to start it. A 200 doesn't clear it either: `CheckPending` only re-raises once the evented file
+  watcher notices `db/migrate` moved, so a passing curl can be followed by
+  `ActiveRecord::PendingMigrationError` on every page. `bundle exec rails db:migrate`, and read
+  `log/development.log` before blaming the capture.
   A gem the merge bumped does the same: the running server keeps the version it booted with, so a
   method the new one adds is a `NoMethodError` until `bin/rails restart`.
 - If `mcp__playwright__*` tools aren't registered, tell the user to run `claude mcp add playwright -- npx -y @playwright/mcp@latest` and restart.
@@ -123,6 +125,8 @@ If the returned content height is **less than the viewport height**, `browser_re
 **Mid-interaction states are in scope.** When the caller asks for a dropdown open, a modal showing, a hover state, a partially-filled form, etc., drive Playwright between settle and the screenshot — `browser_click`, `browser_type`, `browser_press_key`, `browser_hover`, then wait for the UI to reach the target state (`browser_wait_for` on a marker element, or check via `browser_evaluate`) before `browser_take_screenshot`. Treat the interaction sequence as part of the page-slug — e.g. capture `combobox-open` after clicking + typing, distinct from a static `search-registrations` page-load shot. For cross-branch comparisons, run the *same* interaction sequence on each branch so the screenshots actually compare like-for-like.
 
 **At the mobile width a `UI::Forms::Combobox` opens a dialog and its own input goes inert** — clicking `#<id>` works, but typing into it times out on "element is inert". Type into `#<id>-hw-dialog-combobox` instead.
+
+**Navigating to the URL you're already on is a reload, and Chrome restores what you typed.** The second viewport's pass then types onto the first's text (`allez spallez sp`, "No matches") — select the field's text before typing.
 
 **A loading state is captured by holding the request open, not by racing it.** In `browser_run_code_unsafe`, `page.route` the frame's URL and delay with `await page.waitForTimeout(90000)` before `route.continue()` — `setTimeout` isn't defined there — then trigger the fetch the way the frame does, by re-setting its `src`. Load the results first: a frame that goes busy from an empty page captures a header reading "0 matches".
 

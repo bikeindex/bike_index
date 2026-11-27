@@ -1,12 +1,7 @@
 <%# A snapshot keeps the state chosen on leaving, which connecting would act on and leave again %>
 <% helpers.content_for(:header) { tag.meta(name: "turbo-cache-control", content: "no-cache") } %>
 
-<section
-  class="
-    tw:border-b tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
-    tw:dark:bg-gray-900
-  "
->
+<section class="tw:border-b <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>">
   <div class="tw:pt-[clamp(36px,6vw,64px)] tw:pb-28 <%= SECTION_CLASSES %>">
     <h1
       class="
@@ -417,7 +412,7 @@
 
 <section class="tw:bg-blue-600 tw:text-white">
   <div class="tw:flex tw:flex-wrap tw:items-center tw:gap-x-9 tw:gap-y-5 tw:py-8 <%= SECTION_CLASSES %>">
-    <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.png", alt: "", class: "tw:w-30 tw:flex-none" %>
+    <%= image_tag "kelsey/illustrations/comic-assets_bike-hero.webp", alt: "", class: "tw:w-30 tw:flex-none" %>
 
     <div class="tw:flex-[1_1_300px]">
       <h2

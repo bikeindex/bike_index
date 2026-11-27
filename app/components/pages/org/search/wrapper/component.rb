@@ -31,7 +31,6 @@ module Pages
             params:,
             bikes: [],
             impound_records: nil,
-            multiselect_visible: false,
             interpreted_params: {},
             sort_state: ComponentStructs::SortState.new,
             search_stickers: nil,
@@ -49,7 +48,6 @@ module Pages
             @pagy = pagy
             @bikes = impound_records&.map(&:bike) || bikes
             @impound_records = impound_records
-            @multiselect_visible = multiselect_visible
             @interpreted_params = interpreted_params
             @sort_state = sort_state
             @per_page = per_page

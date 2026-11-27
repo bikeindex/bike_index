@@ -200,6 +200,17 @@ if impound_records.any? && ImpoundClaim.where(organization: brakebills).none?
   end
 end
 
+# --- OrganizationMessage: a member's note to a Brakebills registrant ---
+if OrganizationMessage.where(organization: brakebills).none?
+  message_bike = brakebills.bikes.reorder(:id)
+    .detect { |bike| OrganizationMessage.for?(bike:, organization: brakebills) && bike.contact_owner?(member, brakebills) }
+  raise "no Brakebills bike a member can message" if message_bike.blank?
+
+  OrganizationMessage.create!(organization: brakebills, sender: member, bike: message_bike,
+    message: "Your bike is locked to the welters court fence — please move it to a rack by Friday.")
+  puts "  Created OrganizationMessage on bike ##{message_bike.id}"
+end
+
 # --- Transferred bike: needed for the `finished_registration_transferred`
 # preview, which selects an unorganized, unclaimed bike that has a
 # previous_ownership_id (i.e. was transferred to a new owner). ---
@@ -212,16 +223,7 @@ unless transferred_bike_exists
   SeedHelpers.tick
   bike = BikeServices::Creator.new.create_bike(
     BParam.create!(creator: user, params: {
-      bike: {
-        cycle_type: "bike",
-        propulsion_type: "foot-pedal",
-        serial_number: "TRANSFERRED01",
-        manufacturer_id: SeedHelpers.weighted_frame_maker_id,
-        primary_frame_color_id: Color.pluck(:id).sample,
-        rear_tire_narrow: "true",
-        handlebar_type: HandlebarType.slugs.first,
-        owner_email: "previous-owner@bikeindex.org"
-      }
+      bike: SeedHelpers.bike_params(owner_email: "previous-owner@bikeindex.org").merge(serial_number: "TRANSFERRED01")
     })
   )
   raise "Transferred bike creation failed" if bike.errors.any?

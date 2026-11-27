@@ -1,10 +1,5 @@
 <%= helpers.turbo_frame_tag(FRAME_ID, class: ["tw:block", @additional_classes]) do %>
-  <section
-    class="
-      tw:border-y tw:border-gray-200 tw:bg-gray-50 tw:dark:border-gray-700
-      tw:dark:bg-gray-900
-    "
-  >
+  <section class="tw:border-y <%= SharedBlocks::Marketing::Wrapper::Component::BAND_CLASSES %>">
     <div class="tw:py-[clamp(40px,7vw,64px)] <%= Pages::EbikeRules::Show::Component::SECTION_CLASSES %>">
       <% heading, intro = if outside_us
         [unbroken_hyphen(translation(".place_heading", place: @place[:name]))]

@@ -23,6 +23,16 @@ RSpec.describe SharedBlocks::SearchResults::BikeCard::Component, type: :componen
     expect(component).to have_text("Bike")
     expect(component).to have_text("SUR-77120934")
     expect(component).not_to have_text("Registered with")
+    expect(component).to have_no_css("button[aria-label^='Stock photo']")
+  end
+
+  context "with a stock photo" do
+    before { bike.update(year: 2025, frame_model: "Haul ST", stock_photo_url: "https://bikebook.bikeindex.org/specialized/2025/haul-st.png") }
+
+    it "shows it, badged as stock" do
+      expect(component).to have_css("img[src='https://bikebook.bikeindex.org/specialized/2025/haul-st.png']")
+      expect(component).to have_css("button[aria-label='Stock photo of a 2025 Haul ST']", exact_text: "Stock")
+    end
   end
 
   context "with search_all" do
@@ -61,9 +71,11 @@ RSpec.describe SharedBlocks::SearchResults::BikeCard::Component, type: :componen
         FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["credibility_badges"])
       end
 
-      it "renders the with-owner badge, carrying the registration date" do
-        expect(component).to have_text("Registered ·")
-        expect(component).to have_css("span.localizeTime")
+      it "shows the registered and updated dates beside the serial, not in the badge" do
+        expect(component).not_to have_text("Registered ·")
+        expect(component).to have_text(/Registered\s+\S/)
+        expect(component).to have_text("Updated")
+        expect(component).to have_css("span.localizeTime", count: 2)
       end
     end
 

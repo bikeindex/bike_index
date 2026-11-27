@@ -7,4 +7,5 @@ en:
         hidden_because_status: because %{bike_type} is %{status}
         hidden_for_unauthorized_users: hidden for unauthorized users
         made_without_serial: made without serial
+        serial_number: 'Serial number: %{serial}'
         unknown: unknown

@@ -20,7 +20,8 @@ module BikeJobs
     # Other columns that can point at a bike, moved below
     MERGED_COLUMNS = %w[address_records.bike_id b_params.created_bike_id bike_organization_notes.bike_id
       bike_organizations.bike_id bike_stickers.bike_id graduated_notifications.primary_bike_id
-      impound_claims.bike_submitting_id public_images.imageable_id sales.item_id strava_gears.item_id].freeze
+      impound_claims.bike_submitting_id public_images.imageable_id sales.item_id strava_gears.item_id
+      vehicle_specifications.bike_obj_id].freeze
     # Columns that can point at a bike, left on the deleted registration
     LEFT_COLUMNS = {
       "ownerships.bike_id" => "the POS registration's ownership takes the owner's registration info",
@@ -87,6 +88,7 @@ module BikeJobs
       UserAlert.active.where(bike_id: bike.id).update_all(resolved_at: Time.current, updated_at: Time.current)
       PublicImage.unscoped.where(imageable: bike).update_all(imageable_id: pos_bike.id)
       Sale.where(item: bike).update_all(item_id: pos_bike.id)
+      merge_vehicle_specification(bike, pos_bike)
       # Gear is its Strava athlete's
       unless StravaGear.where(item: pos_bike).exists?
         StravaGear.where(item: bike, strava_integration: StravaIntegration.where(user_id: pos_bike.user_id))
@@ -130,6 +132,16 @@ module BikeJobs
         merged_organization_ids
       BikeOrganization.unscoped.where(bike_id: pos_bike.id, organization_id: restricted_organization_ids, can_not_edit_claimed: false)
         .update_all(can_not_edit_claimed: true, updated_at: Time.current)
+    end
+
+    # The owner's values win where they have one, as their frame_model does
+    def merge_vehicle_specification(bike, pos_bike)
+      specification = bike.vehicle_specification
+      return if specification.blank?
+
+      (pos_bike.vehicle_specification || pos_bike.build_vehicle_specification)
+        .update!(specification.slice(:bikebook_model_id, :bikebook_market).compact)
+      specification.destroy!
     end
 
     def merge_attributes(bike, pos_bike)
