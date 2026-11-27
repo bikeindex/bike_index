@@ -49,9 +49,7 @@
     <% end %>
 
     <% list.with_row(label: "Replies") do %>
-      <% replies = @bug_report.reply_notifications.includes(:user).to_a %>
-
-      <% replies.each do |notification| %>
+      <% @bug_report.reply_notifications.includes(:user).each do |notification| %>
         <div>
           <%= link_to admin_notifications_path(search_bug_report_id: @bug_report.id), class: "twlink" do %>
             <%= render(UI::Time::Component.new(time: notification.created_at)) %>
@@ -60,10 +58,6 @@
           <%= notification_delivery_display(notification.delivery_status) %>
           <small class="less-strong"><%= notification.sender_display_name %></small>
         </div>
-      <% end %>
-
-      <% if replies.none? %>
-        <span class="less-strong">none</span>
       <% end %>
     <% end %>
   <% end %>
