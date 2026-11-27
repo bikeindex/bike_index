@@ -63,7 +63,7 @@ This has to happen before the cleanup below, which diffs against `origin/main`.
 
 ### Simplify, lint, and conform to AGENTS.md
 
-`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, a pass over the changed files against `AGENTS.md`, its audits — spec, documentation, churn, comment, backfill and, when the branch adds them, asset, controller, component and markup (the `use-existing-markup` skill) — and the cycle-type translation and product-name checks. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
+`references/pre-push-cleanup.md` has this in full: `/simplify`, `bin/lint` scoped to the branch's files, branch-scoped specs, and the `code-review-bike-index` skill — the `AGENTS.md` conformance pass and every convention audit. The audits are required every run, not just when the diff looks messy. Commit everything it produces before re-dating migrations.
 
 ### Freshen stale migration timestamps
 
@@ -82,7 +82,7 @@ Run in parallel:
 
 Diff against `origin/main`, not the local base branch — in a Conductor worktree the local base often lags the remote, which would inflate or stale the diff. If you skipped **Prepare the branch**, `git fetch origin` first. If the branch has no commits ahead of `origin/main`, stop and tell the user.
 
-**`rtk proxy` the `git log`** — rtk's hook strips merge commits from `git log --oneline`, so the merge **Prepare the branch** just made is absent and the branch reads as though it never merged.
+**The log has to show merge commits** — the merge **Prepare the branch** just made among them. Plain `git log` does. `rtk git log` doesn't, so if the merge you just made is missing, rtk's hook rewrote the command — re-run it as `rtk proxy git log`.
 
 `gh pr view` exits non-zero with "no pull requests found" when the branch has none — that's the answer to the create-or-update question below, not a broken command, and it's the normal case on a first run.
 
@@ -151,7 +151,7 @@ The one that talks itself into existence is the "still accurate" update — a la
 Two gates, either of which skips the section outright:
 
 - **Not a frontend diff** — per the classifier above. **Unless a `## Screenshots` comment already exists**: the user asked for those captures, so a commit since the last one that changes what they show stales them even here. Recapture only those pages.
-- **No `gh`**, with `$CLAUDE_CODE_REMOTE` unset. Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. **The web sandbox is not this case**, though `gh` doesn't work there: `$CLAUDE_CODE_REMOTE` is `true` there, and the section runs, because `github-pr-images` hosts through the PR branch's history — see the appendix.
+- **No `gh`**, with `$CLAUDE_CODE_REMOTE` unset. Then there is nowhere to host or post the images, so don't capture them and don't post anything in their place. Say so in your summary. **The web sandbox is not this case** — see the appendix.
 
 **A dev server you believe is down is not a gate.** Run `curl -fs "$BASE_URL/"` now, whatever an earlier check in the session said — the user starts `bin/dev` whenever, and #4319 went out without screenshots on a stale "isn't running". Only a failing curl *this* run is a reason to stop and ask.
 
@@ -179,7 +179,7 @@ Then return the PR URL.
 
 ## Appendix: the sandbox where `gh` doesn't work
 
-Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_REMOTE` is `true`) lacks the GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found" — or, since a `gh` binary can be present there, `HTTP 403: GitHub GraphQL is not available from Claude Code sessions` — swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
+Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_REMOTE` is `true`) lacks a working GitHub CLI; everywhere else the sections above run as written, and you shouldn't check. If a `gh` command comes back "command not found" — or, since a `gh` binary can be present there, `HTTP 403: GitHub GraphQL is not available from Claude Code sessions` — swap in the GitHub MCP equivalents — the rest of the workflow is unchanged, including `git push`.
 
 | Where | `gh` | MCP |
 | --- | --- | --- |
@@ -190,4 +190,4 @@ Only the Claude Code web sandbox (`/home/user/bike_index`, where `$CLAUDE_CODE_R
 
 Three traps in that column: `head` takes `owner:branch` when listing but a bare branch name when creating; the body is a string parameter, so `--body-file` has no equivalent; and `list_pull_requests` reports `merged: false` even for merged PRs — which is why the branch-state query asks for open PRs rather than filtering `all` on that field.
 
-**Screenshots do run here**, though `gh` doesn't: `github-pr-images`' `references/web-sandbox.md` commits the images to the PR's branch, deletes them in a second commit, and posts sha-pinned `raw.githubusercontent.com` URLs through the MCP tools. Follow that reference from its probe — a session whose comment tools rewrite image URLs ends the phase before any capture — then capture as normal and follow it for the hosting and posting steps. Those URLs live as long as the branch's objects do, so say in your summary that a merged PR's screenshots aren't archival.
+**Screenshots do run here**: `github-pr-images`' preflight decides how they upload.

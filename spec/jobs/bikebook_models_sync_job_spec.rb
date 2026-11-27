@@ -11,16 +11,22 @@ RSpec.describe BikebookModelsSyncJob, type: :job do
     BikebookModel.create!(catalog_id: "m/specialized/2020/dropped", manufacturer: specialized, name: "Dropped",
       model_slug: "dropped", first_year: 2020)
   end
+  let!(:returned) do
+    BikebookModel.create!(catalog_id: "m/specialized/2025/haul-st", manufacturer: specialized, name: "Haul ST",
+      model_slug: "haul_st", first_year: 2025, deleted_at: Time.current)
+  end
   before { stub_bikebook_catalog }
 
   it "syncs the index's models of the manufacturers it has, deleting those it dropped, once for each index and manufacturer" do
     instance.perform
+    # Soft deleted, as vehicle specifications keep pointing at them
+    expect(dropped.reload.deleted_at).to be_present
+    expect(returned.reload.deleted_at).to be_nil
 
     expect(BikebookModel.distinct.pluck(:manufacturer_id)).to match_array [specialized.id, aventon.id, kris_holm.id]
     expect(BikebookModel.count).to eq 30
     expect(BikebookModel.find_by(catalog_id: "m/specialized/2025/haul-st")).to have_attributes(manufacturer: specialized,
-      name: "Haul ST", model_slug: "haul_st", first_year: 2025, final_year: nil, markets: ["US"],
-      variants: [{"id" => "m/specialized/2025/haul-st@CA", "markets" => ["CA"]}])
+      name: "Haul ST", model_slug: "haul-st", first_year: 2025, final_year: nil, markets: ["US", "CA"])
     expect(BikebookModel.find_by(catalog_id: "m/kris-holm/2023/kh24").manufacturer).to eq kris_holm
     expect(BikebookModel.find_by(catalog_id: dropped.catalog_id)).to be_nil
 

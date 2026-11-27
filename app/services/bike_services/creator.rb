@@ -185,15 +185,18 @@ module BikeServices
     end
 
     def add_bike_book_data(b_param = nil)
-      return nil unless b_param&.bike.present? && b_param.manufacturer_id.present?
-      return nil unless b_param.bike["frame_model"].present? && b_param.bike["year"].present?
+      return nil if b_param&.bike.blank?
 
-      bb_data = Integrations::Bikebook::Data.get_model({
+      specification = Integrations::Bikebook::Data.vehicle_specification({
         manufacturer_id: b_param.bike["manufacturer_id"],
         year: b_param.bike["year"],
         frame_model: b_param.bike["frame_model"],
-        market: b_param.address_record.country_iso
+        market: b_param.address_record.country_iso.presence || b_param.params["registrant_country"],
+        bikebook_model: b_param.params["bikebook_model"]
       })
+      # Request params reach b_param unfiltered, so this is what associate records
+      b_param.params["bikebook_model"] = specification&.bikebook_id
+      bb_data = Integrations::Bikebook::Data.get_model(specification, year: b_param.bike["year"])
 
       return true unless bb_data && bb_data["bike"].present?
 
@@ -268,6 +271,7 @@ module BikeServices
       create_parking_notification(b_param, bike) if b_param&.status_abandoned? || b_param&.unregistered_parking_notification?
       create_bike_organizations(ownership)
       ComponentCreator.new(bike: bike, b_param: b_param).create_components_from_params
+      VehicleSpecification.cited(b_param.params["bikebook_model"])&.update!(bike_obj: bike)
       bike.create_normalized_serial_segments
       assign_user_attributes(bike, ownership&.user)
       BikeServices::StolenRecordUpdator.new(bike: bike, b_param: b_param).update_records

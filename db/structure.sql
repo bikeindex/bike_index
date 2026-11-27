@@ -741,9 +741,9 @@ CREATE TABLE public.bikebook_models (
     first_year integer NOT NULL,
     final_year integer,
     markets character varying[] DEFAULT '{}'::character varying[] NOT NULL,
-    variants jsonb DEFAULT '[]'::jsonb NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
-    updated_at timestamp(6) without time zone NOT NULL
+    updated_at timestamp(6) without time zone NOT NULL,
+    deleted_at timestamp(6) without time zone
 );
 
 
@@ -4678,6 +4678,40 @@ ALTER SEQUENCE public.users_id_seq OWNED BY public.users.id;
 
 
 --
+-- Name: vehicle_specifications; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.vehicle_specifications (
+    id bigint NOT NULL,
+    bike_obj_type character varying NOT NULL,
+    bike_obj_id bigint NOT NULL,
+    bikebook_model_id bigint,
+    bikebook_market character varying,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: vehicle_specifications_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.vehicle_specifications_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: vehicle_specifications_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.vehicle_specifications_id_seq OWNED BY public.vehicle_specifications.id;
+
+
+--
 -- Name: wheel_sizes; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -5514,6 +5548,13 @@ ALTER TABLE ONLY public.user_registration_organizations ALTER COLUMN id SET DEFA
 --
 
 ALTER TABLE ONLY public.users ALTER COLUMN id SET DEFAULT nextval('public.users_id_seq'::regclass);
+
+
+--
+-- Name: vehicle_specifications id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.vehicle_specifications ALTER COLUMN id SET DEFAULT nextval('public.vehicle_specifications_id_seq'::regclass);
 
 
 --
@@ -6449,6 +6490,14 @@ ALTER TABLE ONLY public.user_registration_organizations
 
 ALTER TABLE ONLY public.users
     ADD CONSTRAINT users_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: vehicle_specifications vehicle_specifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.vehicle_specifications
+    ADD CONSTRAINT vehicle_specifications_pkey PRIMARY KEY (id);
 
 
 --
@@ -8126,6 +8175,20 @@ CREATE INDEX index_users_on_username ON public.users USING btree (username) WHER
 
 
 --
+-- Name: index_vehicle_specifications_on_bike_obj; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_vehicle_specifications_on_bike_obj ON public.vehicle_specifications USING btree (bike_obj_type, bike_obj_id);
+
+
+--
+-- Name: index_vehicle_specifications_on_bikebook_model_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_vehicle_specifications_on_bikebook_model_id ON public.vehicle_specifications USING btree (bikebook_model_id);
+
+
+--
 -- Name: unique_assignment_to_ambassador; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -8240,6 +8303,9 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261125171521'),
+('20261125162741'),
+('20261125050000'),
 ('20261123074039'),
 ('20261121050440'),
 ('20261119180000'),

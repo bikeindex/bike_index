@@ -3,8 +3,10 @@ import { numberDisplay, uuid } from 'bikebook/templates/helpers'
 import { inlineBadge } from 'bikebook/templates/ui/badge'
 import { classificationOption } from 'bikebook/templates/vehicles/class_cards'
 import { comboboxOption } from 'bikebook/templates/vehicles/combobox_option'
+import { pickedPhoto } from 'bikebook/templates/vehicles/picked_photo'
 import { fragmentOf, renderInto } from 'bikebook/render'
 import { localSources } from 'utils/hw_combobox_patch'
+import { collapse } from 'utils/collapse_utils'
 import { TARGET_RIDERS } from 'bikebook/vehicle_presenter'
 
 /* global IntersectionObserver, Worker */
@@ -86,15 +88,38 @@ export async function mountCatalogCombobox (loading, template, slot, { display, 
   // with an async source the server can only prefill the id, which the gem would display
   const shown = named?.replace(CURRENT_MARK, '') ?? display
   if (shown) combobox.dataset.hwComboboxPrefilledDisplayValue = shown
-  // the option rich_display shows, ahead of the listbox's for the pick, which has its photo and price. Outside the
-  // listbox, the gem never lists it
-  if (named) {
-    combobox.before(fragmentOf(html`<span hidden role="option" data-value=${value} data-autocompletable-as=${shown}>${pickName(named)}</span>`))
+  // the option rich_display shows, ahead of the listbox's for the pick, whose photo and second line overflow the
+  // field. Outside the listbox, the gem never lists it
+  if (richPick) {
+    const picked = document.createElement('span')
+    const name = (value, display, typed) => renderInto(picked, value
+      ? html`<span hidden role="option" data-value=${value} data-autocompletable-as=${typed}>${pickName(display)}</span>`
+      : nothing)
+    if (named) name(value, named, shown)
+    combobox.before(picked)
+    // on the combobox itself, so it's renamed before the bubbling event reaches rich_display. Typed text is only
+    // preselected
+    const rename = ({ detail }) => name(!detail.isNewAndAllowed && detail.value, detail.display, detail.display)
+    combobox.addEventListener('hw-combobox:preselection', rename)
+    combobox.addEventListener('hw-combobox:selection', rename)
   }
   localSources.set(combobox, new CatalogComboboxSource(catalog))
   slot.replaceChildren(fragment)
   return slot.querySelector('input[type=hidden]')
 }
+
+// The model `value` names, null for one naming none: typed text, or a classification
+export const pickedVehicle = async (catalog, value) => value ? (await catalog.vehicles([value]).catch(() => []))[0] ?? null : null
+
+// Collapses open on `vehicle`'s `photo`, its stock photo by default, and shut for none or one that fails to load
+export const showPhoto = (target, vehicle, photo = vehicle?.data.stock_photo) => {
+  if (!photo) return collapse('hide', target)
+  renderInto(target, pickedPhoto({ photo, alt: vehicle.display?.replace(CURRENT_MARK, ''), failed: () => collapse('hide', target) }))
+  collapse('show', target)
+}
+
+// Shows the stock photo of the model `value` names in `target`
+export const showPickedPhoto = async (catalog, value, target) => showPhoto(target, await pickedVehicle(catalog, value))
 
 // Answers a hotwire_combobox async filter with the markup the gem's own turbo-stream response would
 // carry, so its selection and paging run unchanged

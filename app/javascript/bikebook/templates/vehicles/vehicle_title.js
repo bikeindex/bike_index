@@ -16,14 +16,14 @@ export const manufacturerLine = (manufacturer) => present(manufacturer)
 
 // A compared vehicle's model, after an e-vehicle's badge, its configuration where it isn't complete by the kit's
 // `configurations` names, the markets selling it where `market` doesn't and the copy button for its id, `value`, its
-// tooltip linking the JSON, inline after its last line. As an 'h1' or 'h3' `heading`, set large
-export const modelLine = ({ model, data, value, market, configurations, heading }) => {
+// tooltip linking the JSON, inline after its last line. As an 'h3' `heading`, set large
+const modelLine = ({ model, data, value, market, configurations, heading }) => {
   const size = heading ? 'md' : 'sm'
   const name = html`${model}${configurationNote({ configuration: data.model_configuration, names: configurations, size })}${
     marketNote({ markets: array(data.markets), market })}`
   return html`<div class=${heading ? 'tw:text-2xl tw:leading-tight' : ''}>${present(data.motors)
     ? html`${inlineBadge({ text: '⚡', title: 'E-vehicle', color: 'purple', size })} `
-    : nothing}${{ h1: html`<h1 class=${HEADING}>${name}</h1>`, h3: html`<h3 class=${HEADING}>${name}</h3>` }[heading] ?? name} <span
+    : nothing}${heading ? html`<h3 class=${HEADING}>${name}</h3>` : name} <span
     class="tw:inline-block tw:align-middle">${copyButton({ value, label: 'Copy ID', tooltip: true, after: viewJson(value) })}</span></div>`
 }
 

@@ -856,9 +856,12 @@ RSpec.describe BikeServices::Creator do
           manufacturer_id: manufacturer.id,
           year: 2025,
           frame_model: "Haul ST",
-          primary_frame_color_id: color.id
+          primary_frame_color_id: color.id,
+          owner_email: "something@gmail.com"
         }
       end
+      let(:bikebook_model) { BikebookModel.find_by!(catalog_id: "m/specialized/2025/haul-st") }
+
       it "adds the model's data" do
         instance.send(:add_bike_book_data, b_param)
 
@@ -868,6 +871,55 @@ RSpec.describe BikeServices::Creator do
         expect(b_param.bike["description"]).to start_with("Input description Whatever you’re into")
         expect(b_param.bike).to include("serial_number" => "Some serial", "primary_frame_color_id" => color.id,
           "cycle_type" => "cargo-rear", "stock_photo_url" => "https://bikebook.bikeindex.org/specialized/2025/haul-st.png")
+      end
+
+      it "creates the bike with its vehicle specification" do
+        bike = instance.create_bike(b_param)
+        expect(bike.vehicle_specification).to have_attributes(bikebook_model:, bikebook_market: "US")
+      end
+
+      context "registered from Canada, with no address" do
+        before { b_param.update(params: b_param.params.merge("registrant_country" => "CA")) }
+
+        it "adds its Canadian variant's data" do
+          instance.send(:add_bike_book_data, b_param)
+          expect(b_param.reload.bike["description"]).to include("up to 100 km")
+        end
+      end
+
+      context "picked in registration" do
+        let(:bike_params) { super().merge(frame_model: "Haul ST custom") }
+        let(:b_param) { BParam.create(creator: user, params: {bike: bike_params, bikebook_model: "m/specialized/2025/haul-st@CA"}) }
+
+        it "creates the bike with its picked model's data, in its market" do
+          bike = instance.create_bike(b_param)
+
+          expect(bike.description).to include("up to 100 km")
+          expect(bike.vehicle_specification).to have_attributes(bikebook_model:, bikebook_market: "CA")
+        end
+
+        context "without a year" do
+          let(:bike_params) { super().merge(year: nil) }
+
+          it "creates the bike without its data or a vehicle specification" do
+            bike = instance.create_bike(b_param)
+
+            expect(bike.description).to eq "Input description"
+            expect(bike.vehicle_specification).to be_nil
+          end
+        end
+      end
+
+      context "with a model the catalog lacks, and another manufacturer's bikebook_model in the request" do
+        let(:bike_params) { super().merge(frame_model: "Not a real model") }
+        let(:b_param) { BParam.create(creator: user, params: {bike: bike_params, bikebook_model: "m/aventon/2022/level-2"}) }
+
+        it "creates the bike without a vehicle specification" do
+          bike = instance.create_bike(b_param)
+
+          expect(bike.id).to be_present
+          expect(bike.vehicle_specification).to be_nil
+        end
       end
     end
   end

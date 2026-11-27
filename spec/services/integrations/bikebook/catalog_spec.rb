@@ -60,7 +60,7 @@ RSpec.describe Integrations::Bikebook::Catalog do
       expect(described_class.vehicle("m/segway/2025/gt3-pro")).to match(title: "Segway GT3 Pro",
         description: a_string_starting_with("Experience elite performance"), image_url: "https://bikebook.bikeindex.org/segway/2025/gt3-pro.png")
       expect(Rails.cache.exist?(["bikebook_catalog/file", "models/segway/2025.json"])).to be false
-      expect(Rails.cache.exist?(["bikebook_catalog/model", described_class.head["digest"], "m/segway/2025/gt3-pro"])).to be true
+      expect(Rails.cache.exist?(["bikebook_catalog/model_markets", described_class.head["digest"], "m/segway/2025/gt3-pro"])).to be true
       Rails.cache.delete(["bikebook_catalog/manifest", described_class::MANIFEST])
       WebMock.stub_request(:get, /#{Regexp.escape(described_class::URL)}/o).to_return(status: 503)
       described_class::Reads.reset
@@ -125,9 +125,28 @@ RSpec.describe Integrations::Bikebook::Catalog do
     end
   end
 
+  describe "market" do
+    it "is the catalog's market for a country, the US for one Cloudflare can't place" do
+      expect([nil, "XX", "T1", "US", "CA", "DE"].map { described_class.market(it) }).to eq %w[US US US US CA EU]
+    end
+  end
+
   describe "model" do
     it "is the model's record" do
       expect(described_class.model("m/segway/2025/gt3-pro")).to include("id" => "m/segway/2025/gt3-pro", "motors" => be_present)
+    end
+
+    it "is a market variant's by its citation key, reading the block once for every market" do
+      reads = 0
+      WebMock.stub_request(:get, "#{described_class::URL}models/specialized/2025.json").to_return do
+        reads += 1
+        {body: BikebookCatalogHelpers::FIXTURES.join("models/specialized/2025.json").read}
+      end
+      haul_st = "m/specialized/2025/haul-st"
+      expect(described_class.model("#{haul_st}@CA")["description"]).to include("up to 100 km")
+      expect(described_class.model(haul_st)["description"]).to include("60 miles")
+      expect(described_class.model("#{haul_st}@MX")).to be_nil
+      expect(reads).to eq 1
     end
 
     it "is nil for what isn't a model's id, without reading or caching anything for it" do
