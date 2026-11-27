@@ -19,6 +19,7 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
     expect(component.to_html).to include("twinput")
     expect(component).to_not have_css("div")
     expect(component).to_not have_css("input[class~='tw:rounded-l-none']")
+    expect(component).to_not have_css("input[title], [data-controller]")
   end
 
   context "when text_area" do
@@ -40,8 +41,12 @@ RSpec.describe UI::Forms::Input::Component, type: :component do
   context "when telephone_field" do
     let(:kind) { :telephone_field }
 
-    it "renders a tel input, with the pattern the server checks" do
+    it "renders a tel input, with the pattern the server checks and what it wants" do
       expect(component).to have_css("input[type='tel'][name='user[name]'][autocomplete='tel']")
+      input = component.css("input").first
+      expect(input["title"]).to eq "Enter a phone number with at least 7 digits, like 503 555 0123"
+      expect(input["data-ui--forms--format-message-message-value"]).to eq input["title"]
+      expect(input["data-controller"]).to eq "ui--forms--format-message"
       expect(["(718) 383-9999", "+44 20 7946 0958 x12"]).to all(match(pattern))
       expect("callmemaybe").to_not match(pattern)
     end

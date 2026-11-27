@@ -35,7 +35,7 @@ module UI
           @attribute = attribute
           @kind = self.class.validate_kind!(kind)
           @prefix = prefix.presence
-          @html_options = KIND_OPTIONS.fetch(@kind, {}).merge(html_options).merge(
+          @html_options = KIND_OPTIONS.fetch(@kind, {}).merge(format_options, html_options).merge(
             {class: ["twinput", ("tw:rounded-l-none" if @prefix), html_options[:class]].compact.join(" ")},
             (required ? {required: true} : {})
           )
@@ -48,6 +48,24 @@ module UI
         end
 
         private
+
+        # What the format is, in place of the browser's "Please match the requested format" -
+        # the title is what a browser without JavaScript adds to that
+        def format_options
+          message = format_message
+          return {} if message.blank?
+
+          {title: message, data: {controller: "ui--forms--format-message", "ui--forms--format-message-message-value": message,
+                                  action: "invalid->ui--forms--format-message#explain input->ui--forms--format-message#reset"}}
+        end
+
+        def format_message
+          case @kind
+          when :telephone_field then translation(".telephone_format")
+          when :website_field then translation(".website_format")
+          when :postal_code_field then translation(".postal_code_format")
+          end
+        end
 
         def field
           @form_builder.send(TEXT_KINDS.include?(@kind) ? :text_field : @kind, @attribute, @html_options)

@@ -1,0 +1,11 @@
+---
+en:
+  components:
+    ui:
+      forms:
+        input:
+          postal_code_format: Enter a postal code of at least 3 letters or numbers,
+            like 97201 or T6E 2A4
+          telephone_format: Enter a phone number with at least 7 digits, like 503
+            555 0123
+          website_format: Enter a website, like example.com

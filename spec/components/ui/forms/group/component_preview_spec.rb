@@ -3,7 +3,7 @@
 require "rails_helper"
 
 RSpec.describe UI::Forms::Group::ComponentPreview, type: :request do
-  let(:groups) { Lookbook.previews.find { it.preview_class == described_class }.scenarios.index_by(&:name) }
+  let(:scenarios) { Lookbook.previews.find { it.preview_class == described_class }.scenarios.index_by(&:name) }
   let(:components) do
     Dir[Rails.root.join("app/components/ui/forms/**/component.rb")]
       .map { it.delete_prefix(Rails.root.join("app/components/ui/forms/").to_s).delete_suffix("/component.rb") }
@@ -26,9 +26,9 @@ RSpec.describe UI::Forms::Group::ComponentPreview, type: :request do
     end
   end
 
-  # The components and Input kinds a group's scenarios render themselves, not ones nested inside those
-  def rendered_field_types(group)
-    groups.fetch(group).scenarios.flat_map do |scenario|
+  # The components and Input kinds the scenarios render themselves, not ones nested inside those
+  def rendered_field_types(*scenarios)
+    scenarios.flat_map do |scenario|
       returned = described_class.new.public_send(scenario.name)
       source = scenario.source + File.read(Rails.root.join("app/components/#{returned[:template]}.html.erb"))
       source.scan(/UI::Forms::((?:\w+::)*\w+)::Component/).flatten.map(&:underscore) +
@@ -38,23 +38,24 @@ RSpec.describe UI::Forms::Group::ComponentPreview, type: :request do
 
   it "shows every UI::Forms field, and every UI::Forms::Input kind, in All field types" do
     expect(not_field_types - components).to eq([])
-    expect(rendered_field_types("all_field_types"))
+    expect(rendered_field_types(*scenarios.fetch("all_field_types").scenarios))
       .to include(*field_types, *UI::Forms::Input::Component::KINDS.map(&:to_s))
   end
 
   it "shows every field with a frontend check in Validated" do
     expect(validated_kinds).to match_array(%w[telephone_field website_field postal_code_field])
     expect(validated_components).to match_array(%w[email address_group])
-    expect(rendered_field_types("validated")).to include(*validated_kinds, *validated_components)
+    expect(rendered_field_types(scenarios.fetch("validated"))).to include(*validated_kinds, *validated_components)
   end
 
-  it "starts each Validated scenario with a checked field, and a submit to check it with" do
-    groups.fetch("validated").scenarios.each do |scenario|
-      get "/rails/view_components/ui/forms/group/component/#{scenario.name}"
-      expect(response).to have_http_status(:ok)
-      html = Nokogiri::HTML(response.body)
-      expect(html.css("input[pattern][value], input[type='email'][value]")).to be_present, scenario.name
-      expect(html.css("button[type='submit']")).to be_present, scenario.name
-    end
+  it "starts each Validated field with a value, in one form with one submit" do
+    get "/rails/view_components/ui/forms/group/component/validated"
+    expect(response).to have_http_status(:ok)
+    form = Nokogiri::HTML(response.body).css("form").find { it.at_css("[pattern]") }
+    checked = form.css("input[pattern], input[type='email']")
+    # the address group's postal code is the fourth pattern
+    expect(checked.size).to eq validated_kinds.size + 2
+    expect(checked.map { it["value"] }).to all(be_present)
+    expect(form.css("button[type='submit']").size).to eq 1
   end
 end

@@ -1,8 +1,5 @@
-<%= form_with(url: "#", scope:, builder: BikeIndexFormBuilder) do |f| %>
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
   <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email)) do %>
-    <%= render(UI::Forms::Email::Component.new(form_builder: f, html_options: {value:})) %>
+    <%= render(UI::Forms::Email::Component.new(form_builder: f)) %>
   <% end %>
-
-  <%# A message holds the form's own submit, so it's rendered either way. %>
-  <%= render(UI::Button::Component.new(text: "Submit", color: :primary, type: "submit")) %>
 <% end %>

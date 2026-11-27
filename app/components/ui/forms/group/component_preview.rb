@@ -35,7 +35,7 @@ module UI
         end
 
         def email
-          {template: "ui/forms/group/component_preview/email", locals: {scope: nil, value: nil}}
+          {template: "ui/forms/group/component_preview/email"}
         end
 
         def content_block
@@ -79,7 +79,7 @@ module UI
         end
 
         def address_group
-          {template: "ui/forms/group/component_preview/address_group", locals: {scope: nil, postal_code: nil}}
+          {template: "ui/forms/group/component_preview/address_group"}
         end
 
         def custom_label
@@ -99,41 +99,15 @@ module UI
         end
         # @!endgroup
 
-        # @!group Validated
-        # Each starts with a value its check refuses - submit to see it
-        # @label Telephone field
-        def validated_telephone_field
-          input_kind(:telephone_field, :phone, value: "callmemaybe")
+        # Every field the browser checks, each starting with a value its check refuses - submit to see why
+        def validated
+          {template: "ui/forms/group/component_preview/validated"}
         end
-
-        # @label Website field
-        def validated_website_field
-          input_kind(:website_field, :website, value: "http://not a website")
-        end
-
-        # @label Postal code field
-        def validated_postal_code_field
-          input_kind(:postal_code_field, :postal_code, value: "1")
-        end
-
-        # @label Email
-        def validated_email
-          {template: "ui/forms/group/component_preview/email", locals: {scope: :validated, value: "you@gmial.con"}}
-        end
-
-        # @label Address group
-        def validated_address_group
-          {template: "ui/forms/group/component_preview/address_group", locals: {scope: :validated_address, postal_code: "1"}}
-        end
-        # @!endgroup
 
         private
 
-        # A value comes with a submit button, and a scope keeping its ids apart from the same
-        # field in All field types, where the group renders them together
-        def input_kind(kind, attribute, value: nil)
-          {template: "ui/forms/group/component_preview/input_kind",
-           locals: {kind:, attribute:, value:, scope: (:validated if value)}}
+        def input_kind(kind, attribute)
+          {template: "ui/forms/group/component_preview/input_kind", locals: {kind:, attribute:}}
         end
       end
     end
