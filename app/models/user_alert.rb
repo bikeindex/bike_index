@@ -154,10 +154,12 @@ class UserAlert < ApplicationRecord
       .update_all(resolved_at: Time.current, updated_at: Time.current)
   end
 
-  # update_stolen_bike_without_location only revisits bikes that are still stolen
+  # AfterUserChangeJob only revisits bikes that are still stolen. Unscoped, since a hidden
+  # bike is still alerted on
   def self.resolve_recovered(user)
     user.user_alerts.active.where(kind: %w[stolen_bike_without_location theft_alert_without_photo])
-      .includes(bike: :current_stolen_record).reject { it.displayable?(user) }.each(&:resolve!)
+      .where(bike_id: Bike.unscoped.where(current_stolen_record_id: nil).select(:id))
+      .update_all(resolved_at: Time.current, updated_at: Time.current)
   end
 
   def self.update_unfinished_registration(user:, b_param:)
