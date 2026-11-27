@@ -4954,6 +4954,9 @@ en:
         be different within their first 30 characters. Choose another name, or contact
         support@bikeindex.org if it's yours
       name_too_short: Organization name needs at least two letters or numbers
+      phone_invalid: Please enter a valid phone number
+      postal_code_invalid: Please enter a valid postal code
+      website_invalid: Please enter a valid website, like example.com
     recovery_display:
       bike: Bike
       recovered_date: recovered %{date}

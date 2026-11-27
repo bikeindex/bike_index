@@ -5,6 +5,7 @@ module UI
     module Files
       module Upload
         class ComponentPreview < ApplicationComponentPreview
+          # @!group Variants
           def default
             {template: "ui/forms/files/upload/component_preview/default"}
           end
@@ -14,6 +15,7 @@ module UI
             {template: "ui/forms/files/upload/component_preview/with_existing_image",
              locals: {organization: lookbook_organization}}
           end
+          # @!endgroup
         end
       end
     end

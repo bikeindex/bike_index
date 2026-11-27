@@ -51,6 +51,10 @@ module UI
         def state_required? = @required && us_selected?
 
         def region_required? = @required && !us_selected?
+
+        def without_postal_code_ids = @without_postal_code_ids ||= Country.without_postal_code_ids
+
+        def postal_code_required? = @required && !without_postal_code_ids.include?(selected_country_id.to_i)
       end
     end
   end

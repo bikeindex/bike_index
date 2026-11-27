@@ -1,4 +1,11 @@
-<%= form_with(url: "#", builder: BikeIndexFormBuilder, html: {data: {
+<%# Without the keys, which development usually lacks, the component renders nothing. %>
+<% unless Integrations::Turnstile::ENABLED %>
+  <%= render(UI::Alerts::Base::Component.new(kind: :warning,
+      text: "Turnstile is off here - set CLOUDFLARE_TURNSTILE_SITE_KEY and CLOUDFLARE_TURNSTILE_SECRET_KEY to see the widget")) %>
+<% end %>
+
+<%# The scope keeps the variants' ids apart where the group renders them together. %>
+<%= form_with(url: "#", scope:, builder: BikeIndexFormBuilder, html: {data: {
       controller: "ui--forms--turnstile", **UI::Forms::Turnstile::Component.form_data,
       action: "input->ui--forms--turnstile#update"}}) do |f| %>
   <%= f.email_field :email, value: email, placeholder: "you@example.com", class: "twinput tw:w-full" %>

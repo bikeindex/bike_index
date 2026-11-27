@@ -1,0 +1,4 @@
+<%# A checkbox carries its own label, so it renders without a group. %>
+<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :terms_of_service, label: "I agree to the terms")) %>
+<% end %>

@@ -31,8 +31,11 @@
 class OrganizationSignup < ApplicationRecord
   # How long a signup resumes by token, and its emailed link works, after the latest email
   TOKEN_EXPIRATION = 30.days
-  # The state (or region) isn't here: which one a country has is the form's to decide
-  REQUIRED_ADDRESS_ATTRS = %w[street city postal_code country_id].freeze
+  # The state (or region) isn't here: which one a country has is the form's to decide.
+  # Nor is the postal code, which only some countries have
+  REQUIRED_ADDRESS_ATTRS = %w[street city country_id].freeze
+  # Only blatantly wrong ones - UI::Forms::Input has these as patterns
+  DETAIL_FORMATS = {website: Urlifyer::WEBSITE_REGEX, phone: Phonifyer::REGEX, postal_code: Geocodeable::POSTAL_CODE_REGEX}.freeze
 
   enum :kind, Organization::KIND_ENUM
   # What a shop said it uses, rather than Organization#pos_kind's integration status
@@ -47,7 +50,17 @@ class OrganizationSignup < ApplicationRecord
 
   def email_confirmed? = email_confirmed_at.present?
 
-  def details_completed? = REQUIRED_ADDRESS_ATTRS.all? { address[it].present? }
+  def details_completed? = address_completed? && malformed_details.none?
+
+  def address_completed?
+    REQUIRED_ADDRESS_ATTRS.all? { address[it].present? } &&
+      (address["postal_code"].present? || Country.without_postal_code_ids.include?(address["country_id"].to_i))
+  end
+
+  def malformed_details
+    {website:, phone:, postal_code: address["postal_code"]}
+      .filter_map { |attribute, value| attribute if value.present? && !value.match?(DETAIL_FORMATS[attribute]) }
+  end
 
   # A resend reuses the token, so it lasts from the latest email - which promises that long
   def email_confirmation_token_expired?
@@ -61,6 +74,11 @@ class OrganizationSignup < ApplicationRecord
   # The organization would strip markup from the name anyway, so the steps and the email show what it'll be called
   def set_calculated_attributes
     self.name = Organization.sanitize_name(name) if name.present?
-    self.website = website&.strip.presence
+    self.website = normalized(website)
+    self.phone = normalized(phone)
+    self.address = address.merge("postal_code" => normalized(address["postal_code"])).compact
   end
+
+  # A pasted non-breaking space is whitespace to the browser's pattern, but not to Ruby's \s
+  def normalized(value) = value&.squish.presence
 end

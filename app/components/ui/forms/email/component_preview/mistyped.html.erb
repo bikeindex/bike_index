@@ -1,4 +1,5 @@
-<%= form_with(url: "#", builder: BikeIndexFormBuilder) do |f| %>
+<%# Scoped, so it shares no ids with default where the group renders them together. %>
+<%= form_with(url: "#", scope: :mistyped, builder: BikeIndexFormBuilder) do |f| %>
   <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email)) do %>
     <%= render(UI::Forms::Email::Component.new(form_builder: f, html_options: {value: "you@gmial.con"})) %>
   <% end %>

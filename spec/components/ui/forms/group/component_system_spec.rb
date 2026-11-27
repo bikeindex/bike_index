@@ -30,4 +30,27 @@ RSpec.describe UI::Forms::Group::Component, :js, type: :system do
       expect(page).to have_css("#organization_feature_description-content:focus")
     end
   end
+
+  # The browser's bubble isn't in the page, so what it says is read off the field
+  context "validated" do
+    def validation_message(name) = evaluate_script("document.querySelector('[name=\"#{name}\"]').validationMessage")
+
+    it "says what each format wants, and lets a corrected value through" do
+      visit("#{base_path}validated")
+      wait_for_stimulus("ui--forms--format-message")
+
+      click_on "Submit"
+      expect(validation_message("validated[phone]")).to eq "Enter a phone number with at least 7 digits"
+
+      fill_in "Phone", with: "503 555 0123"
+      click_on "Submit"
+      expect(validation_message("validated[phone]")).to eq ""
+      expect(validation_message("validated[website]")).to eq "Enter a website, like example.com"
+
+      fill_in "Website", with: "example.com"
+      click_on "Submit"
+      expect(validation_message("validated[postal_code]")).to start_with "Enter a postal code"
+      expect(validation_message("validated[address_record][postal_code]")).to start_with "Enter a postal code"
+    end
+  end
 end
