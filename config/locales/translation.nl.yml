@@ -4424,7 +4424,6 @@ nl:
       lightspeed_integration_panel: Lightspeed-integratiepaneel
       manage_users: Gebruikers beheren
       messaging: Berichten
-      model_audits: Audits van e-voertuigen
       multi_search: Meerdere zoekopdrachten
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locaties"
@@ -4449,6 +4448,10 @@ nl:
       registration_form_settings: Instellingen voor het registratieformulier
       education_courses: Onderwijscursussen
       org_information: "%{org_name} Informatie"
+      audits: Audits
+      e_vehicles: Elektrische voertuigen
+      ebike_rules: Regels voor e-bikes
+      education_acknowledgments: Erkenningen met betrekking tot onderwijs
     organization_signup:
       address_required: Voer het volledige adres van de organisatie in.
       email_required: Een geldig e-mailadres is vereist.
@@ -5959,6 +5962,25 @@ nl:
             qr_code: QR-code
             set_a_password: Stel een wachtwoord in
             your_public_registration_link: Uw openbare registratielink
+        education_course_acknowledgments:
+          index:
+            acknowledged: Erkend
+            all: Alle
+            course: Cursus
+            for_everyone_start_html: De algemene e-Vehicle-educatiecursus is gestart
+              %{time}. Daarvoor volgden gebruikers geen educatiecursus.
+            header: 'E-voertuigeducatie: Dankbetuigingen'
+            matching_count_html: "%{count} overeenkomende erkenningen"
+            organization_start_html: De %{organization_name} e-Vehicle Education Course
+              is gestart %{time}. Daarvoor volgden gebruikers geen enkele educatieve
+              cursus.
+            organization_started_html: De %{organization_name} e-Vehicle Education
+              Course is %{time} van start gegaan.
+            owner_email: E-mailadres eigenaar
+            registered: Geregistreerd
+            registration: Registratie
+            source: Bron
+            unfinished: Onvoltooid
       registrations:
         show:
           bike_details:

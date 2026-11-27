@@ -5170,7 +5170,6 @@ it:
       lightspeed_integration_panel: Pannello di integrazione Lightspeed
       manage_users: Gestisci utenti
       messaging: Messaggistica
-      model_audits: Audit dei veicoli elettrici
       multi_search: Ricerca multipla
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} posizioni"
@@ -5195,6 +5194,10 @@ it:
       registration_form_settings: Impostazioni del modulo di registrazione
       education_courses: Corsi di formazione
       org_information: "%{org_name} Informazioni"
+      audits: Audit
+      e_vehicles: Veicoli elettrici
+      ebike_rules: Regolamento sulle e-bike
+      education_acknowledgments: Ringraziamenti per l'istruzione
     organization_signup:
       address_required: Inserisci l'indirizzo completo dell'organizzazione.
       email_required: È richiesto un indirizzo email valido
@@ -6045,6 +6048,26 @@ it:
             qr_code: codice QR
             set_a_password: Imposta una password
             your_public_registration_link: Il tuo link di registrazione pubblica
+        education_course_acknowledgments:
+          index:
+            acknowledged: Riconosciuto
+            all: Tutti
+            course: Corso
+            for_everyone_start_html: Il corso generale di formazione sui veicoli elettrici
+              è iniziato %{time}. Prima di allora, gli utenti non avevano seguito
+              alcun corso di formazione.
+            header: Ringraziamenti per la formazione sui veicoli elettrici
+            matching_count_html: "%{count} ringraziamenti corrispondenti"
+            organization_start_html: Il corso di formazione sui veicoli elettrici
+              %{organization_name} è iniziato %{time}. Prima di allora, gli utenti
+              non avevano seguito alcun corso di formazione.
+            organization_started_html: Il corso di formazione sui veicoli elettrici
+              %{organization_name} è iniziato %{time}.
+            owner_email: Email del proprietario
+            registered: Registrato
+            registration: Registrazione
+            source: Fonte
+            unfinished: Incompiuto
       registrations:
         show:
           bike_details:
