@@ -2,8 +2,6 @@ module Organized
   class EducationCourseAcknowledgmentsController < Organized::BaseController
     include Binxtils::SortableTable
 
-    before_action :ensure_access_to_education_courses!
-
     def index
       status = params[:search_status].presence_in(Pages::Org::EducationCourseAcknowledgments::Index::Component::STATUSES)
       pagy, acknowledgments = pagy(:countish, matching_acknowledgments(status)
@@ -12,7 +10,7 @@ module Organized
 
       render Pages::Org::EducationCourseAcknowledgments::Index::Component.new(pagy:, acknowledgments:,
         organization: current_organization, sort_state:, status:, period: @period, start_time: @start_time, end_time: @end_time,
-        organization_start: EducationCourse.organization_start_before_everyone(current_organization))
+        first_course: EducationCourse.first_for(current_organization))
     end
 
     private
@@ -30,12 +28,6 @@ module Organized
       when "unfinished" then acknowledgments.pending
       else acknowledgments
       end
-    end
-
-    def ensure_access_to_education_courses!
-      return true if current_organization.enabled?("education_courses") || current_user.superuser?
-
-      raise_do_not_have_access!
     end
   end
 end

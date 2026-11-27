@@ -16,6 +16,8 @@ en:
             organization_start_html: >-
               The %{organization_name} e-Vehicle Education Course started at %{time}.
               Prior to that, people were not prompted to do the education course
+            organization_started_html: The %{organization_name} e-Vehicle Education
+              Course started at %{time}.
             owner_email: Owner email
             registered: Registered
             registration: Registration

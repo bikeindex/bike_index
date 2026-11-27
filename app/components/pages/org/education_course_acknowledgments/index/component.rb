@@ -8,7 +8,7 @@ module Pages
         class Component < ApplicationComponent
           STATUSES = %w[acknowledged unfinished].freeze
 
-          def initialize(pagy:, acknowledgments:, organization:, sort_state:, status:, period:, start_time:, end_time:, organization_start:)
+          def initialize(pagy:, acknowledgments:, organization:, sort_state:, status:, period:, start_time:, end_time:, first_course:)
             @pagy = pagy
             @acknowledgments = acknowledgments
             @organization = organization
@@ -17,7 +17,7 @@ module Pages
             @period = period
             @start_time = start_time
             @end_time = end_time
-            @organization_start = organization_start
+            @first_course = first_course
           end
 
           private

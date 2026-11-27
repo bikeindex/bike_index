@@ -114,21 +114,23 @@ RSpec.describe EducationCourse, type: :model do
     end
   end
 
-  describe ".organization_start_before_everyone" do
+  describe ".first_for" do
     let(:organization) { FactoryBot.create(:organization) }
     let(:for_everyone_start) { Time.at(EducationCourse::FOR_EVERYONE_START) }
     let(:early_start) { for_everyone_start - 1.month }
 
-    it "is the organization's first course start, only when it was before the default course's" do
+    it "is the organization's earliest started course, and whether it started before the general course" do
       FactoryBot.create(:education_course, organization:)
       FactoryBot.create(:education_course, start_at: early_start - 1.week)
-      expect(EducationCourse.organization_start_before_everyone(organization)).to be_nil
+      expect(EducationCourse.first_for(organization)).to be_nil
 
-      FactoryBot.create(:education_course_active, organization:, start_at: for_everyone_start + 1.day)
-      expect(EducationCourse.organization_start_before_everyone(organization)).to be_nil
+      active = FactoryBot.create(:education_course_active, organization:, start_at: for_everyone_start + 1.day)
+      expect(EducationCourse.first_for(organization)).to eq active
+      expect(active.started_before_everyone?).to be false
 
-      FactoryBot.create(:education_course, organization:, start_at: early_start, end_at: early_start + 1.week)
-      expect(EducationCourse.organization_start_before_everyone(organization)).to be_within(1).of early_start
+      archived = FactoryBot.create(:education_course, organization:, start_at: early_start, end_at: early_start + 1.week)
+      expect(EducationCourse.first_for(organization)).to eq archived
+      expect(archived.started_before_everyone?).to be true
     end
   end
 

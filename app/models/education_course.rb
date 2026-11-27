@@ -73,11 +73,7 @@ class EducationCourse < ApplicationRecord
     # course, falling back to the default every organization starts from
     def active_or_default_for(organization) = active_for(organization) || active_default
 
-    # When the organization's first course started, if it was prompting before the default course was
-    def organization_start_before_everyone(organization)
-      start_at = where(organization:).minimum(:start_at)
-      start_at if start_at&.before?(Time.at(FOR_EVERYONE_START))
-    end
+    def first_for(organization) = where(organization:).where.not(start_at: nil).order(:start_at).first
 
     # The draft as it stands - draft_for opens one when there isn't one
     def existing_draft_for(organization) = draft.find_by(organization:)
@@ -150,6 +146,9 @@ class EducationCourse < ApplicationRecord
   # what a registrant agreed to has to keep saying the same thing - a change belongs in a
   # new draft, which activating supersedes this with.
   def activated? = !draft?
+
+  # Prompting registrants before the default course did
+  def started_before_everyone? = activated? && start_at.before?(Time.at(FOR_EVERYONE_START))
 
   # Moves page to position and re-sequences listing_order (drag-and-drop on the show page).
   # update_all skips the pages' own callbacks, so the guard is here too

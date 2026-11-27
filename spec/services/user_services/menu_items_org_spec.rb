@@ -59,6 +59,11 @@ RSpec.describe UserServices::MenuItemsOrg do
           link_item("Add a registration", "/o/#{organization.to_param}/registrations/new",
             icon: "plus-circle", match_params: {parking_notification: nil}),
           {type: :divider},
+          group_item(:e_vehicles, "E-Vehicles", "bolt", [
+            link_item("E-Bike Rules", "/ebike-rules", match_paths: "/ebike-rules/**"),
+            link_item("Education Acknowledgments", "/o/#{organization.to_param}/education_course_acknowledgments")
+          ]),
+          {type: :divider},
           link_item("#{organization.short_name} Information", "/o/#{organization.to_param}/info")
         ]
       end
@@ -239,16 +244,6 @@ RSpec.describe UserServices::MenuItemsOrg do
 
           expect(bulk[:children].map { |child| child[:label] }).to eq(["Bulk Imports"])
         end
-      end
-    end
-
-    context "with only education_courses" do
-      let(:organization) do
-        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["education_courses"])
-      end
-
-      it "drops audits from the e-vehicles group" do
-        expect(e_vehicles[:children].map { |child| child[:label] }).to eq(["E-Bike Rules", "Education Acknowledgments"])
       end
     end
 

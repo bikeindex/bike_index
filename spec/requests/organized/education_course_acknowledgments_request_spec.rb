@@ -6,16 +6,14 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
   include_context :request_spec_logged_in_as_organization_user
 
   describe "index" do
-    it "redirects without education_courses" do
+    it "renders without an education course of the organization's own" do
       get base_url
-      expect(response).to redirect_to organization_root_path(organization_id: current_organization.to_param)
-      expect(flash[:error]).to be_present
+      expect(response).to be_ok
+      expect(response.body).to include("General e-vehicle education course started at")
+      expect(response.body).to_not include("e-Vehicle Education Course started at")
     end
 
-    context "with education_courses" do
-      let(:current_organization) do
-        FactoryBot.create(:organization_with_organization_features, enabled_feature_slugs: ["education_courses"])
-      end
+    context "with an education course" do
       let(:bike) { FactoryBot.create(:bike_lightspeed_pos, creation_organization: current_organization, created_at: 3.days.ago) }
       let(:education_course) { FactoryBot.create(:education_course_active, organization: current_organization) }
       let!(:acknowledgment) do
@@ -43,8 +41,9 @@ RSpec.describe Organized::EducationCourseAcknowledgmentsController, type: :reque
         get base_url
         expect(response).to be_ok
         expect(response.body).to include("E-Vehicle Education Acknowledgments", "Unfinished")
-        expect(response.body).to include("General e-vehicle education course started at")
-        expect(response.body).to_not include("e-Vehicle Education Course started at")
+        # Started after the general course, so it follows that course's start
+        expect(response.body).to include("General e-vehicle education course started at",
+          "The #{current_organization.name} e-Vehicle Education Course started at")
         expect(response.body).to match(/3<\/span> matching acknowledgments/)
         expect(response.body).to include("/bikes/#{bike.id}?organization_id=#{current_organization.to_param}")
         # Source, the registration's origin
