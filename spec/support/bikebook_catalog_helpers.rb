@@ -13,7 +13,6 @@ module BikebookCatalogHelpers
       .to_return { bikebook_catalog_response(it, status:) }
   end
 
-  # The fixture file a catalog request reads
   def bikebook_catalog_response(request, status: 200)
     file = FIXTURES.join(request.uri.path.delete_prefix(URI(Integrations::Bikebook::Catalog::URL).path))
     file.file? ? {status:, body: file.read} : {status: 404}
