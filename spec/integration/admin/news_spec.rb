@@ -36,4 +36,17 @@ RSpec.describe "Admin news", :js, type: :system do
     expect(page).to have_css("[data-hw-combobox-chip]", text: "Theft prevention", wait: 10)
     expect(blog.reload.content_tag_names).to eq(["Theft prevention"])
   end
+
+  it "keeps a body draft across a reload, until it's saved" do
+    blog.content_tags << ContentTag.friendly_find("Partners")
+    visit "/admin/news/#{blog.to_param}/edit"
+    fill_in "blog_body", with: "A draft that outlived the tab"
+
+    visit page.current_url
+    expect(page).to have_field("blog_body", with: "A draft that outlived the tab", wait: 10)
+
+    click_button "Save"
+    expect(page).to have_content("Blog saved")
+    expect(blog.reload.body).to eq("A draft that outlived the tab")
+  end
 end

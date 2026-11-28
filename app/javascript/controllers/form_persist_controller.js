@@ -16,13 +16,16 @@ import { storage } from 'utils/storage'
 // that found no draft announces nothing. A controller whose UI hangs off restored fields
 // listens for it and reconciles in its own connect, since a lazily loaded module can
 // arrive after the announcement.
+// A scope target narrows the draft to the fields inside it. overwrite-value has the draft
+// replace text the server rendered too - only for a key carrying the record's version.
 // Writes are debounced (DEBOUNCE_MS) and a restored draft is discarded once
 // older than TTL_MS.
 const DEBOUNCE_MS = 400
 const TTL_MS = 604800000 // 1 week
 
 export default class extends Controller {
-  static values = { key: String, save: Boolean }
+  static targets = ['scope']
+  static values = { key: String, save: Boolean, overwrite: Boolean }
 
   connect () {
     // Deferred so siblings connecting alongside this one hear the restore. A later one
@@ -65,7 +68,7 @@ export default class extends Controller {
     storage.removeItem(this.storageKey)
   }
 
-  // Stored values only fill fields the server rendered empty — a field the
+  // Without overwrite, stored values only fill fields the server rendered empty — a field the
   // server filled is at least as fresh as the draft. Checkboxes, selects and
   // comboboxes have no empty state to detect (they render with a default
   // selection), so the draft wins for them.
@@ -97,7 +100,7 @@ export default class extends Controller {
       // and assigning the value fires nothing - so say what a user pick says
       field.dispatchEvent(new Event('change', { bubbles: true }))
     } else {
-      if (field.value) return false
+      if (field.value && !this.overwriteValue) return false
       field.value = value
     }
     return true
@@ -137,13 +140,13 @@ export default class extends Controller {
   }
 
   radioGroupChecked (name) {
-    return this.element.querySelector(`input[type=radio][name="${CSS.escape(name)}"]:checked`)
+    return this.root.querySelector(`input[type=radio][name="${CSS.escape(name)}"]:checked`)
   }
 
   // Nameless fields would all share one key — hotwire_combobox renders two of
   // them per combobox (the display input and its small-viewport twin).
   get fields () {
-    return [...this.element.querySelectorAll(
+    return [...this.root.querySelectorAll(
       'textarea, select, input:not([type=hidden]):not([type=file]):not([type=submit]):not([type=button])'
     )].filter((field) => field.name)
   }
@@ -151,10 +154,14 @@ export default class extends Controller {
   // hotwire_combobox splits each field into a nameless display input and a
   // hidden field carrying the real name/value — persist them as a pair.
   get comboboxes () {
-    return [...this.element.querySelectorAll('fieldset.hw-combobox')].map((fieldset) => ({
+    return [...this.root.querySelectorAll('fieldset.hw-combobox')].map((fieldset) => ({
       hidden: fieldset.querySelector('input[data-hw-combobox-target="hiddenField"]'),
       display: fieldset.querySelector('.hw-combobox__input')
     })).filter(({ hidden, display }) => hidden?.name && display)
+  }
+
+  get root () {
+    return this.hasScopeTarget ? this.scopeTarget : this.element
   }
 
   get storageKey () {

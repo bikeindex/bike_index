@@ -16,7 +16,9 @@
 
 
 - url = {action: "update", controller: "news"}
-= form_for [:admin, @blog], :url => url do |f|
+-# The version in the key keeps a draft from replacing a newer save
+- persist_data = {controller: "form-persist", form_persist_key_value: "admin-news-#{@blog.cache_key_with_version}", form_persist_overwrite_value: true, action: "input->form-persist#save submit->form-persist#clear"}
+= form_for [:admin, @blog], url:, html: {data: (persist_data unless @blog.is_listicle)} do |f|
   = render(UI::Alerts::ObjectError::Component.new(object: @blog))
 
   - if @blog.is_listicle
