@@ -1,14 +1,17 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapseField } from 'utils/collapse_utils'
+import { urlParam, setUrlParam } from 'utils/url_param'
 
 // Connects to data-controller="table-multi-checkbox"
-// whenChecked targets show only while a row is checked. Dispatches table-multi-checkbox:change as the selection does
+// whenChecked targets show only while a row is checked. Dispatches table-multi-checkbox:change as the selection does.
+// The URL's checked param holds the checked values, or "all", so a reload keeps them
 export default class extends Controller {
   static targets = ['checkbox', 'whenChecked']
 
   connect () {
     this.element.addEventListener('keydown', this.ignoreFieldEnter)
     this.element.addEventListener('click', this.selectRange)
+    this.restoreChecked()
     this.syncWhenChecked(0)
   }
 
@@ -34,9 +37,8 @@ export default class extends Controller {
 
   toggleAll (event) {
     event.preventDefault()
-    // Disabled checkboxes can't be selected
-    const anyUnchecked = this.checkboxTargets.some(cb => !cb.disabled && !cb.checked)
-    this.checkboxTargets.forEach(cb => { if (!cb.disabled) cb.checked = anyUnchecked })
+    const anyUnchecked = this.enabledCheckboxes.some(cb => !cb.checked)
+    this.enabledCheckboxes.forEach(cb => { cb.checked = anyUnchecked })
     this.syncWhenChecked()
   }
 
@@ -52,6 +54,27 @@ export default class extends Controller {
     const checked = this.checkboxTargets.some(cb => cb.checked)
     this.whenCheckedTargets.forEach(field => collapseField(field, checked, duration, 'horizontal'))
     this.dispatch('change', { detail: { checked } })
+    this.writeChecked()
+  }
+
+  restoreChecked () {
+    const param = urlParam('checked')
+    if (!param) return
+
+    const values = param.split(',')
+    this.enabledCheckboxes.forEach(cb => { cb.checked = param === 'all' || values.includes(cb.value) })
+  }
+
+  writeChecked () {
+    const checked = this.checkboxTargets.filter(cb => cb.checked)
+    const all = checked.length > 0 && this.enabledCheckboxes.every(cb => cb.checked)
+    const value = all ? 'all' : (checked.map(cb => cb.value).join(',') || null)
+    // Typing in a row's field selects it on every keystroke, and Safari throws past 100 replaceStates in 10 seconds
+    if (value !== urlParam('checked')) setUrlParam('checked', value)
+  }
+
+  get enabledCheckboxes () {
+    return this.checkboxTargets.filter(cb => !cb.disabled)
   }
 
   // Editing a row checks it, so a submit button with data-discards-edits asks before acting on edited rows
