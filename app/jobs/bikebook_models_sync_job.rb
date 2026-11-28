@@ -51,9 +51,7 @@ class BikebookModelsSyncJob < ScheduledJob
     throw :abort if records.nil?
 
     by_model = records.group_by { |key, _| Integrations::Bikebook::Catalog.base_id(key) }
-    BikebookModel.transaction do
-      BikebookModel.where(catalog_id: by_model.keys).find_each { it.update!(data: by_model[it.catalog_id].to_h, data_file: file) }
-    end
+    BikebookModel.where(catalog_id: by_model.keys).find_each { it.update!(data: by_model[it.catalog_id].to_h, data_file: file) }
   end
 
   def on_stop = lock_manager.unlock(@redlock)
