@@ -7,6 +7,9 @@ module Admin
       @per_page = permitted_per_page(default: 50)
       @pagy, @notifications = pagy(:countish, matching_notifications.reorder(sortable_order(Notification))
         .includes(:bike, :notifiable, :user), limit: @per_page, page: permitted_page)
+      # The table shows a user_sender notification's notifiable's user. Not every notifiable has
+      # one, so `includes(notifiable: :user)` would raise
+      ActiveRecord::Associations::Preloader.new(records: @notifications.select(&:user_sender?).filter_map(&:notifiable), associations: :user).call
       @render_kind_counts = Binxtils::InputNormalizer.boolean(params[:search_kind_counts])
     end
 
