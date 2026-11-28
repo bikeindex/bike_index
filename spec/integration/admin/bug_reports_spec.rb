@@ -19,6 +19,14 @@ RSpec.describe "Admin bug reports", :js, type: :system do
     check "bug_reports_selected[#{bug_report.id}]"
     click_button "Email selected senders"
     expect(page).to have_field("Message", focused: true)
+    expect(page).to have_css("button[data-active='true'][aria-expanded='true']", text: "Email selected senders")
+
+    click_button "Email selected senders"
+    expect(page).to have_no_field("Message")
+    expect(page).to have_css("button[data-active='false'][aria-expanded='false']", text: "Email selected senders")
+
+    click_button "Email selected senders"
+    expect(page).to have_field("Message", focused: true)
     expect(page).to have_no_content(banned_alert)
 
     check "bug_reports_selected[#{bug_report_banned.id}]"

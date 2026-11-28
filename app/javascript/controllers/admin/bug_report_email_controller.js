@@ -12,7 +12,7 @@ export default class extends Controller {
   }
 
   toggle () {
-    this.setOpen(this.panelTarget.classList.contains('tw:hidden'))
+    this.setOpen(this.triggerTarget.getAttribute('aria-expanded') !== 'true')
   }
 
   show () {
@@ -23,6 +23,7 @@ export default class extends Controller {
     // Disabled while closed, so the required message doesn't block the table form's other submits
     collapseField(this.panelTarget, open)
     this.triggerTarget.setAttribute('aria-expanded', String(open))
+    this.triggerTarget.dataset.active = String(open)
     if (open) this.messageTarget.focus()
   }
 
