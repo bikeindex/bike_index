@@ -203,6 +203,11 @@ module Admin
       if params[:search_bike_id].present?
         groups = groups.where(id: NormalizedSerialSegment.where(bike_id: params[:search_bike_id]).select(:duplicate_bike_group_id))
       end
+      if params[:search_serial].present?
+        # A stored segment as typed, or a serial normalized as the whole-serial segment is
+        segment = [params[:search_serial].upcase.gsub(/\s/, ""), SerialNormalizer.no_space(SerialNormalizer.normalized_and_corrected(params[:search_serial]))]
+        groups = groups.where(id: NormalizedSerialSegment.where(segment:).select(:duplicate_bike_group_id))
+      end
       groups
     end
 

@@ -11,6 +11,7 @@
 
   <div class="twfieldrow">
     <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_bike_id, label_text: "Bike record ID", kind: :number_field, html_options: {value: params[:search_bike_id], min: 1, autocomplete: "off"}) %>
+    <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_serial, label_text: "Serial", html_options: {value: params[:search_serial], autocomplete: "off"}) %>
 
     <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_ignored, label_text: "Review status") do %>
       <%= render UI::Forms::Select::Component.new(form_builder: form, attribute: :search_ignored, option_tags: options_for_select([["Active", "false"], ["Ignored", "true"], ["All", "all"]], params[:search_ignored] || "false")) %>

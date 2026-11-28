@@ -9,10 +9,9 @@
     minutes.
   <% end %>
 <% else %>
-  <p class="tw:mt-4">
-    The review queues are being prepared. This can take a minute. Refresh this
-    page shortly to see registration groups and counts.
-  </p>
+  <div data-controller="reload">
+    <%= render UI::LoadingSpinner::Component.new(text: "Preparing the review queues. This can take a minute, and the page reloads until they're ready.") %>
+  </div>
 <% end %>
 
 <p class="tw:mt-4">

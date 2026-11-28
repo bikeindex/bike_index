@@ -99,7 +99,7 @@ RSpec.describe Organized::ExportsController, type: :request do
     end
 
     describe "show" do
-      let(:reloads) { "data-controller=\"org--export-progress\"" }
+      let(:reloads) { "data-controller=\"reload\"" }
 
       it "renders, reloading while the export runs" do
         get "#{base_url}/#{export.id}"

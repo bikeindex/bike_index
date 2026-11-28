@@ -1,7 +1,7 @@
 import { Controller } from '@hotwired/stimulus'
 
-// Connects to data-controller='org--export-progress'
-// Reloads while the export runs. The reload is also what sends an Avery export on to its file
+// Connects to data-controller='reload'
+// Reloads the page every 5 seconds while connected, for a page waiting on background work
 export default class extends Controller {
   connect () {
     this.timer = setTimeout(() => window.location.reload(), 5000)

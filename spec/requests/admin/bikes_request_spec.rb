@@ -175,6 +175,38 @@ RSpec.describe Admin::BikesController, type: :request do
       expect(response).to redirect_to("#{base_url}/#{bike.id}/edit")
     end
 
+    context "with duplicate groups" do
+      let(:other_bike) { FactoryBot.create(:bike, :with_ownership) }
+      let!(:active_group) { DuplicateBikeGroup.create }
+      let!(:ignored_group) { DuplicateBikeGroup.create(ignore: true) }
+      before do
+        {"ACTIVE123" => active_group, "IGNORED123" => ignored_group}.each do |segment, group|
+          [bike, other_bike].each { NormalizedSerialSegment.create!(bike: it, duplicate_bike_group: group, segment:) }
+        end
+      end
+
+      it "lists ignored groups after active ones, to un-ignore, and counts the active ones" do
+        duplicates_count = -> { Capybara.string(response.body).find("a[href=\"#{base_url}/#{bike.id}?active_tab=duplicates\"]", match: :first).find("small").text.strip }
+        get "#{base_url}/#{bike.id}?active_tab=duplicates"
+        expect(response.code).to eq("200")
+        expect(duplicates_count.call).to eq "1"
+        body = Capybara.string(response.body)
+        expect(body).to have_link("ignore ACTIVE123", exact: true) { it[:onclick].include?("Ignore it?") }
+        expect(body).to have_button("un-ignore IGNORED123", exact: true)
+        expect(response.body.index("ACTIVE123")).to be < response.body.index("IGNORED123")
+
+        put "#{base_url}/ignore_duplicate_toggle", params: {id: active_group.id}
+        expect(active_group.reload.ignore).to be_truthy
+        get "#{base_url}/#{bike.id}?active_tab=duplicates"
+        expect(duplicates_count.call).to eq "0"
+        expect(Capybara.string(response.body)).to have_button("un-ignore ACTIVE123", exact: true)
+
+        put "#{base_url}/ignore_duplicate_toggle", params: {id: ignored_group.id}
+        get "#{base_url}/#{bike.id}?active_tab=duplicates"
+        expect(duplicates_count.call).to eq "1"
+      end
+    end
+
     context "with a recovery waiting on a decision" do
       let(:stolen_record) { FactoryBot.create(:stolen_record_recovered, bike:, recovered_description: "Got it back from the shop") }
       before { stolen_record.update_column(:recovery_display_status, "waiting_on_decision") }

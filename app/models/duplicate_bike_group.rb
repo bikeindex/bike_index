@@ -10,6 +10,9 @@
 #  updated_at    :datetime         not null
 #
 class DuplicateBikeGroup < ApplicationRecord
+  IGNORE_CONFIRM = "Ignoring drops this group from the active review list and from each bike's duplicate count. " \
+    "It can be un-ignored from a bike's duplicates tab. Ignore it?"
+
   has_many :normalized_serial_segments
   has_many :bikes, through: :normalized_serial_segments
   # A merge deletes the new registration, which can remove the group; the match outlives it
@@ -22,6 +25,11 @@ class DuplicateBikeGroup < ApplicationRecord
   def self.matching_segment(segment)
     includes(:normalized_serial_segments)
       .where(normalized_serial_segments: {segment: segment}).first
+  end
+
+  # Ignoring asks to confirm; un-ignoring doesn't
+  def ignore_toggle_confirm
+    IGNORE_CONFIRM unless ignore?
   end
 
   def update_added_bike_at

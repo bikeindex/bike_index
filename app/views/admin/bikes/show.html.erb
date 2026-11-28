@@ -18,30 +18,50 @@
 
   <%= render partial: "/admin/bike_stickers/table", locals: {bike_stickers: @bike.bike_stickers} %>
 <% when "duplicates" %>
-  <% duplicate_groups = @bike.duplicate_bike_groups %>
+  <%# The tab counts active groups; ignored ones still list here, to un-ignore %>
+  <% grouped_segments = @bike.normalized_serial_segments.joins(:duplicate_bike_group)
+       .includes(:duplicate_bike_group).order("duplicate_bike_groups.ignore, duplicate_bike_groups.id") %>
 
-  <% duplicate_groups.each do |duplicate_group| %>
+  <% grouped_segments.each do |grouped_segment| %>
+    <% duplicate_group = grouped_segment.duplicate_bike_group %>
+
     <div
       class="
         tw:mt-4 tw:flex tw:flex-wrap tw:items-baseline tw:justify-between
         tw:gap-2
       "
     >
-      <strong><%= duplicate_group.segment %></strong>
+      <span>
+        <strong><%= grouped_segment.segment %></strong>
+
+        <% if duplicate_group.ignore? %>
+          <%= render UI::Badge::Component.new(text: "Ignored", color: :gray, size: :sm) %>
+        <% end %>
+      </span>
 
       <span class="tw:flex tw:gap-3">
         <%= render(UI::ButtonLink::Component.new(text: "Review group", href: admin_duplicate_bike_path(duplicate_group), color: :link, html_class: "tw:text-sm")) %>
 
-        <%= render(UI::ButtonLink::Component.new(text: "ignore #{duplicate_group.segment}", method: :put,
-              href: ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), color: :link, html_class: "tw:text-sm")) %>
+        <%= render(UI::ButtonLink::Component.new(text: "#{duplicate_group.ignore? ? "un-ignore" : "ignore"} #{grouped_segment.segment}", method: :put,
+              href: ignore_duplicate_toggle_admin_bikes_path(id: duplicate_group.id), color: :link, html_class: "tw:text-sm",
+              confirm: duplicate_group.ignore_toggle_confirm)) %>
       </span>
     </div>
 
-    <%= render Pages::Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes, sort_state:,
+    <%# A group can be a placeholder serial shared by thousands, so it lists a few of its bikes %>
+    <% bikes_count = duplicate_group.bikes.count %>
+
+    <%= render Pages::Admin::Bikes::Table::Component.new(bikes: duplicate_group.bikes.limit(25), sort_state:,
           no_show_header: true, show_serial: true) %>
+
+    <% if bikes_count > 25 %>
+      <p class="tw:text-sm">
+        The first 25 of <%= number_display(bikes_count) %> bikes
+      </p>
+    <% end %>
   <% end %>
 
-  <% if duplicate_groups.none? %>
+  <% if grouped_segments.none? %>
     <%= render(UI::Header::Component.new(text: "No duplicates", tag: :h2)) %>
   <% end %>
 <% when "messages" %>

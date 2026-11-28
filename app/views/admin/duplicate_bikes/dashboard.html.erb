@@ -143,6 +143,13 @@
   <%= render UI::Button::Component.new(text: "Filter review queue", color: :primary, type: :submit) %>
 <% end %>
 
+<%= form_with url: admin_duplicate_bikes_path, method: :get, local: true, class: "tw:mt-4" do |form| %>
+  <%= form.hidden_field :search_view, value: "segments" %>
+  <%= form.hidden_field :search_ignored, value: "all" %>
+  <%= render UI::Forms::Group::Component.new(form_builder: form, attribute: :search_serial, label_text: "Find a serial in every group, including ignored ones", html_options: {value: params[:search_serial], autocomplete: "off"}) %>
+  <%= render UI::Button::Component.new(text: "Find serial", color: :primary, type: :submit) %>
+<% end %>
+
 <div class="tw:mt-6">
   <p class="tw:text-sm tw:font-semibold">
     Narrow by tentative review cue
