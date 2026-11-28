@@ -51,7 +51,7 @@ class Notification < ApplicationRecord
   enum :message_channel, MESSAGE_CHANNEL_ENUM
   enum :delivery_status, DELIVERY_STATUS_ENUM
 
-  belongs_to :user # RECEIVER of the notification, unless a :user_sender notification
+  belongs_to :user # RECEIVER of the notification - unless it's a stolen_notification_blocked, which is sent to admin instead, or a user_sender kind, whose user sent it
   belongs_to :bike
   belongs_to :notifiable, polymorphic: true
 
