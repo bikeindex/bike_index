@@ -32,6 +32,12 @@ RSpec.describe "Admin bug reports", :js, type: :system do
     check "bug_reports_selected[#{bug_report_banned.id}]"
     expect(page).to have_content(banned_alert)
 
+    visit page.current_url
+    expect(page).to have_field("bug_reports_selected[#{bug_report.id}]", checked: true)
+    expect(page).to have_field("bug_reports_selected[#{bug_report_banned.id}]", checked: true)
+    click_button "Email selected senders"
+    expect(page).to have_content(banned_alert)
+
     uncheck "bug_reports_selected[#{bug_report_banned.id}]"
     expect(page).to have_no_content(banned_alert)
 
