@@ -1,12 +1,13 @@
 import { Controller } from '@hotwired/stimulus'
 import { ExpandControl, loadMapLibre, MAPS_STYLE_URL, OSM_ATTRIBUTION, showMapUnavailable } from 'utils/maplibre'
 import { collapse } from 'utils/collapse_utils'
+import { urlParam } from 'utils/url_param'
 
 // Connects to data-controller='org--parking-notifications-index'
 // Pins every loaded notification on the map, and narrows the table to the ones in view
 export default class extends Controller {
   static targets = ['canvas', 'unavailable', 'pin', 'placePin', 'placeForm', 'placeInput', 'redo', 'fit',
-    'visibleCount', 'mapButton', 'empty', 'repeatForm']
+    'visibleCount', 'mapButton', 'empty', 'repeatForm', 'multiselectButton']
 
   static values = {
     latitude: Number,
@@ -16,6 +17,9 @@ export default class extends Controller {
   }
 
   async connect () {
+    // table-multi-checkbox restores the URL's checked rows, which need their column showing
+    if (urlParam('checked')) this.#revealMultiselect(0)
+
     try {
       const maplibregl = await loadMapLibre()
       if (!this.element.isConnected) return // disconnected while loading
@@ -72,9 +76,13 @@ export default class extends Controller {
     this.popup?.remove()
   }
 
-  showMultiselect (event) {
-    collapse('hide', event.currentTarget)
-    collapse('show', this.repeatFormTarget)
+  showMultiselect () {
+    this.#revealMultiselect()
+  }
+
+  #revealMultiselect (duration) {
+    collapse('hide', this.multiselectButtonTarget, duration)
+    collapse('show', this.repeatFormTarget, duration)
     this.element.querySelectorAll('.multiselect-cell').forEach((cell) => cell.classList.remove('tw:hidden'))
     // Revealing a column changes which cell is last-visible, which ui--table styles
     window.dispatchEvent(new Event('ui-table:refresh'))
