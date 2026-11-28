@@ -1,2 +1,2 @@
-%div{data: {form_persist_target: "scope"}}
+%div{data: {form_persist_target: "scope", action: "input->form-persist#save"}}
   = render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area, required: true, html_options: {placeholder: "Blog post (in markdown)", rows: 20}))

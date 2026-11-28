@@ -16,8 +16,9 @@ import { storage } from 'utils/storage'
 // that found no draft announces nothing. A controller whose UI hangs off restored fields
 // listens for it and reconciles in its own connect, since a lazily loaded module can
 // arrive after the announcement.
-// A scope target narrows the draft to the fields inside it. overwrite-value has the draft
-// replace text the server rendered too - only for a key carrying the record's version.
+// A scope target narrows the draft to the fields inside it. version-value ties the draft to
+// the record version it was typed over: another version discards it, and the same one has it
+// replace text the server rendered too.
 // Writes are debounced (DEBOUNCE_MS) and a restored draft is discarded once
 // older than TTL_MS.
 const DEBOUNCE_MS = 400
@@ -25,7 +26,7 @@ const TTL_MS = 604800000 // 1 week
 
 export default class extends Controller {
   static targets = ['scope']
-  static values = { key: String, save: Boolean, overwrite: Boolean }
+  static values = { key: String, save: Boolean, version: String }
 
   connect () {
     // Deferred so siblings connecting alongside this one hear the restore. A later one
@@ -68,7 +69,7 @@ export default class extends Controller {
     storage.removeItem(this.storageKey)
   }
 
-  // Without overwrite, stored values only fill fields the server rendered empty — a field the
+  // Without a version, stored values only fill fields the server rendered empty — a field the
   // server filled is at least as fresh as the draft. Checkboxes, selects and
   // comboboxes have no empty state to detect (they render with a default
   // selection), so the draft wins for them.
@@ -100,7 +101,7 @@ export default class extends Controller {
       // and assigning the value fires nothing - so say what a user pick says
       field.dispatchEvent(new Event('change', { bubbles: true }))
     } else {
-      if (field.value && !this.overwriteValue) return false
+      if (field.value && !this.versionValue) return false
       field.value = value
     }
     return true
@@ -123,13 +124,14 @@ export default class extends Controller {
       data[hidden.name] = hidden.value
       data[`${hidden.name}::display`] = display.value
     })
-    storage.setItem(this.storageKey, JSON.stringify({ savedAt: Date.now(), data }))
+    storage.setItem(this.storageKey, JSON.stringify({ savedAt: Date.now(), version: this.versionValue, data }))
   }
 
   read () {
     try {
-      const { savedAt, data } = JSON.parse(storage.getItem(this.storageKey)) || {}
-      if (savedAt == null || Date.now() - savedAt > TTL_MS) {
+      const { savedAt, version, data } = JSON.parse(storage.getItem(this.storageKey)) || {}
+      // ?? '' so a draft saved before versions existed still matches an unversioned form
+      if (savedAt == null || Date.now() - savedAt > TTL_MS || (version ?? '') !== this.versionValue) {
         this.clear()
         return {}
       }
