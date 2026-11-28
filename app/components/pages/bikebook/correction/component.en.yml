@@ -1,0 +1,14 @@
+---
+en:
+  components:
+    pages:
+      bikebook:
+        correction:
+          description: >-
+            Tell us what's wrong and we'll fix it. We'll include the vehicles you're
+            looking at.
+          hide: Hide
+          see_something_wrong: See something wrong or missing?
+          send: Send
+          submit_a_correction: Submit a correction
+          whats_wrong: What's wrong?

@@ -9,8 +9,9 @@ module Pages
       class Component < ApplicationComponent
         # market is the visitor's CF-IPCountry; state is theirs in the US. framed: in an iframe, whose autofocus
         # would take its host page's focus
-        def initialize(manifest_url:, market:, state:, query:, paint_colors:, framed: false)
+        def initialize(manifest_url:, market:, state:, query:, paint_colors:, current_user: nil, framed: false)
           @manifest_url = manifest_url
+          @current_user = current_user
           @framed = framed
           @paint_colors = paint_colors
           @market = Integrations::Bikebook::Catalog.market(market)

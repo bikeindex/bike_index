@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class BikebookController < ApplicationController
+  before_action :authenticate_user, only: :correction
+
   def show
     entries = Integrations::Bikebook::Catalog.vehicle_entries(params[:vehicle_models])
     model = Integrations::Bikebook::Catalog.vehicle_id(entries.first) if entries.one?
@@ -36,6 +38,22 @@ class BikebookController < ApplicationController
       status: record ? :ok : :service_unavailable
   end
 
+  # The page it was sent from goes in the report, with the vehicles picked on it named, as they're what's being corrected
+  def correction
+    correction = params.require(:correction).permit(:body, :page_url)
+    page_url = url_from(correction[:page_url]) || url_from(request.referer)
+    vehicles = page_vehicles(page_url)
+    bug_report = BugReport.new(email: current_user.email, from_name: current_user.name, tags: ["bikebook_correction"],
+      subject: ["Bike Book correction", vehicles.map(&:first).join(", ").presence].compact.join(": "), received_at: Time.current,
+      body: [correction[:body], vehicles.map { "#{it.first} (#{it.last})" }.join("\n").presence, page_url].compact_blank.join("\n\n"))
+    if correction[:body].present? && bug_report.save
+      flash[:success] = translation(:thanks_for_the_correction)
+    else
+      flash[:error] = translation(:correction_failed)
+    end
+    redirect_to page_url || bikebook_path
+  end
+
   # For uptime monitoring: the page breaks whenever the catalog doesn't answer in the format it reads. Green or red, as /up is
   def up
     up = Integrations::Bikebook::Catalog.readable?
@@ -55,6 +73,20 @@ class BikebookController < ApplicationController
 
   private
 
+  # [title, id] of each model picked on the page, titled by its id while the catalog doesn't answer
+  def page_vehicles(page_url)
+    vehicle_models = Rack::Utils.parse_query(URI(page_url.to_s).query)["vehicle_models"]
+    ids = Integrations::Bikebook::Catalog.vehicle_entries(vehicle_models).map { Integrations::Bikebook::Catalog.vehicle_id(it) }
+      .grep(Integrations::Bikebook::Catalog::MODEL_ID).uniq
+    ids.map { [vehicle_title(it) || it, it] }
+  end
+
+  def vehicle_title(id)
+    Integrations::Bikebook::Catalog.vehicle(id)&.dig(:title)
+  rescue Integrations::Bikebook::Catalog::Unreachable
+    nil
+  end
+
   # A model picked alone is its own page, canonically without the search's other params
   def render_vehicle(id)
     @page_url = "#{bikebook_url}?vehicle_models=#{id}"
@@ -72,7 +104,7 @@ class BikebookController < ApplicationController
     # the icon is taller than wide, which the large card crops to a banner
     @twitter_card = "summary" unless @page_image
     @page_image ||= helpers.image_url("logos/bikebook.png")
-    render Pages::Bikebook::Show::Component.new(manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
+    render Pages::Bikebook::Show::Component.new(current_user:, manifest_url: Integrations::Bikebook::Catalog::MANIFEST_URL,
       market: request.env["HTTP_CF_IPCOUNTRY"], state: EbikeRuleServices::StateLaws.state_from_location(request_location_hash),
       query: request.query_parameters, paint_colors: Color.displays, framed: request.headers["Sec-Fetch-Dest"] == "iframe"), status:
   end

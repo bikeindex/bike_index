@@ -1659,6 +1659,10 @@ en:
         cannot_update: >-
           You can't update that %{kind}. Please contact support@bikeindex.org if you
           think you should be able to.
+    bikebook:
+      correction:
+        correction_failed: Your correction wasn't sent. Please say what's wrong.
+        thanks_for_the_correction: Thanks for the correction! We'll look into it.
     bikes:
       assign_bike_stickers:
         sticker_assigned: Success! Sticker '%{bike_sticker}' has been assigned to

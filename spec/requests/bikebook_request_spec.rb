@@ -72,6 +72,15 @@ RSpec.describe BikebookController, type: :request do
           .and include("github.com/bikeindex/bikebook")
       end
 
+      it "keeps the correction form, which takes the session's token from outside it" do
+        log_in(FactoryBot.create(:user_confirmed))
+        2.times { get "/bikebook" }
+
+        page = Capybara.string(response.body)
+        expect(page).to have_css("#bikebook-correction-form").and have_no_css("#bikebook-correction-form [name='authenticity_token']", visible: :all)
+        expect(page.find("input[form='bikebook-correction-form'][name='authenticity_token']", visible: :all).value).to be_present
+      end
+
       it "isn't kept while the catalog doesn't answer, which leaves the state laws out" do
         WebMock.stub_request(:get, /#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}/o).to_return(status: 503)
         shells = 2.times.map do
@@ -88,11 +97,13 @@ RSpec.describe BikebookController, type: :request do
       it "doesn't autofocus the search, which would take the host page's focus" do
         get "/bikebook"
         expect(Capybara.string(response.body)).to have_css("#vehicle_models[autofocus]")
+          .and have_link("Submit a correction")
 
         get "/bikebook", headers: {"Sec-Fetch-Dest" => "iframe"}
         expect(response).to have_http_status(:ok)
         expect(Capybara.string(response.body)).to have_css("#vehicle_models")
           .and have_no_css("#vehicle_models[autofocus]")
+          .and have_no_link("Submit a correction")
       end
     end
 
@@ -209,6 +220,77 @@ RSpec.describe BikebookController, type: :request do
           it "is metric" do
             expect(html_class).to be_blank
           end
+        end
+      end
+    end
+  end
+
+  describe "correction" do
+    let(:page_url) { "http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3-pro,m/segway/2025/gt3-pro{size:M}" }
+    let(:correction) { {body: "The GT3 Pro's top speed is 50 mph", page_url:} }
+
+    def post_correction
+      post "/bikebook/corrections", params: {correction:}
+    end
+
+    context "signed out" do
+      it "links to signing in, back to the page with the form open, and files nothing" do
+        stub_bikebook_catalog
+        get "/bikebook"
+        page = Capybara.string(response.body)
+        expect(page).to have_link("Submit a correction", href: "/session/new?return_to=%2Fbikebook%3Fmodal_bikebook-correction%3D1", count: 2)
+        expect(page).to have_no_css("dialog#bikebook-correction")
+
+        expect { post_correction }.not_to change(BugReport, :count)
+        expect(response).to redirect_to(new_session_path)
+      end
+    end
+
+    context "signed in" do
+      include_context :request_spec_logged_in_as_user
+      before { stub_bikebook_catalog }
+
+      it "files it as the user's, naming the vehicles picked on the page, and goes back there" do
+        get "/bikebook"
+        expect(Capybara.string(response.body).find("dialog#bikebook-correction")).to have_field("correction[body]")
+
+        expect { post_correction }.to change(BugReport, :count).by(1)
+        expect(response).to redirect_to(page_url)
+        expect(flash[:success]).to eq "Thanks for the correction! We'll look into it."
+        expect(BugReport.last).to have_attributes(email: current_user.email, user_id: current_user.id, tags: ["bikebook_correction"],
+          subject: "Bike Book correction: Segway GT3 Pro",
+          body: "The GT3 Pro's top speed is 50 mph\n\nSegway GT3 Pro (m/segway/2025/gt3-pro)\n\n#{page_url}")
+      end
+
+      context "while the catalog doesn't answer" do
+        before { stub_bikebook_catalog(status: 503) }
+
+        it "names the vehicles by their ids" do
+          post_correction
+
+          expect(BugReport.last.subject).to eq "Bike Book correction: m/segway/2025/gt3-pro"
+        end
+      end
+
+      context "without a body" do
+        let(:correction) { {body: " ", page_url:} }
+
+        it "saves nothing, and says so" do
+          expect { post_correction }.not_to change(BugReport, :count)
+
+          expect(response).to redirect_to(page_url)
+          expect(flash[:error]).to match(/wasn't sent/)
+        end
+      end
+
+      context "from another site" do
+        let(:page_url) { "https://example.org/bikebook?vehicle_models=m/segway/2025/gt3-pro" }
+
+        it "goes back to Bike Book, leaving the URL and its vehicles out" do
+          post_correction
+
+          expect(response).to redirect_to("/bikebook")
+          expect(BugReport.last).to have_attributes(subject: "Bike Book correction", body: correction[:body])
         end
       end
     end
