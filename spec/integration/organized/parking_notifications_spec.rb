@@ -295,6 +295,13 @@ RSpec.describe "Organized parking notifications", :js, type: :system do
 
     click_button "retrieve/send repeat notification"
     click_button "Select all"
+    expect(page).to have_current_path(/[?&]checked=all\b/)
+
+    # The selection, and the column showing it, survive a reload
+    visit page.current_url
+    expect(page).to have_content("2 visible", wait: 15)
+    expect(page).to have_no_button("retrieve/send repeat notification")
+    expect(all("input[data-table-multi-checkbox-target='checkbox']", visible: :all).map(&:checked?)).to eq [true] * 4
     select "Mark retrieved/resolved", from: "kind"
     expect {
       click_button "Resolve notifications"

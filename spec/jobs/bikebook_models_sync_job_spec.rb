@@ -93,6 +93,26 @@ RSpec.describe BikebookModelsSyncJob, type: :job do
         expect_block_reads(1)
         expect(BikebookModel.where(data: nil).count).to eq 0
         expect(Rails.cache.read(described_class::SYNCED_MANIFEST_KEY)).to be_nil
+        expect(described_class.locked_for?(nil)).to be false
+      end
+    end
+
+    context "with its lock taken by another run partway through" do
+      it "stops at the next block" do
+        instance.perform
+        BikebookModel.update_all(data_file: nil)
+        Rails.cache.delete(described_class::SYNCED_MANIFEST_KEY)
+        key = described_class.redlock_key(nil)
+        WebMock.stub_request(:get, block_url).to_return do |request|
+          RedisPool.conn { it.set(key, "another run") }
+          bikebook_catalog_response(request)
+        end
+
+        instance.perform
+        expect(BikebookModel.distinct.count(:data_file)).to eq 1
+        expect(Rails.cache.read(described_class::SYNCED_MANIFEST_KEY)).to be_nil
+        expect(described_class.locked_for?(nil)).to be true
+        RedisPool.conn { it.del(key) }
       end
     end
   end
