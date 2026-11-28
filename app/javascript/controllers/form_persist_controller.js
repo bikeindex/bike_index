@@ -17,8 +17,7 @@ import { storage } from 'utils/storage'
 // listens for it and reconciles in its own connect, since a lazily loaded module can
 // arrive after the announcement.
 // A scope target narrows the draft to the fields inside it. version-value ties the draft to
-// the record version it was typed over: another version discards it, and the same one has it
-// replace text the server rendered too.
+// the record version it was typed over, discarding it under any other.
 // Writes are debounced (DEBOUNCE_MS) and a restored draft is discarded once
 // older than TTL_MS.
 const DEBOUNCE_MS = 400
