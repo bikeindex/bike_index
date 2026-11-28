@@ -9,14 +9,28 @@ en:
               Combining them keeps the shop's registration of your %{bike_type}, with
               your photos and the details you entered. Your separate registration
               is removed.
+            combining_moves: >-
+              Combining them moves this registration to that account, with the photos
+              and details entered there. Only combine them if it's your account, or
+              the %{bike_type} is theirs now.
             is_this_the_same: Is this the same %{bike_type}?
             no_theyre_different: No, they're different
             pos_registered_it: >-
               The shop you bought your %{bike_type} from had already registered it
               to you with the same serial.
+            pos_registered_it_to_this_email: >-
+              The shop it was bought from registered a %{bike_type} to the email address
+              this link was sent to. Another Bike Index account, %{other_email}, has
+              since registered a %{bike_type} with the same serial.
+            registered_by: Registered by %{other_email}
+            registered_when_it_was_bought: Registered when it was bought
             registered_when_you_bought_it: Registered when you bought it
             shop_registered_it: >-
               %{shop_name} had already registered a %{bike_type} to you with the same
               serial when you bought it.
+            shop_registered_it_to_this_email: >-
+              %{shop_name} registered a %{bike_type} to the email address this link
+              was sent to when it was bought. Another Bike Index account, %{other_email},
+              has since registered a %{bike_type} with the same serial.
             yes_combine_them: Yes, combine them
             your_registration: Your registration

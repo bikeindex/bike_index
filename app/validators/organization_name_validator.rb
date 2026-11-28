@@ -9,7 +9,7 @@ class OrganizationNameValidator < ActiveModel::Validator
     how_not_to_buy_stolen ikes image_resources impound_claims info integrations landing letter_opener
     lightspeed lightspeed_integration lightspeed_interface locks logout lookbook manufacturers
     manufacturers_tsv marketplace membership my_account new news none o oauth organizations ownerships
-    pages payments pghero primary_activities privacy protect_your_bike public_images rails
+    pages payments pghero pos_registration_matches primary_activities privacy protect_your_bike public_images rails
     recede_historical_location recovery_stories refresh_historical_location register registrations
     resources resume_historical_location reverse_geocode review_impound_claims roadmap sales search
     security serials session shop sidekiq signup spokecard sso stickers stolen stolen_bike_listings

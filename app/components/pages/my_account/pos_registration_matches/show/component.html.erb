@@ -3,7 +3,13 @@
     <%= render(UI::Header::Component.new(text: translation(".is_this_the_same", bike_type:))) %>
 
     <p>
-      <% if shop_name.present? %>
+      <% if different_email? %>
+        <% if shop_name.present? %>
+          <%= translation(".shop_registered_it_to_this_email", shop_name:, bike_type:, other_email:) %>
+        <% else %>
+          <%= translation(".pos_registered_it_to_this_email", bike_type:, other_email:) %>
+        <% end %>
+      <% elsif shop_name.present? %>
         <%= translation(".shop_registered_it", shop_name:, bike_type:) %>
       <% else %>
         <%= translation(".pos_registered_it", bike_type:) %>
@@ -11,7 +17,7 @@
     </p>
 
     <div class="twwiderow tw:my-6">
-      <% [[translation(".registered_when_you_bought_it"), @pos_bike], [translation(".your_registration"), @bike]].each do |heading, registration| %>
+      <% registrations.each do |heading, registration| %>
         <div>
           <%= render(UI::Header::Component.new(text: heading, tag: :h3)) %>
 
@@ -22,10 +28,15 @@
       <% end %>
     </div>
 
-    <p><%= translation(".combining_keeps", bike_type:) %></p>
+    <p>
+      <% if different_email? %>
+        <%= translation(".combining_moves", bike_type:) %>
+      <% else %>
+        <%= translation(".combining_keeps", bike_type:) %>
+      <% end %>
+    </p>
 
-    <%= form_with(url: my_account_pos_registration_match_path(@pos_registration_match), method: :patch,
-      class: "tw:mt-4 tw:flex tw:flex-wrap tw:gap-3") do %>
+    <%= form_with(url: answer_path, method: :patch, class: "tw:mt-4 tw:flex tw:flex-wrap tw:gap-3") do %>
       <%= render(UI::Button::Component.new(text: translation(".yes_combine_them"), color: :primary, type: "submit",
         name: "answer", value: "merge")) %>
 

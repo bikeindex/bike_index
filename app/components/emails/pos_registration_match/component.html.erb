@@ -1,7 +1,13 @@
 <h1><%= translation("is_this_the_same", bike_type:) %></h1>
 
 <p>
-  <% if shop_name.present? %>
+  <% if @pos_registration_match.different_email? %>
+    <% if shop_name.present? %>
+      <%= translation("shop_registered_it_to_this_email_html", shop_name:, bike_type:, other_email:) %>
+    <% else %>
+      <%= translation("pos_registered_it_to_this_email", bike_type:, other_email:) %>
+    <% end %>
+  <% elsif shop_name.present? %>
     <%= translation("shop_registered_it_html", shop_name:, bike_type:) %>
   <% else %>
     <%= translation("pos_registered_it", bike_type:) %>
@@ -12,8 +18,14 @@
   <%= render(Emails::Partials::BikeBox::Component.new(bike: registration, ownership: registration.current_ownership, bike_url_path: bike_url(registration))) %>
 <% end %>
 
-<p><%= translation("combine_them", bike_type:) %></p>
+<p>
+  <% if @pos_registration_match.different_email? %>
+    <%= translation("combine_them_onto_their_account", bike_type:) %>
+  <% else %>
+    <%= translation("combine_them", bike_type:) %>
+  <% end %>
+</p>
 
-<%= link_to translation("review_and_combine"), my_account_pos_registration_match_url(@pos_registration_match), class: "binx-button" %>
+<%= render(Emails::Partials::TokenLink::Component.new(href: answer_url, text: translation("review_and_combine"))) %>
 
 <p><%= translation("if_theyre_different") %></p>

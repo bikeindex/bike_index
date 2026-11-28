@@ -179,6 +179,8 @@ Rails.application.routes.draw do
     resources :pos_registration_matches, only: %i[show update], controller: "my_accounts/pos_registration_matches"
   end
   get "my_account/edit(/:edit_template)", to: "my_accounts#edit", as: :edit_my_account
+  # By the token emailed to the address a shop registered the bike to
+  resources :pos_registration_matches, only: %i[show update]
 
   # Strava integration
   resource :strava_integration, only: [:new, :destroy] do

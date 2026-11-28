@@ -70,11 +70,36 @@ RSpec.describe CustomerMailer, type: :mailer do
     let(:match) { FactoryBot.create(:pos_registration_match) }
 
     it "renders email" do
-      mail = CustomerMailer.pos_registration_match_email(match, match.bike.user)
+      mail = CustomerMailer.pos_registration_match_email(match, match.bike.user.email, match.bike.user)
       expect(mail.subject).to eq "Is this the same bike?"
       expect(mail.to).to eq [match.bike.user.email]
       expect(mail.tag).to eq "pos_registration_match_email"
       expect(mail.body.encoded).to include("/my_account/pos_registration_matches/#{match.id}")
+    end
+
+    context "to another email the shop registered it to" do
+      let(:match) { FactoryBot.create(:pos_registration_match, :different_email) }
+
+      it "links the token, and obscures the owner's email" do
+        mail = CustomerMailer.pos_registration_match_email(match, "shop-customer@example.com")
+        expect(mail.to).to eq ["shop-customer@example.com"]
+        body = mail.body.encoded
+        expect(body).to include("/pos_registration_matches/#{match.id}?token=#{match.token}", EmailNormalizer.obfuscate(match.bike.user.email),
+          "moves this registration to that account")
+        expect(body).not_to include(match.bike.user.email)
+      end
+    end
+  end
+
+  describe "pos_registration_merged_email" do
+    let(:match) { FactoryBot.create(:pos_registration_match, :different_email, status: :merged) }
+
+    it "renders email" do
+      mail = CustomerMailer.pos_registration_merged_email(match, match.bike.user)
+      expect(mail.subject).to eq "We combined your bike's registrations"
+      expect(mail.to).to eq [match.bike.user.email]
+      expect(mail.tag).to eq "pos_registration_merged_email"
+      expect(mail.body.encoded).to include("another email address", "reply to this email")
     end
   end
 

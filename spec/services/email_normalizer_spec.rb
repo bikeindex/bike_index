@@ -19,6 +19,17 @@ RSpec.describe EmailNormalizer do
     end
   end
 
+  describe "mailbox" do
+    it "drops a +tag, and Gmail's dots and googlemail.com" do
+      expect(EmailNormalizer.mailbox(" John.Smith+bikes@GoogleMail.com")).to eq "johnsmith@gmail.com"
+      expect(EmailNormalizer.mailbox("john.smith+bikes@example.com")).to eq "john.smith@example.com"
+    end
+
+    it "is nil without an address" do
+      expect([nil, "", "johnsmith"].map { EmailNormalizer.mailbox(it) }).to eq([nil, nil, nil])
+    end
+  end
+
   describe "obfuscate" do
     it "removes some stuff" do
       expect(EmailNormalizer.obfuscate("seth@example.com")).to eq "se**@e********om"

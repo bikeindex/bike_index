@@ -43,7 +43,7 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     }.to change(PosRegistrationMatch, :count).by 1
     duplicate_bike_group = bike.normalized_serial_segments.find_by(segment: bike.serial_normalized_no_space).duplicate_bike_group
     expect(PosRegistrationMatch.last).to have_attributes(bike_id: bike.id, pos_bike_id: pos_bike.id, duplicate_bike_group:,
-      status: "pending", bucket: "merge_candidate", review_reasons: [])
+      status: "pending", bucket: "merge_candidate", review_reasons: [], token: nil)
     expect(duplicate_bike_group.pos_registration_matches.pluck(:id)).to eq([PosRegistrationMatch.last.id])
   end
 
@@ -188,10 +188,33 @@ RSpec.describe BikeJobs::PosRegistrationMatchFinderJob, type: :job do
     include_examples "records a review candidate", ["stolen_history"]
   end
 
-  context "pos bike owned by someone else" do
+  context "pos bike registered to another email" do
     let(:pos_owner_email) { "shop-customer@example.com" }
 
-    include_examples "records no match"
+    it "records a match that email answers, and asks it" do
+      perform_for(bike)
+      match = PosRegistrationMatch.sole
+      expect(match).to have_attributes(pos_bike_id: pos_bike.id, bucket: "merge_candidate", different_email?: true)
+      expect(match.token.length).to be > 20
+      expect(EmailJobs::PosRegistrationMatchJob.jobs.map { it["args"] }).to eq([[match.id]])
+    end
+
+    context "that another account has claimed" do
+      before { pos_bike.current_ownership.update!(user: FactoryBot.create(:user_confirmed), claimed: true) }
+
+      include_examples "records no match"
+    end
+  end
+
+  context "pos bike registered to an address that delivers to the owner's" do
+    let(:user) { FactoryBot.create(:user_confirmed, email: "john.smith@gmail.com") }
+    let(:pos_owner_email) { "johnsmith+shop@gmail.com" }
+
+    it "records a match the owner answers" do
+      expect(pos_bike.user_id).to be_nil
+      perform_for(bike)
+      expect(PosRegistrationMatch.sole).to have_attributes(pos_bike_id: pos_bike.id, token: nil)
+    end
   end
 
   context "new bike credited to the POS bike's shop, as the register flow does by default" do

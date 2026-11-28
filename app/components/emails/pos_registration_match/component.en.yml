@@ -6,12 +6,23 @@ en:
         combine_them: >-
           Combining them keeps one registration for your %{bike_type}, with your photos
           and the details you entered.
+        combine_them_onto_their_account: >-
+          Combining them moves this registration to that account. Only combine them
+          if it's your account, or the %{bike_type} is theirs now.
         if_theyre_different: If they're different, you can tell us on the same page.
         is_this_the_same: Is this the same %{bike_type}?
         pos_registered_it: >-
           You registered a %{bike_type} that the shop you bought it from had already
           registered to you, with the same serial.
+        pos_registered_it_to_this_email: >-
+          The shop it was bought from registered a %{bike_type} to this email address.
+          Another Bike Index account, %{other_email}, has since registered a %{bike_type}
+          with the same serial.
         review_and_combine: Review and combine
         shop_registered_it_html: >-
           You registered a %{bike_type} that <strong>%{shop_name}</strong> had already
           registered to you when you bought it, with the same serial.
+        shop_registered_it_to_this_email_html: >-
+          <strong>%{shop_name}</strong> registered a %{bike_type} to this email address
+          when it was bought. Another Bike Index account, %{other_email}, has since
+          registered a %{bike_type} with the same serial.

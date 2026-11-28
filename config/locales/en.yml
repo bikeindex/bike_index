@@ -2004,6 +2004,18 @@ en:
           make sense.
         you_claimed_it: Looks like this is your %{bike_type}! Good work, you just
           claimed it.
+    pos_registration_matches:
+      redirect_by_status:
+        already_combined: These are already combined into one registration.
+        already_kept_separate: You told us these are different, so they're staying
+          separate.
+        cant_combine_here: >-
+          These registrations can't be combined. Email support@bikeindex.org if you
+          need help.
+        combining_thanks: >-
+          Thanks! We're combining them into one registration on the other account,
+          and we'll let them know.
+        kept_separate: Thanks, we'll keep them as separate registrations.
     public_images:
       create:
         cannot_create: Whoops! We can't let you create that image.
@@ -2195,6 +2207,8 @@ en:
       subject: Instructions to reset your password
     pos_registration_match_email:
       subject: Is this the same %{bike_type}?
+    pos_registration_merged_email:
+      subject: We combined your %{bike_type}'s registrations
     recovered_from_link:
       html:
         marked_recovered_by: 'Marked recovered by:'

@@ -55,6 +55,27 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
         expect(Bike.unscoped.find(bike.id).deleted_at).to be_present
         expect(CallbackJobs::AfterBikeSaveJob.jobs.map { it["args"] }).to include([bike.id], [pos_bike.id])
         expect(PosRegistrationMatch.merged_into(Bike.unscoped.find(bike.id))).to eq pos_bike
+        expect(EmailJobs::PosRegistrationMergedJob.jobs).to be_empty
+      end
+    end
+
+    context "when the shop registered it to another email" do
+      let(:match) { FactoryBot.create(:pos_registration_match, :different_email, status: :confirmed) }
+      let!(:strava_gear) do
+        FactoryBot.create(:strava_gear, item: bike, strava_integration: FactoryBot.create(:strava_integration, user:))
+      end
+
+      # Written because confirming an account with the shop's email reassigned the claimed registration to it
+      it "claims it for the owner's account, with their Strava gear, and tells them" do
+        expect(pos_bike.user).to be_blank
+        instance.perform(match.id)
+        expect(match.reload.status).to eq "merged"
+        expect(pos_bike.reload).to have_attributes(user:, owner_email: user.email)
+        expect(pos_bike.current_ownership).to have_attributes(claimed: true, owner_email: user.email)
+        FactoryBot.create(:user_confirmed, email: "shop-customer@example.com")
+        expect(pos_bike.reload.user).to eq user
+        expect(strava_gear.reload.item_id).to eq pos_bike.id
+        expect(EmailJobs::PosRegistrationMergedJob.jobs.map { it["args"] }).to eq([[match.id]])
       end
     end
 
@@ -307,6 +328,18 @@ RSpec.describe BikeJobs::MergePosRegistrationJob, type: :job do
         instance.perform(match.id)
         expect(match.reload.review_reasons).to eq ["changed_since_confirmed"]
         expect(bike.reload.deleted_at).to be_blank
+      end
+    end
+
+    context "when another account claimed the POS registration the shop registered to another email" do
+      let(:match) { FactoryBot.create(:pos_registration_match, :different_email, status: :confirmed) }
+      before { pos_bike.current_ownership.update!(user: FactoryBot.create(:user_confirmed), claimed: true) }
+
+      it "records why" do
+        instance.perform(match.id)
+        expect(match.reload.review_reasons).to eq ["changed_since_confirmed"]
+        expect(bike.reload.deleted_at).to be_blank
+        expect(EmailJobs::PosRegistrationMergedJob.jobs).to be_empty
       end
     end
 
