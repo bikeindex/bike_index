@@ -743,7 +743,9 @@ CREATE TABLE public.bikebook_models (
     markets character varying[] DEFAULT '{}'::character varying[] NOT NULL,
     created_at timestamp(6) without time zone NOT NULL,
     updated_at timestamp(6) without time zone NOT NULL,
-    deleted_at timestamp(6) without time zone
+    deleted_at timestamp(6) without time zone,
+    data jsonb,
+    data_file character varying
 );
 
 
@@ -8304,6 +8306,7 @@ ALTER TABLE ONLY public.bug_reports
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20261127201240'),
 ('20261127170000'),
 ('20261125171521'),
 ('20261125162741'),

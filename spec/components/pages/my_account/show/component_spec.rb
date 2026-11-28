@@ -48,8 +48,8 @@ RSpec.describe Pages::MyAccount::Show::Component, type: :component do
 
       before { UserAlert.refresh_alert_slugs(user) }
 
-      it "renders it with its bike, saying 'this one'" do
-        expect(component).to have_css("li [role=alert]", text: "but this one is not")
+      it "renders it with its bike, naming it" do
+        expect(component).to have_css("li [role=alert]", text: "but your #{bike.title_string} isn't")
         expect(component).not_to have_css("[role=alert] a[href='/bikes/#{bike.id}']")
       end
     end

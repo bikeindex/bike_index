@@ -66,7 +66,7 @@ module OrgServices
         address: address.to_h.stringify_keys.slice(*AddressRecord.permitted_params.map(&:to_s)).compact_blank)
       return true if signup.details_completed?
 
-      signup.errors.add(:base, translation(:address_required))
+      details_errors(signup).each { signup.errors.add(:base, it) }
       false
     end
 
@@ -151,6 +151,14 @@ module OrgServices
       translation(:name_taken_shortened, name: existing)
     end
 
+    def details_errors(signup)
+      malformed = signup.malformed_details
+      [(translation(:website_invalid) if malformed.include?(:website)),
+        (translation(:phone_invalid) if malformed.include?(:phone)),
+        (translation(:postal_code_invalid) if malformed.include?(:postal_code)),
+        (translation(:address_required) unless signup.address_completed?)].compact
+    end
+
     def location_attributes(signup)
       {name: signup.name, phone: signup.phone, publicly_visible: signup.publicly_visible,
        address_record_attributes: signup.address}
@@ -158,6 +166,6 @@ module OrgServices
 
     def translation(key, **) = I18n.t(key, scope: "shared.organization_signup", **)
 
-    conceal :start_errors, :name_error, :taken_name_error, :location_attributes, :translation
+    conceal :start_errors, :name_error, :taken_name_error, :details_errors, :location_attributes, :translation
   end
 end

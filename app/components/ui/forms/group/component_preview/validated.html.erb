@@ -1,0 +1,23 @@
+<%# Scoped, so its ids stay apart from All field types', which share the preview's page. %>
+<%= form_with(url: "#", scope: :validated, builder: BikeIndexFormBuilder) do |f| %>
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone, kind: :telephone_field,
+      html_options: {value: "callmemaybe"})) %>
+
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :website, kind: :website_field,
+      html_options: {value: "http://not a website"})) %>
+
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :postal_code, kind: :postal_code_field,
+      html_options: {value: "1"})) %>
+
+  <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :email)) do %>
+    <%= render(UI::Forms::Email::Component.new(form_builder: f, html_options: {value: "you@gmial.con"})) %>
+  <% end %>
+
+  <%# Everything but the postal code filled in, so that's what it's refused for. %>
+  <%= f.fields_for :address_record, AddressRecord.new(street: "10544 82 Ave NW", city: "Edmonton",
+      region_string: "AB", postal_code: "1", country_id: Country.canada_id) do |address_form| %>
+    <%= render(UI::Forms::AddressGroup::Component.new(form_builder: address_form, required: true)) %>
+  <% end %>
+
+  <%= render(UI::Button::Component.new(text: "Submit", color: :primary, type: "submit")) %>
+<% end %>

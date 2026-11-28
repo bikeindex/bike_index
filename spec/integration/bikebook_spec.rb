@@ -453,12 +453,12 @@ RSpec.describe "Bike Book", :js, type: :system do
     # under its frame, weight limits, wheels, brakes, suspension and drivetrain
     headings = find("section[aria-label='Aventón Level 2 Step-Through components']").all("h2").map { it.text.downcase }
     expect(headings.first(6)).to eq(["frame", "weight limits", "wheels", "brakes", "suspension", "drivetrain"])
-    # each row level with the other card's, its blank standing in where only the other has the component. Read two
-    # frames on, as bikebook--align-rows sizes them in the frame after the cards render
+    # each row level with the other card's, its blank standing in where only the other has the component. Read once
+    # bikebook--align-rows has sized every row, which can be well after the cards render: its module is fetched then
+    expect(page).to have_no_css("section[aria-label$=' components'] [data-align-row]:not([style*='height'])", wait: 10)
     tops = page.evaluate_script(<<~JS)
-      new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve(
-        [...document.querySelectorAll("section[aria-label$=' components']")].map((card) => [...card.querySelectorAll('[data-align-row]')]
-          .map((row) => [row.dataset.alignRow, Math.round(row.getBoundingClientRect().top)]))))))
+      [...document.querySelectorAll("section[aria-label$=' components']")].map((card) => [...card.querySelectorAll('[data-align-row]')]
+        .map((row) => [row.dataset.alignRow, Math.round(row.getBoundingClientRect().top)]))
     JS
     expect(tops.first.map(&:first)).to eq(tops.last.map(&:first))
     expect(page).to have_css("section[aria-label$=' components'] tbody tr", exact_text: "")

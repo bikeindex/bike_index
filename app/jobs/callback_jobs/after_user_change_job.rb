@@ -54,6 +54,7 @@ module CallbackJobs
       UserAlert.update_unfinished_registrations(user)
       bike_ids = UserAlert.alert_bike_ids(user)
       UserAlert.resolve_without_bike(user, bike_ids:)
+      UserAlert.resolve_recovered(user)
 
       # Ignore alerts below for superusers
       if user.superuser?

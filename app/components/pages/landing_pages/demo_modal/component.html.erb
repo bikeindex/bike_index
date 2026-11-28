@@ -26,7 +26,7 @@
       <% end %>
 
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :phone_number, kind: :telephone_field,
-        html_options: {required: true, pattern: PHONE_PATTERN, title: translation(".phone_hint")})) %>
+        required: true)) %>
 
       <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :body, kind: :text_area,
         label_text: translation(".field_message"), html_options: {rows: 3})) %>

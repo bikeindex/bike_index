@@ -60,7 +60,11 @@ RSpec.describe Integrations::Bikebook::Data do
     context "with the catalog unreachable" do
       before { stub_bikebook_catalog(status: 500) }
 
-      it { expect(result).to be_nil }
+      it "returns the synced model, its component types humanized" do
+        expect(result[:bike][:cycle_type]).to eq "cargo-rear"
+        expect(result[:components]).to include({component_type: "Gripstape", description: "Globe closed end slip on type, 155mm",
+                                                manufacturer: "Globe", front: false, rear: false}.as_json)
+      end
     end
   end
 

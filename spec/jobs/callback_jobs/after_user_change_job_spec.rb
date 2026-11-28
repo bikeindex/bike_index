@@ -328,7 +328,7 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
     end
   end
 
-  describe "bikes deleted or transferred away" do
+  describe "bikes deleted, transferred away or recovered" do
     let(:user) { FactoryBot.create(:user_confirmed) }
     let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:) }
     let!(:stolen_record) { FactoryBot.create(:stolen_record, bike:, street: " ") }
@@ -356,6 +356,28 @@ RSpec.describe CallbackJobs::AfterUserChangeJob, type: :job do
       expect(user.user_alerts.active.count).to eq 0
       expect(user.user_alerts.resolved.pluck(:kind)).to match_array %w[stolen_bike_without_location
         theft_alert_without_photo unfinished_registration]
+    end
+
+    it "resolves the stolen alerts when the bike is recovered" do
+      bike.update(updated_at: Time.current)
+      instance.perform(user.id)
+      expect(user.reload.alert_slugs).to eq %w[stolen_bike_without_location theft_alert_without_photo unfinished_registration]
+
+      stolen_record.add_recovery_information
+      instance.perform(user.id)
+      expect(user.reload.alert_slugs).to eq %w[unfinished_registration]
+    end
+
+    # Bike's default scope hides the bike, so its alerts were resolved and recreated every run
+    context "with the stolen bike hidden by the user" do
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, user:, marked_user_hidden: true) }
+
+      it "keeps its stolen alerts" do
+        instance.perform(user.id)
+        instance.perform(user.id)
+        expect(user.reload.alert_slugs).to eq %w[stolen_bike_without_location theft_alert_without_photo unfinished_registration]
+        expect(user.user_alerts.resolved.count).to eq 0
+      end
     end
 
     context "with a theft alert bought by an organization member" do
