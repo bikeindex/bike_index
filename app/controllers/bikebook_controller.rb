@@ -55,13 +55,15 @@ class BikebookController < ApplicationController
 
   private
 
-  # A model picked alone is its own page, canonically without the search's other params
+  # A model picked alone is its own page, canonically without the search's other params. Read from its BikebookModel,
+  # or the catalog for one without, as a manufacturer Bike Index doesn't have
   def render_vehicle(id)
     @page_url = "#{bikebook_url}?vehicle_models=#{id}"
-    model = Integrations::Bikebook::Catalog.model(id) || fail(ActiveRecord::RecordNotFound)
+    model = BikebookModel.where(catalog_id: Integrations::Bikebook::Catalog.base_id(id)).pick(:data)&.dig(id) ||
+      Integrations::Bikebook::Catalog.model(id) || fail(ActiveRecord::RecordNotFound)
     @page_description = model["description"]
     @page_image = model["stock_photo"]
-    overview = Pages::Bikebook::ModelOverview::Component.new(model:, vocabulary: Integrations::Bikebook::Catalog.display_names)
+    overview = Pages::Bikebook::ModelOverview::Component.new(model:, vocabulary_file: Integrations::Bikebook::Catalog.vocabulary)
     render_page(overview.title, overview:)
   rescue Integrations::Bikebook::Catalog::Unreachable
     # the browser loads the catalog itself, and a crawler keeps the model's page and comes back

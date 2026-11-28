@@ -171,10 +171,40 @@ RSpec.describe BikebookController, type: :request do
             get("/bikebook", params:)
           end
 
-          it "renders the model's page without it" do
+          it "is unavailable, rather than cache an overview without its names" do
+            expect(response).to have_http_status(:service_unavailable)
+          end
+        end
+
+        context "cached", :caching do
+          include_context :caching_basic
+
+          it "renders again without reading the vocabulary" do
+            expect(overview).to have_css("section")
+            cache.delete_matched(%r{bikebook_catalog/.*vocabulary})
+            WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(status: 503)
+
+            get("/bikebook", params:)
             expect(response).to have_http_status(:ok)
-            expect(page).to have_title("Segway GT3 Pro", exact: true)
-            expect(overview).to have_no_css("section")
+            expect(overview).to have_css("h2", text: "GT3 Pro")
+          end
+        end
+
+        context "synced to its BikebookModel" do
+          let(:params) { {vehicle_models: "m/specialized/2025/haul-st@CA"} }
+
+          before do
+            FactoryBot.create(:manufacturer, name: "Specialized")
+            BikebookModelsSyncJob.new.perform
+            Rails.cache.clear
+            WebMock.stub_request(:get, %r{\A#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}models/}o).to_return(status: 503)
+            get("/bikebook", params:)
+          end
+
+          it "renders it from the database, without reading the catalog's block" do
+            expect(response).to have_http_status(:ok)
+            expect(page).to have_title("Specialized Haul ST", exact: true)
+            expect(overview).to have_css("h2", text: "Haul ST")
           end
         end
       end

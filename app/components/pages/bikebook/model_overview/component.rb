@@ -4,20 +4,25 @@ module Pages
   module Bikebook
     module ModelOverview
       # A catalog model's photo and headline fields, as the browser's Overview has them, for a browser without
-      # JavaScript. vocabulary is Integrations::Bikebook::Catalog.display_names, without which it renders nothing
+      # JavaScript. vocabulary_file is Integrations::Bikebook::Catalog.vocabulary, without which it renders nothing
       class Component < ApplicationComponent
-        def initialize(model:, vocabulary:)
+        def initialize(model:, vocabulary_file:)
           @model = model
-          @vocabulary = vocabulary
+          @vocabulary_file = vocabulary_file
         end
 
-        def render? = @vocabulary.present?
+        def render? = @vocabulary_file.present?
 
         def title = [@model["manufacturer"], @model["model"]].compact_blank.join(" ")
 
         private
 
-        def named(field, value) = @vocabulary.dig("names", field, value) || value
+        def cache_key = [self.class.cache_digest, @vocabulary_file, Digest::SHA256.hexdigest(@model.to_json)]
+
+        # Read only when the fragment isn't cached. Raising rather than caching a fragment without its names
+        def vocabulary = @vocabulary ||= Integrations::Bikebook::Catalog.display_names || raise(Integrations::Bikebook::Catalog::Unreachable)
+
+        def named(field, value) = vocabulary.dig("names", field, value) || value
 
         def years = @model["years"].to_h.sort.reverse.map(&:last)
 
@@ -34,7 +39,7 @@ module Pages
         def price
           year = years.find { it["original_msrp"].is_a?(Numeric) } or return
           code = year["original_msrp_currency"] || "USD"
-          currency = @vocabulary.dig("currencies", code) || {}
+          currency = vocabulary.dig("currencies", code) || {}
           amount = year["original_msrp"].fdiv(Money::Currency.find(code)&.subunit_to_unit || 100)
           tag.span(safe_join([tag.span(currency["symbol"] || "#{code} ", title: currency["name"] || code),
             helpers.number_display((amount % 1).zero? ? amount.to_i : amount)]))
@@ -52,7 +57,7 @@ module Pages
         end
 
         def e_vehicle_classes = EbikeRuleServices::BikebookVehicles.stock_classifications(@model)
-          .map { @vocabulary.dig("classifications", it) || named("motors.operating_modes.e_vehicle_classifications", it) }.join(", ")
+          .map { vocabulary.dig("classifications", it) || named("motors.operating_modes.e_vehicle_classifications", it) }.join(", ")
       end
     end
   end
