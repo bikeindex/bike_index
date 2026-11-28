@@ -68,7 +68,7 @@ RSpec.describe BikebookController, type: :request do
         expect([japan, us, france].map { it.at_css("[data-controller='bikebook--page']").attributes.slice(*%w[market market-name jurisdiction].map { "data-bikebook--page-#{it}-value" }).transform_values(&:value).values })
           .to eq [%w[JP Japan US], ["US", "United States", "US"], ["EU", "European Union", "US"]]
         expect(response.body).to include("https://github.com/bikeindex/bikebook (CC BY-SA 4.0). Clone that repository instead.")
-        expect(us.at_css("[data-controller='bikebook--page'] > noscript").text).to include("AI agents: get the data there")
+        expect(us.at_css("[data-controller='bikebook--page'] noscript").text).to include("AI agents: get the data there")
           .and include("github.com/bikeindex/bikebook")
       end
 
@@ -139,6 +139,74 @@ RSpec.describe BikebookController, type: :request do
           .and have_css("link[rel='canonical'][href='http://www.example.com/bikebook?vehicle_models=m/segway/2025/gt3-pro']", visible: :all)
         # its search hidden from the start, as the browser hides it
         expect(page.find("[inert]", visible: :all)[:class]).to eq "tw:hidden"
+      end
+
+      describe "its overview, for a browser without JavaScript" do
+        let(:overview) { Nokogiri::HTML5(response.body).at_css("[data-bikebook--page-target='page'] > noscript")&.inner_html.then { Capybara.string(it.to_s) } }
+        let(:rows) { overview.all("dl > div").to_h { [it.find("dt").text, it.find("dd").text.squish] } }
+
+        it "shows its photo and headline fields" do
+          expect(overview).to have_css("img[src='https://bikebook.bikeindex.org/segway/2025/gt3-pro.png'][alt='Segway GT3 Pro']")
+            .and have_css("h2", text: "GT3 Pro")
+            .and have_link("manufacturer's page", href: "https://store.segway.com/segway-superscooter-gt3-pro")
+          expect(rows.except("Description")).to eq("Price" => "$2,699.99", "Years" => "2025 – current manufacturer's page",
+            "Vehicle type" => "e-Scooter", "Primary activity" => "Commuting (Around Town / Hybrid)", "Frame material" => "Steel")
+          expect(rows["Description"]).to start_with("Experience elite performance with the Segway GT3 Pro")
+        end
+
+        context "electric, with a frame's detail" do
+          let(:params) { {vehicle_models: "m/aventon/2025/abound-lr"} }
+
+          it "names its classes, the frame's detail and its step-through" do
+            expect(rows.slice("Price", "Vehicle type", "Frame material", "E-vehicle class")).to eq("Price" => "$1,999",
+              "Vehicle type" => "Cargo Bike Rear · Long tail · Step-through", "Frame material" => "Aluminum Gravity Cast 6061 Single-Butted Aluminum",
+              "E-vehicle class" => "Class 2")
+          end
+        end
+
+        context "with the vocabulary unreachable" do
+          before do
+            Rails.cache.clear
+            WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(status: 503)
+            get("/bikebook", params:)
+          end
+
+          it "is unavailable, rather than cache an overview without its names" do
+            expect(response).to have_http_status(:service_unavailable)
+          end
+        end
+
+        context "cached", :caching do
+          include_context :caching_basic
+
+          it "renders again without reading the vocabulary" do
+            expect(overview).to have_css("section")
+            cache.delete_matched(%r{bikebook_catalog/.*vocabulary})
+            WebMock.stub_request(:get, "#{Integrations::Bikebook::Catalog::URL}vocabulary.json").to_return(status: 503)
+
+            get("/bikebook", params:)
+            expect(response).to have_http_status(:ok)
+            expect(overview).to have_css("h2", text: "GT3 Pro")
+          end
+        end
+
+        context "synced to its BikebookModel" do
+          let(:params) { {vehicle_models: "m/specialized/2025/haul-st@CA"} }
+
+          before do
+            FactoryBot.create(:manufacturer, name: "Specialized")
+            BikebookModelsSyncJob.new.perform
+            Rails.cache.clear
+            WebMock.stub_request(:get, %r{\A#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}models/}o).to_return(status: 503)
+            get("/bikebook", params:)
+          end
+
+          it "renders it from the database, without reading the catalog's block" do
+            expect(response).to have_http_status(:ok)
+            expect(page).to have_title("Specialized Haul ST", exact: true)
+            expect(overview).to have_css("h2", text: "Haul ST")
+          end
+        end
       end
 
       context "a market's, by its citation key" do

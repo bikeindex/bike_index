@@ -8,9 +8,10 @@ module Pages
       # and renders again for each pick and history step
       class Component < ApplicationComponent
         # market is the visitor's CF-IPCountry; state is theirs in the US. framed: in an iframe, whose autofocus
-        # would take its host page's focus
-        def initialize(manifest_url:, market:, state:, query:, paint_colors:, framed: false)
+        # would take its host page's focus. overview: a model picked alone's Pages::Bikebook::ModelOverview
+        def initialize(manifest_url:, market:, state:, query:, paint_colors:, framed: false, overview: nil)
           @manifest_url = manifest_url
+          @overview = overview
           @framed = framed
           @paint_colors = paint_colors
           @market = Integrations::Bikebook::Catalog.market(market)

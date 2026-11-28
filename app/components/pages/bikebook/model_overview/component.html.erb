@@ -1,0 +1,38 @@
+<% cache(cache_key, expires_in: 1.day) do %>
+  <noscript>
+    <section
+      aria-label="<%= translation(".overview") %>"
+      class="tw:flex tw:flex-col tw:gap-6 tw:lg:flex-row tw:lg:items-start"
+    >
+      <% if @model["stock_photo"].present? %>
+        <%= image_tag(@model["stock_photo"], alt: title, class: "tw:aspect-[4/3] tw:w-full tw:object-contain tw:lg:w-1/2") %>
+      <% end %>
+
+      <div class="tw:min-w-0 tw:flex-1">
+        <p class="tw:m-0 tw:text-gray-600 tw:dark:text-gray-400">
+          <%= @model["manufacturer"] %>
+        </p>
+
+        <%= render(UI::Header::Component.new(text: @model["model"], tag: :h2)) %>
+
+        <%= render(UI::DefinitionList::Container::Component.new) do %>
+          <%= render UI::DefinitionList::Row::Component.new(label: translation(".price"), value: price) %>
+
+          <%= render(UI::DefinitionList::Row::Component.new(label: translation(".years"), value: year_range)) do %>
+            <% if manufacturer_url %>
+              <small class="tw:ml-1">
+                <%= link_to(translation(".manufacturers_page"), manufacturer_url, class: "twlink") %>
+              </small>
+            <% end %>
+          <% end %>
+
+          <%= render UI::DefinitionList::Row::Component.new(label: translation(".vehicle_type"), value: vehicle_type) %>
+          <%= render UI::DefinitionList::Row::Component.new(label: translation(".primary_activity"), value: named("primary_activity", @model["primary_activity"])) %>
+          <%= render UI::DefinitionList::Row::Component.new(label: translation(".frame_material"), value: frame_material) %>
+          <%= render UI::DefinitionList::Row::Component.new(label: translation(".e_vehicle_class"), value: e_vehicle_classes) %>
+          <%= render UI::DefinitionList::Row::Component.new(label: translation(".description"), value: @model["description"], full_width: true) %>
+        <% end %>
+      </div>
+    </section>
+  </noscript>
+<% end %>
