@@ -29,12 +29,8 @@
       <% end %>
 
       <%= render(UI::Card::Component.new) do %>
-        <%= render(UI::Header::Component.new(text: "Images", tag: :h3, html_class: "tw:mb-1!")) %>
-
-        <p class="less-strong tw:mb-2 tw:text-sm">
-          Upload, then paste an image's tag into the body. Pick one as the
-          primary image to show it on the homepage.
-        </p>
+        <%= render(UI::Header::Component.new(text: "Images", tag: :h3,
+          subtitle: "Upload, then paste an image's tag into the body. Pick one as the primary image to show it on the homepage.")) %>
 
         <label
           class="

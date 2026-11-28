@@ -4,8 +4,7 @@ module Pages
   module Admin
     module News
       module Form
-        # The admin news edit form: writing in the main column, publishing and metadata in a
-        # sidebar. Pages::Admin::News::Options is the legacy layout's equivalent of the sidebar.
+        # Pages::Admin::News::Options is the legacy layout's equivalent of the sidebar
         class Component < ApplicationComponent
           def initialize(blog:)
             @blog = blog
