@@ -17,6 +17,6 @@
       %div{ class: "tw:flex tw:justify-between" }
         = render(UI::Button::Component.new(text: "delete", color: :error, size: :sm, data: { action: "admin--public-image#destroy" }))
         %label{class: "tw:inline-flex tw:cursor-pointer tw:items-center"}
-          -# The list sits outside the blog's form, so `form` is what joins it to "No primary image"
+          -# `form` joins it to "No primary image" when the list sits outside the blog's form
           %input{ type: "radio", name: "blog[index_image_id]", value: public_image.id, form: dom_id(blog, :edit), checked: blog.index_image_id == public_image.id }
           %em{ class: "tw:ml-1" } primary image
