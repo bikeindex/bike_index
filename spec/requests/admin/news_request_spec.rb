@@ -35,6 +35,32 @@ RSpec.describe Admin::NewsController, type: :request do
       expect(response.body).to include("data-ui--forms--files--upload-multiple-params-value=\"{&quot;blog_id&quot;:#{blog.id}}\"")
       expect(response.body).to include("id=\"image-#{public_image.id}\"")
     end
+
+    it "toggles to the legacy form, and remembers it" do
+      get "#{base_url}/#{blog.to_param}/edit"
+      expect(response.body).to include("Legacy interface")
+      expect(response.body).to_not include("Blog post (in markdown)")
+
+      get "#{base_url}/#{blog.to_param}/edit", params: {legacy_form: true}
+      expect(response.body).to include("New interface", "Blog post (in markdown)")
+
+      get "#{base_url}/#{blog.to_param}/edit"
+      expect(response.body).to include("New interface")
+
+      get "#{base_url}/#{blog.to_param}/edit", params: {legacy_form: false}
+      expect(response.body).to include("Legacy interface")
+      expect(response.body).to_not include("Blog post (in markdown)")
+    end
+
+    context "with a listicle" do
+      let(:blog) { FactoryBot.create(:blog, kind: :listicle, is_listicle: true) }
+
+      it "only has the legacy form" do
+        get "#{base_url}/#{blog.to_param}/edit"
+        expect(response.body).to include("Listicles are no longer actively maintained")
+        expect(response.body).to_not include("Legacy interface", "New interface")
+      end
+    end
   end
 
   describe "update" do

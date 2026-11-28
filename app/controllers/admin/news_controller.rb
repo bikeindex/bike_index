@@ -4,6 +4,7 @@ module Admin
 
     before_action :find_blog, only: [:show, :edit, :update, :destroy]
     before_action :set_dignified_name
+    before_action :set_legacy_form, only: [:edit, :update]
 
     def index
       @blogs = available_blogs.reorder(sortable_order(Blog))
@@ -127,6 +128,12 @@ module Admin
     def set_dignified_name
       @dignified_name = "short form creative non-fiction"
       @dignified_name = "collection of vignettes" if @blog&.is_listicle
+    end
+
+    # A listicle only has the legacy form
+    def set_legacy_form
+      session[:admin_news_legacy_form] = Binxtils::InputNormalizer.boolean(params[:legacy_form]) if params.key?(:legacy_form)
+      @legacy_form = @blog.is_listicle || session[:admin_news_legacy_form].present?
     end
 
     def find_blog
