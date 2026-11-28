@@ -29,4 +29,14 @@ class ApplicationJob
       lock_manager.unlock(redlock)
     end
   end
+
+  # For a lock held past one block, renewed with `extend` while it's still held. A Redis error counts as not getting it,
+  # as with retry: false, raising would drop the job
+  def renewable_redlock(id, duration, extend: nil)
+    lock_manager.lock(self.class.redlock_key(id), duration.in_milliseconds.to_i, extend:, extend_only_if_locked: extend.present?)
+  rescue Redlock::LockAcquisitionError
+    false
+  end
+
+  def lock_manager = @lock_manager ||= self.class.new_lock_manager
 end

@@ -96,33 +96,31 @@ RSpec.describe BikebookModelsSyncJob, type: :job do
         expect(described_class.locked_for?(nil)).to be false
       end
     end
+
+    context "with its lock taken by another run partway through" do
+      it "stops at the next block" do
+        instance.perform
+        BikebookModel.update_all(data_file: nil)
+        Rails.cache.delete(described_class::SYNCED_MANIFEST_KEY)
+        key = described_class.redlock_key(nil)
+        WebMock.stub_request(:get, block_url).to_return do |request|
+          RedisPool.conn { it.set(key, "another run") }
+          bikebook_catalog_response(request)
+        end
+
+        instance.perform
+        expect(BikebookModel.distinct.count(:data_file)).to eq 1
+        expect(Rails.cache.read(described_class::SYNCED_MANIFEST_KEY)).to be_nil
+        expect(described_class.locked_for?(nil)).to be true
+        RedisPool.conn { it.del(key) }
+      end
+    end
   end
 
   context "while another run holds the lock" do
     it "syncs nothing" do
       described_class.new.with_redlock(nil) { instance.perform }
       expect(BikebookModel.pluck(:catalog_id)).to eq [dropped.catalog_id]
-    end
-
-    context "once another run takes it partway through" do
-      it "stops at the next block, leaving the other run its lock" do
-        instance.perform
-        BikebookModel.update_all(data_file: nil)
-        Rails.cache.delete(described_class::SYNCED_MANIFEST_KEY)
-        key = described_class.redlock_key(nil)
-        other_lock = nil
-        WebMock.stub_request(:get, %r{\A#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}models/}o).to_return do |request|
-          Redis.new(url: Bikeindex::Application.config.redis_default_url).del(key)
-          other_lock ||= described_class.new_lock_manager.lock(key, 10_000)
-          {body: BikebookCatalogHelpers::FIXTURES.join(request.uri.path.delete_prefix(URI(Integrations::Bikebook::Catalog::URL).path)).read}
-        end
-
-        instance.perform
-        expect(BikebookModel.distinct.where.not(data_file: nil).count(:data_file)).to eq 1
-        expect(Rails.cache.read(described_class::SYNCED_MANIFEST_KEY)).to be_nil
-        expect(described_class.locked_for?(nil)).to be true
-        described_class.new_lock_manager.unlock(other_lock)
-      end
     end
   end
 

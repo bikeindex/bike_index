@@ -30,18 +30,18 @@ class BikebookModelsSyncJob < ScheduledJob
   end
 
   def build_enumerator(cursor:)
-    return unless (@redlock = lock)
+    return unless (@redlock = renewable_redlock(nil, LOCK_DURATION))
 
     # Before the manifest, as reading a manifest that's expired writes a fresh head too
     @digest = Integrations::Bikebook::Catalog.head&.dig("digest")
     manifest = Integrations::Bikebook::Catalog.manifest
     @blocks = manifest["blocks"] if manifest.present? && sync_index(manifest["index"])
     # Not from `cursor`: a synced block drops out of stale_files, so a resumed run starts on what's left
-    array_enumerator(@blocks ? stale_files(@blocks) : [], cursor: nil)
+    (@blocks ? stale_files(@blocks) : []).each
   end
 
   def around_iteration
-    throw :abort unless (@redlock = lock(extend: @redlock))
+    throw :abort unless renewable_redlock(nil, LOCK_DURATION, extend: @redlock)
     yield
   end
 
@@ -56,20 +56,13 @@ class BikebookModelsSyncJob < ScheduledJob
     end
   end
 
-  def on_stop
-    self.class.new_lock_manager.unlock(@redlock) if @redlock
-  end
+  def on_stop = lock_manager.unlock(@redlock)
 
   def on_complete
     Rails.cache.write(SYNCED_MANIFEST_KEY, @digest) if @blocks && stale_files(@blocks).empty?
   end
 
   private
-
-  def lock(extend: nil)
-    self.class.new_lock_manager.lock(self.class.redlock_key(nil), LOCK_DURATION.in_milliseconds, extend:,
-      extend_only_if_locked: extend.present?)
-  end
 
   # Whether the index's models have synced
   def sync_index(index)
