@@ -9,10 +9,13 @@ module BikebookCatalogHelpers
   def stub_bikebook_catalog(status: 200)
     Rails.cache.clear
     Integrations::Bikebook::Catalog::Reads.reset
-    WebMock.stub_request(:get, /\A#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}/o).to_return do |request|
-      file = FIXTURES.join(request.uri.path.delete_prefix(URI(Integrations::Bikebook::Catalog::URL).path))
-      file.file? ? {status:, body: file.read} : {status: 404}
-    end
+    WebMock.stub_request(:get, /\A#{Regexp.escape(Integrations::Bikebook::Catalog::URL)}/o)
+      .to_return { bikebook_catalog_response(it, status:) }
+  end
+
+  def bikebook_catalog_response(request, status: 200)
+    file = FIXTURES.join(request.uri.path.delete_prefix(URI(Integrations::Bikebook::Catalog::URL).path))
+    file.file? ? {status:, body: file.read} : {status: 404}
   end
 
   # The fixture catalog, its index and blocks synced to BikebookModel, creating the manufacturers it lists

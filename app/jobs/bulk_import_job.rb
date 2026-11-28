@@ -4,7 +4,7 @@ class BulkImportJob < ApplicationJob
   MAX_LINES = 25_100
   REDLOCK_PREFIX = "BulkImportAscendLock-#{Rails.env.slice(0, 3)}"
   # Expires the lock if a worker dies mid-import, so deferred imports can't wait forever
-  LOCK_DURATION_MS = 30.minutes.in_milliseconds.to_i
+  LOCK_DURATION = 30.minutes
   LOCKED_RETRY_DELAY = 1.minute
   sidekiq_options retry: false
 
@@ -78,26 +78,17 @@ class BulkImportJob < ApplicationJob
     return process_import unless @bulk_import.ascend?
 
     # Ascend sends a shop's files seconds apart, and concurrent imports can't dedupe against each other
-    @lock_manager = self.class.new_lock_manager
-    @redlock = ascend_lock
+    @redlock = renewable_redlock(@bulk_import.organization_id, LOCK_DURATION)
     return self.class.perform_in(LOCKED_RETRY_DELAY, bulk_import_id, true) unless @redlock
 
     begin
       process_import
     ensure
-      @lock_manager.unlock(@redlock)
+      lock_manager.unlock(@redlock)
     end
   end
 
   private
-
-  # A Redis error counts as not getting the lock - with retry: false, raising would drop the import
-  def ascend_lock(extend: nil)
-    @lock_manager.lock(self.class.redlock_key(@bulk_import.organization_id), LOCK_DURATION_MS,
-      extend:, extend_only_if_locked: extend.present?)
-  rescue Redlock::LockAcquisitionError
-    false
-  end
 
   def process_import
     # Check file size before processing
@@ -141,7 +132,7 @@ class BulkImportJob < ApplicationJob
       row_index += 1 # row_index is current line number
       if (row_index % 50).zero?
         @bulk_import.reload # check every so often whether the import is finished (external trip switch)
-        @redlock = ascend_lock(extend: @redlock) || @redlock if @redlock # so a long import keeps its lock
+        renewable_redlock(@bulk_import.organization_id, LOCK_DURATION, extend: @redlock) if @redlock # so a long import keeps its lock
       end
       break false if @bulk_import.finished? # Means there was an error or we marked finished separately, so noop
 
