@@ -37,9 +37,8 @@ export default class extends Controller {
 
   toggleAll (event) {
     event.preventDefault()
-    // Disabled checkboxes can't be selected
-    const anyUnchecked = this.checkboxTargets.some(cb => !cb.disabled && !cb.checked)
-    this.checkboxTargets.forEach(cb => { if (!cb.disabled) cb.checked = anyUnchecked })
+    const anyUnchecked = this.enabledCheckboxes.some(cb => !cb.checked)
+    this.enabledCheckboxes.forEach(cb => { cb.checked = anyUnchecked })
     this.syncWhenChecked()
   }
 
