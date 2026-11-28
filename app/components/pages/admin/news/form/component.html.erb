@@ -60,47 +60,42 @@
           <%= render(status_badge) %>
         </div>
 
-        <div class="tw:mb-3">
-          <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :published, label: "Published")) %>
-        </div>
+        <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :published, label: "Published", class_name: "tw:mb-3")) %>
 
-        <div class="tw:mb-3">
-          <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :info_kind, checked: @blog.info?,
-            html_options: {data: {"admin--news-form-target": "infoKind", action: "change->admin--news-form#kindChanged"}})) do %>
-            Info post
-            <small class="less-strong tw:block">static content that's updated</small>
-          <% end %>
-        </div>
+        <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :info_kind, checked: @blog.info?, class_name: "tw:mb-3",
+          html_options: {data: {"admin--news-form-target": "infoKind", action: "change->admin--news-form#kindChanged"}})) do %>
+          Info post
+          <small class="less-strong tw:block">static content that's updated</small>
+        <% end %>
 
-        <div
-          class="tw:mb-3 <%= info_only_class %>"
+        <small
+          class="less-strong tw:mb-3 tw:block <%= info_only_class %>"
           data-admin--news-form-target="infoOnly"
         >
-          <small class="less-strong">Info posts are published at the most recent edit time</small>
-        </div>
+          Info posts are published at the most recent edit time
+        </small>
 
         <div
           class="tw:mb-3 <%= blog_only_class %>"
           data-admin--news-form-target="blogOnly"
+          data-controller="ui--collapse"
         >
-          <div data-controller="ui--collapse">
-            <div class="tw:text-sm">
-              <span class="less-strong">Publish date:</span>
-              <%= render(UI::Time::Component.new(time: @blog.published_at)) %>
-            </div>
+          <div class="tw:text-sm">
+            <span class="less-strong">Publish date:</span>
+            <%= render(UI::Time::Component.new(time: @blog.published_at)) %>
+          </div>
 
-            <div class="tw:mt-1 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
-              <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :post_now, label: "Publish now")) %>
+          <div class="tw:mt-1 tw:flex tw:flex-wrap tw:items-center tw:gap-2">
+            <%= render(UI::Forms::Checkbox::Component.new(form_builder: f, attribute: :post_now, label: "Publish now")) %>
 
-              <%= render(UI::Collapse::Component.new(text: "change date", color: :link, html_class: "tw:text-sm")) %>
-            </div>
+            <%= render(UI::Collapse::Component.new(text: "change date", color: :link, html_class: "tw:text-sm")) %>
+          </div>
 
-            <div class="tw:mt-2 tw:hidden" data-ui--collapse-target="content">
-              <%= f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
+          <div class="tw:mt-2 tw:hidden" data-ui--collapse-target="content">
+            <%= f.hidden_field :timezone, value: "", class: "hiddenFieldTimezone" %>
 
-              <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :post_date, kind: :datetime_local_field,
-                wrapper_class: "", html_options: {value: post_date, max: Time.current + 1.week, step: 60, required: true})) %>
-            </div>
+            <%= render(UI::Forms::Group::Component.new(form_builder: f, attribute: :post_date, kind: :datetime_local_field,
+              wrapper_class: "", html_options: {value: post_date, max: Time.current + 1.week, step: 60, required: true})) %>
           </div>
         </div>
 

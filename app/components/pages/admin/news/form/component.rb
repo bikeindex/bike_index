@@ -26,13 +26,7 @@ module Pages
 
           def author_needs_personal_page? = @blog.user.userlink.blank?
 
-          def status_badge
-            if @blog.published?
-              UI::Badge::Component.new(text: "Published", color: :success)
-            else
-              UI::Badge::Component.new(text: "Draft", color: :gray)
-            end
-          end
+          def status_badge = @blog.published? ? UI::Badge::Component.new(text: "Published", color: :success) : UI::Badge::Component.new(text: "Draft", color: :gray)
         end
       end
     end

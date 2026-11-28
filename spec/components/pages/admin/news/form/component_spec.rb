@@ -10,7 +10,7 @@ RSpec.describe Pages::Admin::News::Form::Component, type: :component do
   let(:blog_only) { component.css("[data-admin--news-form-target='blogOnly']") }
   let(:info_only) { component.css("[data-admin--news-form-target='infoOnly']") }
 
-  it "renders the form, wired to the kind toggle, with the image radios' form id" do
+  it "renders the form, wired to the kind toggle" do
     expect(component.css("form#edit_blog_#{blog.id}[data-controller='admin--news-form']").count).to eq 1
     expect(component.css("[data-admin--news-form-target='infoKind']").count).to eq 1
     expect(component).to have_field("blog_title", with: blog.title)
