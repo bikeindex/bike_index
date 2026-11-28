@@ -37,6 +37,13 @@ RSpec.describe "Me API V3", type: :request do
           {type: "link", label: "Add a registration", path: "/o/#{organization.slug}/registrations/new",
            icon: "plus-circle", match_params: {parking_notification: nil}},
           {type: "divider"},
+          {type: "group", key: "e_vehicles", label: "E-Vehicles", icon: "bolt",
+           children: [
+             {type: "link", label: "E-Bike Rules", path: "/ebike-rules", icon: nil, match_paths: "/ebike-rules/**"},
+             {type: "link", label: "Education Acknowledgments",
+              path: "/o/#{organization.slug}/education_course_acknowledgments", icon: nil}
+           ]},
+          {type: "divider"},
           {type: "link", label: "#{organization.short_name} Information",
            path: "/o/#{organization.slug}/info", icon: nil}
         ]
@@ -201,6 +208,102 @@ RSpec.describe "Me API V3", type: :request do
     it "403s if read_bikes_spec isn't in token" do
       get "/api/v3/me/bikes", params: {access_token: token.token}, headers: {format: :json}
       expect(response.response_code).to eq(403)
+    end
+  end
+
+  describe "current/alerts" do
+    it "403s if read_user isn't in token" do
+      get "/api/v3/me/alerts", params: {access_token: token.token}
+      expect(response.response_code).to eq(403)
+    end
+
+    context "with alerts" do
+      let(:token) { create_doorkeeper_token(scopes: "read_user") }
+      let(:bike) { FactoryBot.create(:bike, :with_ownership_claimed, :with_stolen_record, user:) }
+      let(:organization) { FactoryBot.create(:organization) }
+      let!(:user_alert_photo) do
+        FactoryBot.create(:user_alert, user:, bike:, kind: "theft_alert_without_photo")
+      end
+      let!(:user_alert_org) do
+        FactoryBot.create(:user_alert, user:, bike:, organization:, kind: "unassigned_bike_org")
+      end
+      let!(:user_alert_location) { FactoryBot.create(:user_alert_stolen_bike_without_location, user:) }
+      let!(:b_param) { FactoryBot.create(:b_param_unfinished_registration, creator: user) }
+      let(:user_phone) { FactoryBot.create(:user_phone, user:, phone: "4334444444") }
+      let(:target_alerts) do
+        [
+          {id: user_alert_photo.id, kind: "theft_alert_without_photo", title: "Please add a photo",
+           message: "Successful promoted alerts need to have an image",
+           action: "Add a photo to your #{bike.title_string}", url: "#{ENV["BASE_URL"]}/bikes/#{bike.to_param}/edit/photos", bike_id: bike.id,
+           organization_id: nil, created_at: user_alert_photo.created_at.to_i},
+          {id: user_alert_org.id, kind: "unassigned_bike_org", title: nil,
+           message: "Some of your registrations are connected to #{organization.short_name}, but your " \
+             "#{bike.title_string} isn't. Generally, you should connect all of them to #{organization.short_name}.",
+           action: "Add it now!", url: "#{ENV["BASE_URL"]}/my_account", bike_id: bike.id,
+           organization_id: organization.id, created_at: user_alert_org.created_at.to_i},
+          {id: user_alert_location.id, kind: "stolen_bike_without_location", title: "Please add theft location",
+           message: "It is critical for recovery that you include the address or cross-street where your bike was stolen.",
+           action: "Add the location of the theft of your #{user_alert_location.bike.title_string}", url: "#{ENV["BASE_URL"]}/bikes/#{user_alert_location.bike.to_param}/edit/theft_details#where-theft-happened",
+           bike_id: user_alert_location.bike_id, organization_id: nil, created_at: user_alert_location.created_at.to_i}
+        ]
+      end
+
+      it "responds with the active alerts, in plain text" do
+        UserAlert.update_unfinished_registrations(user)
+        UserAlert.update_phone_waiting_confirmation(user:, user_phone:)
+        FactoryBot.create(:user_alert, user:, bike:, kind: "theft_alert_without_photo", resolved_at: Time.current)
+        FactoryBot.create(:user_alert, kind: "theft_alert_without_photo")
+
+        get "/api/v3/me/alerts", params: {access_token: token.token}
+        expect(response.response_code).to eq(200)
+        expect(response.headers["Access-Control-Allow-Origin"]).to eq("*")
+        user_alert_registration = user.user_alerts.unfinished_registration.first
+        target_registration = {id: user_alert_registration.id, kind: "unfinished_registration",
+                               title: nil, message: "Your Surly cargo bike isn't registered yet! Please finish the required steps",
+                               action: "finish the required steps",
+                               url: "#{ENV["BASE_URL"]}/register?b_param_token=#{b_param.id_token}",
+                               bike_id: nil, organization_id: nil, created_at: user_alert_registration.created_at.to_i}
+        # phone_waiting_confirmation is behind a flag
+        expect(json_result[:alerts]).to match_array((target_alerts + [target_registration]).as_json)
+
+        Flipper.enable(:phone_verification)
+        # Expiry is silent, so the alert stays active
+        b_param.update_column(:created_at, Time.current - BParam::TOKEN_EXPIRATION - 1.day)
+        expect(user.user_alerts.active.unfinished_registration.count).to eq 1
+
+        get "/api/v3/me/alerts", params: {access_token: token.token}
+        user_alert_phone = user.user_alerts.phone_waiting_confirmation.first
+        target_phone = {id: user_alert_phone.id, kind: "phone_waiting_confirmation",
+                        title: "Verify 433-444-4444", message: nil, action: "Confirm your phone number",
+                        url: "#{ENV["BASE_URL"]}/my_account/edit", bike_id: nil, organization_id: nil,
+                        created_at: user_alert_phone.created_at.to_i}
+        expect(json_result[:alerts]).to match_array((target_alerts + [target_phone]).as_json)
+
+        # Before the job resolves them
+        bike.current_stolen_record.add_recovery_information
+        user_alert_location.bike.current_stolen_record.add_recovery_information
+        expect(user.user_alerts.active.pluck(:id)).to include(user_alert_photo.id, user_alert_location.id)
+
+        get "/api/v3/me/alerts", params: {access_token: token.token}
+        expect(json_result[:alerts].pluck(:kind)).to match_array(%w[unassigned_bike_org phone_waiting_confirmation])
+      end
+
+      context "with a preferred_language" do
+        let(:user) { FactoryBot.create(:user_confirmed, preferred_language: "nl") }
+        let!(:user_alert_org) { nil }
+
+        it "responds in it" do
+          get "/api/v3/me/alerts", params: {access_token: token.token}
+          expect(response.response_code).to eq(200)
+          expect(json_result[:alerts].pluck(:kind, :title)).to match_array([
+            ["theft_alert_without_photo", "Voeg een foto toe"],
+            ["stolen_bike_without_location", "Voeg diefstallocatie toe"],
+            ["unfinished_registration", nil]
+          ])
+          expect(json_result[:alerts].find { it[:kind] == "unfinished_registration" }[:action])
+            .to eq "Voltooi de vereiste stappen."
+        end
+      end
     end
   end
 end

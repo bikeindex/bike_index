@@ -5162,7 +5162,6 @@ es:
       lightspeed_integration_panel: Panel de integración Lightspeed
       manage_users: Gestionar usuarios
       messaging: Mensajería
-      model_audits: Auditorías de vehículos eléctricos
       multi_search: Búsqueda múltiple
       org_dashboard: "%{org_name} Panel de control"
       org_locations: "%{org_name} ubicaciones"
@@ -5187,6 +5186,10 @@ es:
       registration_form_settings: Configuración del formulario de registro
       education_courses: cursos de formación
       org_information: "%{org_name} Información"
+      audits: Auditorías
+      e_vehicles: Vehículos eléctricos
+      ebike_rules: Normativa para bicicletas eléctricas
+      education_acknowledgments: Agradecimientos en materia de educación
     organization_signup:
       address_required: Por favor, introduzca la dirección completa de la organización.
       email_required: Se requiere un correo electrónico válido.
@@ -5200,6 +5203,9 @@ es:
         nombre o póngase en contacto con support@bikeindex.org si es suyo.
       name_too_short: El nombre de la organización debe tener al menos dos letras
         o números.
+      phone_invalid: Por favor, introduzca un número de teléfono válido
+      postal_code_invalid: Por favor, introduzca un código postal válido.
+      website_invalid: Por favor, introduzca una dirección web válida, como example.com.
   theft_alert_plans:
     theft_alert_plan:
       days: Días
@@ -5645,6 +5651,11 @@ es:
           state: Estado
         combobox:
           no_matches: No hay coincidencias
+        input:
+          postal_code_format: Introduzca un código postal de al menos 3 letras o números,
+            como 97201 o T6E 2A4.
+          telephone_format: Introduce un número de teléfono de al menos 7 dígitos.
+          website_format: Introduce una dirección web, como por ejemplo.com.
       alerts:
         base:
           error: Error
@@ -6036,6 +6047,26 @@ es:
             qr_code: Código QR
             set_a_password: Establecer una contraseña
             your_public_registration_link: Enlace a su registro público
+        education_course_acknowledgments:
+          index:
+            acknowledged: Admitido
+            all: Todo
+            course: Curso
+            for_everyone_start_html: El curso general de formación sobre vehículos
+              eléctricos comenzó el %{time}. Anteriormente, los usuarios no habían
+              realizado ningún curso de formación.
+            header: Agradecimientos por la formación en vehículos eléctricos
+            matching_count_html: "%{count} Confirmaciones coincidentes"
+            organization_start_html: El curso de formación sobre vehículos eléctricos
+              %{organization_name} comenzó el %{time}. Antes de eso, los usuarios
+              no habían realizado ningún curso de formación.
+            organization_started_html: El curso de formación sobre vehículos eléctricos
+              %{organization_name} comenzó el %{time}.
+            owner_email: Correo electrónico del propietario
+            registered: Registrado
+            registration: Registro
+            source: Fuente
+            unfinished: Inconcluso
       registrations:
         show:
           bike_details:
@@ -6606,10 +6637,10 @@ es:
             update_listing: Actualizar listado
           bike_alerts:
             add_it_now: "¡Añádelo ahora!"
-            generally_connect_to_org: Algunas de tus bicicletas están asociadas con
-              %{org_name}, pero esta no. En general, debes conectar todas tus bicicletas
-              a %{org_name}.
             ignore_this_suggestion: Ignora esta sugerencia.
+            connect_to_org: Algunos de tus registros están conectados a %{org_name},
+              pero %{bike_title} no lo está. En general, deberías conectarlos todos
+              a %{org_name}.
           add_a_lock: "+ Añadir un candado"
           add_a_lock_empty: Agregar un candado
           bike_index_is_free: Bike Index es gratuito gracias a la colaboración de
@@ -8051,7 +8082,6 @@ es:
           field_message: "¿Hay algo más que debamos saber?"
           field_name: Su nombre
           field_role: Tu papel
-          phone_hint: Un número de teléfono, con sus dígitos
           request_name: pedido
           submit_text: Hablemos
           title: Contáctanos para una prueba gratuita.

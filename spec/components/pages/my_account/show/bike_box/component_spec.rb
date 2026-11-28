@@ -155,7 +155,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
     it "renders only this bike's alert, tucked under the card" do
       expect(component).to have_css("[role=alert]", count: 1)
       expect(component).to have_css("li > div:last-child.tw\\:-mt-3 [role=alert].tw\\:pt-5\\!")
-      expect(component).to have_text("associated with Brakebills")
+      expect(component).to have_text("connected to Brakebills, but your #{bike.title_string} isn't")
       expect(component).to have_css("form[action='/user_alerts/#{user_alert.id}?add_bike_organization=true'] button", text: "Add it now!")
       expect(component).to have_css("form[action='/user_alerts/#{user_alert.id}?alert_action=dismiss'] button", text: "Ignore this suggestion")
     end
@@ -189,7 +189,7 @@ RSpec.describe Pages::MyAccount::Show::BikeBox::Component, type: :component do
       UserAlert.refresh_alert_slugs(user)
       rendered = nil
       expect(fragments_written { rendered = render_box }).to eq([])
-      expect(rendered).to have_text("associated with Brakebills")
+      expect(rendered).to have_text("connected to Brakebills")
     end
   end
 end

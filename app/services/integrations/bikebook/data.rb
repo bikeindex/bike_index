@@ -6,12 +6,10 @@ module Integrations
     module Data
       extend Functionable
 
-      # The specification's bike and component params, nil for a model the catalog lacks or while it doesn't answer
+      # The specification's bike and component params, nil for a model whose data hasn't synced
       def get_model(specification, year:)
         specification&.bikebook_data && {bike: specification.bikebook_data_bike_attributes(year:),
                                          components: specification.bikebook_data_component_attributes}.with_indifferent_access
-      rescue Integrations::Bikebook::Catalog::Unreachable
-        nil
       end
 
       # A bike's own, or unsaved: the manufacturer's `bikebook_model` sold in the year, a catalog id or citation key picked

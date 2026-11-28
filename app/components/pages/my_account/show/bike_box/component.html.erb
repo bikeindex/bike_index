@@ -100,5 +100,5 @@
     <% end %>
   <% end %>
 
-  <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(user_alerts: @user_alerts)) %>
+  <%= render(Pages::MyAccount::Show::BikeAlerts::Component.new(bike: @bike, user_alerts: @user_alerts)) %>
 </li>

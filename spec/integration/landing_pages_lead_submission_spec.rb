@@ -141,6 +141,10 @@ RSpec.describe "Landing page demo modals", :js, type: :system do
       fill_in "Email", with: "staff@portland.gov"
       click_button "Request a demo"
       expect(page.evaluate_script("document.activeElement.id")).to eq "feedback_phone_number"
+      # an email in the phone field is refused, saying what it wants
+      fill_in "Phone number", with: "staff@portland.gov"
+      click_button "Request a demo"
+      expect(page.evaluate_script("document.activeElement.validationMessage")).to eq "Enter a phone number with at least 7 digits"
       fill_in "Phone number", with: "(555) 123-4567 ext. 12"
       fill_in "Anything else we should know?", with: "Starting with e-bikes"
 

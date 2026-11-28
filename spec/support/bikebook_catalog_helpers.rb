@@ -15,7 +15,7 @@ module BikebookCatalogHelpers
     end
   end
 
-  # The fixture catalog, its index synced to BikebookModel, creating the manufacturers it lists
+  # The fixture catalog, its index and blocks synced to BikebookModel, creating the manufacturers it lists
   def sync_bikebook_models
     stub_bikebook_catalog
     JSON.parse(FIXTURES.join("index.json").read)["manufacturers"].each_value do

@@ -4424,7 +4424,6 @@ nl:
       lightspeed_integration_panel: Lightspeed-integratiepaneel
       manage_users: Gebruikers beheren
       messaging: Berichten
-      model_audits: Audits van e-voertuigen
       multi_search: Meerdere zoekopdrachten
       org_dashboard: "%{org_name} Dashboard"
       org_locations: "%{org_name} locaties"
@@ -4449,6 +4448,10 @@ nl:
       registration_form_settings: Instellingen voor het registratieformulier
       education_courses: Onderwijscursussen
       org_information: "%{org_name} Informatie"
+      audits: Audits
+      e_vehicles: Elektrische voertuigen
+      ebike_rules: Regels voor e-bikes
+      education_acknowledgments: Erkenningen met betrekking tot onderwijs
     organization_signup:
       address_required: Voer het volledige adres van de organisatie in.
       email_required: Een geldig e-mailadres is vereist.
@@ -4462,6 +4465,9 @@ nl:
         - namen moeten binnen de eerste 30 tekens verschillen. Kies een andere naam,
         of neem contact op met support@bikeindex.org als het uw naam is.
       name_too_short: De organisatienaam moet minimaal twee letters of cijfers bevatten.
+      phone_invalid: Voer een geldig telefoonnummer in.
+      postal_code_invalid: Voer een geldige postcode in.
+      website_invalid: Voer een geldige website in, bijvoorbeeld example.com.
   users:
     accept_terms:
       i_agree_to_tos_html: Ik ga akkoord met de <strong>Servicevoorwaarden van</strong>
@@ -5561,6 +5567,11 @@ nl:
           state: Staat
         combobox:
           no_matches: Geen overeenkomsten
+        input:
+          postal_code_format: Voer een postcode in van minimaal 3 letters of cijfers,
+            zoals 97201 of T6E 2A4.
+          telephone_format: Voer een telefoonnummer in met minimaal 7 cijfers.
+          website_format: Voer een website in, bijvoorbeeld example.com.
       alerts:
         base:
           error: Fout
@@ -5959,6 +5970,25 @@ nl:
             qr_code: QR-code
             set_a_password: Stel een wachtwoord in
             your_public_registration_link: Uw openbare registratielink
+        education_course_acknowledgments:
+          index:
+            acknowledged: Erkend
+            all: Alle
+            course: Cursus
+            for_everyone_start_html: De algemene e-Vehicle-educatiecursus is gestart
+              %{time}. Daarvoor volgden gebruikers geen educatiecursus.
+            header: 'E-voertuigeducatie: Dankbetuigingen'
+            matching_count_html: "%{count} overeenkomende erkenningen"
+            organization_start_html: De %{organization_name} e-Vehicle Education Course
+              is gestart %{time}. Daarvoor volgden gebruikers geen enkele educatieve
+              cursus.
+            organization_started_html: De %{organization_name} e-Vehicle Education
+              Course is %{time} van start gegaan.
+            owner_email: E-mailadres eigenaar
+            registered: Geregistreerd
+            registration: Registratie
+            source: Bron
+            unfinished: Onvoltooid
       registrations:
         show:
           bike_details:
@@ -6523,10 +6553,10 @@ nl:
             update_listing: Lijst bijwerken
           bike_alerts:
             add_it_now: Voeg het nu toe!
-            generally_connect_to_org: Sommige van uw fietsen zijn geassocieerd met
-              %{org_name}, maar deze niet. Over het algemeen sluit u al uw fietsen
-              aan op %{org_name} -
             ignore_this_suggestion: Negeer deze suggestie
+            connect_to_org: Sommige van uw registraties zijn verbonden met %{org_name},
+              maar uw %{bike_title} niet. Over het algemeen moet u ze allemaal verbinden
+              met %{org_name}.
           add_a_lock: "+ Een slot toevoegen"
           add_a_lock_empty: Voeg een slot toe
           bike_index_is_free: Bike Index is gratis omdat fietsers zoals jij een bijdrage
@@ -7964,7 +7994,6 @@ nl:
           field_message: Is er verder nog iets dat we moeten weten?
           field_name: Jouw naam
           field_role: Jouw rol
-          phone_hint: Een telefoonnummer, met zijn cijfers.
           request_name: verzoek
           submit_text: Laten we praten
           title: Neem contact met ons op voor een gratis proefperiode

@@ -22,6 +22,14 @@ RSpec.describe Country, type: :model do
   describe "select_options" do
     let!(:country) { Country.create!(name: "Svenborgia", iso: "SVE") }
 
+    it "is alphabetical by the name shown" do
+      Country.create!(name: "Lebanon", iso: "LB")
+      Country.create!(name: "Åland Islands", iso: "AX")
+      Country.united_states
+      Country.canada
+      expect(Country.select_options.map(&:first)).to eq(["Åland Islands", "Canada", "Lebanon", "Svenborgia", "United States"])
+    end
+
     it "falls back to name when the iso has no translation" do
       expect(Country.select_options).to include(["Svenborgia", country.id])
     end
@@ -31,6 +39,18 @@ RSpec.describe Country, type: :model do
         I18n.backend.store_translations(:en, countries: {SVE: "Svenborgia (translated)"})
         expect(Country.select_options).to include(["Svenborgia (translated)", country.id])
       end
+    end
+  end
+
+  describe "without_postal_code_ids" do
+    it "is the countries without postal codes" do
+      hong_kong = Country.create!(name: "Hong Kong", iso: "HK")
+      Country.canada
+      expect(Country.without_postal_code_ids).to eq([hong_kong.id])
+    end
+
+    it "only names real countries" do
+      expect(Country::WITHOUT_POSTAL_CODE_ISOS - StatesAndCountries.countries.map { it[:iso] }).to eq([])
     end
   end
 

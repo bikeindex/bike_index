@@ -1,5 +1,6 @@
 import { Controller } from '@hotwired/stimulus'
 import { collapseField } from 'utils/collapse_utils'
+import { toggleRequired } from 'utils/required_toggle'
 
 /* global window */
 
@@ -66,9 +67,7 @@ export default class extends Controller {
   // The phone a theft or a find gets contacted on: required, starred rather than badged
   // optional, and captioned with which of them is asking
   applyRequired (field, text) {
-    field.querySelectorAll('input, select, textarea').forEach((el) => { el.required = Boolean(text) })
-    field.querySelectorAll('[data-required-marker]').forEach((el) => { el.hidden = !text })
-    field.querySelectorAll('[data-optional-marker]').forEach((el) => { el.hidden = Boolean(text) })
+    toggleRequired(field, Boolean(text))
     const helper = field.querySelector('[data-required-helper]')
     if (helper) {
       helper.textContent = text || ''
