@@ -6,6 +6,8 @@
 # Database name: primary
 #
 #  id              :bigint           not null, primary key
+#  data            :jsonb
+#  data_file       :string
 #  deleted_at      :datetime
 #  final_year      :integer
 #  first_year      :integer          not null
@@ -23,7 +25,9 @@
 #  index_bikebook_models_on_manufacturer_id_and_model_slug  (manufacturer_id,model_slug)
 #
 # A model in the Bike Book catalog's index, which BikebookModelsSyncJob copies here so that registering doesn't wait on
-# the index, the catalog's biggest file. `markets` are every market it's sold in, its market variants' too
+# the index, the catalog's biggest file. `markets` are every market it's sold in, its market variants' too. `data` is
+# the records of the model and its market variants by citation key, which BikebookModelsSyncJob copies from
+# `data_file`, the model's block
 class BikebookModel < ApplicationRecord
   acts_as_paranoid
 
@@ -34,16 +38,12 @@ class BikebookModel < ApplicationRecord
   # The name of a catalog id or a market variant's citation key (…/haul-st@CA), which a pick in registration's model
   # combobox submits. Anything else, typed rather than picked, as it is
   def self.frame_model(value)
-    (find_by(catalog_id: Integrations::Bikebook::Catalog.base_id(value))&.name if value.to_s.match?(Integrations::Bikebook::Catalog::MODEL_ID)) || value
+    (where(catalog_id: Integrations::Bikebook::Catalog.base_id(value)).pick(:name) if value.to_s.match?(Integrations::Bikebook::Catalog::MODEL_ID)) || value
   end
 
-  # The catalog's records of the model and its market variants, by citation key, nil while it lacks the model. Raises
-  # Catalog::Unreachable while the catalog doesn't answer
-  def data_all_markets = Integrations::Bikebook::Catalog.model_markets(catalog_id)
-
   # The model's record with its `market`'s variant laid over it
-  def data(market: nil)
+  def market_data(market: nil)
     market ||= "US"
-    data_all_markets&.then { it[catalog_id]&.merge(it["#{catalog_id}@#{market}"].to_h) }
+    data&.then { it[catalog_id]&.merge(it["#{catalog_id}@#{market}"].to_h) }
   end
 end

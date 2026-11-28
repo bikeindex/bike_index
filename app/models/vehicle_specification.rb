@@ -34,8 +34,7 @@ class VehicleSpecification < ApplicationRecord
   # The citation key of the model in its market, which a b_param's bikebook_model holds
   def bikebook_id = bikebook_model&.then { "#{it.catalog_id}@#{bikebook_market}" }
 
-  # Raise Integrations::Bikebook::Catalog::Unreachable while the catalog doesn't answer
-  def bikebook_data = bikebook_model&.data(market: bikebook_market)
+  def bikebook_data = bikebook_model&.market_data(market: bikebook_market)
 
   def bikebook_data_bike_attributes(year: bike_obj.year) = bikebook_data&.then { Integrations::Bikebook::Data.bike_attributes(it, year) }
 
