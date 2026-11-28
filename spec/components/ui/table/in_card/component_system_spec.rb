@@ -30,27 +30,37 @@ RSpec.describe UI::Table::InCard::Component, :js, type: :system do
     JS
   end
 
-  it "selects a shift-clicked range, reveals the checked-only field, toggles all, and bleeds once the table is wider than the card, without flipping back" do
+  it "selects a shift-clicked range, keeps the selection in the URL across a reload, reveals the checked-only field, toggles all, and bleeds once the table is wider than the card, without flipping back" do
     visit("/lookbook/preview/ui/table/in_card/variants")
     wait_for_stimulus("table-multi-checkbox")
-    boxes = (1..6).map { find_field("cryptids[#{it}]") }
+    boxes = -> { (1..6).map { find_field("cryptids[#{it}]") } }
     expect(page).to have_no_field("Habitat")
     expect(page).to have_no_button("Relocate selected")
 
-    boxes[1].click
-    boxes[3].click(:shift)
-    expect(boxes.map(&:checked?)).to eq [false, true, true, true, false, false]
+    boxes.call[1].click
+    boxes.call[3].click(:shift)
+    expect(boxes.call.map(&:checked?)).to eq [false, true, true, true, false, false]
+    expect(page).to have_current_path(/[?&]checked=2,3,4\b/)
+
+    visit(page.current_url)
+    wait_for_stimulus("table-multi-checkbox")
+    expect(boxes.call.map(&:checked?)).to eq [false, true, true, true, false, false]
     expect(page).to have_field("Habitat", disabled: false)
     expect(page).to have_button("Relocate selected")
 
-    boxes[3].click
-    boxes[1].click(:shift)
-    expect(boxes.map(&:checked?)).to all(be false)
+    boxes.call[3].click
+    boxes.call[1].click(:shift)
+    expect(boxes.call.map(&:checked?)).to all(be false)
+    expect(page).to have_no_current_path(/checked=/)
     expect(page).to have_no_field("Habitat", wait: 2)
     expect(page).to have_field("Habitat", disabled: true, visible: :hidden)
 
     click_button(title: "Toggle all checked")
-    expect(boxes.map(&:checked?)).to all(be true)
+    expect(boxes.call.map(&:checked?)).to all(be true)
+    expect(page).to have_current_path(/[?&]checked=all\b/)
+    visit(page.current_url)
+    wait_for_stimulus("table-multi-checkbox")
+    expect(boxes.call.map(&:checked?)).to all(be true)
     expect_axe_clean
 
     resize_window(width: 500, height: 800)
