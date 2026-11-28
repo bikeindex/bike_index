@@ -249,4 +249,16 @@ class CustomerMailer < ApplicationMailer
       )
     end
   end
+
+  # BCC'd to the inbox so the reply shows in its Gmail thread
+  def bug_report_reply(notification, message)
+    bug_report = notification.notifiable
+    receiver = bug_report.receiver || CONTACT_EMAIL
+    original_message_id = bug_report.message_id&.then { "<#{it}>" }
+    headers[BugReportsMailbox::REPLY_HEADER] = bug_report.id.to_s
+
+    mail(to: notification.message_channel_target, from: "\"Bike Index\" <#{receiver}>", reply_to: receiver, bcc: receiver,
+      subject: "Re: #{bug_report.subject}", in_reply_to: original_message_id, references: original_message_id,
+      content_type: "text/plain", body: message, tag: __callee__)
+  end
 end

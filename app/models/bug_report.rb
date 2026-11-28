@@ -19,6 +19,7 @@
 #  created_at                     :datetime         not null
 #  updated_at                     :datetime         not null
 #  inbound_email_id               :bigint
+#  message_id                     :text
 #  user_id                        :bigint
 #
 # Indexes
@@ -53,6 +54,7 @@ class BugReport < ApplicationRecord
   enum :status, STATUS_ENUM
 
   belongs_to :user
+  has_many :reply_notifications, -> { bug_report_reply.order(:id) }, as: :notifiable, class_name: "Notification"
   belongs_to :inbound_email, class_name: "ActionMailbox::InboundEmail"
 
   has_many_attached :images
@@ -70,6 +72,8 @@ class BugReport < ApplicationRecord
   scope :member, -> { where(is_member: true) }
   scope :invoiced_organization, -> { where(is_invoiced_organization: true) }
   scope :invoiced_organization_staff, -> { where(is_invoiced_organization_staff: true) }
+  scope :sender_email_banned, -> { where(user_id: User.email_banned.select(:id)) }
+  scope :sender_not_email_banned, -> { where(user_id: nil).or(where.not(user_id: User.email_banned.select(:id))) }
   # Includes unprioritized so reports the auto-prioritize job hasn't reached yet stay visible
   scope :investigate, -> { where(status: %i[unprioritized investigate_priority_high investigate_priority_low]) }
 
@@ -170,6 +174,8 @@ class BugReport < ApplicationRecord
   def ignored_tag?
     tags.intersect?(IGNORED_TAGS)
   end
+
+  def sender_email_banned? = user&.email_banned?
 
   private
 

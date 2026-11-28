@@ -254,6 +254,16 @@ when "update-bug-report" # update-bug-report <id> tags=a,b github_pull_request=4
     form: attributes.transform_keys { "bug_report[#{it}]" }) or exit(22)
   puts body
 
+# The message on stdin, so a shell never rewrites it
+when "email-bug-reports" # email-bug-reports <id> [id …] <<< 'Fixed, thanks!'
+  ids = ARGV.drop(1)
+  abort("usage: email-bug-reports <id> [id …] <<< 'message'") if ids.empty?
+  message = $stdin.read.strip
+  abort("message is empty — pass it on stdin") if message.empty?
+  body = with_token(:post, "#{BUG_REPORTS}/email.json",
+    form: ids.to_h { ["bug_reports_selected[#{it}]", it] }.merge("email_message" => message)) or exit(22)
+  puts body
+
 # JSON on stdin rather than key=value args, so no value passes through a shell that can merge it into `name`
 when "create-manufacturers" # create-manufacturers <<< '[{"name": "Cool Bikes", "website": "https://cool.com", "frame_maker": true}]'
   manufacturers = JSON.parse($stdin.read)

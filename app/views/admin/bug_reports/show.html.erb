@@ -44,6 +44,21 @@
       <%= link_to @bug_report.github_pull_request_url, class: "twlink" do %>
         #<%= @bug_report.github_pull_request %>
       <% end %>
+
+      <%= bug_report_search_link(search_pull_request: @bug_report.github_pull_request) %>
+    <% end %>
+
+    <% list.with_row(label: "Replies") do %>
+      <% @bug_report.reply_notifications.includes(:user).each do |notification| %>
+        <div>
+          <%= link_to admin_notifications_path(search_bug_report_id: @bug_report.id), class: "twlink" do %>
+            <%= render(UI::Time::Component.new(time: notification.created_at)) %>
+          <% end %>
+
+          <%= notification_delivery_display(notification.delivery_status) %>
+          <small class="less-strong"><%= notification.sender_display_name %></small>
+        </div>
+      <% end %>
     <% end %>
   <% end %>
 
@@ -71,27 +86,33 @@
   </p>
 <% end %>
 
-<%= render(UI::Card::Component.new(additional_classes: "tw:max-w-3xl")) do %>
-  <p class="tw:mb-4">
-    <strong>Subject:</strong> <%= @bug_report.display_subject %>
-  </p>
+<div class="twwiderow tw:items-start">
+  <div>
+    <%= render(UI::Card::Component.new) do %>
+      <p class="tw:mb-4">
+        <strong>Subject:</strong> <%= @bug_report.display_subject %>
+      </p>
 
-  <%= render(UI::UserTextBlockDisplay::Component.new(text: @bug_report.body_stripped, max_height_class: "")) %>
-<% end %>
+      <%= render(UI::UserTextBlockDisplay::Component.new(text: @bug_report.body_stripped, max_height_class: "")) %>
+    <% end %>
 
-<% if @bug_report.body_significant_tags? %>
-  <div data-controller="ui--collapse" class="tw:max-w-3xl">
-    <div class="tw:flex tw:justify-end">
-      <%= render UI::Collapse::Component.new(text: "show with tags", color: :link) %>
-    </div>
+    <% if @bug_report.body_significant_tags? %>
+      <div data-controller="ui--collapse">
+        <div class="tw:flex tw:justify-end">
+          <%= render UI::Collapse::Component.new(text: "show with tags", color: :link) %>
+        </div>
 
-    <div data-ui--collapse-target="content" class="tw:hidden">
-      <%= render(UI::Card::Component.new) do %>
-        <pre class="tw:mb-4 tw:overflow-x-auto"><code class="tw:text-sm"><%= @bug_report.body %></code></pre>
-      <% end %>
-    </div>
+        <div data-ui--collapse-target="content" class="tw:hidden">
+          <%= render(UI::Card::Component.new) do %>
+            <pre class="tw:mb-4 tw:overflow-x-auto"><code class="tw:text-sm"><%= @bug_report.body %></code></pre>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
   </div>
-<% end %>
+
+  <%= render(Pages::Admin::BugReports::EmailForm::Component.new(bug_report: @bug_report)) %>
+</div>
 
 <% if @bug_report.images.attached? %>
   <%= render(UI::Header::Component.new(text: "Images", tag: :h2, html_class: "tw:mt-12")) %>

@@ -3,11 +3,11 @@ module Admin
     include Binxtils::SortableTable
     include Admin::TokenAccessible
 
-    token_accessible :index, :show, :update, :assign_tags
+    token_accessible :index, :show, :update, :assign_tags, :email
 
-    # Keyed by the BugReport scope each filter applies
-    MEMBERSHIP_FILTERS = {"member" => "Only members", "invoiced_organization" => "Only invoiced org",
-                          "invoiced_organization_staff" => "Only invoiced org staff"}.freeze
+    USER_STATUS_FILTERS = {"member" => "Only members", "invoiced_organization" => "Only invoiced org",
+                           "invoiced_organization_staff" => "Only invoiced org staff",
+                           "banned" => "Only banned users", "not_banned" => "Only not banned users"}.freeze
     STATUS_FILTER_ALL = "all"
     STATUS_FILTER_INVESTIGATE = "investigate"
 
@@ -15,9 +15,12 @@ module Admin
 
     def index
       @per_page = permitted_per_page(default: 50)
-      bug_reports = matching_bug_reports.includes(user: %i[membership_active email_bans_active])
-      # Only the JSON serializes images
-      bug_reports = bug_reports.with_attached_images if request.format.json?
+      # Only the JSON serializes images, and only the table reads the rest
+      bug_reports = if request.format.json?
+        matching_bug_reports.with_attached_images
+      else
+        matching_bug_reports.includes(:reply_notifications, user: %i[membership_active email_bans_active])
+      end
       @pagy, @collection = pagy(:countish,
         bug_reports.reorder(sortable_order(BugReport)),
         limit: @per_page,
@@ -69,13 +72,38 @@ module Admin
       redirect_back(fallback_location: admin_bug_reports_path)
     end
 
+    # The notification is created here, so a retried job reuses it rather than sending again
+    def email
+      message = params[:email_message].to_s.strip
+      bug_reports = BugReport.where(id: selected_ids(:bug_reports_selected)).to_a
+      unless message.present? && bug_reports.any?
+        error = "Write a message and select at least one bug report"
+        return respond_to do |format|
+          format.html { redirect_back(fallback_location: admin_bug_reports_path, flash: {error:}) }
+          format.json { render json: {errors: [error]}, status: :unprocessable_entity }
+        end
+      end
+
+      notifications = bug_reports.map do |bug_report|
+        Notification.create!(kind: :bug_report_reply, notifiable: bug_report, user: current_user, message_channel_target: bug_report.email)
+      end
+      EmailJobs::BugReportReplyJob.perform_bulk(notifications.map { [it.id, message] })
+      respond_to do |format|
+        format.html do
+          redirect_back(fallback_location: admin_bug_reports_path,
+            flash: {success: "Emailing #{bug_reports.size} bug report #{"sender".pluralize(bug_reports.size)}"})
+        end
+        format.json { render json: {emailed_bug_report_ids: bug_reports.map(&:id)} }
+      end
+    end
+
     # Chips carry the value verbatim - the combobox removes a selection by the text as typed
     def tag_chips
       render :tag_chips, formats: :turbo_stream, locals: {tags: params[:combobox_values].to_s.split(",")}
     end
 
     helper_method :matching_bug_reports, :searchable_tags, :tag_combobox_options, :searchable_receivers,
-      :membership_filters, :status_filters, :status_only_filters
+      :user_status_filters, :status_filters, :status_only_filters
 
     def searchable_tags
       @searchable_tags ||= BugReport.all_tags
@@ -89,8 +117,8 @@ module Admin
       @searchable_receivers ||= BugReport.all_receivers
     end
 
-    def membership_filters
-      MEMBERSHIP_FILTERS
+    def user_status_filters
+      USER_STATUS_FILTERS
     end
 
     # Ordered value => label. "Status: investigate" and "All" sit above the per-status options
@@ -120,20 +148,25 @@ module Admin
       @searched_receiver = params[:search_receiver]
       bug_reports = bug_reports.where(receiver: @searched_receiver) if @searched_receiver.present?
       bug_reports = bug_reports.where(user_id: params[:user_id]) if params[:user_id].present?
+      # The table shows "#4064", so a search can carry the hash
+      pull_request = params[:search_pull_request].to_s.delete("^0-9")
+      bug_reports = bug_reports.where(github_pull_request: pull_request) if pull_request.present?
       bug_reports = bug_reports.where("email ILIKE ?", "%#{EmailNormalizer.normalize(params[:search_email])}%") if params[:search_email].present?
-      @searched_membership = params[:search_membership] if MEMBERSHIP_FILTERS.key?(params[:search_membership])
-      bug_reports = filter_by_membership(bug_reports)
+      @searched_user_status = params[:search_user_status] if USER_STATUS_FILTERS.key?(params[:search_user_status])
+      bug_reports = filter_by_user_status(bug_reports)
       bug_reports = filter_by_status(bug_reports)
       bug_reports = bug_reports.text_search(params[:query]) if params[:query].present?
       bug_reports.where(created_at: @time_range)
     end
 
     # Explicit scopes rather than a dynamic key, so no user input reaches the query
-    def filter_by_membership(bug_reports)
-      case @searched_membership
+    def filter_by_user_status(bug_reports)
+      case @searched_user_status
       when "member" then bug_reports.member
       when "invoiced_organization" then bug_reports.invoiced_organization
       when "invoiced_organization_staff" then bug_reports.invoiced_organization_staff
+      when "banned" then bug_reports.sender_email_banned
+      when "not_banned" then bug_reports.sender_not_email_banned
       else bug_reports
       end
     end

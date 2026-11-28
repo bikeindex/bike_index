@@ -51,7 +51,7 @@ class Notification < ApplicationRecord
   enum :message_channel, MESSAGE_CHANNEL_ENUM
   enum :delivery_status, DELIVERY_STATUS_ENUM
 
-  belongs_to :user # RECEIVER of the notification - unless it's a stolen_notification_blocked, which is sent to admin instead
+  belongs_to :user # RECEIVER of the notification - unless it's a stolen_notification_blocked, which is sent to admin instead, or a user_sender kind, whose user sent it
   belongs_to :bike
   belongs_to :notifiable, polymorphic: true
 
@@ -65,6 +65,7 @@ class Notification < ApplicationRecord
   scope :customer_contact, -> { where(kind: customer_contact_kinds) }
   scope :theft_survey, -> { where(kind: theft_survey_kinds) }
   scope :admin, -> { where(kind: admin_kinds) }
+  scope :user_sender, -> { where(kind: user_sender_kinds) }
   scope :with_message_id, -> { where.not(message_id: nil) }
 
   class << self
@@ -115,6 +116,10 @@ class Notification < ApplicationRecord
       %w[invalid_extension_for_ascend_import].freeze
     end
 
+    def user_sender_kinds
+      %w[bug_report_reply].freeze
+    end
+
     def admin_kinds
       %w[stolen_notification_blocked marketplace_message_blocked unknown_organization_for_ascend].freeze +
         pos_integration_broken_kinds
@@ -146,6 +151,10 @@ class Notification < ApplicationRecord
         .or(where(notifiable_type: "StolenNotification", notifiable_id: StolenNotification.where(sender_id: user_id).select(:id)))
         .or(where(notifiable_type: "OrganizationMessage", notifiable_id: OrganizationMessage.where(sender_id: user_id).select(:id)))
     end
+  end
+
+  def user_sender?
+    self.class.user_sender_kinds.include?(kind)
   end
 
   def theft_alert?
@@ -196,7 +205,9 @@ class Notification < ApplicationRecord
   def sender
     return nil if self.class.sender_auto_kinds.include?(kind)
 
-    if notifiable_type == "CustomerContact"
+    if user_sender?
+      user
+    elsif notifiable_type == "CustomerContact"
       notifiable&.creator
     elsif sender_receiver_notifiable?
       notifiable&.sender
@@ -251,7 +262,7 @@ class Notification < ApplicationRecord
   end
 
   def recipient_users
-    [user].compact
+    [user_sender? ? notifiable&.user : user].compact
   end
 
   def recipient_emails
@@ -279,6 +290,8 @@ class Notification < ApplicationRecord
 
   def calculated_user_id
     return notifiable&.receiver_id if sender_receiver_notifiable?
+    # The sender, which the caller sets
+    return if user_sender?
 
     notifiable&.user_id if defined?(notifiable.user_id)
   end

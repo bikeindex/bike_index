@@ -379,6 +379,7 @@ Rails.application.routes.draw do
     resources :bug_reports, only: %i[index show update] do
       collection do
         post :assign_tags
+        post :email
         # Selection chips for the tags combobox on the show page
         post :tag_chips
       end

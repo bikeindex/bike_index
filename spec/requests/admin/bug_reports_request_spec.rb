@@ -130,19 +130,40 @@ RSpec.describe Admin::BugReportsController, type: :request do
       end
     end
 
-    context "with search_membership" do
-      let!(:bug_report_invoiced) { FactoryBot.create(:bug_report, is_invoiced_organization: true) }
+    context "with search_pull_request" do
+      let!(:bug_report_fixed) { FactoryBot.create(:bug_report, github_pull_request: 4064, status: :ignored) }
 
-      it "filters by the membership snapshot" do
+      it "filters to the reports linked to the PR" do
+        get base_url, params: {search_pull_request: "4064", search_status: "all"}
+        expect(assigns(:collection).pluck(:id)).to eq([bug_report_fixed.id])
+        expect(response.body).to include("PR: ")
+
+        get base_url, params: {search_pull_request: "#4064", search_status: "all"}
+        expect(assigns(:collection).pluck(:id)).to eq([bug_report_fixed.id])
+      end
+    end
+
+    context "with search_user_status" do
+      let!(:bug_report_invoiced) { FactoryBot.create(:bug_report, is_invoiced_organization: true) }
+      let(:email_ban) { FactoryBot.create(:email_ban) }
+      let!(:bug_report_banned) { FactoryBot.create(:bug_report, user: email_ban.user) }
+
+      it "filters by the membership snapshot and by email ban" do
         expect(bug_report.is_invoiced_organization).to be_falsey
-        get "#{base_url}.json", params: {search_membership: "invoiced_organization", search_status: "all"}
+        get "#{base_url}.json", params: {search_user_status: "invoiced_organization", search_status: "all"}
         expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_invoiced.id])
+
+        get "#{base_url}.json", params: {search_user_status: "banned", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to eq([bug_report_banned.id])
+
+        get "#{base_url}.json", params: {search_user_status: "not_banned", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to match_array([bug_report.id, bug_report_invoiced.id])
       end
 
-      it "ignores an unknown membership filter" do
+      it "ignores an unknown user status filter" do
         expect(bug_report).to be_present
-        get "#{base_url}.json", params: {search_membership: "nonsense", search_status: "all"}
-        expect(json_result["bug_reports"].map { it["id"] }).to match_array([bug_report.id, bug_report_invoiced.id])
+        get "#{base_url}.json", params: {search_user_status: "nonsense", search_status: "all"}
+        expect(json_result["bug_reports"].map { it["id"] }).to match_array([bug_report.id, bug_report_invoiced.id, bug_report_banned.id])
       end
     end
   end
@@ -153,6 +174,17 @@ RSpec.describe Admin::BugReportsController, type: :request do
       expect(response.status).to eq(200)
       expect(response).to render_template(:show)
       expect(response.body).not_to include("View the full feedback")
+      expect(response.body).not_to include(admin_notifications_path(search_bug_report_id: bug_report.id))
+    end
+
+    context "with a reply" do
+      let!(:notification) { Notification.create!(kind: :bug_report_reply, notifiable: bug_report, user: current_user, message_channel_target: bug_report.email) }
+
+      it "links to the reply's notification, naming who sent it" do
+        get "#{base_url}/#{bug_report.to_param}"
+        expect(response.body).to include(admin_notifications_path(search_bug_report_id: bug_report.id))
+        expect(response.body).to include(current_user.display_name)
+      end
     end
 
     context "from the feedback panel" do
@@ -195,6 +227,16 @@ RSpec.describe Admin::BugReportsController, type: :request do
         expect(response.status).to eq(200)
         expect(response).to render_template(:show)
         expect(response.body).to include(admin_user_path(bug_report.user_id))
+        expect(response.body).not_to include("You are messaging a banned user")
+      end
+
+      context "who is email banned" do
+        before { FactoryBot.create(:email_ban, user: bug_report.user) }
+
+        it "warns that the email won't reach them" do
+          get "#{base_url}/#{bug_report.to_param}"
+          expect(response.body).to include("You are messaging a banned user - they will not receive the message")
+        end
       end
     end
   end
@@ -251,6 +293,33 @@ RSpec.describe Admin::BugReportsController, type: :request do
       chips = Nokogiri::HTML.fragment(response.body).css("[data-hw-combobox-chip] span[class*='font-mono']")
       expect(chips.map { it.text.strip }).to eq(["search", "Not Yet Normalized"])
       expect(response.body).to include('data-hw-combobox-value-param="Not Yet Normalized"')
+    end
+  end
+
+  describe "email" do
+    let!(:bug_report_unselected) { FactoryBot.create(:bug_report) }
+
+    it "enqueues a reply to each selected bug report" do
+      Sidekiq::Job.clear_all
+      expect {
+        post "#{base_url}/email", params: {email_message: " Fixed! ", bug_reports_selected: {bug_report.id.to_s => bug_report.id}}
+      }.to change(Notification, :count).by 1
+      expect(response).to redirect_to(admin_bug_reports_path)
+      expect(flash[:success]).to be_present
+
+      notification = Notification.last
+      expect(notification).to have_attributes(kind: "bug_report_reply", notifiable: bug_report, message_channel_target: bug_report.email,
+        user_id: current_user.id)
+      expect(EmailJobs::BugReportReplyJob.jobs.map { it["args"] }).to eq([[notification.id, "Fixed!"]])
+    end
+
+    context "without a message" do
+      it "sends nothing" do
+        expect {
+          post "#{base_url}/email", params: {email_message: " ", bug_reports_selected: {bug_report.id.to_s => bug_report.id}}
+        }.not_to change(Notification, :count)
+        expect(flash[:error]).to be_present
+      end
     end
   end
 
@@ -335,6 +404,15 @@ RSpec.describe Admin::BugReportsController, type: :request do
         )
         expect(response).to redirect_to(admin_bug_reports_path)
         expect(bug_report.reload.tags).to eq(%w[parking search])
+      end
+
+      it "emails the senders" do
+        post "#{base_url}/email", params: token_param.merge(
+          email_message: "Fixed!", bug_reports_selected: {bug_report.id.to_s => bug_report.id}
+        ), as: :json
+        expect(response.status).to eq 200
+        expect(json_result).to eq("emailed_bug_report_ids" => [bug_report.id])
+        expect(EmailJobs::BugReportReplyJob.jobs.count).to eq 1
       end
     end
 

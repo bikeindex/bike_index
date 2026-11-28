@@ -963,7 +963,8 @@ CREATE TABLE public.bug_reports (
     from_name text,
     inbound_email_id bigint,
     status integer DEFAULT 0 NOT NULL,
-    receiver text
+    receiver text,
+    message_id text
 );
 
 
@@ -8306,6 +8307,7 @@ SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
 ('20261127201240'),
+('20261127170000'),
 ('20261125171521'),
 ('20261125162741'),
 ('20261125050000'),

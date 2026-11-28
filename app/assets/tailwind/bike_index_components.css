@@ -168,7 +168,7 @@
    * Both counts share the 320px floor, so both are single-column below the 672px that
    * .twfullbleed and the /twwiderow container queries read. Three columns go 3, 2+1, 1 */
   .twwiderow {
-    @apply tw:grid tw:gap-x-8;
+    @apply tw:grid tw:gap-x-8 tw:gap-y-6;
     --twwiderow-columns: 2;
     container: twwiderow / inline-size;
     grid-template-columns: repeat(auto-fill, minmax(min(100%, max(320px, calc(100% / var(--twwiderow-columns) - var(--tw-spacing) * 8))), 1fr));

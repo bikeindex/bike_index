@@ -1,0 +1,25 @@
+<% fields = capture do %>
+  <%= render(UI::Card::Component.new) do %>
+    <%= render(UI::Header::Component.new(text: title, tag: :h3, html_class: "tw:mb-3!")) %>
+
+    <%= banned_alert %>
+
+    <%= render(UI::Forms::Group::Component.new(attribute: :email_message, label_text: "Message", required: true)) do %>
+      <%= text_area_tag :email_message, nil, rows: @bug_report ? 8 : 4, required: true, form: table_form_id, disabled: table_form_id.present?,
+        class: "twinput tw:w-full", data: ({"admin--bug-report-email-target": "message"} unless @bug_report) %>
+    <% end %>
+
+    <%# formaction, since in the table's form this button isn't its default action %>
+    <%= render(UI::Button::Component.new(text: "Send email", color: :primary, type: :submit, form: table_form_id,
+      formaction: email_admin_bug_reports_path, data: {action: "form-persist#clear"})) %>
+  <% end %>
+<% end %>
+
+<% if @bug_report %>
+  <%= form_with(url: email_admin_bug_reports_path, data: card_data) do %>
+    <%= hidden_field_tag "bug_reports_selected[#{@bug_report.id}]", @bug_report.id %>
+    <%= fields %>
+  <% end %>
+<% else %>
+  <%= tag.div(fields, class: "tw:hidden tw:mb-4 tw:mx-auto tw:max-w-3xl", data: card_data) %>
+<% end %>

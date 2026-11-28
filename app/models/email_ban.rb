@@ -27,7 +27,8 @@ class EmailBan < ApplicationRecord
 
   enum :reason, REASON_ENUM
 
-  belongs_to :user
+  # Touched so the caches keyed on the user show the ban
+  belongs_to :user, touch: true
   belongs_to :user_email
 
   validates_presence_of :reason, :user_id

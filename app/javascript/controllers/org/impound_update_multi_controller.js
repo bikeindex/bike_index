@@ -25,6 +25,7 @@ export default class extends Controller {
 
   openPanel () {
     collapse('show', this.panelTarget)
+    this.panelTarget.querySelector('textarea')?.focus()
     this.element.toggleAttribute('data-table-selecting', true)
     this.refreshChecks()
     this.toggleTarget.textContent = this.openLabelValue

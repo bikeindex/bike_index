@@ -2,7 +2,7 @@
   <%= form_with(url: admin_bug_reports_path, method: :get,
     html: {class: "twsearchrow"}) do |f| %>
     <%= hidden_field_tag :search_receiver, params[:search_receiver] %>
-    <%= hidden_field_tag :search_membership, params[:search_membership] %>
+    <%= hidden_field_tag :search_user_status, params[:search_user_status] %>
     <%= hidden_field_tag :search_status, params[:search_status] %>
 
     <div class="tw:w-full tw:sm:w-72">
@@ -14,6 +14,9 @@
     <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :search_email,
       html_options: {value: params[:search_email], placeholder: "Sender email", class: "tw:w-full tw:sm:w-72"}) %>
 
+    <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :search_pull_request,
+      html_options: {value: params[:search_pull_request], placeholder: "PR #", class: "tw:w-full tw:sm:w-24"}) %>
+
     <%= render UI::Forms::Input::Component.new(form_builder: f, attribute: :query,
       html_options: {value: params[:query], placeholder: "Search subject and body", class: "tw:w-full tw:sm:w-[32rem]"}) %>
 
@@ -22,7 +25,7 @@
 <% end %>
 
 <% searched_terms = {"receiver" => @searched_receiver, "tags" => @searched_tags.join(", "), "sender email" => params[:search_email],
-  "user" => params[:user_id], "text" => params[:query]}
+  "user" => params[:user_id], "PR" => params[:search_pull_request], "text" => params[:query]}
   .filter_map { |label, value| safe_join(["#{label}: ", render(UI::Code::Inline::Component.new(text: value))]) if value.present? } %>
 
 <% count_detail = capture do %>
@@ -34,7 +37,7 @@
   collection: @collection,
   viewing: controller_name.humanize,
   admin_search_form:, count_detail:,
-  table_view: render(Pages::Admin::BugReportsTable::Component.new(collection: @collection, searchable_tags:, sort_state:, render_sortable: true)),
+  table_view: render(Pages::Admin::BugReports::Table::Component.new(collection: @collection, searchable_tags:, sort_state:, render_sortable: true)),
   chart_collection: @render_chart && matching_bug_reports,
 )) do |skeleton| %>
   <% skeleton.with_nav_item do %>
@@ -53,14 +56,15 @@
 
   <% skeleton.with_nav_item do %>
     <%= render(UI::Dropdown::Component.new(
-      name: @searched_membership.present? ? membership_filters[@searched_membership] : "All membership status",
+      name: @searched_user_status.present? ? user_status_filters[@searched_user_status] : "All user status",
       button_size: :sm,
-      active: @searched_membership.present?
+      active: @searched_user_status.present?
     )) do |dropdown|
-      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All membership status", path: url_for(sortable_search_params.merge(search_membership: nil)), match_params: {search_membership: nil}) }
+      dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: "All user status", path: url_for(sortable_search_params.merge(search_user_status: nil)), match_params: {search_user_status: nil}) }
       dropdown.with_entry_divider
-      membership_filters.each do |value, label|
-        dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: label, path: url_for(sortable_search_params.merge(search_membership: value)), match_params: {search_membership: value}) }
+      user_status_filters.each do |value, label|
+        dropdown.with_entry_divider if value == "banned"
+        dropdown.with_entry_item { render UI::ActiveLink::Component.new(text: label, path: url_for(sortable_search_params.merge(search_user_status: value)), match_params: {search_user_status: value}) }
       end
     end %>
   <% end %>
