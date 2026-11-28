@@ -13,9 +13,12 @@ RSpec.describe "Admin news", :js, type: :system do
   end
 
   # The tags multiselect is required, which the browser enforces only while nothing is picked
-  it "requires a tag, and saves the ones picked" do
+  it "keeps a body draft across a reload, requires a tag, and saves both" do
     visit "/admin/news/#{blog.to_param}/edit"
-    expect(page).to have_css('#blog_content_tag_names[aria-expanded="false"]', wait: 10)
+    fill_in "blog_body", with: "A draft that outlived the tab"
+    refresh
+    expect(page).to have_field("blog_body", with: "A draft that outlived the tab", wait: 10)
+    expect(page).to have_css('#blog_content_tag_names[aria-expanded="false"]')
 
     click_button "Save"
     expect(find_field("blog_content_tag_names")[:validationMessage]).to be_present
@@ -33,7 +36,8 @@ RSpec.describe "Admin news", :js, type: :system do
     send_keys(:escape)
 
     click_button "Save"
-    expect(page).to have_css("[data-hw-combobox-chip]", text: "Theft prevention", wait: 10)
-    expect(blog.reload.content_tag_names).to eq(["Theft prevention"])
+    expect(page).to have_content("Blog saved", wait: 10)
+    expect(page).to have_css("[data-hw-combobox-chip]", text: "Theft prevention")
+    expect(blog.reload).to have_attributes(content_tag_names: ["Theft prevention"], body: "A draft that outlived the tab")
   end
 end

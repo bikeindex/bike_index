@@ -16,7 +16,8 @@
 
 
 - url = {action: "update", controller: "news"}
-= form_for [:admin, @blog], :url => url do |f|
+- persist_data = {controller: "form-persist", form_persist_version_value: @blog.cache_key_with_version, action: "submit->form-persist#clear"}
+= form_for [:admin, @blog], url:, html: {data: (persist_data unless @blog.is_listicle)} do |f|
   = render(UI::Alerts::ObjectError::Component.new(object: @blog))
 
   - if @blog.is_listicle
